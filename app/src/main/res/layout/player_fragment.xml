@@ -99,12 +99,12 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.mhrsdev.musicplayer.ui.player.PlayerArtworkView
+            <com.mhrsdev.musicplayer.ui.widget.ArtworkView
                 android:id="@+id/player_artwork"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_margin="12dp"
+                android:elevation="18dp"
                 android:importantForAccessibility="no" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -211,12 +211,12 @@
         </LinearLayout>
 
         <!-- Seek (always LTR, tape direction) -->
-        <com.mhrsdev.musicplayer.ui.player.PlayerSeekBar
-            android:id="@+id/player_seek"
+        <FrameLayout
+            android:id="@+id/player_seek_container"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
-            android:contentDescription="@string/player_seek" />
+            android:layoutDirection="ltr" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -260,7 +260,7 @@
                 android:contentDescription="@string/player_previous"
                 android:src="@drawable/player_ic_prev" />
 
-            <com.mhrsdev.musicplayer.ui.player.PlayPauseButton
+            <com.mhrsdev.musicplayer.ui.widget.MorphPlayPauseView
                 android:id="@+id/player_play"
                 android:layout_width="104dp"
                 android:layout_height="104dp"

@@ -39,6 +39,11 @@ import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsAdapter;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsScrollPolicy;
 import com.mhrsdev.musicplayer.ui.queue.QueueSheetFragment;
+import com.mhrsdev.musicplayer.ui.widget.BarsSeekView;
+import com.mhrsdev.musicplayer.ui.widget.BaseSeekView;
+import com.mhrsdev.musicplayer.ui.widget.SeekBarView;
+import com.mhrsdev.musicplayer.ui.widget.WaveformSeekView;
+import com.mhrsdev.musicplayer.ui.widget.WavySeekView;
 
 import java.util.Locale;
 
@@ -53,7 +58,11 @@ public final class PlayerFragment extends Fragment {
     public static final String PREFS = "settings";
     public static final String KEY_SEEK_STYLE = "seek_bar_style";
 
+    /** Seek-bar styles (D4): Wavy default, Waveform, Bars (voice-memo). */
+    public enum SeekStyle { WAVY, WAVEFORM, BARS }
+
     private PlayerFragmentBinding b;
+    private BaseSeekView seek;
     private PlayerViewModel vm;
     private LyricsAdapter lyricsAdapter;
     private final LyricsScrollPolicy scrollPolicy = new LyricsScrollPolicy();
@@ -81,7 +90,20 @@ public final class PlayerFragment extends Fragment {
             return insets;
         });
 
-        b.playerSeek.setStyle(readSeekStyle(requireContext()));
+        seek = createSeekView(readSeekStyle(requireContext()));
+        b.playerSeekContainer.addView(seek, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        seek.setContentDescription(getString(R.string.player_seek));
+        b.playerArtwork.setCornerRadiusDp(32);
+        b.playerStage.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
+            int size = Math.min(r - l, bt - t) - dp(16);
+            ViewGroup.LayoutParams lp = b.playerArtwork.getLayoutParams();
+            if (size > 0 && lp.width != size) {
+                lp.width = size;
+                lp.height = size;
+                v.post(() -> { if (b != null) b.playerArtwork.setLayoutParams(lp); });
+            }
+        });
         setupControls();
         setupLyrics();
         setupSwipeToCollapse();
@@ -89,7 +111,7 @@ public final class PlayerFragment extends Fragment {
         vm.getState().observe(getViewLifecycleOwner(), this::render);
         vm.getCurrentTrack().observe(getViewLifecycleOwner(), this::renderTrack);
         vm.getLiked().observe(getViewLifecycleOwner(), this::renderLiked);
-        vm.getWaveform().observe(getViewLifecycleOwner(), b.playerSeek::setWaveform);
+        vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
         vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
@@ -97,12 +119,21 @@ public final class PlayerFragment extends Fragment {
         if (savedInstanceState == null && PlayerPalette.motionAllowed(requireContext())) playEnterTransition();
     }
 
-    static PlayerSeekBar.Style readSeekStyle(Context ctx) {
+    static SeekStyle readSeekStyle(Context ctx) {
         SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         try {
-            return PlayerSeekBar.Style.valueOf(p.getString(KEY_SEEK_STYLE, "WAVY"));
-        } catch (IllegalArgumentException e) {
-            return PlayerSeekBar.Style.WAVY;
+            return SeekStyle.valueOf(p.getString(KEY_SEEK_STYLE, "WAVY"));
+        } catch (IllegalArgumentException | ClassCastException e) {
+            return SeekStyle.WAVY;
+        }
+    }
+
+    private BaseSeekView createSeekView(SeekStyle style) {
+        Context c = requireContext();
+        switch (style) {
+            case WAVEFORM: return new WaveformSeekView(c);
+            case BARS: return new BarsSeekView(c);
+            default: return new WavySeekView(c);
         }
     }
 
@@ -136,17 +167,13 @@ public final class PlayerFragment extends Fragment {
         });
         b.playerLyricsToggle.setOnClickListener(v -> vm.toggleLyrics());
         b.playerQueue.setOnClickListener(v -> QueueSheetFragment.show(getParentFragmentManager()));
-        b.playerSeek.setListener(new PlayerSeekBar.Listener() {
-            @Override public void onScrub(float f) {
-                scrubbing = true;
-                PlaybackState s = vm.getState().getValue();
-                if (s != null) renderTimes((long) (f * s.durationMs()), s.durationMs());
-            }
-            @Override public void onSeek(float f) {
+        seek.setOnSeekListener(new SeekBarView.OnSeekListener() {
+            @Override public void onSeekStart(long pos) { scrubbing = true; }
+            @Override public void onSeek(long pos) { renderTimes(pos, seek.getDuration()); }
+            @Override public void onSeekEnd(long pos) {
                 scrubbing = false;
-                vm.seekToFraction(f);
+                vm.seekTo(pos);
             }
-            @Override public void onStep(int direction) { vm.seekBy(direction * 10_000L); }
         });
     }
 
@@ -209,10 +236,13 @@ public final class PlayerFragment extends Fragment {
     private void render(@Nullable PlaybackState s) {
         if (s == null) s = PlaybackState.empty();
         b.playerPlay.setPlaying(s.playing(), true);
-        b.playerSeek.setPlaying(s.playing());
-        b.playerSeek.setDuration(s.durationMs());
-        if (!scrubbing) {
-            b.playerSeek.setProgress(PlayerFormat.fraction(s.positionMs(), s.durationMs()));
+        b.playerPlay.setBuffering(s.buffering());
+        b.playerPlay.setContentDescription(getString(s.playing() ? R.string.player_pause : R.string.player_play));
+        seek.setPlaying(s.playing());
+        seek.setDuration(s.durationMs());
+        seek.setBuffered(s.durationMs());
+        if (!scrubbing && !seek.isDragging()) {
+            seek.setPosition(s.positionMs());
             renderTimes(s.positionMs(), s.durationMs());
         }
         b.playerNext.setEnabled(s.hasNext() || s.repeatMode() == RepeatMode.ALL);
@@ -255,9 +285,9 @@ public final class PlayerFragment extends Fragment {
         paletteTrackId = t.id();
         palette = PlayerPalette.forSeed(t.placeholderSeed());
         b.playerBackdrop.setPalette(palette, changed);
-        b.playerArtwork.setPalette(palette);
+        b.playerArtwork.bind(t);
         b.playerPlay.setColors(palette.primary, palette.onPrimary);
-        b.playerSeek.setColor(palette.primary);
+        seek.setColors(palette.primary, 0x47FFFFFF);
         b.playerLike.setImageTintList(ColorStateList.valueOf(palette.primary));
         if (changed && PlayerPalette.motionAllowed(requireContext())) {
             View art = b.playerArtwork;
@@ -354,6 +384,7 @@ public final class PlayerFragment extends Fragment {
     @Override public void onDestroyView() {
         b.lyricsList.removeCallbacks(resumeAutoScroll);
         b = null;
+        seek = null;
         super.onDestroyView();
     }
 }

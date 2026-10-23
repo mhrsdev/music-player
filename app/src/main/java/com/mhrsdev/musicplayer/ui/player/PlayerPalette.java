@@ -1,8 +1,6 @@
 package com.mhrsdev.musicplayer.ui.player;
 
 import android.content.Context;
-import android.os.PowerManager;
-import android.provider.Settings;
 
 import androidx.core.graphics.ColorUtils;
 
@@ -28,10 +26,8 @@ public final class PlayerPalette {
         return new PlayerPalette(hue);
     }
 
-    /** False under reduce-motion (animator scale 0) or battery saver: static wave, no rotation, no backdrop drift. */
+    /** False under reduce-motion (system or app setting) or battery saver: static frames, no rotation/drift. */
     public static boolean motionAllowed(Context c) {
-        float scale = Settings.Global.getFloat(c.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
-        PowerManager pm = (PowerManager) c.getSystemService(Context.POWER_SERVICE);
-        return scale > 0f && (pm == null || !pm.isPowerSaveMode());
+        return com.mhrsdev.musicplayer.ui.theme.MotionPolicy.decorativeMotionEnabled(c);
     }
 }
