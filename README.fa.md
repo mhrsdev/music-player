@@ -19,19 +19,25 @@
 
 ## صفحه‌ها
 
-رندرهای واقعی که از خود کد برنامه تولید شده‌اند (Robolectric، پوشهٔ `docs/screens/`):
+رندرهای واقعی که از خود کد برنامه روی داده‌های نمونه تولید شده‌اند (Robolectric، پوشهٔ `docs/screens/`؛ نه از روی دستگاه):
 
 <div dir="ltr">
 
-| Home | Home (فارسی، RTL) | Library | Search |
-|---|---|---|---|
-| ![Home](docs/screens/p1-home-dark.png) | ![Home fa](docs/screens/p1-home-fa-dark.png) | ![Library](docs/screens/p1-library-dark.png) | ![Search](docs/screens/p1-search-dark.png) |
-
-| Home light | Widgets dark | Widgets light |
+| Home | Home (فارسی، RTL) | Home (light) |
 |---|---|---|
-| ![Home light](docs/screens/p1-home-light.png) | ![Widgets dark](docs/screens/t2-widget-gallery-dark.png) | ![Widgets light](docs/screens/t2-widget-gallery-light.png) |
+| ![Home](docs/screens/p3-home-dark.png) | ![Home fa](docs/screens/p3-home-fa-dark.png) | ![Home light](docs/screens/p3-home-light.png) |
+
+| Library | Artists | Search |
+|---|---|---|
+| ![Library](docs/screens/p3-library-dark.png) | ![Artists](docs/screens/p3-artists-dark.png) | ![Search](docs/screens/p3-search-dark.png) |
+
+| Player dark | Player light | Widget gallery |
+|---|---|---|
+| ![Player dark](docs/screens/p2-player-dark.png) | ![Player light](docs/screens/p2-player-light.png) | ![Widgets dark](docs/screens/t2-widget-gallery-dark.png) |
 
 </div>
+
+دو رندر Player **بدون آهنگ بارگذاری‌شده** هستند (عنوان خالی، دکمه‌های غیرفعال)؛ به همین دلیل نمای lyrics نشان داده نشده است. برای پلیر کامل، mockupهای زیر را ببینید.
 
 طرح هدف (mockup مرورگری در `docs/design/`؛ پیاده‌سازی از آن پیروی می‌کند ولی پیکسل‌به‌پیکسل یکسان نیست):
 
@@ -49,19 +55,22 @@
 
 پیاده‌سازی‌شده (کد موجود است و در جاهایی که ذکر شده با unit test پوشش داده شده):
 
-- **کتابخانه (Library)** - اسکن افزایشی MediaStore به SQLite؛ آهنگ‌ها، آلبوم‌ها، هنرمندان، پلی‌لیست‌ها، لایک‌ها، تاریخچه و تعداد پخش.
-- **صفحهٔ Home** بر پایهٔ کتابخانه و تاریخچهٔ پخش خودتان (quick picks، آلبوم‌ها، پلی‌لیست‌ها - مرتب‌شده بر اساس پخش‌های شما).
+- **کتابخانه (Library)** - اسکن افزایشی MediaStore به SQLite (در اولین اجرا هم بلافاصله پس از دادن مجوز)؛ آهنگ‌ها، آلبوم‌ها، هنرمندان، پلی‌لیست‌ها، لایک‌ها، تاریخچه و تعداد پخش. صفحهٔ اصلی Library با کولاژ محو لایک‌ها، شبکهٔ ۲×۲ و skeleton هنگام بارگذاری.
+- **صفحهٔ Home** (hero carousel، skeleton loading) بر پایهٔ کتابخانه و تاریخچهٔ پخش خودتان (quick picks، آلبوم‌ها، پلی‌لیست‌ها - مرتب‌شده بر اساس پخش‌های شما).
 - **جستجو** در آهنگ، آلبوم، هنرمند و پلی‌لیست با فیلتر.
 - **پخش** - Media3 ExoPlayer داخل یک foreground `MediaSessionService`: نوتیفیکیشن، کنترل lock screen / بلوتوث / هدست، audio focus، توقف با جداشدن هدفون.
+- **افزودن به پلی‌لیست** - از منوی آهنگ و منوی پلیر: انتخاب پلی‌لیست موجود یا ساخت پلی‌لیست جدید.
 - **صف (Queue)** - پخش بعدی، افزودن به صف، جابه‌جایی با drag، حذف با swipe و Undo، shuffle با Undo، تکرار خاموش / همه / یکی، بازیابی صف و موقعیت پس از راه‌اندازی مجدد.
 - **Sleep timer** - N دقیقه (با fade-out) یا پایان آهنگ؛ مقدار پیش‌فرض قابل تنظیم است.
-- **متن آهنگ (Lyrics)** - تگ‌های embedded (ID3 / FLAC / MP4)، فایل کناری `.lrc` / `.txt`، سپس جستجوی آنلاینِ اختیاری در [LRCLIB](https://lrclib.net) (کلید در Settings). خطوط همگام هایلایت می‌شوند و با لمس seek می‌کنند؛ نتایج (و نتیجهٔ «پیدا نشد») cache می‌شوند.
+- **متن آهنگ (Lyrics)** - تگ‌های embedded (ID3 / FLAC / MP4)، فایل کناری `.lrc` / `.txt`، سپس جستجوی آنلاینِ اختیاری در [LRCLIB](https://lrclib.net) (کلید در Settings). خطوط همگام هایلایت می‌شوند و با لمس seek می‌کنند؛ نتایج (و نتیجهٔ «پیدا نشد») cache می‌شوند. هنگام آفلاین بودن، چیپ Retry نشان داده می‌شود.
 - **سبک‌های seek bar** (در Settings): *Wavy* (پیش‌فرض)، *Waveform* و *Bars*؛ دادهٔ waveform پوشش بلندی واقعی صداست که روی خود دستگاه و به‌صورت lazy استخراج و cache می‌شود.
+- **پلیر** - پلیر روشن و تیره با کنترل کنتراست روی accent مشتق از کاور، چیپ مسیر خروجی (This phone / بلوتوث / ...) و انیمیشن «پرواز کاور» بین mini-player و پلیر کامل.
+- **مجوز نوتیفیکیشن** در اولین پخش درخواست می‌شود (اندروید ۱۳+).
 - **تم‌ها** - سیستم / روشن / تیره / مشکی، رنگ‌گیری اختیاری از کاور، accent با کنترل کنتراست.
-- **فارسی و RTL** - ترجمهٔ کامل `fa`، فونت Vazirmatn برای فارسی، layout آینه‌ای؛ seek barها و دکمه‌های پخش LTR می‌مانند. زبان در Settings قابل تغییر است.
+- **فارسی و RTL** - ترجمهٔ کامل `fa`، فونت Vazirmatn برای فارسی (انتخاب فونت بر اساس خط، پس متن مخلوط فارسی/لاتین فونت درست می‌گیرد)، layout آینه‌ای؛ seek barها و دکمه‌های پخش LTR می‌مانند. زبان در Settings قابل تغییر است.
 - **Battery saver** - تنظیم (Auto / On / Off) که حرکت، blur و grain را خاموش می‌کند؛ تنظیم reduce-motion سیستم را هم رعایت می‌کند.
 
-هنوز نیست (برنامه‌ریزی‌شده، در v0.1.0 نیست): equalizer، ویجت صفحهٔ اصلی، Android Auto، ساخت پلی‌لیست / افزودن به پلی‌لیست از داخل UI (لایهٔ data آماده است)، انتخاب پوشهٔ موزیک (ردیف UI فقط نمایشی است)، ویرایش تگ، crossfade، کاتالوگ آنلاین.
+هنوز نیست (برنامه‌ریزی‌شده، در v0.1.0 نیست): equalizer، ویجت صفحهٔ اصلی، Android Auto، UI تغییر نام / حذف پلی‌لیست و حذف آهنگ از آن، دکمهٔ rescan، انتخاب پوشهٔ موزیک (ردیف UI فقط نمایشی است)، ویرایش تگ، crossfade، کاتالوگ آنلاین.
 
 ## نصب
 
@@ -207,12 +216,12 @@ docs/                              ARCHITECTURE, DESIGN, STATUS, screenshots, de
 - APK نسخهٔ release با کلید debug امضا شده (بخش «نصب»)؛ آپدیت خودکار ندارد.
 - متن‌های فارسی را فارسی‌زبان بومی بازبینی نکرده است.
 - در دسترس بودن LRCLIB دست ما نیست (هنگام توسعه گاهی 503 داده است).
-- هنوز نمی‌توان از UI پلی‌لیست ساخت یا آهنگ اضافه کرد؛ ردیف پوشه‌ها در Settings فقط نمایشی است.
+- UI تغییر نام / حذف پلی‌لیست و حذف آهنگ از آن، دکمهٔ rescan و انتخاب پوشه هنوز وجود ندارد (ردیف پوشه‌ها در Settings فقط نمایشی است).
 - کاتالوگ آنلاین یا streaming وجود ندارد: برنامه فقط فایل‌های روی دستگاه را پخش می‌کند.
 
 ## نقشهٔ راه (Roadmap)
 
-برنامه‌ریزی‌شده، هنوز پیاده‌سازی نشده: equalizer، ویجت صفحهٔ اصلی، Android Auto، افزودن به پلی‌لیست و ویرایش پلی‌لیست در UI، انتخاب پوشهٔ موزیک، layout تبلت / landscape، crossfade، ویرایش تگ، release با keystore واقعی، مجموعه تست روی دستگاه، audit باتری.
+برنامه‌ریزی‌شده، هنوز پیاده‌سازی نشده: equalizer، ویجت صفحهٔ اصلی، Android Auto، ویرایش پلی‌لیست در UI (تغییر نام / حذف)، دکمهٔ rescan، انتخاب پوشهٔ موزیک، layout تبلت / landscape، crossfade، ویرایش تگ، release با keystore واقعی، مجموعه تست روی دستگاه، audit باتری.
 
 ## مجوز (License)
 

@@ -14,17 +14,22 @@ three seek-bar styles and first-class Persian / RTL support.
 
 ## Screens
 
-Real renders produced by the app code (Robolectric, from `docs/screens/`):
+Real renders produced by the app code on sample data (Robolectric, from `docs/screens/`; not from a device):
 
-| Home | Home (Persian, RTL) | Library | Search |
-|---|---|---|---|
-| ![Home](docs/screens/p1-home-dark.png) | ![Home fa](docs/screens/p1-home-fa-dark.png) | ![Library](docs/screens/p1-library-dark.png) | ![Search](docs/screens/p1-search-dark.png) |
-
-Light theme and widget gallery (seek bars, buttons, chips):
-
-| Home light | Widgets dark | Widgets light |
+| Home | Home (Persian, RTL) | Home (light) |
 |---|---|---|
-| ![Home light](docs/screens/p1-home-light.png) | ![Widgets dark](docs/screens/t2-widget-gallery-dark.png) | ![Widgets light](docs/screens/t2-widget-gallery-light.png) |
+| ![Home](docs/screens/p3-home-dark.png) | ![Home fa](docs/screens/p3-home-fa-dark.png) | ![Home light](docs/screens/p3-home-light.png) |
+
+| Library | Artists | Search |
+|---|---|---|
+| ![Library](docs/screens/p3-library-dark.png) | ![Artists](docs/screens/p3-artists-dark.png) | ![Search](docs/screens/p3-search-dark.png) |
+
+Player (dark / light). These two renders have **no track loaded** (empty title, disabled transport buttons); the lyrics view
+is not shown for the same reason. For a populated player see the design mockups below.
+
+| Player dark | Player light | Widget gallery |
+|---|---|---|
+| ![Player dark](docs/screens/p2-player-dark.png) | ![Player light](docs/screens/p2-player-light.png) | ![Widgets dark](docs/screens/t2-widget-gallery-dark.png) |
 
 Design target (browser mockups, `docs/design/`; the implementation follows them but is not pixel-identical):
 
@@ -38,25 +43,29 @@ Design target (browser mockups, `docs/design/`; the implementation follows them 
 
 Implemented (code exists and is covered by unit tests where noted):
 
-- **Library** - incremental MediaStore scan into SQLite; songs, albums, artists, playlists, liked songs, history, play counts.
-- **Home feed** built from your own library and listening history (quick picks, albums, playlists - ranked by your plays).
+- **Library** - incremental MediaStore scan into SQLite (also on first run right after the permission is granted); songs, albums, artists, playlists, liked songs, history, play counts. Hub with a blurred liked-songs collage and a 2x2 grid, skeleton loading states.
+- **Home feed** (hero carousel, skeleton loading) built from your own library and listening history (quick picks, albums, playlists - ranked by your plays).
 - **Search** across songs, albums, artists and playlists with filters.
 - **Playback** - Media3 ExoPlayer in a foreground `MediaSessionService`: notification, lock-screen / Bluetooth / headset buttons,
   audio focus, pause on headphones unplug.
+- **Add to playlist** - from the track menu and the player menu: pick an existing playlist or create a new one.
 - **Queue** - play next, add to queue, drag to reorder, swipe to remove with undo, shuffle with undo, repeat off / all / one,
   queue and position restored after a restart.
 - **Sleep timer** - N minutes (with fade-out) or end of track; default configurable.
 - **Lyrics** - embedded tags (ID3 / FLAC / MP4), sidecar `.lrc` / `.txt`, then optional online lookup on
-  [LRCLIB](https://lrclib.net) (toggle in Settings). Synced lines highlight and tap-to-seek; results (and misses) are cached.
+  [LRCLIB](https://lrclib.net) (toggle in Settings). Synced lines highlight and tap-to-seek; results (and misses) are cached. When offline, a Retry chip appears.
 - **Seek-bar styles** (Settings): *Wavy* (default), *Waveform* and *Bars*; waveform data is the real loudness envelope, extracted
   lazily on-device and cached.
+- **Player** - light and dark player with a contrast guard on the cover-derived accent, an output-route chip (This phone / Bluetooth / ...),
+  and a cover flight transition between mini-player and full player.
+- **Notification permission** is requested on the first play (Android 13+).
 - **Themes** - system / light / dark / black, optional colors from the cover art, contrast-guarded accent.
-- **Persian & RTL** - full `fa` translation, Vazirmatn font for Persian, mirrored layouts; seek bars and transport buttons stay LTR.
+- **Persian & RTL** - full `fa` translation, Vazirmatn font for Persian (chosen per script, so mixed Persian/Latin text uses the right font), mirrored layouts; seek bars and transport buttons stay LTR.
   Language can be switched in Settings.
 - **Battery saver** - setting (Auto / On / Off) that disables motion, blur and grain; also honours the system reduce-motion setting.
 
-Not yet (planned, not in v0.1.0): equalizer, home-screen widget, Android Auto, creating playlists / add-to-playlist from the UI
-(data layer exists), music-folder picker (UI row is display-only), tag editor, crossfade, online catalog.
+Not yet (planned, not in v0.1.0): equalizer, home-screen widget, Android Auto, rename / delete / remove-from-playlist UI,
+rescan button, music-folder picker (UI row is display-only), tag editor, crossfade, online catalog.
 
 ## Install
 
@@ -203,12 +212,12 @@ in query classes), clean packages, Gradle 9.0.0. Battery and RAM use are hard re
 - The release APK is debug-signed (see Install); no automatic updates.
 - Persian copy has not been reviewed by a native speaker.
 - LRCLIB availability is outside our control (it returned occasional 503s during development).
-- Playlists cannot yet be created / filled from the UI; the folder row in Settings is display-only.
+- Playlist rename / delete / remove-track UI, a rescan button and the folder picker do not exist yet (the folder row in Settings is display-only).
 - No online catalog or streaming: the app plays files on the device only.
 
 ## Roadmap
 
-Planned, not implemented: equalizer, home-screen widget, Android Auto, add-to-playlist and playlist editing in the UI, music-folder
+Planned, not implemented: equalizer, home-screen widget, Android Auto, playlist editing in the UI (rename / delete / remove), rescan button, music-folder
 picker, tablet / landscape layouts, crossfade, tag editing, signed releases with a real keystore, on-device test suite, battery audit.
 
 ## License
