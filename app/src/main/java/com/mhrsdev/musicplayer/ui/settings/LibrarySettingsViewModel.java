@@ -49,6 +49,18 @@ public final class LibrarySettingsViewModel extends ViewModel {
     /** Result of the last scan started here; null until one finished. */
     public LiveData<ScanResult> getLastResult() { return lastResult; }
 
+    /** Chip choices for "Skip short audio", seconds (0 = keep everything). */
+    public static final int[] MIN_LENGTH_CHOICES = {0, 10, 30, 60};
+
+    public LiveData<Integer> getMinTrackSeconds() { return settings.minTrackSeconds(); }
+
+    public void setMinTrackSeconds(int seconds) {
+        Integer now = settings.minTrackSeconds().getValue();
+        if (now != null && now == seconds) return;
+        settings.setMinTrackSeconds(seconds);
+        rescan();
+    }
+
     public void rescan() {
         if (Boolean.TRUE.equals(admin.isScanning().getValue())) return;
         admin.rescan(lastResult::setValue);
