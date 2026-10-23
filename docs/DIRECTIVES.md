@@ -419,3 +419,14 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > پس چنتا نوار جدیدم بساز
 
 **Summary:** (1) generated covers must match the reference beauty (G1 done, sheet shown); (2) logo = bilingual Latin M + Persian م (A: M2 recommended, awaiting owner's final pick); (3) headset buttons broken → O1; (4) v0.2.0 laggier than v0.1.0 on friend's phone → **optimise consumption, do NOT remove effects; cut redundant simultaneous work** → E; (5) the One UI media-card seek bar (system-drawn, from the MediaSession) cannot be restyled by apps on Android 13+ — explained to the owner; he answered "then create several NEW bars" → **B2: 5-6 new in-app seek-bar styles + a style picker with live previews in Settings > Playback**.
+
+---
+
+## D25 — 2026-10-24 — Lyrics junk bug; "where do lyrics come from?" (friend's question)
+
+**Original (verbatim):**
+
+> دریافت متنشم هنو خوب نیس  (screenshot: lyrics view showing only "RozMusic.com")
+> جواب سوالش؟  (screenshot: friends' group asking "لیریک رو از کجا میاره؟")
+
+**Summary:** (1) Tags containing only a site watermark/advert must not count as lyrics -> L2 (junk filter + query normaliser + empty states with Retry / Add file / Search manually). (2) Owner needed an answer for his friends: lyrics resolve in order sidecar `.lrc`/`.elrc`/`.json` next to the audio -> embedded tags (ID3 USLT/SYLT, FLAC Vorbis, M4A ©lyr) -> LRCLIB (lrclib.net, free, no key), cached in the app DB. Answered in chat.
