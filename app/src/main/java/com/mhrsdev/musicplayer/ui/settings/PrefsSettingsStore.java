@@ -34,7 +34,7 @@ public final class PrefsSettingsStore implements SettingsStore {
 
     @Override public void setSeekStyle(SeekStyle s) { data.setSeekBarStyle(SeekBarStyle.valueOf(s.name())); }
 
-    @Override public String getLanguage() { return data.language().getValue(); }
+    @Override public String getLanguage() { return ThemeApplier.currentLanguage(); }
 
     @Override public void setLanguage(String tag) { data.setLanguage(tag); }
 

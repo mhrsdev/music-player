@@ -1,6 +1,8 @@
 package com.mhrsdev.musicplayer.di;
 
 import android.content.Context;
+import com.mhrsdev.musicplayer.BuildConfig;
+import com.mhrsdev.musicplayer.data.backup.SqliteBackupService;
 import com.mhrsdev.musicplayer.data.db.DbHelper;
 import com.mhrsdev.musicplayer.data.repository.ChangeNotifier;
 import com.mhrsdev.musicplayer.data.repository.LocalHomeFeedSource;
@@ -28,19 +30,26 @@ public final class DataModule {
     /** Persistent waveform cache, ready to hand to {@code WaveformModule} (blocking calls, background thread). */
     public final SqliteWaveformStore waveformStore;
 
-    private DataModule(Context context, Executor io, SettingsStore settings) {
+    /** User-data export / import over the same database and settings. */
+    public final SqliteBackupService backup;
+
+    private DataModule(Context context, Executor io, Executor scanIo, SettingsStore settings) {
         dbHelper = new DbHelper(context);
         this.settings = settings;
         scanner = new MediaStoreScanner(context, dbHelper, settings);
         ChangeNotifier notifier = new ChangeNotifier();
-        library = new SqliteLibraryRepository(dbHelper, io, notifier, scanner);
+        library = new SqliteLibraryRepository(dbHelper, io, scanIo, notifier, scanner);
         homeFeed = new LocalHomeFeedSource(dbHelper, io, notifier);
         browser = new SqliteLibraryBrowser(dbHelper, io, notifier, context.getContentResolver());
         waveformStore = new SqliteWaveformStore(dbHelper);
+        backup = new SqliteBackupService(dbHelper, io, notifier, settings, BuildConfig.VERSION_NAME, System::currentTimeMillis);
     }
 
-    /** @param settings shared with the rest of the app (the scanner reads the folder filters from it) */
-    public static DataModule create(Context context, Executor io, SettingsStore settings) {
-        return new DataModule(context, io, settings);
+    /**
+     * @param scanIo single-thread executor reserved for library scans (keeps {@code io} free for reads)
+     * @param settings shared with the rest of the app (the scanner reads the folder filters from it)
+     */
+    public static DataModule create(Context context, Executor io, Executor scanIo, SettingsStore settings) {
+        return new DataModule(context, io, scanIo, settings);
     }
 }

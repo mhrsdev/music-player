@@ -25,4 +25,10 @@ public final class ShapeMath {
         float a = squircle(t), b = cookie(t);
         return a + (b - a) * m;
     }
+
+    /** Like {@link #radius} but only the cookie is rotated by {@code rot}; result never exceeds the unit square. */
+    public static float radiusRotated(double t, double rot, float m) {
+        float a = squircle(t), b = cookie(t - rot);
+        return a + (b - a) * m;
+    }
 }

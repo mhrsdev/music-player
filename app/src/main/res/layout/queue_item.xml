@@ -50,7 +50,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textAlignment="viewStart"
-                android:textColor="#E2E2E9"
+                android:textColor="?attr/mpOnSurface"
                 android:textDirection="anyRtl"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -62,7 +62,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textAlignment="viewStart"
-                android:textColor="#BFC6D2"
+                android:textColor="?attr/mpOnSurfaceVariant"
                 android:textDirection="anyRtl"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:fontFeatureSettings="tnum"
-            android:textColor="#BFC6D2"
+            android:textColor="?attr/mpOnSurfaceVariant"
             android:textSize="14sp" />
 
         <ImageView
@@ -83,6 +83,6 @@
             android:scaleType="center"
             android:importantForAccessibility="no"
             android:src="@drawable/queue_ic_drag"
-            app:tint="#BFC6D2" />
+            app:tint="?attr/mpOnSurfaceVariant" />
     </LinearLayout>
 </FrameLayout>

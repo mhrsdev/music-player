@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 4x1 bar. Only RemoteViews-safe widgets; colors are the lapis defaults, overridden at runtime (ImageView.setColorFilter). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UseAppTint"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg"
+        android:tint="@color/widget_default_bg" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <FrameLayout
+            android:id="@+id/cover_frame"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:contentDescription="@string/widget_cd_open">
+            <ImageView android:id="@+id/cover_bg" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:scaleType="fitXY" android:src="@drawable/widget_cover_bg" android:tint="@color/widget_default_cover" />
+            <ImageView android:id="@+id/cover_note" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:padding="14dp" android:src="@drawable/widget_ic_note" android:tint="@color/widget_default_note" />
+            <ImageView android:id="@+id/cover" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:scaleType="fitXY" android:visibility="gone" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/text_block"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:text="@string/widget_preview_title" android:textAlignment="viewStart" android:textColor="@color/widget_default_text" android:textSize="15sp" android:textStyle="bold" />
+            <TextView android:id="@+id/artist" android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="end" android:maxLines="1" android:text="@string/widget_preview_artist" android:textAlignment="viewStart" android:textColor="@color/widget_default_text" android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layoutDirection="ltr"
+            android:orientation="horizontal">
+            <ImageView android:id="@+id/prev" android:layout_width="38dp" android:layout_height="38dp" android:contentDescription="@string/widget_cd_previous" android:padding="7dp" android:src="@drawable/widget_ic_prev" android:tint="@color/widget_default_text" />
+            <FrameLayout android:id="@+id/play_frame" android:layout_width="44dp" android:layout_height="44dp" android:contentDescription="@string/widget_cd_play">
+                <ImageView android:id="@+id/play_bg" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:src="@drawable/widget_oval" android:tint="@color/widget_default_primary" />
+                <ImageView android:id="@+id/play" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:padding="10dp" android:src="@drawable/widget_ic_play" android:tint="@color/widget_default_on_primary" />
+            </FrameLayout>
+            <ImageView android:id="@+id/next" android:layout_width="38dp" android:layout_height="38dp" android:contentDescription="@string/widget_cd_next" android:padding="7dp" android:src="@drawable/widget_ic_next" android:tint="@color/widget_default_text" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

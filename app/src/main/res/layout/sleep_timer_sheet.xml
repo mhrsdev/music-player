@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sleep timer sheet (DESIGN §12 "not mocked": built on the queue sheet's language): presets, end of track, custom stepper. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sleep_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/queue_sheet_bg"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="20dp">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/queue_handle_bg" />
+
+    <TextView
+        android:id="@+id/sleep_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:accessibilityHeading="true"
+        android:text="@string/player_sleep_timer"
+        android:textAlignment="viewStart"
+        android:textColor="?attr/mpOnSurface"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/sleep_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:accessibilityLiveRegion="polite"
+        android:textAlignment="viewStart"
+        android:textColor="?attr/mpOnSurfaceVariant"
+        android:textSize="15sp" />
+
+    <LinearLayout
+        android:id="@+id/sleep_row1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal" />
+
+    <LinearLayout
+        android:id="@+id/sleep_row2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/sleep_custom"
+        android:textAlignment="viewStart"
+        android:textColor="?attr/mpOnSurfaceVariant"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/queue_chip_bg"
+        android:gravity="center_vertical"
+        android:minHeight="64dp"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageButton
+            android:id="@+id/sleep_minus"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/sleep_chip_bg"
+            android:contentDescription="@string/sleep_less"
+            android:src="@drawable/sleep_ic_minus"
+            app:tint="?attr/mpOnSurface" />
+
+        <TextView
+            android:id="@+id/sleep_custom_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:accessibilityLiveRegion="polite"
+            android:fontFeatureSettings="tnum"
+            android:gravity="center"
+            android:textColor="?attr/mpOnSurface"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/sleep_plus"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/sleep_chip_bg"
+            android:contentDescription="@string/sleep_more"
+            android:src="@drawable/sleep_ic_plus"
+            app:tint="?attr/mpOnSurface" />
+
+        <TextView
+            android:id="@+id/sleep_start"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/queue_sleep_bg"
+            android:gravity="center"
+            android:minWidth="88dp"
+            android:paddingHorizontal="20dp"
+            android:text="@string/sleep_start"
+            android:textColor="?attr/mpOnPrimaryContainer"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sleep_off"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/sleep_chip_bg"
+        android:gravity="center"
+        android:text="@string/sleep_turn_off"
+        android:textColor="?attr/mpOnSurface"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+</LinearLayout>
