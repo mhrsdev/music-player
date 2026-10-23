@@ -20,6 +20,13 @@ public final class PlayerPalette {
         deep = ColorUtils.HSLToColor(new float[]{(hue + 20f) % 360f, 0.55f, 0.08f});
     }
 
+    /** From a color extracted from real artwork (T2's ColorExtractor seed): keeps the cover's hue. */
+    public static PlayerPalette fromColor(int argb) {
+        float[] hsl = new float[3];
+        ColorUtils.colorToHSL(argb, hsl);
+        return new PlayerPalette(hsl[1] < 0.08f ? 212f : hsl[0]);
+    }
+
     public static PlayerPalette forSeed(int seed) {
         // Lapis-leaning hue spread: avoids muddy yellows that read poorly at night.
         float hue = ((seed & 0x7fffffff) % 300 + 180) % 360;

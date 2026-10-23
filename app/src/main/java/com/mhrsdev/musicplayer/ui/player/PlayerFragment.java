@@ -95,6 +95,7 @@ public final class PlayerFragment extends Fragment {
                 ViewGroup.LayoutParams.MATCH_PARENT));
         seek.setContentDescription(getString(R.string.player_seek));
         b.playerArtwork.setCornerRadiusDp(32);
+        b.playerArtwork.setListener(this::onArtwork);
         b.playerStage.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
             int size = Math.min(r - l, bt - t) - dp(16);
             ViewGroup.LayoutParams lp = b.playerArtwork.getLayoutParams();
@@ -287,12 +288,8 @@ public final class PlayerFragment extends Fragment {
         b.playerArtist.setText(t.artistName());
         boolean changed = paletteTrackId != null && !paletteTrackId.equals(t.id());
         paletteTrackId = t.id();
-        palette = PlayerPalette.forSeed(t.placeholderSeed());
-        b.playerBackdrop.setPalette(palette, changed);
-        b.playerArtwork.bind(t);
-        b.playerPlay.setColors(palette.primary, palette.onPrimary);
-        seek.setColors(palette.primary, 0x47FFFFFF);
-        b.playerLike.setImageTintList(ColorStateList.valueOf(palette.primary));
+        applyPalette(PlayerPalette.forSeed(t.placeholderSeed()), null, changed);
+        b.playerArtwork.bind(t); // may call onArtwork() with the real cover, which refines the palette
         if (changed && PlayerPalette.motionAllowed(requireContext())) {
             View art = b.playerArtwork;
             art.setAlpha(0.4f);
@@ -301,6 +298,26 @@ public final class PlayerFragment extends Fragment {
                     .setInterpolator(new DecelerateInterpolator(2f)).start();
         }
         render(vm.getState().getValue());
+    }
+
+    private void applyPalette(PlayerPalette p, @Nullable android.graphics.Bitmap tinyArt, boolean animate) {
+        palette = p;
+        b.playerBackdrop.setContent(p, tinyArt, animate);
+        b.playerPlay.setColors(p.primary, p.onPrimary);
+        seek.setColors(p.primary, 0x47FFFFFF);
+        b.playerLike.setImageTintList(ColorStateList.valueOf(p.primary));
+        render(vm.getState().getValue());
+    }
+
+    /** Real artwork arrived (ArtworkView decodes off-thread, downsampled): derive colors + tiny blurred backdrop once. */
+    private void onArtwork(@Nullable android.graphics.Bitmap cover) {
+        if (b == null || cover == null) return;
+        android.graphics.Bitmap tiny = PlayerBackdropView.prepare(cover);
+        if (tiny == null) return;
+        int[] px = new int[tiny.getWidth() * tiny.getHeight()];
+        tiny.getPixels(px, 0, tiny.getWidth(), 0, 0, tiny.getWidth(), tiny.getHeight());
+        int seed = com.mhrsdev.musicplayer.ui.theme.ColorExtractor.extractSeed(px, px.length);
+        applyPalette(PlayerPalette.fromColor(seed), tiny, true);
     }
 
     private void renderLiked(Boolean liked) {
