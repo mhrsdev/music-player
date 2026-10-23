@@ -341,3 +341,15 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 6. **Material theming is missing** (Material You/dynamic color, M3 roles/shape) and **Settings is very empty** → M1 (theme) + U1 (Settings content).
 7. Friend's brief (to adopt in OUR OWN style, **not** copied from Google code): M3 Expressive shapes + shape transitions; native-style bounce/spring physics; Google Sans Flex in different weights and **roundness** (ROND axis); nothing floating may be low-opacity (nav bar etc.); page transitions; coherent jiggle for state transitions.
 8. **Constraint from the owner:** must **not break the app's optimizations** (battery/RAM), and **don't use Google's implementations directly — build similar ones in our own style**.
+
+---
+
+## D20 — 2026-10-23 — Build, update README, real songs in sample screenshots (+ misc bug reports)
+
+**Original (verbatim):**
+
+> بیلدو بگیر بعدش ریدیمیشو اپدیت کن و تو عکسهای نمونه برنامه بجای فرم اهنگ های حالی چنتا اهنگ دانلود کن قرار بده
+
+**Also in this stretch (verbatim, summarised):** "دکمه پخش خوبه دکمه توقف زشته ولی اگه پیشنهاد بهتری داره میتونه ارائه بده" (play button good, PAUSE button ugly — M1 to propose options, D19); "اگه آهنگ فایل lyric نداره پس نیازی به اینم نیست" (hide the lyrics button when the track has no lyrics → L1); "رفرش کردن لیستش کلا باگ هستش، برای این که یه موزیکی که دانلود کردم رو اضافه کنم ناچار شدم Clear Data کنم" (library refresh broken → F1/F2: rescan on every foreground, MediaStore observer while visible, force rescan, pending/non-music filters).
+
+**Summary:** (1) take the full build, (2) update README/docs, (3) the sample/screenshot data must show **real songs with real covers** instead of the invented empty-looking placeholders → R2 (CC/public-domain tracks + covers, metadata only; audio not committed; debug-only assets; CREDITS.md). Final README screenshot refresh happens after the UI agents finish.

@@ -44,6 +44,8 @@ _Last updated: 2026-10-23 — D16 phase 2 started (name Mowj/موج, logo, auto-
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
+- 🔄 **R2** [Sonnet] Realistic sample data (real CC tracks' metadata + public-domain/CC covers, debug-only assets, CREDITS.md) for renders/README. `task/r2-sample-data`.
+- 🔄 **F2** [Sonnet] Library refresh bug (D20): rescan every foreground, observer while visible, force rescan. `task/f2-refresh`.
 **Wave 3 (D19):**
 - 🔄 **H1** [Opus] Discovery/Home richness: many more sections + refresh/shuffle discovery, stats, mixes, decades/genres (additive data), infinite-feeling scroll.
 - 🔄 **L1** [Opus] Lyrics: word-by-word (enhanced LRC/embedded/external), emulated word timing, per-word gradient+blur, cover-art dynamic background.
