@@ -104,6 +104,7 @@ public class PerfBudgetTest {
                 "java/com/mhrsdev/musicplayer/playback/PlaybackService.java",     // idle stop after 60 s
                 "java/com/mhrsdev/musicplayer/playback/PlaybackStore.java",       // 1 s queue-save debounce
                 "java/com/mhrsdev/musicplayer/ui/widget/SkeletonView.java",       // only while attached + visible + motion on
+                "java/com/mhrsdev/musicplayer/di/AppContainer.java",              // MediaStore-change scan debounce, removed in onAppBackground
                 "java/com/mhrsdev/musicplayer/playback/NowPlayingBridge.java",     // one coalesced widget push per playback event
                 "java/com/mhrsdev/musicplayer/ui/library/FastScrollerView.java",  // one-shot hide after a touch
                 "java/com/mhrsdev/musicplayer/ui/player/PlayerFragment.java"));   // lyrics auto-scroll resume, view-scoped
@@ -111,6 +112,14 @@ public class PerfBudgetTest {
         found.removeAll(allowed);
         assertEquals("new delayed callbacks: gate them on visibility/playback and add to the allow-list: " + found,
                 new TreeSet<String>(), found);
+    }
+
+    @Test public void loopingAnimationsRideTheSharedFrameDriver() throws IOException {
+        // Decorative loops use PeriodicTick / FrameDriver (one Choreographer callback for the app); a private
+        // postInvalidateDelayed / postOnAnimationDelayed loop is a second wake-up source that is easy to leave running.
+        Set<String> found = filesMatching("postInvalidateDelayed\\(|postOnAnimationDelayed\\(|Choreographer\\.getInstance");
+        found.remove("java/com/mhrsdev/musicplayer/ui/motion/FrameDriver.java");
+        assertEquals("use ui.motion.PeriodicTick: " + found, new TreeSet<String>(), found);
     }
 
     @Test public void threadsAlwaysTimeOut() throws IOException {
@@ -123,6 +132,7 @@ public class PerfBudgetTest {
         Pattern leak = Pattern.compile("static\\s+(?!final\\s)[\\w.<>]*\\s*\\b(Context|Activity|View|Fragment|Resources)\\b\\s+\\w+\\s*(=|;)");
         Set<String> found = new TreeSet<>();
         for (Path p : javaFiles()) if (leak.matcher(read(p)).find()) found.add(name(p));
+        found.remove("java/com/mhrsdev/musicplayer/ui/motion/Motion.java"); // holds the APPLICATION context only
         assertEquals("static Context/View leaks the activity: " + found, new TreeSet<String>(), found);
     }
 

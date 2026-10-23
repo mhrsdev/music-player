@@ -108,8 +108,9 @@ public class ArtworkLoader {
         return instance;
     }
 
+    /** Sizes share size buckets: row, card and mini-player of one cover are one decode, not three. */
     public static String key(String uri, int sizePx) {
-        return uri + '#' + sizePx;
+        return uri + '#' + bucket(sizePx);
     }
 
     @Nullable
@@ -144,7 +145,7 @@ public class ArtworkLoader {
             // One probe per cover at a time: the same album asked at 3 sizes (row, card, player) must not run the
             // thumbnail / retriever / folder probes three times in parallel. The later ones find the miss or the winner.
             synchronized (probeLocks[(uri.hashCode() & 0x7fffffff) % probeLocks.length]) {
-                bmp = misses.get(uri) != null ? null : resolver.resolve(uri, sizePx);
+                bmp = misses.get(uri) != null ? null : resolver.resolve(uri, bucket(sizePx));
             }
             main.post(() -> deliver(uri, key, bmp));
         });

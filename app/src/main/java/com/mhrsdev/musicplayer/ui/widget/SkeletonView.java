@@ -1,10 +1,9 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
+import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
@@ -29,14 +28,12 @@ public final class SkeletonView extends View {
     private static final long FRAME_MS = 66; // <= 15 fps
     private static final long PERIOD_MS = 1400;
     private static final List<SkeletonView> LIVE = new ArrayList<>();
-    private static final Handler MAIN = new Handler(Looper.getMainLooper());
-    private static final Runnable TICK = new Runnable() {
-        @Override public void run() {
-            if (LIVE.isEmpty()) return;
-            for (int i = 0; i < LIVE.size(); i++) LIVE.get(i).invalidate();
-            MAIN.postDelayed(this, FRAME_MS);
-        }
-    };
+    /** One shared shimmer tick for every skeleton on screen, on the app-wide frame driver. */
+    private static final PeriodicTick TICK = new PeriodicTick(FRAME_MS, () -> {
+        if (LIVE.isEmpty()) return false;
+        for (int i = 0; i < LIVE.size(); i++) LIVE.get(i).invalidate();
+        return true;
+    });
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final float d;
@@ -113,7 +110,7 @@ public final class SkeletonView extends View {
         if (want && !registered) {
             registered = true;
             LIVE.add(this);
-            if (LIVE.size() == 1) MAIN.postDelayed(TICK, FRAME_MS);
+            if (LIVE.size() == 1) TICK.start();
         } else if (!want) {
             unregister();
         }
@@ -124,6 +121,6 @@ public final class SkeletonView extends View {
         if (!registered) return;
         registered = false;
         LIVE.remove(this);
-        if (LIVE.isEmpty()) MAIN.removeCallbacks(TICK);
+        if (LIVE.isEmpty()) TICK.stop();
     }
 }

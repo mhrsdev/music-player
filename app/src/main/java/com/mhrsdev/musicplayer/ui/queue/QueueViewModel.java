@@ -3,6 +3,7 @@ package com.mhrsdev.musicplayer.ui.queue;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -49,7 +50,13 @@ public final class QueueViewModel extends ViewModel {
         this.player = player;
         this.library = library;
         this.state = player.getState();
-        this.ui = Transformations.map(state, QueueViewModel::map);
+        // The state ticks 4 times a second while playing; the screen only re-renders when what it shows changed.
+        MediatorLiveData<UiState> distinct = new MediatorLiveData<>();
+        distinct.addSource(state, s -> {
+            UiState next = map(s);
+            if (!next.equals(distinct.getValue())) distinct.setValue(next);
+        });
+        this.ui = distinct;
     }
 
     /** Pure state mapping (unit-tested). */

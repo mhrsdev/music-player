@@ -17,7 +17,7 @@ layout / draw / sync / GPU split, `debug/JankLogger.java`, installed only when `
 | 3 | **Hero cover decode size/format and cache thrash** | hero card is about 300 dp = 800-1000 px; `prepare()` used ARGB_8888 above 320 px = 3-4 MB per cover; the LruCache is `heap/16` = 8 MB on a 128 MB heap, i.e. two covers; every scroll evicted and re-decoded (through the heavy chain above) | **Likely major on low-heap phones** | opaque JPEG decoded RGB_565 up to 1100 px (half the memory, decoder dithers; alpha PNGs unchanged); cache floor 6 MB. Visual: no alpha lost; 565 gradient banding is the only possible difference, not visible on photos |
 | 4 | **Hero carousel lays out a whole extra screen on each side** | `HeroCarousel.calculateExtraLayoutSpace` returned `getWidth()` both ways: 2-3 invisible full-size cards bound and decoded for every position (was needed for the v0.1 translated tail cards; v0.2 has none). `apply()` ran `findViewById` x3 per card per scroll frame, set alpha/scale/a11y mode even when unchanged, and the layout listener posted a new lambda per layout | Confirmed waste, smaller effect | extra space = the padding zone where the peeking card sits (+ gap); lookups cached on the card; setters only when the value changed; one pending apply. `HeroScrollCostTest`: initial binds 3 -> 2 (300 dp card, 411 dp screen), no layout request per scroll frame (5 requests in 120 frames, all from entering cards) |
 | 5 | Track rows: `Format.duration` built two ICU `NumberFormat` objects per row bind; `getString(R.string.library_more, title)` = `String.format` per bind | `ui/library/Format.java`, `TrackAdapter.onBindViewHolder`, `HomeAdapter` | Confirmed per-bind cost (also in v0.1 for the first), hits every list on every scroll | Format caches the locale's zero digit and builds the string by hand (identical output in en/fa/ar/de, `FormatTest`); the "More options for <title>" label is built on demand by an accessibility delegate (TalkBack only) |
-| 6 | Cookie button spin (`MorphPlayPauseView`), mini-player and player, 20 fps while playing | rebuilt a 121-point path with 2 `pow` + 4 trig per point per frame; v0.2 added `radiusRotated` (more trig) | Real but small | settled squircle / cookie cached; the playing cookie is drawn with `canvas.rotate` on the cached path (a cookie only turns rigidly, so identical pixels); the morph transition still computes per frame |
+| 6 | Cookie button spin (`MorphPlayPauseView`) | v0.2 rebuilt a 121-point trig path 20 times a second | **Gone**: M1 replaced the cookie/spin with a spring morph that only draws while moving. My cached-shape change was dropped in the merge | M1 version taken as is; its buffering arc now rides the shared `FrameDriver` (was `postInvalidateOnAnimation`) |
 | 7 | Home glow, bottom scrim, dock (`MainActivity`, `HomeGlow`, `BottomChrome`) | glow is one static `GradientDrawable` on a `View` sized once in the inset callback (no per-scroll work); scrim is a cached shader; `BottomChrome.apply` runs only when the dock height changes (`px == dockPx` guard) and skips RecyclerView subtrees | **Not a cause**; the opaque nav/mini pills added two elevated layers over lists (GPU shadow cost is constant, outlines cached) | no change |
 | 8 | Skeleton shimmer 15 fps | shared single tick, gated on attached + visible + motion allowed (`SkeletonView.sync`) | Not a cause unless a skeleton stays visible | no change |
 | 9 | Playback state fan-out | lists do **not** observe `PlaybackState` (only mini-player, player, queue); `QueueViewModel` maps each tick to a new `UiState` (O(queue) `remainingQueueMs`) while the queue screen is open | Minor, queue screen only | open item |
@@ -40,10 +40,29 @@ layout / draw / sync / GPU split, `debug/JankLogger.java`, installed only when `
 Frame-time numbers on the friend's phone are unknown: ask for `adb logcat -s MowjJank` while scrolling Home and while
 playing with the mini-player visible.
 
+## Second pass (after M1 / H1 / G1 / L1 / S1 landed on ccr)
+
+Merged ccr into this branch (M1 `MorphPlayPauseView` and H1 `HeroCarousel` taken, then the still-valid optimisations
+re-applied on top; G1 `ArtworkLoader` kept with its generated-cover path).
+
+| Area (new code) | Finding | Change |
+|-----------------|---------|--------|
+| Animation loops | five private loops: `BaseSeekView` 30 fps (`postInvalidateDelayed`), `AmbientBackdropView` and `PlayerBackdropView` drift (`postOnAnimationDelayed`), `LyricsTicker` 30 fps, `SkeletonView` 15 fps (Handler), plus the buffering arc at 60 fps | all on **one Choreographer callback**: new `ui/motion/PeriodicTick` (fixed rate on M1's `FrameDriver`). Same rates, same gates (visible / playing / attached); stop on detach. `PerfBudgetTest.loopingAnimationsRideTheSharedFrameDriver` fails the build on a new private loop. `PeriodicTickTest`: 66 ms tick = 15 body calls per second of 60 Hz frames, nothing registered after `stop()` |
+| Artwork | decode keyed by exact view size: row (137 px), card, mini-player and player of one cover = 3-4 decodes | `ArtworkLoader.key()` and the decode use G1's size buckets (64..1024): one decode per cover per bucket, shared by every view in it. Real art only: generated covers already used buckets |
+| Colour extraction | `ColorExtractor.extractSeed` ran again for the same cover in Home tint, mini-player, player, widget | memoised on a 64-bit hash of the (downscaled) pixels, 24 entries; identical result by construction (`compute` unchanged) |
+| Queue screen | `QueueViewModel` rebuilt and re-rendered (NumberFormat, adapter submit) on every 4 Hz state tick | emits only when the mapped `UiState` changed (distinct); 0 renders per second while playing instead of 4 |
+| Search rows | `getString(..., title)` (a `String.format`) per bind | label built on demand by an accessibility delegate |
+| Hero carousel (H1) | still laid out a full extra screen each side, looked children up 3x per card per frame, re-set pivot/scale/alpha/a11y every frame | reserved zone = padding + gap, cached lookups, setters only on change, one pending apply per layout (`HeroScrollCostTest`: first-screen binds 3 -> 2) |
+| L1 lyrics / ambient | `LyricsTicker` 30 fps only while list visible + playing + active line has word timing; `AmbientBackdropView` 15 fps only visible + playing (FULL mode) | both on the shared driver now; gates unchanged |
+| G1 generated covers | rendered on the artwork worker thread; at most `SYNC_MAX_PX` = 96 px synchronously on the main thread | no change needed |
+| H1 Home feed / S1 widgets / U1b system bars | Home feed query on the io executor; widgets pushed by `NowPlayingBridge` per playback event (coalesced), `updatePeriodMillis=0`; system bars set once per window | no change; widget/bridge allow-listed in `PerfBudgetTest` |
+| Foreground update check | `AppContainer.onAppForeground` -> `updates().checkIfDue()` (at most daily, foreground only) | documented in BATTERY_AUDIT B8 |
+
+Both variants checked: `compileDebugJavaWithJavac` + `compileReleaseJavaWithJavac`, targeted tests in debug and release
+(`PeriodicTickTest`, `PerfBudgetTest`, `HeroScrollCostTest`, `MiniPlayerInvalidationTest`, `FormatTest`, resolver, queue).
+
 ## Not changed on purpose / next
 
-* One shared frame driver for all animated views: the cookie spin (20 fps) and the player wave (30 fps) still post
-  their own invalidates; M1's `ui/motion/FrameDriver` (branch `task/m1-motion`) should drive them once merged.
+* `ArtworkView`'s 150 ms fade-in still uses `postInvalidateOnAnimation` (one-shot, ends by itself).
 * Persistent "no artwork" memory and one decode shared across size buckets (see #2).
-* `QueueViewModel` per-tick mapping (#9); `SearchResultAdapter` still formats its "More" label per bind.
-* Colour extraction is still per artwork bind in the player and `ThemeController`; share one result per artwork key.
+* The ambient palette (`AmbientPalette`) is still built per layer on the main thread (small bitmap, cached per key).
