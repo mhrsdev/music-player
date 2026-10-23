@@ -5,7 +5,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 
 /**
- * Decides whether decorative animation (wave travel, cookie spin, glow) may run.
+ * Decides whether decorative animation (wave travel, glow, springs) may run.
  * Off when the system animator scale is 0, battery saver is on, or the app's own reduce-motion setting is on.
  * Widgets then draw a static, equally legible frame.
  */

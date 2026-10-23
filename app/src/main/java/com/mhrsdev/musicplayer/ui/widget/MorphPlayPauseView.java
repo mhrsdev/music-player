@@ -24,15 +24,14 @@ import com.mhrsdev.musicplayer.ui.theme.Tokens;
 
 /**
  * Mowj play/pause button. PLAY (paused) is the soft squircle with the play triangle (the look the owner liked).
- * PAUSE (playing) follows {@link #PAUSE_STYLE} (owner picks; docs/screens/m1-pause-options.png): the container
+ * PAUSE (playing) follows {@link #PAUSE_STYLE} (owner picked B; docs/screens/m1-pause-options.png): the container
  * spring-morphs through {@link ShapeMorph} and the triangle's two halves morph point by point into the two bars
  * (no crossfade, no clipping). Every state change plays the one Mowj jiggle (1 -> 0.92 -> ~1.03 -> 1) and a press
  * squishes; both are drawn inside a 4% headroom so the silhouette never touches the bounds. Media icons never
  * mirror in RTL.
  *
- * <p>Battery: frames run only while a spring moves (shared {@code FrameDriver}); nothing ticks at rest. Style C
- * breathes while playing at 30 fps, only when visible with motion allowed. Reduce motion / battery saver: instant
- * state change, no jiggle, no breathing.
+ * <p>Battery: frames run only while a spring moves (shared {@code FrameDriver}); nothing ticks at rest, not even
+ * while playing. Reduce motion / battery saver: instant state change, no jiggle.
  */
 public class MorphPlayPauseView extends View {
     /** Pause-state options shown to the owner. */
@@ -41,19 +40,15 @@ public class MorphPlayPauseView extends View {
         SQUIRCLE_ROUND_BARS,
         /** B: the squircle melts into a circle, centred bars (recommended). */
         CIRCLE,
-        /** C: squircle, two soft blocks that breathe while playing. */
-        BREATHING_BLOCKS,
         /** D: the squircle firms into a rounded square, wider bars in a "held" stance. */
         ROUNDED_SQUARE
     }
 
-    /** The one switch: which pause look ships. */
+    /** The one switch: which pause look ships. Owner decision (D-M1): B, squircle <-> circle. */
     public static final PauseStyle PAUSE_STYLE = PauseStyle.CIRCLE;
 
     /** Scale headroom kept free for the jiggle rebound (max drawn scale). */
     static final float HEADROOM = 1.04f;
-    private static final long BREATH_PERIOD_MS = 2400L;
-    private static final long BREATH_FRAME_MS = 33L;
 
     private final Paint containerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -194,7 +189,6 @@ public class MorphPlayPauseView extends View {
         float bw, bh, gap;
         switch (style) {
             case SQUIRCLE_ROUND_BARS: bw = 0.7f; bh = 1.05f; gap = 0.4f; break;
-            case BREATHING_BLOCKS: bw = 0.86f; bh = 1.1f; gap = 0.3f; break;
             case ROUNDED_SQUARE: bw = 0.78f; bh = 1.18f; gap = 0.36f; break;
             case CIRCLE:
             default: bw = 0.7f; bh = 1.2f; gap = 0.38f; break;
@@ -255,21 +249,14 @@ public class MorphPlayPauseView extends View {
             if (motion) postInvalidateOnAnimation();
             return;
         }
-        float breathe = 1f;
-        boolean breathing = style == PauseStyle.BREATHING_BLOCKS && playing && m >= 1f && motion && isEnabled();
-        if (breathing) {
-            double ph = 2 * Math.PI * ((SystemClock.uptimeMillis() - origin) % BREATH_PERIOD_MS) / BREATH_PERIOD_MS;
-            breathe = 1f - 0.06f * (float) (0.5 - 0.5 * Math.cos(ph));
-        }
         for (int i = 0; i < 16; i++) cur[i] = playPts[i] + (pausePts[i] - playPts[i]) * m;
         icon.rewind();
         float corner = (barCorner() * m + 0.14f * (1f - m)) * u;
-        addQuad(icon, cur, 0, cx, cy, u, u * breathe, corner, m, true);
-        addQuad(icon, cur, 8, cx, cy, u, u * breathe, corner, m, false);
+        addQuad(icon, cur, 0, cx, cy, u, u, corner, m, true);
+        addQuad(icon, cur, 8, cx, cy, u, u, corner, m, false);
         iconPaint.setColor(iconColor);
         iconPaint.setAlpha(alpha);
         canvas.drawPath(icon, iconPaint);
-        if (breathing) postInvalidateDelayed(BREATH_FRAME_MS);
     }
 
     /**

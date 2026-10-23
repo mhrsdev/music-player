@@ -52,14 +52,7 @@ public class SeekMathTest {
         assertEquals(0.5f, WaveMath.approach(0f, 1f, 150, 300), 1e-6f);
     }
 
-    @Test public void shapeMorphEndpoints() {
-        assertEquals(1f, ShapeMath.squircle(0), 1e-6f);
-        // Superellipse: corners reach out to (0.84, 0.84), i.e. polar radius ~1.19, still inside the square bounds.
-        assertEquals(1.189f, ShapeMath.squircle(Math.PI / 4), 0.01f);
-        assertEquals(1f, ShapeMath.cookie(0), 1e-6f);
-        assertEquals(ShapeMath.squircle(0.3), ShapeMath.radius(0.3, 0f), 1e-6f);
-        assertEquals(ShapeMath.cookie(0.3), ShapeMath.radius(0.3, 1f), 1e-6f);
-    }
+    // Play/pause shape maths moved to ui/motion/ShapeMorph (ShapeMorphTest).
 
     @Test public void barsResampleKeepsPeaks() {
         float[] wf = {0f, 1f, 0f, 0f, 0.5f, 0f};

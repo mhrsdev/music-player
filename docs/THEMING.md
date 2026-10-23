@@ -51,5 +51,5 @@ The Latin font is rebuilt by `tools/fonts/build_sans_subset.py` (keeps `wght` 40
   mirror-symmetric, morphable point by point, rebuilt into a reused Path.
 
 ## Play/pause
-`MorphPlayPauseView.PAUSE_STYLE` picks the pause look (A squircle + round bars, **B circle (default)**,
-C breathing blocks, D rounded square). See `docs/screens/m1-pause-options.png`.
+`MorphPlayPauseView.PAUSE_STYLE` picks the pause look (A squircle + round bars, **B circle (owner pick, default)**,
+D rounded square; the breathing option C was dropped: it redrew while playing). PLAY is unchanged. See `docs/screens/m1-pause-options.png`.

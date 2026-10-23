@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 /**
- * M1: the redesigned play/pause. (1) Owner proposal sheet docs/screens/m1-pause-options.png: the four pause styles,
+ * M1: the redesigned play/pause. (1) Owner proposal sheet docs/screens/m1-pause-options.png: the pause styles (A, B = shipped, D),
  * dark and light, morph frames 0 / 0.35 / 0.7 / 1 at 72 dp plus play/pause at 48 dp. (2) For every style, size
  * 40-72 dp, morph frame and the jiggle's peak scale: the silhouette keeps a clear 1 px ring inside the bounds and
  * is mirror-symmetric top/bottom (and left/right for the container alone).
@@ -29,8 +29,8 @@ import java.io.FileOutputStream;
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class M1PlayPauseRenderTest {
     private static final float[] FRAMES = {0f, 0.35f, 0.7f, 1f};
-    private static final String[] NAMES = {"A  squircle, round-cap bars", "B  circle (recommended)",
-            "C  breathing blocks", "D  rounded square"};
+    private static final String[] NAMES = {"A  squircle, round-cap bars", "B  circle (shipped, owner pick)",
+            "D  rounded square"};
 
     @Test @Config(sdk = 35, qualifiers = "w412dp-h915dp-night-xhdpi")
     public void optionsSheet() throws Exception {

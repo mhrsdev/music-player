@@ -27,7 +27,7 @@ import com.mhrsdev.musicplayer.ui.theme.ThemeController;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
 
 /**
- * Artwork-tinted mini-player (DESIGN.md 08/16): 76 dp, 24 dp corners, art + title/subtitle + cookie play/pause +
+ * Artwork-tinted mini-player (DESIGN.md 08/16): 76 dp, 24 dp corners, art + title/subtitle + squircle play/pause +
  * next, and a progress line along the bottom edge that is wavy while playing (static wave: no per-frame work on
  * Home). Tap or swipe up opens the player, swipe sideways skips (tape direction: left = next), swipe down dismisses.
  */
