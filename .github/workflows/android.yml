@@ -11,7 +11,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
@@ -28,7 +28,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build, lint and unit tests
-        run: ./gradlew :app:assembleDebug test lint --stacktrace
+        # --continue: report every failing test / lint error in one run instead of stopping at the first failing task.
+        run: ./gradlew :app:assembleDebug test lint --continue --stacktrace
 
       - name: Upload debug APK
         if: success()
@@ -45,3 +46,41 @@ jobs:
           path: |
             app/build/reports/lint-results-debug.html
             app/build/reports/tests/testDebugUnitTest/
+            app/build/reports/tests/testReleaseUnitTest/
+            app/build/test-results/
+
+      # Last step so the cause is readable in the final lines of the job log.
+      - name: Failure summary
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob, xml.etree.ElementTree as ET
+          failed = 0
+          for f in sorted(glob.glob("app/build/test-results/**/TEST-*.xml", recursive=True)):
+              try:
+                  root = ET.parse(f).getroot()
+              except ET.ParseError as e:
+                  print(f"UNREADABLE: {f}: {e}")
+                  continue
+              for case in root.iter("testcase"):
+                  bad = case.find("failure")
+                  if bad is None:
+                      bad = case.find("error")
+                  if bad is not None:
+                      failed += 1
+                      msg = (bad.get("message") or bad.text or "").strip().splitlines()
+                      print(f"FAILED: {case.get('classname')}.{case.get('name')}: {msg[0] if msg else ''}")
+          print(f"--- {failed} failing test(s)")
+          lint = 0
+          for f in glob.glob("app/build/reports/lint-results-debug.xml"):
+              for issue in ET.parse(f).getroot().iter("issue"):
+                  if issue.get("severity") in ("Error", "Fatal"):
+                      lint += 1
+                      loc = issue.find("location")
+                      where = f"{loc.get('file')}:{loc.get('line')}" if loc is not None else "?"
+                      print(f"LINT {issue.get('severity').upper()}: [{issue.get('id')}] {where}: {(issue.get('message') or '').splitlines()[0]}")
+          for f in glob.glob("app/build/reports/lint-results-debug.txt"):
+              print(open(f, errors="replace").read()[-3000:])
+          print(f"--- {lint} lint error(s)")
+          PY
