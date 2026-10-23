@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import com.mhrsdev.musicplayer.domain.model.Artist;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,10 +15,10 @@ import org.junit.Test;
 
 public class SampleDataTest {
     @Test public void catalogSizes() {
-        assertEquals(37, SampleData.TRACKS.size());
-        assertEquals(7, SampleData.ARTISTS.size());
-        assertEquals(8, SampleData.ALBUMS.size());
-        assertEquals(3, SampleData.SEED_PLAYLISTS.size());
+        assertEquals(26, SampleData.TRACKS.size());
+        assertEquals(8, SampleData.ARTISTS.size());
+        assertEquals(9, SampleData.ALBUMS.size());
+        assertEquals(4, SampleData.SEED_PLAYLISTS.size());
     }
 
     @Test public void idsAreUniqueAndReferencesResolve() {
@@ -31,8 +32,8 @@ public class SampleDataTest {
             assertTrue(albumIds.contains(t.albumId()));
             assertTrue(artistIds.contains(t.artistId()));
         }
-        assertEquals(8, albumIds.size());
-        assertEquals(7, artistIds.size());
+        assertEquals(9, albumIds.size());
+        assertEquals(8, artistIds.size());
         SampleData.SEED_HISTORY_IDS.forEach(id -> assertTrue(trackIds.contains(id)));
         SampleData.SEED_PLAYLISTS.values().forEach(ids -> ids.forEach(id -> assertTrue(trackIds.contains(id))));
     }
@@ -44,17 +45,25 @@ public class SampleDataTest {
         }
     }
 
-    @Test public void hasNeffexAndPersianArtist() {
-        assertTrue(SampleData.ARTISTS.stream().anyMatch(a -> a.name().equals("NEFFEX")));
+    @Test public void hasPersianArtist() {
         assertTrue(SampleData.ARTISTS.stream().anyMatch(a -> a.name().chars().anyMatch(c -> c >= 0x0600 && c <= 0x06FF)));
     }
 
+    /** Every cover URI maps to a file of the debug asset folder (the render tests and galleries show them). */
+    @Test public void coversExistInDebugAssets() {
+        for (Track t : SampleData.TRACKS) {
+            assertTrue(t.artworkUri().startsWith("content://com.mhrsdev.musicplayer.samplecovers/"));
+            String name = t.artworkUri().substring(t.artworkUri().lastIndexOf('/') + 1);
+            assertTrue(name, new File("src/debug/assets/sample-covers/" + name).length() > 0);
+        }
+    }
+
     @Test public void lyricsVariants() {
-        assertTrue(SampleData.lyricsFor("track-4").isEmpty());
+        assertTrue(SampleData.lyricsFor("track-10").isEmpty());
         Lyrics plain = SampleData.lyricsFor("track-3");
         assertFalse(plain.synced());
         assertFalse(plain.isEmpty());
-        assertTrue(SampleData.lyricsFor("track-35").synced());
+        assertTrue(SampleData.lyricsFor("track-25").synced());
         assertTrue(SampleData.lyricsFor("track-1").synced());
     }
 }
