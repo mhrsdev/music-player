@@ -6,7 +6,7 @@ import com.mhrsdev.musicplayer.R;
 import java.util.List;
 
 /** Playlist options: rename, add songs, delete. */
-public final class PlaylistMenuSheet extends ActionSheet {
+public class PlaylistMenuSheet extends ActionSheet {
     private static final String TAG = "playlist_menu";
     @Nullable private TrackListViewModel.Header header;
     @Nullable private Runnable rename, delete, addSongs;

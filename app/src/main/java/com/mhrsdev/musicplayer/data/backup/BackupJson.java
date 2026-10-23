@@ -16,7 +16,7 @@ import org.json.JSONObject;
  * Backup file format v1. Tracks are listed once in {@code tracks}; likes, playlists and plays refer to them by index,
  * so the file stays small for big libraries.
  */
-public final class BackupJson {
+public class BackupJson {
     private static final String APP = "musicplayer-backup";
 
     private BackupJson() { }

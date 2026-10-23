@@ -14,7 +14,7 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 /** State of the backup screen: idle -> (export | choose file -> dry-run preview -> restore). */
-public final class BackupViewModel extends ViewModel {
+public class BackupViewModel extends ViewModel {
     public enum Phase { IDLE, WORKING, PREVIEW, EXPORTED, RESTORED, ERROR }
 
     /** {@code summary} is null while IDLE / WORKING; in ERROR its {@code error} says why. */

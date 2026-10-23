@@ -17,7 +17,7 @@ import java.util.function.IntConsumer;
  * Redirects (301/302/303/307/308: a renamed repository, release assets served from objects.githubusercontent.com) are
  * followed here, at most {@value #MAX_REDIRECTS} hops, never from https down to http.
  */
-final class UrlConnectionUpdateHttp implements UpdateHttp {
+class UrlConnectionUpdateHttp implements UpdateHttp {
     private static final int CONNECT_TIMEOUT_MS = 8_000;
     private static final int READ_TIMEOUT_MS = 15_000;
     private static final int MAX_BODY = 1024 * 1024;

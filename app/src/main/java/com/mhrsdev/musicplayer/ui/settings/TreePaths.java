@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
  * document ids look like {@code primary:Music/Rock} (internal storage) or {@code 1A2B-3C4D:Music} (SD card / USB).
  * Anything else (Drive, Downloads provider, ...) has no file path and returns null.
  */
-public final class TreePaths {
+public class TreePaths {
     public static final String EXTERNAL_STORAGE_AUTHORITY = "com.android.externalstorage.documents";
     private static final String PRIMARY_ROOT = "/storage/emulated/0";
 
