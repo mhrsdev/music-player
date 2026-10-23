@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Music Player</string>
+    <string name="placeholder_sections">Home sections: %1$d</string>
 </resources>
