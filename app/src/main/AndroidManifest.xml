@@ -23,6 +23,7 @@
         android:theme="@style/Theme.MusicPlayer">
         <activity
             android:name=".MainActivity"
+            android:enableOnBackInvokedCallback="true"
             android:exported="true"
             android:theme="@style/Theme.MusicPlayer">
             <intent-filter>

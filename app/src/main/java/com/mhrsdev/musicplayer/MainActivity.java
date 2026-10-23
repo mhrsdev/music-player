@@ -31,6 +31,7 @@ import com.mhrsdev.musicplayer.ui.nav.AudioPermission;
 import com.mhrsdev.musicplayer.ui.nav.PermissionFragment;
 import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
+import com.mhrsdev.musicplayer.ui.nav.ScrollToTop;
 import com.mhrsdev.musicplayer.ui.nav.ShellViewModel;
 import com.mhrsdev.musicplayer.ui.search.SearchFragment;
 import com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore;
@@ -131,7 +132,13 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override public void onItemReselected(int id) {
-                openTab(shell.getTab().getValue());
+                // Reselecting a tab: first back to its root, then (already at the root) scroll to the top.
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    openTab(shell.getTab().getValue());
+                } else {
+                    Fragment current = getSupportFragmentManager().findFragmentById(R.id.screen_container);
+                    if (current != null && current.getView() != null) ScrollToTop.scroll(current.getView());
+                }
             }
         });
         shell.getTab().observe(this, selected -> {
@@ -226,13 +233,24 @@ public class MainActivity extends AppCompatActivity
         push(CollectionFragment.newInstance(kind));
     }
 
+    @Override public void openFragment(Fragment f, String tag) {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment top = fm.findFragmentById(R.id.screen_container);
+        if (top != null && tag.equals(top.getTag())) return;
+        push(f, tag);
+    }
+
     private void push(Fragment f) {
+        push(f, null);
+    }
+
+    private void push(Fragment f, @Nullable String tag) {
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out,
                         android.R.animator.fade_in, android.R.animator.fade_out)
-                .replace(R.id.screen_container, f)
-                .addToBackStack(null)
+                .replace(R.id.screen_container, f, tag)
+                .addToBackStack(tag)
                 .commit();
     }
 

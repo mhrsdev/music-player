@@ -18,6 +18,12 @@ public interface ScreenNavigator {
 
     void openCollection(Collection kind);
 
+    /**
+     * Pushes any screen (e.g. a feature screen from {@link FeatureScreens}) onto the back stack; back returns.
+     * {@code tag} identifies it so repeated taps do not stack duplicates.
+     */
+    void openFragment(androidx.fragment.app.Fragment fragment, String tag);
+
     /** Switches to a top-level tab (clears the back stack). */
     void openTab(Tab tab);
 
