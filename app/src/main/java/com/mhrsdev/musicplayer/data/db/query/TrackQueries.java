@@ -101,8 +101,10 @@ public final class TrackQueries {
     public List<TrackStat> quickPickCandidates(int limit) {
         String sql = "SELECT " + COLUMNS + ", COALESCE(ps." + PlayStatsContract.COL_PLAY_COUNT + ", 0), COALESCE(ps."
                 + PlayStatsContract.COL_LAST_PLAYED_AT + ", 0)" + FROM + JOIN_STATS
-                + " WHERE ps." + PlayStatsContract.COL_PLAY_COUNT + " > 0 OR l." + LikesContract.COL_TRACK_ID
-                + " IS NOT NULL ORDER BY ps." + PlayStatsContract.COL_PLAY_COUNT + " DESC LIMIT " + limit;
+                // Candidates first (a few hundred rows), then one primary-key lookup each: no scan of the whole library.
+                + " WHERE t." + COL_ID + " IN (SELECT " + PlayStatsContract.COL_TRACK_ID + " FROM " + PlayStatsContract.TABLE
+                + " WHERE " + PlayStatsContract.COL_PLAY_COUNT + " > 0 UNION SELECT " + LikesContract.COL_TRACK_ID
+                + " FROM " + LikesContract.TABLE + ") ORDER BY ps." + PlayStatsContract.COL_PLAY_COUNT + " DESC LIMIT " + limit;
         List<TrackStat> out = new ArrayList<>();
         try (Cursor c = db.rawQuery(sql, null)) {
             Map<String, String> shared = new HashMap<>();
