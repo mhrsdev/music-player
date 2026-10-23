@@ -44,10 +44,12 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 ### In progress
 - 🔄 **T2b** [Opus] Design revision for Java/Views: less stock-Material/Google look, own identity, custom-drawn controls; update `docs/design/DESIGN.md` + re-render PNGs; show owner in chat and get OK. Branch `task/t2b-design-revision`.
 
+- 🔄 **T1b** [Sonnet + ponytail] Java re-scaffold (Gradle 9.0.0, framework SQLite, contracts + fakes). Worktree `../wt-t1b`, branch `task/t1b-java-scaffold`. Gates T5/T6/T7/T-W/T2 (they start in parallel once T1b contracts are merged).
+
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
 Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room), tidy query classes, clean packages, Gradle 9.0.0 (CLAUDE.md "Hard code rules").
-- ⬜ **T1b** [Sonnet] Re-scaffold in Java: delete Kotlin/Compose/Room code, Groovy `.gradle`, Gradle 9.0.0 wrapper (+ compatible AGP; report if impossible), Material Components/AndroidX Views, Media3, ViewModel/LiveData, packages per ARCHITECTURE.md (rewrite it for Java), domain models + repository interfaces + in-memory fakes with sample data, SQLite helper skeleton, CI, SDK setup per README. `./gradlew :app:assembleDebug test lint` green.
+- (T1b → in progress) Re-scaffold in Java: delete Kotlin/Compose/Room code, Groovy `.gradle`, Gradle 9.0.0 wrapper (+ compatible AGP; report if impossible), Material Components/AndroidX Views, Media3, ViewModel/LiveData, packages per ARCHITECTURE.md (rewrite it for Java), domain models + repository interfaces + in-memory fakes with sample data, SQLite helper skeleton, CI, SDK setup per README. `./gradlew :app:assembleDebug test lint` green.
 - ⬜ **T2** [Opus] UI foundation (Views): theme/styles, custom widgets incl. 3 seek bars (Wavy/Waveform/**Bars** voice-memo loudness, D4), nav shell, `WaveformRepository` contract + fake.
 - ⬜ **T5** [Sonnet] Data: MediaStore scanner, `SQLiteOpenHelper` DB (library, likes, playlists, history, waveform cache), tidy query/DAO classes, repositories, settings (SharedPreferences).
 - ⬜ **T6** [Sonnet] Playback: Media3 `MediaSessionService`, `PlayerController` impl, queue ops, sleep timer, notification; battery rules.
