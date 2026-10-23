@@ -39,6 +39,7 @@ public final class PlayerViewModel extends ViewModel {
     private final MediatorLiveData<Boolean> liked = new MediatorLiveData<>();
     private final MediatorLiveData<Integer> activeLyricLine = new MediatorLiveData<>();
     private final MutableLiveData<Boolean> showLyrics = new MutableLiveData<>(false);
+    private final MediatorLiveData<LyricsAvailability> lyricsAvailability = new MediatorLiveData<>();
     /** Re-emits the current track on {@link #retryLyrics()} so the repository is asked again. */
     private final MediatorLiveData<Track> lyricsRequest = new MediatorLiveData<>();
     private Set<String> likedIds = new HashSet<>();
@@ -69,6 +70,8 @@ public final class PlayerViewModel extends ViewModel {
         });
         liked.addSource(currentTrack, t -> updateLiked());
 
+        lyricsAvailability.addSource(lyrics, l -> updateAvailability());
+        lyricsAvailability.addSource(currentTrack, t -> updateAvailability());
         activeLyricLine.addSource(lyrics, l -> updateActiveLine());
         activeLyricLine.addSource(state, s -> updateActiveLine());
     }
@@ -82,6 +85,14 @@ public final class PlayerViewModel extends ViewModel {
         Track t = currentTrack.getValue();
         boolean v = t != null && (likedLoaded ? likedIds.contains(t.id()) : t.liked());
         if (!Objects.equals(liked.getValue(), v)) liked.setValue(v);
+    }
+
+    private void updateAvailability() {
+        LyricsAvailability a = LyricsAvailability.of(lyrics.getValue(), currentTrack.getValue());
+        if (a == lyricsAvailability.getValue()) return;
+        lyricsAvailability.setValue(a);
+        // A track without lyrics while the lyrics view is open: back to the cover.
+        if (a == LyricsAvailability.NONE && Boolean.TRUE.equals(showLyrics.getValue())) showLyrics.setValue(false);
     }
 
     private void updateActiveLine() {
@@ -106,6 +117,8 @@ public final class PlayerViewModel extends ViewModel {
     /** Distinct-until-changed index of the active lyric line. */
     public LiveData<Integer> getActiveLyricLine() { return activeLyricLine; }
     public LiveData<Boolean> getShowLyrics() { return showLyrics; }
+    /** Drives the lyrics button: shown only for {@link LyricsAvailability#AVAILABLE}. */
+    public LiveData<LyricsAvailability> getLyricsAvailability() { return lyricsAvailability; }
 
     public void togglePlayPause() { player.togglePlayPause(); }
     public void next() { player.next(); }

@@ -2,6 +2,7 @@ package com.mhrsdev.musicplayer.data.lyrics;
 
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.domain.model.LyricLine;
+import com.mhrsdev.musicplayer.domain.model.LyricWord;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +21,13 @@ import java.util.regex.Pattern;
  *
  * <p>Handles {@code [mm:ss.xx]}, {@code [mm:ss.xxx]}, {@code [mm:ss]}, {@code [mm:ss:xx]}, {@code [h:mm:ss.xx]}, several
  * timestamps on one line, {@code [offset:+/-ms]} (positive = lyrics appear earlier), header tags
- * ({@code ti ar al au by length re ve tool lang}), enhanced word tags {@code <mm:ss.xx>} (removed: the domain model
- * has no word timings), Persian/Arabic-Indic digits in timestamps, invisible bidi marks, BOM, LF/CRLF/CR.
+ * ({@code ti ar al au by length re ve tool lang}), Persian/Arabic-Indic digits in timestamps, invisible bidi marks,
+ * BOM, LF/CRLF/CR.
+ *
+ * <p>Word timing: enhanced LRC / A2 {@code [00:12.00]<00:12.00>Hel<00:12.30>lo <00:12.80>world<00:13.40>} (the first
+ * unit may omit its tag: it then starts at the line time), the inline-bracket variant
+ * {@code [00:12.00]Hello [00:12.80]world}, and Walaoke voice prefixes ({@code M: F: D:}, removed). A tag right after a
+ * unit is its end; a last unit without one ends at the next line (at most {@link #OPEN_END_MS} later).
  * Output is sorted by time (stable, so equal timestamps keep file order; exact duplicates are dropped).
  * Without any timestamp the text becomes unsynced lines.
  */
@@ -29,6 +35,10 @@ public final class LrcParser {
     private static final Pattern WORD_TAG = Pattern.compile("<\\s*\\d+\\s*:\\s*\\d+(?:\\s*[.:,]\\s*\\d+)?\\s*>");
     private static final Pattern SHORT_TS = Pattern.compile("(\\d{1,5}):(\\d{1,2})(?:[.:,](\\d{1,3}))?");
     private static final Pattern LONG_TS = Pattern.compile("(\\d{1,4}):(\\d{1,2}):(\\d{1,2})[.,](\\d{1,3})");
+    /** A word tag inside line text: {@code <ts>} or (after the line's own timestamps) {@code [ts]}. */
+    private static final Pattern INLINE_TAG = Pattern.compile("<([^<>]{3,16})>|\\[([^\\[\\]]{3,16})]");
+    private static final Pattern WALAOKE = Pattern.compile("^(?:[MFD]|v\\d)\\s*:\\s+");
+    static final long OPEN_END_MS = 3_000;
     private static final Pattern META = Pattern.compile("([A-Za-z]+)\\s*:(.*)", Pattern.DOTALL);
     private static final Set<String> META_KEYS = new HashSet<>(
             Arrays.asList("ti", "ar", "al", "au", "by", "offset", "length", "re", "ve", "tool", "lang"));
@@ -69,8 +79,8 @@ public final class LrcParser {
             if (times.isEmpty()) {
                 plain.add(clean(rawLine.substring(start)));
             } else {
-                String text = clean(rawLine.substring(i));
-                for (long t : times) timed.add(new LyricLine(t, text));
+                LyricLine first = wordLine(rawLine.substring(i), times.get(0));
+                for (long t : times) timed.add(shift(first, t, t - times.get(0)));
             }
         }
 
@@ -97,8 +107,9 @@ public final class LrcParser {
 
     private static List<LyricLine> syncedLines(List<LyricLine> timed, long offset) {
         List<LyricLine> shifted = new ArrayList<>(timed.size());
-        for (LyricLine l : timed) shifted.add(new LyricLine(Math.max(0, l.timeMs() - offset), l.text()));
+        for (LyricLine l : timed) shifted.add(shift(l, Math.max(0, l.timeMs() - offset), -offset));
         shifted.sort(Comparator.comparingLong(LyricLine::timeMs)); // stable
+        closeOpenEnds(shifted);
         List<LyricLine> out = new ArrayList<>(shifted.size());
         Set<LyricLine> seenAtTime = new HashSet<>();
         long seenTime = -1;
@@ -113,6 +124,96 @@ public final class LrcParser {
             out.add(l);
         }
         return out;
+    }
+
+    /**
+     * Parses the text after the line timestamps into clean text plus word units; words stay null without any word tag.
+     * Unknown ends are -1 here and fixed by {@link #closeOpenEnds}.
+     */
+    static LyricLine wordLine(String rest, long lineTime) {
+        Matcher m = INLINE_TAG.matcher(rest);
+        StringBuilder text = new StringBuilder(rest.length());
+        List<LyricWord> words = new ArrayList<>();
+        long pending = lineTime; // A2: the first unit may come without a tag
+        boolean anyTag = false;
+        int pos = 0;
+        while (true) {
+            boolean found = m.find();
+            Long ts = null;
+            if (found) {
+                ts = parseTimestamp(m.group(1) != null ? m.group(1) : m.group(2));
+                if (ts == null) continue; // "<3" or "[chorus]": ordinary text
+            }
+            int segEnd = found ? m.start() : rest.length();
+            String seg = rest.substring(pos, segEnd);
+            if (!anyTag && words.isEmpty() && text.length() == 0) seg = WALAOKE.matcher(seg.stripLeading()).replaceFirst("");
+            appendUnit(text, words, seg, pending);
+            if (!found) break;
+            anyTag = true;
+            LyricWord last = words.isEmpty() ? null : words.get(words.size() - 1);
+            if (last != null && last.endMs() < 0) {
+                words.set(words.size() - 1, new LyricWord(last.startMs(), Math.max(last.startMs(), ts), last.text(),
+                        last.start(), last.end()));
+            }
+            pending = ts;
+            pos = m.end();
+        }
+        int len = text.length();
+        while (len > 0 && text.charAt(len - 1) == ' ') len--;
+        text.setLength(len);
+        return new LyricLine(lineTime, text.toString(), anyTag && !words.isEmpty() ? words : null, false);
+    }
+
+    /** Appends one tagged segment (collapsed whitespace) and records it as a unit starting at {@code startMs}. */
+    private static void appendUnit(StringBuilder text, List<LyricWord> words, String seg, long startMs) {
+        int from = -1, to = -1;
+        for (int k = 0; k < seg.length(); k++) {
+            char c = seg.charAt(k);
+            if (c == '\uFEFF' || c == '\u200B') continue;
+            if (c == ' ' || c == '\t') {
+                if (text.length() > 0 && text.charAt(text.length() - 1) != ' ') text.append(' ');
+                continue;
+            }
+            if (from < 0) from = text.length();
+            text.append(c);
+            to = text.length();
+        }
+        if (from < 0) return;
+        words.add(new LyricWord(startMs, -1, text.substring(from, to), from, to));
+    }
+
+    /** Moves a line (and its words) to {@code time}, word times by {@code delta}. */
+    private static LyricLine shift(LyricLine l, long time, long delta) {
+        if (!l.hasWords()) return new LyricLine(time, l.text());
+        List<LyricWord> ws = new ArrayList<>(l.words().size());
+        for (LyricWord w : l.words()) {
+            long s = Math.max(0, w.startMs() + delta);
+            ws.add(new LyricWord(s, w.endMs() < 0 ? -1 : Math.max(s, w.endMs() + delta), w.text(), w.start(), w.end()));
+        }
+        return new LyricLine(time, l.text(), ws, false);
+    }
+
+    /** A last word without an end tag ends at the next line's start, at most {@link #OPEN_END_MS} after it began. */
+    static void closeOpenEnds(List<LyricLine> lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            LyricLine l = lines.get(i);
+            if (!l.hasWords()) continue;
+            long next = Long.MAX_VALUE;
+            for (int j = i + 1; j < lines.size(); j++) {
+                if (lines.get(j).timeMs() > l.timeMs()) { next = lines.get(j).timeMs(); break; }
+            }
+            List<LyricWord> ws = new ArrayList<>(l.words());
+            boolean changed = false;
+            for (int k = 0; k < ws.size(); k++) {
+                LyricWord w = ws.get(k);
+                if (w.endMs() >= 0) continue;
+                long nextStart = k + 1 < ws.size() ? ws.get(k + 1).startMs() : next;
+                long end = Math.max(w.startMs(), Math.min(nextStart, w.startMs() + OPEN_END_MS));
+                ws.set(k, new LyricWord(w.startMs(), end, w.text(), w.start(), w.end()));
+                changed = true;
+            }
+            if (changed) lines.set(i, l.withWords(ws, false));
+        }
     }
 
     @Nullable
@@ -185,7 +286,7 @@ public final class LrcParser {
         return sb == null ? s : sb.toString();
     }
 
-    /** Removes word tags and collapses whitespace; keeps all other characters (Persian etc.) intact. */
+    /** Removes word tags (on unsynced lines) and collapses whitespace; keeps all other characters intact. */
     private static String clean(String s) {
         if (s.indexOf('<') >= 0) s = WORD_TAG.matcher(s).replaceAll("");
         return s.replaceAll("[ \\t]{2,}", " ").trim();

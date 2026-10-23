@@ -122,6 +122,7 @@ public final class PlayerFragment extends Fragment {
         // (WaveformSeekView extends WavySeekView, so compare the exact class.)
         if (seek.getClass() != WavySeekView.class) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
         vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
+        vm.getLyricsAvailability().observe(getViewLifecycleOwner(), this::renderLyricsButton);
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
 
@@ -216,7 +217,9 @@ public final class PlayerFragment extends Fragment {
         b.playerMore.setOnClickListener(v -> {
             android.widget.PopupMenu menu = new android.widget.PopupMenu(requireContext(), v);
             boolean lyrics = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
-            menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
+            if (lyrics || vm.getLyricsAvailability().getValue() == LyricsAvailability.AVAILABLE) {
+                menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
+            }
             menu.getMenu().add(0, 2, 1, R.string.player_queue);
             menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
             Track current = vm.getCurrentTrack().getValue();
@@ -531,7 +534,31 @@ public final class PlayerFragment extends Fragment {
         b.playerLyricsToggle.setContentDescription(getString(lyrics ? R.string.player_show_cover : R.string.player_show_lyrics));
         b.playerLyricsToggle.setActivated(lyrics);
         b.playerLyricsToggle.setAlpha(lyrics ? 1f : 0.82f);
+        renderLyricsButton(vm.getLyricsAvailability().getValue());
         renderLyrics(vm.getLyrics().getValue());
+    }
+
+    /**
+     * Lyrics button only when the track has lyrics. INVISIBLE (not GONE) so the centred pill group never jumps when
+     * the next track's answer arrives; a short fade-in when it appears, nothing while checking.
+     */
+    private void renderLyricsButton(@Nullable LyricsAvailability a) {
+        View v = b.playerLyricsToggle;
+        boolean show = a == LyricsAvailability.AVAILABLE || Boolean.TRUE.equals(vm.getShowLyrics().getValue());
+        if (show == (v.getVisibility() == View.VISIBLE)) return;
+        v.animate().cancel();
+        float target = Boolean.TRUE.equals(vm.getShowLyrics().getValue()) ? 1f : 0.82f;
+        if (show) {
+            v.setVisibility(View.VISIBLE);
+            if (com.mhrsdev.musicplayer.ui.theme.MotionPolicy.decorativeMotionEnabled(requireContext())) {
+                v.setAlpha(0f);
+                v.animate().alpha(target).setDuration(180).start();
+            } else {
+                v.setAlpha(target);
+            }
+        } else {
+            v.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void crossfade(View v, boolean show) {

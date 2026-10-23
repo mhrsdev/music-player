@@ -88,30 +88,41 @@ final class Id3LyricsReader {
             anyNewline |= text.indexOf('\n') >= 0;
             pos = t + 4;
         }
+        // Each entry is a line, unless entries carry their own newlines: then entries are words/syllables of a line,
+        // written as enhanced LRC ([line]<word>...) so the word timing survives.
         StringBuilder out = new StringBuilder();
-        StringBuilder line = new StringBuilder();
-        long lineTime = -1;
+        List<Long> unitTimes = new ArrayList<>();
+        List<String> units = new ArrayList<>();
         for (int i = 0; i < texts.size(); i++) {
             String t = texts.get(i);
             boolean breaksBefore = !anyNewline || t.startsWith("\n");
-            if (breaksBefore && line.length() > 0) {
-                appendLrc(out, lineTime, line);
-                line.setLength(0);
+            if (breaksBefore && !units.isEmpty()) appendLrc(out, unitTimes, units);
+            String clean = t.replace("\n", "").replace("\r", "");
+            if (!clean.isEmpty() || units.isEmpty()) {
+                unitTimes.add(times.get(i));
+                units.add(clean);
             }
-            if (line.length() == 0) lineTime = times.get(i);
-            line.append(t.replace("\n", "").replace("\r", ""));
-            if (anyNewline && t.endsWith("\n")) {
-                appendLrc(out, lineTime, line);
-                line.setLength(0);
-            }
+            if (anyNewline && t.endsWith("\n")) appendLrc(out, unitTimes, units);
         }
-        if (line.length() > 0) appendLrc(out, lineTime, line);
+        if (!units.isEmpty()) appendLrc(out, unitTimes, units);
         return out.length() == 0 ? null : out.toString();
     }
 
-    private static void appendLrc(StringBuilder out, long ms, CharSequence text) {
-        out.append(String.format(Locale.ROOT, "[%02d:%02d.%02d]", ms / 60000, ms / 1000 % 60, ms % 1000 / 10))
-                .append(text).append('\n');
+    private static void appendLrc(StringBuilder out, List<Long> times, List<String> units) {
+        out.append(stamp('[', times.get(0), ']'));
+        int real = 0;
+        for (String u : units) if (!u.trim().isEmpty()) real++;
+        for (int i = 0; i < units.size(); i++) {
+            if (real > 1) out.append(stamp('<', times.get(i), '>'));
+            out.append(units.get(i));
+        }
+        out.append('\n');
+        times.clear();
+        units.clear();
+    }
+
+    private static String stamp(char open, long ms, char close) {
+        return String.format(Locale.ROOT, "%c%02d:%02d.%02d%c", open, ms / 60000, ms / 1000 % 60, ms % 1000 / 10, close);
     }
 
     private static int terminatorLength(int enc) {
