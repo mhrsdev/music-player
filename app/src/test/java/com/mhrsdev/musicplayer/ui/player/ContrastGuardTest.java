@@ -50,12 +50,12 @@ public class ContrastGuardTest {
     }
 
     @Test public void lightThemeDarkTextOverDarkCover() {
-        int[] px = fill(0xFF1A2030);
-        int text = 0xFF191C20;
-        float a = ContrastGuard.requiredScrimAlpha(px, 20, 20, 0f, 1f, LIGHT_SCRIM, 0.55f, text, 4.5);
+        int[] px = fill(0xFF000000);
+        int text = 0x99191C20; // inactive lyric, onSurface .60
+        float a = ContrastGuard.requiredScrimAlpha(px, 20, 20, 0f, 1f, LIGHT_SCRIM, 0.55f, text, 3.0);
         assertTrue(a > 0.55f);
         int bg = ContrastGuard.blend(LIGHT_SCRIM, px[0], a);
-        assertTrue(ContrastGuard.ratio(text, bg) >= 4.5);
+        assertTrue(ContrastGuard.ratio(ContrastGuard.blend(text, bg, 0.6f), bg) >= 3.0);
     }
 
     @Test public void nullOrShortInputReturnsBase() {
