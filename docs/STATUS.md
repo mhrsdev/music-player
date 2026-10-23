@@ -54,7 +54,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 - 🔄 **R1** [Sonnet+ponytail] Release engineering: signing config, tag-triggered release workflow, README (en+fa) + CHANGELOG, APK build/verify. Branch `task/r1-release`, worktree `../wt-r1`.
 
-- 🔄 **F1** [Sonnet+ponytail] Functional integration audit of the critical user flows (first-run permission→scan, notification permission, play from every list, mini→full player, restore, settings) + fixes. Branch `task/f1-flows`, worktree `../wt-f1`.
 
 - 🔄 **P3** [Opus] Library/Home layout gaps (collage, 2×2 grid, snap carousel, skeletons, search/artists, per-script font). Branch `task/p3-polish-library`, worktree `../wt-p3`.
 
@@ -73,6 +72,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **F1** [Sonnet+ponytail] Integration audit merged. Fixed: first scan after permission grant (FirstRunFlowTest), Home scanning/empty states + action, POST_NOTIFICATIONS requested on first play (API 33+), language re-applied on API 26–32, nav tab restored after process death, waveform requested only for Waveform/Bars styles, Add-to-playlist in track menu (create/pick). Verified only by reading/Robolectric (no device).
 - ✅ **P1** [Opus] Polish merged: bundled fonts (Google Sans Flex subset 110 KB + Vazirmatn 114 KB, OFL notices in assets/licenses), v1 type ramp, morph play buttons on Home/Library, Persian-in-English subtitle fix, Robolectric screen renders (`docs/screens/p1-*.png`, `ScreenRenderTest` + `FakeRenderApp`). Not done (→ P3): liked collage, 2×2 library grid, carousel snap, skeletons, search/artist polish, per-script font.
 - ✅ **T8** [Sonnet+ponytail] Wiring merged: `AppContainer` real impls by default (`USE_FAKES` switch), `LibraryAdmin`, SqliteWaveformStore as WaveformStore, SqliteLyricsCacheStore (DB v3), single SettingsStore (battery-saver/sleep-default/seek-style/online-lyrics now consumed), deterministic history order (fixes flaky test), manifest perms (READ_MEDIA_AUDIO, READ_EXTERNAL_STORAGE ≤32, INTERNET), debug+release+test+lint green (agent-reported). **Supervisor found a gap:** nothing calls `AppContainer.onAudioPermissionGranted()` → first scan after in-app permission grant never runs → F1.
 - ✅ **T2** [Opus] UI foundation merged (design v1 tokens): `ui/theme` (Tokens, ThemeController, AccentScheme w/ 4.5:1 guard, ColorExtractor, MotionPolicy), `ui/widget` (SeekBarView + Wavy/Waveform/Bars, MorphPlayPauseView, FloatingNavView, MiniPlayerView, ArtworkView/Loader, BackdropBlur, ChipView, SectionHeaderView, TrackRowView), 26 icons, debug WidgetGalleryActivity + Robolectric render test → `docs/screens/t2-widget-gallery-*.png` (real render from Android code). Gaps: fonts not bundled (system sans), LoadingIndicator, grain, hand-drawn 10-lobe cookie, device run.
@@ -87,6 +87,15 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T2a** [Opus] Design phase: 17 PNG mockups in `docs/design/png/` + spec `docs/design/DESIGN.md` (sources in `docs/design/src/`). Sent to owner in chat. **Approved by owner (D4).** Not verified: nothing runs on Android (browser mockups); notification/lock-screen is approximate; Persian copy needs native check; not mocked: tablet, overflow menus, sleep-timer sheet, permission-denied state.
 - ✅ **T1** [Sonnet] Scaffold: Gradle 9.8.2/AGP 9.4.1, Kotlin 2.4.21, compile/target SDK 37, M3 1.5.0-beta02 (Expressive), Koin, Media3, Room; domain contracts + fakes (37 tracks); `assembleDebug`, `lint`, 23 unit tests pass (agent-reported; SDK at /opt/android-sdk, `ANDROID_HOME=/opt/android-sdk ./gradlew :app:assembleDebug`). NOT verified: device run, release/R8, GitHub Actions run.
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
+
+
+## Backlog for the full version (phase 2, from F1 + P1 gaps + owner D14 'everything a music player needs')
+- Playlist management UI: rename/delete/remove track/reorder (LibraryAdmin methods exist, UI doesn't call them); Settings: rescan button + folder include/exclude picker.
+- Perf: queue (de)serialization + `readQueue` off the main thread for 10k-track queues; first scan shouldn't block the single io thread (own scan executor); lyrics fetched only when lyrics view visible; `android:localeConfig` for API 33+ per-app language.
+- Player features: equalizer + bass/virtualizer (AudioEffect) UI, playback speed/pitch, gapless/crossfade, ReplayGain, skip-silence, audio focus options, headset/Bluetooth auto-resume rules, repeat A-B?, sleep timer already.
+- Library: genres/folders/year views, sort options, track info/tag viewer & edit, share, set as ringtone, delete from device, favorites auto-playlist, smart playlists (recent/most played), duplicate handling, album art fetch fallback.
+- System: home-screen widget (RemoteViews), Android Auto/MediaLibraryService browse tree, lock-screen/notification polish, backup/restore (playlists+likes export/import), app shortcuts, Quick Settings tile, tablet/landscape layouts, accessibility pass (TalkBack), predictive back, light-player verification.
+- Online (needs owner decision, K2): legal catalog provider.
 
 ## Change log
 - 2026-10-23: D15: MIT license added (LICENSE); README license section to say MIT.

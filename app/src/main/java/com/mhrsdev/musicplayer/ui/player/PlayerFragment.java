@@ -113,7 +113,8 @@ public final class PlayerFragment extends Fragment {
         vm.getState().observe(getViewLifecycleOwner(), this::render);
         vm.getCurrentTrack().observe(getViewLifecycleOwner(), this::renderTrack);
         vm.getLiked().observe(getViewLifecycleOwner(), this::renderLiked);
-        vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
+        // Wavy ignores the envelope: don't extract it (CPU/battery) unless the chosen style draws it.
+        if (!(seek instanceof WavySeekView)) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
         vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
