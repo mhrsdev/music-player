@@ -42,27 +42,25 @@ import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsTicker;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsScrollPolicy;
 import com.mhrsdev.musicplayer.ui.queue.QueueFragment;
 import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
-import com.mhrsdev.musicplayer.ui.widget.BarsSeekView;
+import com.mhrsdev.musicplayer.data.settings.SeekBarStyle;
 import com.mhrsdev.musicplayer.ui.widget.BaseSeekView;
 import com.mhrsdev.musicplayer.ui.widget.SeekBarView;
-import com.mhrsdev.musicplayer.ui.widget.WaveformSeekView;
-import com.mhrsdev.musicplayer.ui.widget.WavySeekView;
+import com.mhrsdev.musicplayer.ui.widget.SeekStyles;
 
 import java.util.Locale;
 
 /**
  * Full player (design v1, 05/06/11/15): top row lyrics toggle · shuffle/repeat/queue pill group · heart; cover or
- * synced lyrics; title/artist; seek (Wavy default / Waveform / Bars from the "seek_bar_style" setting); cookie
+ * synced lyrics; title/artist; seek (any {@link SeekStyles} style from the "seek_bar_style" setting, swapped live); cookie
  * play/pause between rounded prev/next; output chip. All observation uses the view lifecycle, so position ticks and
  * animations stop when the player is not visible.
  */
 public final class PlayerFragment extends Fragment {
 
-    /** Seek-bar styles (D4): Wavy default, Waveform, Bars (voice-memo). */
-    public enum SeekStyle { WAVY, WAVEFORM, BARS }
-
     private PlayerFragmentBinding b;
     private BaseSeekView seek;
+    @Nullable private SeekBarStyle seekStyle;
+    @Nullable private androidx.lifecycle.Observer<float[]> waveformObserver;
     private PlayerViewModel vm;
     private LyricsAdapter lyricsAdapter;
     private final LyricsScrollPolicy scrollPolicy = new LyricsScrollPolicy();
@@ -107,10 +105,7 @@ public final class PlayerFragment extends Fragment {
             return insets;
         });
 
-        seek = createSeekView(readSeekStyle(requireContext()));
-        b.playerSeekContainer.addView(seek, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        seek.setContentDescription(getString(R.string.player_seek));
+        installSeek(readSeekStyle(c));
         b.playerArtwork.setCornerRadiusDp(32);
         b.playerArtwork.setListener(this::onArtwork);
         b.playerStage.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
@@ -136,9 +131,16 @@ public final class PlayerFragment extends Fragment {
         vm.getState().observe(getViewLifecycleOwner(), this::render);
         vm.getCurrentTrack().observe(getViewLifecycleOwner(), this::renderTrack);
         vm.getLiked().observe(getViewLifecycleOwner(), this::renderLiked);
-        // Wavy ignores the envelope: don't extract it (CPU/battery) unless the chosen style draws it.
-        // (WaveformSeekView extends WavySeekView, so compare the exact class.)
-        if (seek.getClass() != WavySeekView.class) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
+        observeWaveformIfNeeded();
+        // D25: switching the style in Settings (or the picker) while the player is open swaps the bar live.
+        c.settings().seekBarStyle().observe(getViewLifecycleOwner(), st -> {
+            if (st == null || st == seekStyle || b == null) return;
+            installSeek(st);
+            observeWaveformIfNeeded();
+            applySeekColors();
+            renderedOnce = false;
+            render(vm.getState().getValue());
+        });
         vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
         vm.getLyricsAvailability().observe(getViewLifecycleOwner(), this::renderLyricsButton);
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
@@ -172,21 +174,42 @@ public final class PlayerFragment extends Fragment {
         lyricsTicker.setEnabled(showing && l != null && l.synced() && !l.isEmpty() && MotionPolicy.lyricsWordsEnabled());
     }
 
-    /** Reads the Settings screen's choice (T3's SettingsStore, file "settings"); Wavy when unset or unknown. */
-    static SeekStyle readSeekStyle(Context ctx) {
-        try {
-            return SeekStyle.valueOf(new com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore(ctx).getSeekStyle().name());
-        } catch (RuntimeException e) {
-            return SeekStyle.WAVY;
-        }
+    /** The "seek_bar_style" setting; Wavy when unset or unknown. */
+    static SeekBarStyle readSeekStyle(AppContainer c) {
+        SeekBarStyle s = c.settings().seekBarStyle().getValue();
+        return s != null ? s : SeekBarStyle.WAVY;
     }
 
-    private BaseSeekView createSeekView(SeekStyle style) {
-        Context c = requireContext();
-        switch (style) {
-            case WAVEFORM: return new WaveformSeekView(c);
-            case BARS: return new BarsSeekView(c);
-            default: return new WavySeekView(c);
+    /** Creates the bar for {@code style} (replacing the current one) and wires its seek callbacks. */
+    private void installSeek(SeekBarStyle style) {
+        seekStyle = style;
+        b.playerSeekContainer.removeAllViews();
+        seek = SeekStyles.create(requireContext(), style);
+        b.playerSeekContainer.addView(seek, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        seek.setContentDescription(getString(R.string.seek_style_cd, getString(SeekStyles.nameRes(style))));
+        scrubbing = false;
+        seek.setOnSeekListener(new SeekBarView.OnSeekListener() {
+            @Override public void onSeekStart(long pos) { scrubbing = true; }
+            @Override public void onSeek(long pos) { renderTimes(pos, seek.getDuration()); }
+            @Override public void onSeekEnd(long pos) {
+                scrubbing = false;
+                vm.seekTo(pos);
+            }
+        });
+    }
+
+    /** Styles that ignore the envelope don't make the repository extract it (CPU/battery). */
+    private void observeWaveformIfNeeded() {
+        boolean wants = seekStyle != null && SeekStyles.usesWaveform(seekStyle);
+        if (wants && waveformObserver == null) {
+            waveformObserver = w -> { if (seek != null) seek.setWaveform(w); };
+            vm.getWaveform().observe(getViewLifecycleOwner(), waveformObserver);
+        } else if (wants) {
+            seek.setWaveform(vm.getWaveform().getValue());
+        } else if (waveformObserver != null) {
+            vm.getWaveform().removeObserver(waveformObserver);
+            waveformObserver = null;
         }
     }
 
@@ -312,14 +335,6 @@ public final class PlayerFragment extends Fragment {
             else QueueFragment.show(getParentFragmentManager());
         });
         b.playerOutput.setOnClickListener(v -> { if (btNameNeedsPermission) explainBluetoothName(); });
-        seek.setOnSeekListener(new SeekBarView.OnSeekListener() {
-            @Override public void onSeekStart(long pos) { scrubbing = true; }
-            @Override public void onSeek(long pos) { renderTimes(pos, seek.getDuration()); }
-            @Override public void onSeekEnd(long pos) {
-                scrubbing = false;
-                vm.seekTo(pos);
-            }
-        });
     }
 
     private void setupLyrics() {
@@ -641,13 +656,17 @@ public final class PlayerFragment extends Fragment {
         render(vm.getState().getValue());
     }
 
+    private void applySeekColors() {
+        seek.setColors(light ? palette.glow : palette.primary, light ? 0x3D181C21 : 0x47FFFFFF);
+    }
+
     private void applyPalette(PlayerPalette p, @Nullable android.graphics.Bitmap tinyArt, boolean animate) {
         palette = p;
         b.playerBackdrop.setContent(p, tinyArt, animate);
         b.playerPlay.setColors(light ? p.glow : p.primary, light ? 0xFFFFFFFF : p.onPrimary);
         // Light theme: the tone-40 role reads on the pale scrim; dark theme keeps the tone-80 primary.
         int accent = light ? p.glow : p.primary;
-        seek.setColors(accent, light ? 0x3D181C21 : 0x47FFFFFF);
+        applySeekColors();
         b.playerLike.setImageTintList(ColorStateList.valueOf(accent));
         renderedOnce = false; // the toggles' tint comes from the palette: repaint them once
         render(vm.getState().getValue());
@@ -1016,6 +1035,8 @@ public final class PlayerFragment extends Fragment {
         rElapsedSec = -1;
         b = null;
         seek = null;
+        seekStyle = null;
+        waveformObserver = null;
         super.onDestroyView();
     }
 }

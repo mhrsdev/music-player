@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/nav_back"
+        android:src="@drawable/nav_ic_back"
+        app:tint="?attr/mpOnSurface" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/scr_bottom_chrome">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/Scr.PageTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:paddingTop="4dp" android:text="@string/headset_title" />
+
+            <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/headset_buttons_label" />
+            <LinearLayout android:id="@+id/gestures" style="@style/Settings.Card" />
+            <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/headset_buttons_hint" />
+
+            <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/headset_connection_label" />
+            <LinearLayout style="@style/Settings.Card">
+                <androidx.appcompat.widget.SwitchCompat android:id="@+id/resume_connect" style="@style/Settings.CardSwitch" android:text="@string/headset_resume_connect" />
+                <TextView style="@style/Settings.CardSub" android:text="@string/headset_resume_connect_sub" />
+                <androidx.appcompat.widget.SwitchCompat android:id="@+id/pause_disconnect" style="@style/Settings.CardSwitch" android:text="@string/headset_pause_disconnect" />
+                <TextView style="@style/Settings.CardSub" android:text="@string/headset_pause_disconnect_sub" />
+                <androidx.appcompat.widget.SwitchCompat android:id="@+id/resume_call" style="@style/Settings.CardSwitch" android:text="@string/headset_resume_call" />
+                <TextView style="@style/Settings.CardSub" android:text="@string/headset_resume_call_sub" />
+            </LinearLayout>
+
+            <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/headset_outputs_title" />
+            <TextView android:id="@+id/outputs_empty" style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/headset_outputs_none" android:visibility="gone" />
+            <LinearLayout android:id="@+id/outputs" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+            <TextView
+                android:id="@+id/switch_output"
+                style="@style/Sound.Reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/headset_switch"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/bt_names"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:text="@string/headset_bt_names"
+                android:textColor="?attr/mpPrimary"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <LinearLayout style="@style/Settings.Card" android:layout_marginTop="16dp">
+                <TextView style="@style/Settings.CardTitle" android:text="@string/headset_dual_title" android:accessibilityHeading="true" />
+                <TextView style="@style/Settings.CardSub" android:text="@string/headset_dual_body" />
+                <TextView
+                    android:id="@+id/dual_open"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:text="@string/headset_dual_open"
+                    android:textColor="?attr/mpPrimary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

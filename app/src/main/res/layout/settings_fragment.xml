@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Settings (DESIGN.md 09): grouped cards. Rows for folders / feature screens / about are added by SettingsFragment. -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/settings_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -71,14 +72,20 @@
         <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_playback" />
         <LinearLayout android:id="@+id/sound_card" style="@style/Settings.Card" />
         <LinearLayout style="@style/Settings.Card">
-            <TextView style="@style/Settings.CardTitle" android:text="@string/settings_seek_style" />
-            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                <LinearLayout style="@style/Settings.ChipStrip">
-                    <TextView android:id="@+id/seek_wavy" style="@style/Search.Chip" android:text="@string/settings_seek_wavy" />
-                    <TextView android:id="@+id/seek_waveform" style="@style/Search.Chip" android:text="@string/settings_seek_waveform" />
-                    <TextView android:id="@+id/seek_bars" style="@style/Search.Chip" android:text="@string/settings_seek_bars" />
+            <!-- D25: one row with the current style's name and a static mini preview; opens SeekStylePickerSheet. -->
+            <LinearLayout android:id="@+id/seek_style_row" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:minHeight="56dp" android:clickable="true" android:focusable="true"
+                android:background="?attr/selectableItemBackground" android:paddingBottom="4dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView style="@style/Settings.CardTitle" android:layout_width="0dp" android:layout_weight="1" android:text="@string/settings_seek_style" />
+                    <TextView android:id="@+id/seek_style_value" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:textSize="15sp" android:textColor="?attr/mpPrimary" android:textStyle="bold" android:paddingEnd="4dp" />
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_mp_chevron_right" android:importantForAccessibility="no" app:tint="?attr/mpOnSurfaceVariant" />
                 </LinearLayout>
-            </HorizontalScrollView>
+                <FrameLayout android:id="@+id/seek_style_preview" android:layout_width="match_parent" android:layout_height="48dp"
+                    android:layout_marginHorizontal="8dp" android:layoutDirection="ltr" android:importantForAccessibility="noHideDescendants" />
+            </LinearLayout>
             <TextView style="@style/Settings.CardTitle" android:text="@string/settings_sleep_default" />
             <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
                 <LinearLayout android:id="@+id/sleep_row" style="@style/Settings.ChipStrip" />

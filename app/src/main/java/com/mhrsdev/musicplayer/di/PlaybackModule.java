@@ -8,7 +8,10 @@ import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 import com.mhrsdev.musicplayer.domain.repository.LibraryReader;
 import com.mhrsdev.musicplayer.playback.AudioEffectsEngine;
 import com.mhrsdev.musicplayer.playback.BrowseHolder;
+import com.mhrsdev.musicplayer.domain.repository.OutputDevices;
 import com.mhrsdev.musicplayer.playback.ExoPlayerController;
+import com.mhrsdev.musicplayer.playback.HeadsetControls;
+import com.mhrsdev.musicplayer.playback.OutputDevicesImpl;
 import com.mhrsdev.musicplayer.playback.PlayCountListener;
 import java.util.function.Consumer;
 
@@ -33,5 +36,15 @@ public final class PlaybackModule {
     /** Equalizer / bass / virtualizer / loudness on the shared player's audio session (effects attach lazily). */
     public static AudioEffectsController createAudioEffects(Context context) {
         return new AudioEffectsEngine(context);
+    }
+
+    /** Connected outputs from AudioManager; the device callback is registered only while the list is observed. */
+    public static OutputDevices createOutputDevices(Context context) {
+        return new OutputDevicesImpl(context);
+    }
+
+    /** What the headset "like" gesture does with the current track id, e.g. {@code library::toggleLike}. */
+    public static void setLikeHandler(Consumer<String> handler) {
+        HeadsetControls.setLikeHandler(handler);
     }
 }

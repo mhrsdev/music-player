@@ -25,7 +25,7 @@
     <string name="settings_perf_lyrics_words">ترانهٔ کلمه‌به‌کلمه</string>
     <string name="settings_perf_lyrics_words_sub">سطری که خوانده می‌شود کلمه‌به‌کلمه پر می‌شود. خاموش: کل سطر یک‌جا روشن می‌شود.</string>
     <string name="settings_perf_seek">نوار پخش متحرک</string>
-    <string name="settings_perf_seek_sub">موج نوار هنگام پخش روان حرکت می‌کند. خاموش: موج ثابت می‌ماند.</string>
+    <string name="settings_perf_seek_sub">موج، نقطه‌ها یا چین‌های نوار پخش هنگام پخش حرکت می‌کنند. خاموش: نوار ثابت می‌ماند.</string>
     <string name="settings_perf_fps">نرخ فریم انیمیشن</string>
     <string name="settings_perf_fps_screen">هم‌پای صفحه</string>
     <string name="settings_perf_fps_60">۶۰ فریم</string>

@@ -29,6 +29,10 @@ import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 import com.mhrsdev.musicplayer.domain.repository.UpdateRepository;
 import com.mhrsdev.musicplayer.domain.repository.WaveformRepository;
 import com.mhrsdev.musicplayer.fake.FakeAudioEffects;
+import com.mhrsdev.musicplayer.fake.FakeOutputDevices;
+import com.mhrsdev.musicplayer.domain.repository.OutputDevices;
+import com.mhrsdev.musicplayer.playback.DeviceProfileApplier;
+import com.mhrsdev.musicplayer.playback.DeviceProfiles;
 import com.mhrsdev.musicplayer.fake.FakeBackupService;
 import com.mhrsdev.musicplayer.playback.NowPlayingBridge;
 import com.mhrsdev.musicplayer.fake.FakeHomeFeedSource;
@@ -51,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  * happens until something is observed or called; the only eager piece is the player, which must exist when the
  * process is started by a media button.
  */
-public final class AppContainer {
+public class AppContainer {
     /** The one place that decides real vs fake for the running app. */
     static final boolean USE_FAKES = false;
     /** App start: skip the incremental scan if one finished this recently. */
@@ -76,6 +80,9 @@ public final class AppContainer {
     private final LibraryAdmin libraryAdmin;
     private final LibraryBrowser libraryBrowser;
     private final AudioEffectsController audioEffects;
+    private final OutputDevices outputDevices;
+    private final DeviceProfiles deviceProfiles;
+    private final DeviceProfileApplier deviceProfileApplier;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Runnable observedScan = this::scanAfterMediaChange;
     private ContentObserver mediaObserver;
@@ -100,6 +107,7 @@ public final class AppContainer {
                 }, "scan"));
         scan.allowCoreThreadTimeOut(true);
         settings = new SettingsStore(appContext);
+        deviceProfiles = new DeviceProfiles(appContext);
         musicSource = new FakeMusicSource();
 
         if (useFakes) {
@@ -109,6 +117,7 @@ public final class AppContainer {
             libraryBrowser = fake;
             player = new FakePlayerController();
             audioEffects = new FakeAudioEffects();
+            outputDevices = new FakeOutputDevices();
             lyrics = new FakeLyricsRepository();
             waveform = new FakeWaveformRepository();
             homeFeed = new FakeHomeFeedSource(library);
@@ -127,10 +136,15 @@ public final class AppContainer {
             // Home-screen widgets: redrawn on track / play-pause changes only, and only while this process lives.
             NowPlayingBridge.attach(appContext, np -> WidgetUpdater.update(appContext, np, io));
             audioEffects = PlaybackModule.createAudioEffects(appContext);
+            outputDevices = PlaybackModule.createOutputDevices(appContext);
+            PlaybackModule.setLikeHandler(data.library::toggleLike);
             lyrics = LyricsModule.create(appContext, BuildConfig.VERSION_NAME,
                     new SqliteLyricsCacheStore(data.dbHelper, System::currentTimeMillis),
                     () -> !Boolean.FALSE.equals(settings.lyricsOnline().getValue()));
         }
+        // Saved per-device sounds are applied when their device becomes the output; listens only if any are saved.
+        deviceProfileApplier = new DeviceProfileApplier(outputDevices, deviceProfiles, audioEffects, player);
+        deviceProfileApplier.startIfNeeded();
     }
 
     /** Settings are real in both modes (SharedPreferences only). */
@@ -141,6 +155,21 @@ public final class AppContainer {
     /** Equalizer, bass boost, virtualizer and loudness (real effects on the player's audio session, or a fake). */
     public AudioEffectsController audioEffects() {
         return audioEffects;
+    }
+
+    /** Connected audio outputs and the media volume of the active one (the system callback runs only while observed). */
+    public OutputDevices outputDevices() {
+        return outputDevices;
+    }
+
+    /** Saved sound per output device. */
+    public DeviceProfiles deviceProfiles() {
+        return deviceProfiles;
+    }
+
+    /** Starts applying saved device sounds (call after the first profile is saved). */
+    public void startDeviceProfiles() {
+        deviceProfileApplier.startIfNeeded();
     }
 
     /** Scanning and the extra playlist edits (rename, delete, remove, reorder). */

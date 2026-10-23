@@ -21,6 +21,20 @@ class WidgetRenderer {
 
     private WidgetRenderer() { }
 
+    /** The widget's progress follows the chosen seek style's family (static); a filled pill if settings can't load. */
+    static com.mhrsdev.musicplayer.ui.widget.SeekStyles.Family seekFamily(Context context) {
+        try {
+            Context app = context.getApplicationContext();
+            if (app instanceof com.mhrsdev.musicplayer.MusicPlayerApp m) {
+                com.mhrsdev.musicplayer.data.settings.SeekBarStyle s = m.getContainer().settings().seekBarStyle().getValue();
+                if (s != null) return com.mhrsdev.musicplayer.ui.widget.SeekStyles.family(s);
+            }
+        } catch (RuntimeException ignored) {
+            // fall through: default look
+        }
+        return com.mhrsdev.musicplayer.ui.widget.SeekStyles.Family.PILL;
+    }
+
     static RemoteViews build(Context context, WidgetKind kind, @Nullable NowPlaying np, @Nullable Bitmap art,
             boolean dark, int widthDp, int heightDp) {
         WidgetPalette p = WidgetPalette.of(context, art, dark);
@@ -37,7 +51,7 @@ class WidgetRenderer {
         }
         if (kind == WidgetKind.WIDE) {
             rv.setImageViewBitmap(R.id.progress, WidgetArt.progressBar(PROGRESS_W, PROGRESS_H,
-                    idle ? 0f : np.progress(), WidgetPalette.withAlpha(p.text(), 0.22f), p.primary()));
+                    idle ? 0f : np.progress(), WidgetPalette.withAlpha(p.text(), 0.22f), p.primary(), seekFamily(context)));
         }
         if (kind == WidgetKind.WIDE) rv.setViewVisibility(R.id.progress, idle ? View.INVISIBLE : View.VISIBLE);
         cover(context, rv, kind, p, art, widthDp, heightDp);

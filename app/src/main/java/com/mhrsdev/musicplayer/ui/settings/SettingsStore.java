@@ -8,7 +8,8 @@ public interface SettingsStore {
 
     enum Theme { SYSTEM, LIGHT, DARK, BLACK }
 
-    enum SeekStyle { WAVY, WAVEFORM, BARS }
+    /** Mirrors {@code data.settings.SeekBarStyle} name for name (append only). */
+    enum SeekStyle { WAVY, WAVEFORM, BARS, RIBBON, PULSE_DOTS, LED_LADDER, MOUNTAIN, BEADS, LIQUID }
 
     /** BCP-47 tag, or "" for the system language. */
     String LANG_SYSTEM = "";

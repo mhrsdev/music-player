@@ -31,7 +31,10 @@ import com.mhrsdev.musicplayer.domain.model.ScanResult;
 import com.mhrsdev.musicplayer.ui.nav.Adaptive;
 import com.mhrsdev.musicplayer.ui.nav.FeatureScreens;
 import com.mhrsdev.musicplayer.ui.nav.Screens;
-import com.mhrsdev.musicplayer.ui.settings.SettingsStore.SeekStyle;
+import com.mhrsdev.musicplayer.data.settings.SeekBarStyle;
+import com.mhrsdev.musicplayer.ui.widget.BaseSeekView;
+import com.mhrsdev.musicplayer.ui.widget.SeekShapes;
+import com.mhrsdev.musicplayer.ui.widget.SeekStyles;
 import com.mhrsdev.musicplayer.ui.settings.SettingsStore.Theme;
 import com.mhrsdev.musicplayer.ui.theme.ThemeController;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
@@ -245,14 +248,7 @@ public class SettingsFragment extends Fragment {
                 if (before == Theme.BLACK || t == Theme.BLACK) requireActivity().recreate();
             });
         }
-        TextView[] seeks = {b.seekWavy, b.seekWaveform, b.seekBars};
-        for (int i = 0; i < seeks.length; i++) {
-            SeekStyle s = SeekStyle.values()[i];
-            seeks[i].setOnClickListener(v -> {
-                v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
-                vm.setSeekStyle(s);
-            });
-        }
+        bindSeekStyleRow();
         TextView[] langs = {b.langSystem, b.langEn, b.langFa};
         String[] tags = {SettingsStore.LANG_SYSTEM, "en", "fa"};
         for (int i = 0; i < langs.length; i++) {
@@ -289,11 +285,36 @@ public class SettingsFragment extends Fragment {
         vm.refresh();
         vm.getState().observe(getViewLifecycleOwner(), s -> {
             for (int i = 0; i < themes.length; i++) themes[i].setSelected(Theme.values()[i] == s.theme());
-            for (int i = 0; i < seeks.length; i++) seeks[i].setSelected(SeekStyle.values()[i] == s.seekStyle());
             for (int i = 0; i < langs.length; i++) langs[i].setSelected(tags[i].equals(s.language()));
             for (int i = 0; i < presets.length; i++) sleepChips[i].setSelected(presets[i] == s.sleepDefaultMinutes());
             if (b.artworkColors.isChecked() != s.artworkColors()) b.artworkColors.setChecked(s.artworkColors());
             if (b.onlineLyrics.isChecked() != s.onlineLyrics()) b.onlineLyrics.setChecked(s.onlineLyrics());
+        });
+    }
+
+    /** Seek style: one row (name + static mini preview) that opens the picker; follows the setting live. */
+    private void bindSeekStyleRow() {
+        b.seekStyleRow.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+            SeekStylePickerSheet.show(getChildFragmentManager());
+        });
+        float[] sample = SeekShapes.sampleEnvelope();
+        Screens.container(this).settings().seekBarStyle().observe(getViewLifecycleOwner(), st -> {
+            SeekBarStyle style = st != null ? st : SeekBarStyle.WAVY;
+            String name = getString(SeekStyles.nameRes(style));
+            b.seekStyleValue.setText(name);
+            b.seekStyleRow.setContentDescription(getString(R.string.settings_seek_style) + ", " + name);
+            b.seekStylePreview.removeAllViews();
+            BaseSeekView p = SeekStyles.create(requireContext(), style);
+            p.setEnabled(false);
+            p.setFocusable(false);
+            p.setColors(Tokens.primary(requireContext()),
+                    SeekShapes.withAlpha(Tokens.color(requireContext(), R.attr.mpOnSurface), 0.26f));
+            p.setDuration(SeekStylePickerSheet.DEMO_DURATION_MS);
+            p.setWaveform(sample);
+            p.setPosition(Math.round(SeekStylePickerSheet.DEMO_DURATION_MS * SeekStylePickerSheet.DEMO_PROGRESS));
+            b.seekStylePreview.addView(p, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT)); // not playing: a still frame, no animation in Settings
         });
     }
 

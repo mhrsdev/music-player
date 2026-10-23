@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Collections;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -99,7 +100,11 @@ public class PlaybackNotificationTest {
         return posted;
     }
 
-    @After public void tearDown() {
+    @Before public void dropPlayerLeftByEarlierTests() throws Exception {
+        PlayerHolder.resetForTest();
+    }
+
+    @After public void tearDown() throws Exception {
         if (controller != null) controller.pause();
         if (service != null) service.destroy(); // releases the session: its id must be unique per test
         PlayerHolder.resetForTest(); // fresh ExoPlayer per test: no state or pending callbacks leak across tests

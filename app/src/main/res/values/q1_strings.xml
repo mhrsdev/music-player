@@ -25,7 +25,7 @@
     <string name="settings_perf_lyrics_words">Word-by-word lyrics</string>
     <string name="settings_perf_lyrics_words_sub">The sung line fills in word by word. Off: the whole line lights up at once.</string>
     <string name="settings_perf_seek">Moving seek bar</string>
-    <string name="settings_perf_seek_sub">The wavy bar flows while music plays. Off: the wave stays still.</string>
+    <string name="settings_perf_seek_sub">The seek bar’s wave, dots or ripples move while music plays. Off: it stays still.</string>
     <string name="settings_perf_fps">Animation frame rate</string>
     <string name="settings_perf_fps_screen">Match screen</string>
     <string name="settings_perf_fps_60">60 fps</string>
