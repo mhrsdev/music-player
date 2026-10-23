@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Design tokens (DESIGN.md section 2). Widgets resolve these from the theme, so Light/Dark/Black all work. -->
+    <attr name="mpBackground" format="color" />
+    <attr name="mpSurfaceContainerLow" format="color" />
+    <attr name="mpSurfaceContainer" format="color" />
+    <attr name="mpSurfaceContainerHigh" format="color" />
+    <attr name="mpSurfaceContainerHighest" format="color" />
+    <attr name="mpOnSurface" format="color" />
+    <attr name="mpOnSurfaceVariant" format="color" />
+    <attr name="mpOutline" format="color" />
+    <attr name="mpOutlineVariant" format="color" />
+    <attr name="mpPrimary" format="color" />
+    <attr name="mpOnPrimary" format="color" />
+    <attr name="mpPrimaryContainer" format="color" />
+    <attr name="mpOnPrimaryContainer" format="color" />
+    <attr name="mpSecondaryContainer" format="color" />
+    <attr name="mpOnSecondaryContainer" format="color" />
+    <attr name="mpTertiary" format="color" />
+    <attr name="mpError" format="color" />
+</resources>
