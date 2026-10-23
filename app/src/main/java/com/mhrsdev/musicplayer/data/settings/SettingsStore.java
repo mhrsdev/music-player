@@ -6,7 +6,9 @@ import android.os.Looper;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -28,6 +30,12 @@ public final class SettingsStore {
     private static final String K_BATTERY_SAVER = "battery_saver";
     private static final String K_INCLUDE = "folders_include";
     private static final String K_EXCLUDE = "folders_exclude";
+
+    private static final int MAX_BACKUP_STRING = 32;
+    private static final Map<String, Class<?>> BACKUP_TYPES = Map.of(
+            K_THEME, String.class, K_ARTWORK_COLORS, Boolean.class, K_SEEK_BAR, String.class, K_LANGUAGE, String.class,
+            K_LYRICS_ONLINE, Boolean.class, K_LYRICS_SIZE, String.class, K_SLEEP_MINUTES, Integer.class,
+            K_BATTERY_SAVER, String.class);
 
     private final SharedPreferences prefs;
     private final MutableLiveData<ThemeMode> theme;
@@ -149,6 +157,37 @@ public final class SettingsStore {
     public void setExcludedFolders(Set<String> folders) {
         prefs.edit().putStringSet(K_EXCLUDE, new HashSet<>(folders)).apply();
         publish(excludedFolders, Collections.unmodifiableSet(new HashSet<>(folders)));
+    }
+
+    /** The settings a backup carries (folder lists are device paths, so they stay out), by key. */
+    public Map<String, Object> exportBackup() {
+        Map<String, Object> all = new HashMap<>(prefs.getAll());
+        all.keySet().retainAll(BACKUP_TYPES.keySet());
+        return all;
+    }
+
+    /** Writes the known keys of {@code values} whose type matches, then refreshes every LiveData. Returns how many were applied. */
+    public int importBackup(Map<String, Object> values) {
+        SharedPreferences.Editor edit = prefs.edit();
+        int applied = 0;
+        for (Map.Entry<String, Class<?>> type : BACKUP_TYPES.entrySet()) {
+            Object v = values.get(type.getKey());
+            if (v == null || !type.getValue().isInstance(v)) continue;
+            if (v instanceof String s) edit.putString(type.getKey(), s.length() <= MAX_BACKUP_STRING ? s : "");
+            else if (v instanceof Boolean b) edit.putBoolean(type.getKey(), b);
+            else edit.putInt(type.getKey(), (Integer) v);
+            applied++;
+        }
+        edit.apply();
+        publish(theme, readEnum(K_THEME, ThemeMode.SYSTEM));
+        publish(artworkColors, prefs.getBoolean(K_ARTWORK_COLORS, true));
+        publish(seekBarStyle, readEnum(K_SEEK_BAR, SeekBarStyle.WAVY));
+        publish(language, prefs.getString(K_LANGUAGE, ""));
+        publish(lyricsOnline, prefs.getBoolean(K_LYRICS_ONLINE, true));
+        publish(lyricsTextSize, readEnum(K_LYRICS_SIZE, LyricsTextSize.MEDIUM));
+        publish(sleepTimerMinutes, prefs.getInt(K_SLEEP_MINUTES, DEFAULT_SLEEP_TIMER_MINUTES));
+        publish(batterySaver, readEnum(K_BATTERY_SAVER, BatterySaverMode.AUTO));
+        return applied;
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {

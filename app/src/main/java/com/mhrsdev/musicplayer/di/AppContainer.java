@@ -10,6 +10,7 @@ import com.mhrsdev.musicplayer.BuildConfig;
 import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
+import com.mhrsdev.musicplayer.domain.repository.BackupService;
 import com.mhrsdev.musicplayer.domain.repository.HomeFeedSource;
 import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
@@ -17,6 +18,7 @@ import com.mhrsdev.musicplayer.domain.repository.LyricsRepository;
 import com.mhrsdev.musicplayer.domain.repository.MusicSource;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 import com.mhrsdev.musicplayer.domain.repository.WaveformRepository;
+import com.mhrsdev.musicplayer.fake.FakeBackupService;
 import com.mhrsdev.musicplayer.fake.FakeHomeFeedSource;
 import com.mhrsdev.musicplayer.fake.FakeLibraryRepository;
 import com.mhrsdev.musicplayer.fake.FakeLyricsRepository;
@@ -49,6 +51,7 @@ public final class AppContainer {
     public final LyricsRepository lyrics;
     public final WaveformRepository waveform;
     public final HomeFeedSource homeFeed;
+    public final BackupService backup;
     /** Always the fake: there is no online catalog in Phase 1. */
     public final MusicSource musicSource;
 
@@ -80,11 +83,13 @@ public final class AppContainer {
             lyrics = new FakeLyricsRepository();
             waveform = new FakeWaveformRepository();
             homeFeed = new FakeHomeFeedSource(library);
+            backup = new FakeBackupService();
         } else {
             DataModule data = DataModule.create(appContext, io, settings);
             library = data.library;
             libraryAdmin = data.library;
             homeFeed = data.homeFeed;
+            backup = data.backup;
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
