@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Variable font, one entry per weight used by the v1 type ramp (DESIGN.md section 3). -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+    <font android:font="@font/vazirmatn" android:fontStyle="normal" android:fontWeight="400" android:fontVariationSettings="'wght' 400" />
+    <font android:font="@font/vazirmatn" android:fontStyle="normal" android:fontWeight="500" android:fontVariationSettings="'wght' 500" />
+    <font android:font="@font/vazirmatn" android:fontStyle="normal" android:fontWeight="600" android:fontVariationSettings="'wght' 650" />
+    <font android:font="@font/vazirmatn" android:fontStyle="normal" android:fontWeight="700" android:fontVariationSettings="'wght' 760" />
+    <font android:font="@font/vazirmatn" android:fontStyle="normal" android:fontWeight="800" android:fontVariationSettings="'wght' 800" />
+</font-family>
