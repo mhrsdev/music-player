@@ -1,85 +1,69 @@
 <!doctype html>
-<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Queue</title><link rel="stylesheet" href="base.css">
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Queue</title><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="player.css">
 <style>
-  .screen { --dyn-primary: #A9D4F5; --dyn-on-primary: #00344D; --dyn-container: #1A4B66; --dyn-on-container: #CDE8FF; --sb: #fff; }
-  .scrim { background: linear-gradient(180deg, rgba(4,14,24,.25), rgba(4,14,24,.5)); }
-  .tint { position: absolute; inset: 0; z-index: 1; background: #1f5f86; mix-blend-mode: soft-light; opacity: .55; }
-  .top { position: absolute; top: 58px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; color: #fff; }
-  .cp { position: absolute; top: 140px; left: 24px; right: 16px; display: flex; align-items: center; color: #fff; }
+  .screen { --dyn: #A9D4F5; --on-dyn: #00344D; --dyn-shadow: rgba(20,90,140,.75); --tintc: #1f5f86; }
+  .scrim { background: linear-gradient(180deg, rgba(4,14,26,.3), rgba(4,14,26,.55)); }
+  .cp { position: absolute; top: 104px; left: 20px; right: 16px; display: flex; align-items: center; gap: 14px; }
   .cp .tt { flex: 1; min-width: 0; }
-  .cp .tt .h { font-size: 26px; line-height: 32px; font-weight: 600; font-variation-settings: 'ROND' 40; }
-  .cp .tt .s { font-size: 16px; color: rgba(255,255,255,.72); font-weight: 500; }
-  .cp .ctl { display: flex; align-items: center; gap: 2px; }
-  .sk { position: absolute; top: 214px; left: 24px; width: 364px; color: #fff; }
-  .sheet { position: absolute; top: 300px; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--sc-low); border-radius: 32px 32px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.35); font-family: 'GSF', sans-serif; color: var(--on-surface); }
-  .sheet .handle { width: 36px; height: 4px; border-radius: 4px; background: var(--outline); opacity: .6; margin: 10px auto 0; }
-  .hdr { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 6px 12px; }
-  .sleep { height: 40px; padding: 0 14px 0 10px; border-radius: 99px; background: var(--dyn-container); color: var(--dyn-on-container); display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; font-feature-settings: 'tnum' 1; }
-  .from { text-align: center; padding: 6px 18px; border-radius: 20px; background: var(--sc-high); }
-  .from .a { font-size: 12.5px; color: var(--on-surface-var); font-weight: 520; }
-  .from .b { font-size: 15px; font-weight: 620; }
-  .list { position: relative; padding: 4px 12px 0; }
-  .q { display: flex; align-items: center; gap: 14px; height: 72px; padding: 0 4px 0 10px; border-radius: 6px; background: var(--sc); margin-bottom: 3px; position: relative; }
-  .q:first-child { border-radius: 22px 22px 6px 6px; }
+  .cp .tt .h { font-size: 21px; line-height: 26px; font-weight: 600; letter-spacing: -.3px; }
+  .cp .tt .s { font-size: 14px; color: rgba(255,255,255,.72); }
+  .sk { position: absolute; top: 190px; left: 20px; width: 372px; }
+  .qs { position: absolute; top: 262px; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--ink1); border-radius: 28px 28px 0 0; box-shadow: 0 -12px 36px rgba(0,0,0,.4), inset 0 1px 0 var(--line2); color: var(--text); }
+  .qs .handle { width: 32px; height: 4px; border-radius: 4px; background: var(--text3); opacity: .7; margin: 10px auto 0; }
+  .qh { display: flex; align-items: flex-start; justify-content: space-between; padding: 10px 8px 8px 20px; }
+  .sleep { height: 40px; padding: 0 12px 0 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 560; color: var(--dyn); background: rgba(169,212,245,.10); font-feature-settings: 'tnum' 1; }
+  .list { position: relative; }
+  .q { display: flex; align-items: center; gap: 14px; height: 64px; padding: 0 6px 0 20px; position: relative; background: var(--ink1); }
   .q .txt { flex: 1; min-width: 0; }
-  .q .d { font-size: 14px; color: var(--on-surface-var); font-feature-settings: 'tnum' 1; font-weight: 520; }
-  .q .h { width: 44px; height: 48px; display: grid; place-items: center; color: var(--on-surface-var); }
-  .q.now { background: color-mix(in srgb, var(--dyn-container) 70%, var(--sc)); }
-  .q.now .t-title { color: var(--dyn-on-container); }
-  .eq { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; gap: 3px; padding-bottom: 14px; background: rgba(0,10,20,.45); border-radius: 12px; }
-  .eq i { width: 4px; border-radius: 2px; background: #fff; display: block; }
-  .q.drag { z-index: 5; background: var(--sc-highest); border-radius: 18px; transform: translate(4px,-6px) scale(1.025); box-shadow: 0 14px 30px rgba(0,0,0,.45); }
-  .q.drag .h { color: var(--on-surface); }
-  .slot { height: 72px; margin-bottom: 3px; border-radius: 18px; border: 1.5px dashed var(--outline-var); }
-  .swipe { position: relative; height: 72px; margin-bottom: 3px; border-radius: 6px; background: var(--error-container); overflow: hidden; }
-  .swipe .del { position: absolute; right: 22px; top: 0; bottom: 0; display: flex; align-items: center; gap: 8px; color: var(--on-error-container); font-size: 14px; font-weight: 600; }
-  .swipe .q { position: absolute; left: -120px; right: 120px; top: 0; margin: 0; border-radius: 6px 22px 22px 6px; }
-  .snackbar { bottom: 28px; }
+  .q .d { font-size: 13px; color: var(--text3); font-feature-settings: 'tnum' 1; }
+  .q .h { width: 44px; height: 48px; display: grid; place-items: center; color: var(--text3); }
+  .q.now .t-title { color: var(--dyn); }
+  .q.drag { position: absolute; left: 10px; right: 10px; top: 176px; z-index: 5; background: var(--ink3); border-radius: 18px; transform: rotate(-1.2deg) scale(1.03); box-shadow: 0 22px 40px -10px rgba(0,0,0,.7), inset 0 0 0 1px var(--line2); padding-left: 10px; }
+  .q.drag .h { color: var(--text); }
+  .slot { height: 64px; margin: 0 14px; border-radius: 16px; background: repeating-linear-gradient(90deg, var(--line2) 0 6px, transparent 6px 11px) top/100% 1.5px no-repeat, repeating-linear-gradient(90deg, var(--line2) 0 6px, transparent 6px 11px) bottom/100% 1.5px no-repeat; }
+  .swipe { position: relative; height: 64px; background: var(--danger-ink); overflow: hidden; }
+  .swipe .del { position: absolute; right: 14px; top: 0; bottom: 0; display: flex; align-items: center; gap: 8px; color: var(--danger); font-size: 14px; font-weight: 560; }
+  .swipe .q { position: absolute; left: -104px; right: 104px; top: 0; border-radius: 0 18px 18px 0; }
+  .sep { height: 1px; background: var(--line); margin: 6px 20px; }
+  .toast { bottom: 26px; }
 </style></head>
-<body><div class="screen theme-dark">
+<body><div class="screen theme-dark pl">
   <div class="backdrop"><div class="art" data-art="without-you"></div></div>
-  <div class="tint"></div>
-  <div class="backdrop-scrim scrim"></div>
-  <div class="grain"></div>
+  <div class="tint"></div><div class="backdrop-scrim scrim"></div><div class="grain"></div>
   <div class="layer">
     <div class="statusbar"></div>
-    <div class="top">
-      <div class="iconbtn"><i class="ic">lyrics</i></div>
-      <div class="togglegroup">
-        <div class="tg on"><i class="ic">shuffle</i></div>
-        <div class="tg on"><i class="ic">repeat</i></div>
-        <div class="tg on"><i class="ic f">queue_music</i></div>
-      </div>
-      <div class="iconbtn" style="color:var(--dyn-primary)"><i class="ic f">favorite</i></div>
+    <div class="top" style="top:42px">
+      <div class="ib"><i class="g" data-g="chevd"></i></div>
+      <div class="from"><div class="a">Playing from artist</div><div class="b">NEFFEX</div></div>
+      <div class="ib"><i class="g" data-g="more"></i></div>
     </div>
     <div class="cp">
+      <div class="art sl10 edge" data-art="without-you" style="width:60px;height:60px"></div>
       <div class="tt"><div class="h ell">Without You</div><div class="s">NEFFEX</div></div>
-      <div class="ctl">
-        <div class="iconbtn"><i class="ic f s28">skip_previous</i></div>
-        <div class="cookie" data-size="64" data-n="9" data-k=".08" data-c="#A9D4F5" data-rot="14"><i class="ic f s28" style="color:#00344D">pause</i></div>
-        <div class="iconbtn"><i class="ic f s28">skip_next</i></div>
-      </div>
+      <div class="disc play" style="width:56px;height:56px;box-shadow:0 0 0 5px rgba(169,212,245,.13),0 10px 22px -8px rgba(20,90,140,.8)"><span class="glyph" data-t="1" data-s="26" data-c="#00344D"></span></div>
+      <div class="ib" style="color:#fff"><i class="g s28" data-g="next"></i></div>
     </div>
-    <div class="sk"><div class="seek" data-w="364" data-h="30" data-p=".31" data-c="#fff" data-t="rgba(255,255,255,.3)" data-thumb="24" data-ph=".6"></div><div class="times" style="margin-top:2px"><span>1:00</span><span>−2:10</span></div></div>
+    <div class="sk"><div class="seek" data-w="372" data-h="24" data-p=".31" data-c="#A9D4F5" data-t="rgba(255,255,255,.26)" data-sw="3" data-amp="2.6" data-wl="22" data-r="7" data-ph=".6"></div><div class="times" style="margin-top:6px"><span>1:00</span><span>−2:10</span></div></div>
   </div>
-  <div class="sheet">
+  <div class="qs">
     <div class="handle"></div>
-    <div class="hdr">
-      <div class="sleep"><i class="ic f s20">bedtime</i>23 min</div>
-      <div class="from"><div class="a">Playing from artist</div><div class="b">NEFFEX · 1 h 18 min left</div></div>
-      <div class="iconbtn" style="color:var(--on-surface-var)"><i class="ic">more_vert</i></div>
+    <div class="qh">
+      <div><div class="t-section">Up next</div><div class="t-meta num">NEFFEX · 12 songs · 1 h 18 min left</div></div>
+      <div style="display:flex;align-items:center;gap:2px"><div class="sleep"><i class="g s18" data-g="moon.f"></i>23 min</div><div class="ib" style="color:var(--text2)"><i class="g" data-g="shuffle"></i></div></div>
     </div>
     <div class="list">
-      <div class="q now"><div class="art r12" data-art="without-you" style="width:52px;height:52px"><div class="eq"><i style="height:14px"></i><i style="height:22px"></i><i style="height:10px"></i><i style="height:18px"></i></div></div><div class="txt"><div class="t-title ell">Without You</div><div class="t-support ell">Now playing</div></div><div class="d">3:10</div><div class="h"><i class="ic">drag_handle</i></div></div>
-      <div class="q"><div class="art r12" data-art="grateful" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Grateful</div><div class="t-support ell">NEFFEX</div></div><div class="d">3:09</div><div class="h"><i class="ic">drag_handle</i></div></div>
+      <div class="q now"><div class="art sl8" data-art="without-you" style="width:44px;height:44px"><div class="live"><i style="height:12px"></i><i style="height:20px"></i><i style="height:9px"></i><i style="height:16px"></i></div></div><div class="txt"><div class="t-title ell">Without You</div><div class="t-meta ell">Now playing</div></div><div class="d">3:10</div><div class="h"></div></div>
+      <div class="sep"></div>
+      <div class="q"><div class="art sl8 edge" data-art="grateful" style="width:44px;height:44px"></div><div class="txt"><div class="t-title ell">Grateful</div><div class="t-meta ell">NEFFEX</div></div><div class="d">3:09</div><div class="h"><i class="g" data-g="drag"></i></div></div>
       <div class="slot"></div>
-      <div class="q drag" style="position:absolute;left:12px;right:12px;top:176px"><div class="art r12" data-art="fight-back" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Fight Back</div><div class="t-support ell">NEFFEX</div></div><div class="d">3:17</div><div class="h"><i class="ic">drag_handle</i></div></div>
-      <div class="q"><div class="art r12" data-art="cold" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Cold</div><div class="t-support ell">NEFFEX</div></div><div class="d">2:58</div><div class="h"><i class="ic">drag_handle</i></div></div>
-      <div class="swipe"><div class="del"><i class="ic">delete</i>Remove</div><div class="q"><div class="art r12" data-art="without-you" data-zoom="1.4" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Best of Me</div><div class="t-support ell">NEFFEX</div></div><div class="d">4:05</div><div class="h"><i class="ic">drag_handle</i></div></div></div>
-      <div class="q"><div class="art r12" data-art="cold" data-zoom="1.6" data-origin="20% 80%" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Cold (Acoustic)</div><div class="t-support ell">NEFFEX</div></div><div class="d">3:04</div><div class="h"><i class="ic">drag_handle</i></div></div>
+      <div class="q drag"><div class="art sl8" data-art="fight-back" style="width:44px;height:44px"></div><div class="txt"><div class="t-title ell">Fight Back</div><div class="t-meta ell">NEFFEX</div></div><div class="d">3:17</div><div class="h"><i class="g" data-g="drag"></i></div></div>
+      <div class="q"><div class="art sl8 edge" data-art="cold" style="width:44px;height:44px"></div><div class="txt"><div class="t-title ell">Cold</div><div class="t-meta ell">NEFFEX</div></div><div class="d">2:58</div><div class="h"><i class="g" data-g="drag"></i></div></div>
+      <div class="swipe"><div class="del"><i class="g s20" data-g="trash"></i>Remove</div><div class="q"><div class="art sl8" data-art="without-you" data-zoom="1.4" style="width:44px;height:44px"></div><div class="txt"><div class="t-title ell">Best of Me</div><div class="t-meta ell">NEFFEX</div></div><div class="d">4:05</div><div class="h"><i class="g" data-g="drag"></i></div></div></div>
+      <div class="q"><div class="art sl8 edge" data-art="cold" data-zoom="1.6" data-origin="20% 80%" style="width:44px;height:44px"></div><div class="txt"><div class="t-title ell">Cold (Acoustic)</div><div class="t-meta ell">NEFFEX</div></div><div class="d">3:04</div><div class="h"><i class="g" data-g="drag"></i></div></div>
+      <div class="q"><div class="art sl8 edge" data-art="mercury" style="width:44px;height:44px"></div><div class="txt"><div class="t-title ell">Mercury</div><div class="t-meta ell">Oslo Haze</div></div><div class="d">3:20</div><div class="h"><i class="g" data-g="drag"></i></div></div>
     </div>
-    <div class="snackbar"><span>Queue shuffled</span><span class="act">Undo</span></div>
+    <div class="toast"><span>Queue shuffled</span><span class="act">Undo</span></div>
   </div>
-  <div class="gesture" style="--gh:var(--on-surface)"></div>
+  <div class="gesture" style="--gh:var(--text)"></div>
 </div>
 <script src="lib.js"></script><script>buildMock()</script></body></html>

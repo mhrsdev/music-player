@@ -2,61 +2,50 @@
 <html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Library</title><link rel="stylesheet" href="base.css">
 <style>
   .content { position: absolute; inset: 40px 0 0 0; }
-  .hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 8px 0 20px; height: 64px; }
-  .liked { position: relative; margin: 8px 16px 0; height: 132px; border-radius: 32px; overflow: hidden; background: var(--primary-container); color: var(--on-primary-container); }
-  .liked .collage { position: absolute; inset: 0; filter: blur(26px) saturate(1.2); opacity: .55; }
-  .liked .collage .art { position: absolute; width: 140px; height: 140px; border-radius: 40px; }
-  .liked .wash { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(30,72,120,.92) 0%, rgba(30,72,120,.55) 55%, rgba(30,72,120,.25) 100%); }
-  .liked .heart { position: absolute; left: 22px; top: 24px; width: 44px; height: 44px; display: grid; place-items: center; }
-  .liked .tx { position: absolute; left: 24px; bottom: 20px; }
-  .liked .tx .h { font-size: 26px; line-height: 30px; font-weight: 600; font-variation-settings: 'ROND' 50; }
-  .liked .tx .s { font-size: 14px; opacity: .8; font-weight: 500; margin-top: 2px; }
-  .liked .fan { position: absolute; right: 108px; top: 26px; width: 120px; height: 80px; }
-  .liked .fan .art { position: absolute; width: 60px; height: 60px; border-radius: 14px; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
-  .liked .play { position: absolute; right: 20px; top: 50%; margin-top: -36px; }
-  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 16px 0; }
-  .tile { position: relative; height: 124px; border-radius: 26px; background: var(--sc); padding: 16px 16px; overflow: hidden; }
-  .tile .ic { color: var(--primary); }
-  .tile .h { font-size: 18px; font-weight: 600; margin-top: 30px; font-variation-settings: 'ROND' 30; }
-  .tile .s { font-size: 13.5px; color: var(--on-surface-var); margin-top: 1px; }
-  .peek { position: absolute; right: 14px; top: 14px; display: flex; }
-  .peek .art { width: 34px; height: 34px; border: 2px solid var(--sc); margin-left: -12px; }
-  .sec { display: flex; align-items: center; justify-content: space-between; padding: 22px 12px 8px 20px; }
-  .rs { display: flex; gap: 12px; padding: 0 16px; }
-  .rs .c { width: 140px; flex: none; }
-  .rs .c .t-title { margin-top: 8px; font-size: 15.5px; }
+  .hdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 8px 0 20px; height: 64px; }
+  .liked { position: relative; margin: 8px 16px 0; height: 172px; border-radius: 24px; overflow: hidden; background: var(--ink1); box-shadow: inset 0 0 0 1px var(--line); }
+  .liked .glowx { position: absolute; right: -60px; top: -80px; width: 360px; height: 300px; background: radial-gradient(closest-side, rgba(237,192,106,.26), rgba(237,192,106,0)); }
+  .liked .win { position: absolute; left: 16px; top: 14px; width: 112px; height: 144px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 0; }
+  .liked .win .art { width: 100%; height: 100%; }
+  .liked .frame { position: absolute; left: 12px; top: 10px; width: 120px; height: 152px; }
+  .liked .tx { position: absolute; left: 150px; top: 28px; right: 16px; }
+  .liked .tx .h { font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -.4px; margin-top: 8px; }
+  .liked .playl { position: absolute; right: 18px; bottom: 18px; width: 56px; height: 56px; background: var(--saffron); color: var(--on-saffron); box-shadow: 0 0 0 6px rgba(237,192,106,.14), 0 10px 22px -8px rgba(0,0,0,.7); }
+  .shelf { display: flex; align-items: center; gap: 14px; height: 76px; padding: 0 12px 0 20px; }
+  .shelf .txt { flex: 1; }
+  .shelf .h { font-size: 19px; line-height: 24px; font-weight: 520; letter-spacing: -.2px; }
+  .fan { position: relative; width: 92px; height: 52px; }
+  .fan > * { position: absolute; top: 2px; width: 48px; height: 48px; box-shadow: -4px 0 10px -2px rgba(0,0,0,.6); }
+  .shelf .chev { color: var(--text3); }
+  .rs { display: flex; gap: 14px; padding: 4px 20px 0; }
+  .rs .c { width: 132px; flex: none; }
+  .rs .c .t-title { margin-top: 8px; font-size: 15px; }
 </style></head>
 <body><div class="screen theme-dark">
   <div class="statusbar"></div>
   <div class="content">
-    <div class="hdr"><div class="t-display" style="font-size:32px">Library</div><div style="display:flex"><div class="iconbtn"><i class="ic">sort</i></div><div class="iconbtn"><i class="ic">library_add</i></div></div></div>
+    <div class="hdr"><div class="t-display">Library</div><div style="display:flex"><div class="ib" style="color:var(--text2)"><i class="g" data-g="sort"></i></div><div class="ib" style="color:var(--text2)"><i class="g" data-g="plus"></i></div></div></div>
     <div class="liked">
-      <div class="collage"><div class="art" data-art="anar" style="left:150px;top:-30px"></div><div class="art" data-art="cold" style="left:230px;top:20px"></div><div class="art" data-art="baran" style="left:60px;top:40px"></div></div>
-      <div class="wash"></div>
-      <div class="heart"><i class="ic f s36">favorite</i></div>
-      <div class="tx"><div class="h">Liked songs</div><div class="s">27 songs · 1 h 42 min</div></div>
-      <div class="play cookie" data-size="72" data-n="9" data-k=".07" data-c="#D4E3FF"><i class="ic f s36" style="color:#1E4878">play_arrow</i></div>
+      <div class="glowx"></div>
+      <svg class="frame" viewBox="0 0 120 152"><path id="lf" d="" fill="none" stroke="rgba(237,192,106,.55)" stroke-width="1.2"/></svg>
+      <div class="win arch" data-r="10"><div class="art" data-art="anar" data-zoom="1.6" data-origin="45% 55%"></div><div class="art" data-art="cold" data-zoom="1.7" data-origin="70% 20%"></div><div class="art" data-art="baran" data-zoom="1.5" data-origin="20% 40%"></div><div class="art" data-art="tehran-nights" data-zoom="1.7" data-origin="66% 60%"></div></div>
+      <div class="tx"><i class="g s28" data-g="heart.f" style="color:var(--saffron)"></i><div class="h">Liked songs</div><div class="t-meta num">27 songs · 1 h 42 min</div></div>
+      <div class="disc playl"><i class="g s28" data-g="play"></i></div>
     </div>
-    <div class="tiles">
-      <div class="tile"><i class="ic">album</i><div class="peek"><div class="art r8" data-art="koucheh-bagh"></div><div class="art r8" data-art="desert-bloom"></div><div class="art r8" data-art="salt-static"></div></div><div class="h">Albums</div><div class="s">12 albums</div></div>
-      <div class="tile"><i class="ic">queue_music</i><div class="peek"><div class="art r8" data-art="mix-2016"></div><div class="art r8" data-art="mix-fa"></div></div><div class="h">Playlists</div><div class="s">4 playlists</div></div>
-      <div class="tile"><i class="ic">person</i><div class="peek"><div class="art rf" data-art="without-you" data-zoom="1.9" data-origin="62% 40%"></div><div class="art rf" data-art="tehran-nights" data-zoom="2.0" data-origin="66% 50%"></div><div class="art rf" data-art="topography" data-zoom="1.8" data-origin="36% 42%"></div></div><div class="h">Artists</div><div class="s">9 artists</div></div>
-      <div class="tile"><i class="ic">history</i><div class="h">History</div><div class="s">Last played 12 min ago</div></div>
-    </div>
-    <div class="sec"><div class="t-headline" style="font-size:22px">Recently saved</div><div class="iconbtn" style="color:var(--on-surface-var)"><i class="ic">chevron_right</i></div></div>
+    <div style="height:10px"></div>
+    <div class="shelf"><div class="txt"><div class="h">Albums</div><div class="t-meta">12 albums</div></div><div class="fan"><div class="art sl8" data-art="salt-static" style="left:44px"></div><div class="art sl8" data-art="desert-bloom" style="left:22px"></div><div class="art sl8" data-art="koucheh-bagh" style="left:0"></div></div><i class="g s20 chev" data-g="chev"></i></div>
+    <div class="shelf"><div class="txt"><div class="h">Playlists</div><div class="t-meta">4 playlists · 2 made by you</div></div><div class="fan"><div class="art sl8" data-art="mix-summer" style="left:44px"></div><div class="art sl8" data-art="mix-fa" style="left:22px"></div><div class="art sl8" data-art="mix-2016" style="left:0"></div></div><i class="g s20 chev" data-g="chev"></i></div>
+    <div class="shelf"><div class="txt"><div class="h">Artists</div><div class="t-meta">9 artists</div></div><div class="fan"><div class="art arch" data-r="6" data-art="topography" data-zoom="1.8" data-origin="36% 42%" style="left:44px"></div><div class="art arch" data-r="6" data-art="tehran-nights" data-zoom="2.0" data-origin="66% 50%" style="left:22px"></div><div class="art arch" data-r="6" data-art="without-you" data-zoom="1.9" data-origin="62% 40%" style="left:0"></div></div><i class="g s20 chev" data-g="chev"></i></div>
+    <div class="shelf"><div class="txt"><div class="h">History</div><div class="t-meta">Last played 12 min ago</div></div><div class="fan" style="display:grid;place-items:center end;padding-right:12px;color:var(--text3)"><i class="g s28" data-g="history" style="position:static;box-shadow:none;width:28px;height:28px"></i></div><i class="g s20 chev" data-g="chev"></i></div>
+    <div class="sec" style="margin-top:14px"><div class="t-section">Recently saved</div><div class="act">See all<i class="g s18" data-g="chev"></i></div></div>
     <div class="rs">
-      <div class="c"><div class="art r24" data-art="desert-bloom" style="width:140px;height:140px"></div><div class="t-title ell">Desert Bloom</div><div class="t-support ell">Kaveh Rostami</div></div>
-      <div class="c"><div class="art rf" data-art="tehran-nights" data-zoom="2.0" data-origin="66% 50%" style="width:140px;height:140px"></div><div class="t-title ell fa" dir="rtl" style="text-align:center">آوا نیک‌زاد</div><div class="t-support ell" style="text-align:center">Artist</div></div>
-      <div class="c"><div class="art r24" data-art="paper-planes" style="width:140px;height:140px"></div><div class="t-title ell">Paper Planes</div><div class="t-support ell">Juniper Lane</div></div>
+      <div class="c"><div class="art sl12 edge" data-art="desert-bloom" style="width:132px;height:132px"></div><div class="t-title ell">Desert Bloom</div><div class="t-meta ell">Kaveh Rostami</div></div>
+      <div class="c"><div class="art arch" data-r="12" data-art="tehran-nights" data-zoom="2.0" data-origin="66% 50%" style="width:132px;height:132px"></div><div class="t-title ell fa" dir="rtl" style="text-align:left">آوا نیک‌زاد</div><div class="t-meta ell">Artist</div></div>
+      <div class="c"><div class="art sl12 edge" data-art="paper-planes" style="width:132px;height:132px"></div><div class="t-title ell">Paper Planes</div><div class="t-meta ell">Juniper Lane</div></div>
     </div>
   </div>
-  <div class="navwrap"></div>
-  <div class="nav">
-    <div class="it"><i class="ic">home</i></div>
-    <div class="it"><i class="ic">search</i></div>
-    <div class="it on"><i class="ic">library_music</i><span class="l">Library</span></div>
-    <div class="it"><i class="ic">settings</i></div>
-  </div>
+  <div class="deckwrap"></div>
+  <div class="deck" data-on="library"></div>
   <div class="gesture"></div>
 </div>
-<script src="lib.js"></script><script>buildMock()</script></body></html>
+<script src="lib.js"></script><script>document.getElementById('lf').setAttribute('d', MP.archPath(118, 150, 12, 1, 1)); buildMock()</script></body></html>
