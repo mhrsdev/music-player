@@ -175,6 +175,7 @@ public class LyricLineView extends View {
         setMeasuredDimension(w, h);
     }
 
+    @android.annotation.SuppressLint("WrongConstant") // Layout.BREAK_STRATEGY_* == LineBreaker values (API 23+)
     private void buildLayout(int width) {
         String text = line == null ? "" : line.text();
         paint.setTextSize(textPx);
@@ -184,7 +185,6 @@ public class LyricLineView extends View {
                 .setTextDirection(TextDirectionHeuristics.FIRSTSTRONG_LTR)
                 .setLineSpacing(0f, 1.08f)
                 .setIncludePad(false);
-        if (Build.VERSION.SDK_INT >= 26) b.setJustificationMode(Layout.JUSTIFICATION_MODE_NONE);
         b.setBreakStrategy(Layout.BREAK_STRATEGY_BALANCED);
         layout = b.build();
         layoutWidth = width;

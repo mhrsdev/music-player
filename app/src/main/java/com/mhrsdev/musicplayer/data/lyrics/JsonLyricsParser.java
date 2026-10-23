@@ -20,7 +20,7 @@ class JsonLyricsParser {
 
     static boolean looksLikeJson(String raw) {
         int i = 0;
-        while (i < raw.length() && (Character.isWhitespace(raw.charAt(i)) || raw.charAt(i) == '﻿')) i++;
+        while (i < raw.length() && (Character.isWhitespace(raw.charAt(i)) || raw.charAt(i) == '\uFEFF')) i++;
         return i < raw.length() && (raw.charAt(i) == '{' || raw.startsWith("[{", i) || raw.startsWith("[ ", i)
                 || raw.startsWith("[\n", i) || raw.startsWith("[]", i));
     }
@@ -28,7 +28,7 @@ class JsonLyricsParser {
     @Nullable
     static List<LyricLine> parse(String raw) {
         try {
-            String s = raw.charAt(0) == '﻿' ? raw.substring(1) : raw;
+            String s = raw.charAt(0) == '\uFEFF' ? raw.substring(1) : raw;
             Object root = new JSONTokener(s).nextValue();
             JSONArray arr = root instanceof JSONObject o ? o.optJSONArray("lines") : root instanceof JSONArray a ? a : null;
             if (arr == null) return null;
