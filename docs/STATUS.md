@@ -1,6 +1,6 @@
 # Project Status (live — supervisor updates after every event)
 
-_Last updated: 2026-10-23 — v0.1.0 on main + tag; D8: parallel agents + ponytail skill + UI/RAM/battery bar; D7: Q-J answered → JAVA ONLY (no Kotlin), MVVM, no Room (framework SQLite), Gradle 9.0.0; Compose/Kotlin scaffold obsolete_
+_Last updated: 2026-10-23 — D16 phase 2 started (name Mowj/موج, logo, auto-update, UX, features); v0.1.0 on main; D8: parallel agents + ponytail skill + UI/RAM/battery bar; D7: Q-J answered → JAVA ONLY (no Kotlin), MVVM, no Room (framework SQLite), Gradle 9.0.0; Compose/Kotlin scaffold obsolete_
 
 ## HOW TO RESUME IN A NEW CHAT (read this first)
 1. Read `CLAUDE.md` (roles/rules), this file, `docs/DIRECTIVES.md` (all owner orders, D1–D7), `docs/design/DESIGN.md` (approved design; PNGs in `docs/design/png/`).
@@ -44,6 +44,15 @@ _Last updated: 2026-10-23 — v0.1.0 on main + tag; D8: parallel agents + ponyta
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
+**Phase 2 (D16) — up to 8 agents in parallel, worktrees `../wt-<id>`, branches `task/<id>-<slug>`:**
+- 🔄 **A-brand** [Opus] Name **Mowj/موج** + logo: adaptive/monochrome icon, notification icon, splash, `docs/brand/` assets.
+- 🔄 **B-update** [Sonnet] GitHub auto-update (`data/update`, `ui/update/UpdateFragment`).
+- 🔄 **U1** [Opus] Settings (rescan, SAF folder picker, rows/registry), search + empty states, landscape/tablet.
+- 🔄 **U2** [Opus] Library management (playlist CRUD, sort, genres/folders/years, track details/share/delete, long-press menus).
+- 🔄 **U3** [Opus] Player UX (loaded-track renders, queue upgrades, speed/EQ entry points, gestures).
+- 🔄 **D-sound** [Sonnet] Audio effects (equalizer/bass/virtualizer/loudness, speed/pitch, skip silence, ReplayGain) + `ui/sound/SoundFragment`.
+- 🔄 **E-perf** [Sonnet] Perf/RAM/battery audit + fixes from F1 backlog; battery audit checklist doc.
+- 🔄 **S1-system** [Sonnet] Home-screen widget, Android Auto browse tree, shortcuts, backup/restore (`ui/backup/BackupFragment`).
 
 
 

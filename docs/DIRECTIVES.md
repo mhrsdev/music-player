@@ -254,3 +254,21 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > لایسنسو بزار MIT
 
 **Summary:** Put an **MIT license** on the project. Added `LICENSE` (MIT, "Copyright (c) 2026 mhrsdev" — the GitHub account name; owner can change the holder name). README/README.fa must say MIT (R1 told). Bundled fonts keep their own OFL notice (`assets/licenses/FONTS-NOTICE.txt`).
+
+---
+
+## D16 — 2026-10-23 — Name + logo first, then bug fixes, easier UX, more complete, GitHub auto-update
+
+**Original (verbatim):**
+
+> خوبه خوبه ولی اول یه اسم براش انتخاب کن و لوگو
+> بعد برو باگهاشو رفع کن راحتی کار باهاش یا همون UI UX رو بهتر کن
+> کاملتر کن 
+> و یه سیستم اتو اپدیت هم بزار خودکار از گیت هاب اپدیت جدیدشو بگیره
+
+**Summary:**
+1. **Pick an app name and a logo** (supervisor chooses). Chosen: **Mowj / موج** ("wave" — ties to the wavy/bars seek bars). Package id `com.mhrsdev.musicplayer` is kept so installs can update in place; only the display name/icon change.
+2. Then **fix bugs**, make the app **easier to use** (UI/UX improvements) and **more complete** (features a music player needs).
+3. Add an **auto-update system** that automatically fetches the newest release from GitHub (checks GitHub Releases, downloads the APK, verifies, installs). Supervisor design: check only on app foreground ≤ 1×/day + manual button (no background polling → battery), SHA-256 + signing-certificate check, user confirms the system installer.
+
+**Supervisor risk note (owner decision pending):** an APK update only installs over the old app if both are signed with the SAME key. CI currently falls back to a throw-away debug key (different on every runner) → updates would fail. A fixed release keystore is required (owner asked: key as GitHub secrets vs. committed keystore).
