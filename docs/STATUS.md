@@ -1,6 +1,6 @@
 # Project Status (live — supervisor updates after every event)
 
-_Last updated: 2026-10-23 — D8: parallel agents + ponytail skill + UI/RAM/battery bar; D7: Q-J answered → JAVA ONLY (no Kotlin), MVVM, no Room (framework SQLite), Gradle 9.0.0; Compose/Kotlin scaffold obsolete_
+_Last updated: 2026-10-23 — v0.1.0 on main + tag; D8: parallel agents + ponytail skill + UI/RAM/battery bar; D7: Q-J answered → JAVA ONLY (no Kotlin), MVVM, no Room (framework SQLite), Gradle 9.0.0; Compose/Kotlin scaffold obsolete_
 
 ## HOW TO RESUME IN A NEW CHAT (read this first)
 1. Read `CLAUDE.md` (roles/rules), this file, `docs/DIRECTIVES.md` (all owner orders, D1–D7), `docs/design/DESIGN.md` (approved design; PNGs in `docs/design/png/`).
@@ -96,6 +96,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - Online (needs owner decision, K2): legal catalog provider.
 
 ## Change log
+- 2026-10-23: **ccr → main fast-forward; tag v0.1.0 pushed** (release workflow builds the GitHub pre-release; APK also sent to owner in chat). Phase 2 (full-featured version) next, see backlog.
 - 2026-10-23: everything merged into ccr (green full build). Next: ccr → main (fast-forward), tag v0.1.0 (pre-release via Actions), APK sent to owner. Then phase 2 (backlog above).
 - 2026-10-23: D15: MIT license added (LICENSE); README license section to say MIT.
 - 2026-10-23: D14: owner wants a GitHub release now + README OK + main fully updated; then full-featured version. Release agent R1 launched (signing, release workflow, README/CHANGELOG, APK build).
