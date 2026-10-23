@@ -22,7 +22,7 @@ import java.util.function.LongSupplier;
  * (API 33+) or READ_EXTERNAL_STORAGE (<= 32); without it {@link #scan} returns {@link ScanResult#FAILED} and leaves the
  * library untouched. Both methods block: call them from the io executor. Nothing here schedules itself (no polling).
  */
-public final class MediaStoreScanner {
+public class MediaStoreScanner {
     private static final String PREFS = "scanner_state";
     private static final String KEY_SCANNED_AT = "scanned_at_ms";
     private static final String KEY_GENERATION = "media_generation";

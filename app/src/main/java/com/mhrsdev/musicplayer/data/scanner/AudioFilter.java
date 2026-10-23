@@ -7,7 +7,7 @@ import java.util.Set;
  * Which MediaStore audio rows are library music. Downloads often have IS_MUSIC=0 (no tags yet), so a normal audio file
  * extension counts as music too; ringtones, notifications, alarms and podcasts only with "include non-music audio".
  */
-public final class AudioFilter {
+public class AudioFilter {
     private static final Set<String> MUSIC_EXTENSIONS = Set.of("mp3", "m4a", "flac", "ogg", "opus", "wav", "aac");
 
     private final boolean includeNonMusic;

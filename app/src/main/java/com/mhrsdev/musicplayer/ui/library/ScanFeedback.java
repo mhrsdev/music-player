@@ -6,7 +6,7 @@ import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.ScanResult;
 
 /** The one-line answer to a manual rescan (empty-state button, pull-to-refresh): "N new songs added" / "Library up to date". */
-public final class ScanFeedback {
+public class ScanFeedback {
     private ScanFeedback() { }
 
     public static void show(Context context, ScanResult r) {

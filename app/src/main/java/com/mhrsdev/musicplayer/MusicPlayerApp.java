@@ -31,7 +31,7 @@ public class MusicPlayerApp extends Application {
     }
 
     /** Every activity start rechecks the library; the last stop drops the MediaStore observer (nothing runs in background). */
-    private final class VisibilityCallbacks implements ActivityLifecycleCallbacks {
+    private class VisibilityCallbacks implements ActivityLifecycleCallbacks {
         private int started;
 
         @Override public void onActivityStarted(Activity activity) {

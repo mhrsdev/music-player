@@ -13,7 +13,7 @@ import java.util.Map;
 import org.robolectric.Robolectric;
 
 /** In-memory MediaStore audio table served through a ContentProvider registered as authority "media". */
-public final class FakeMediaStore extends ContentProvider {
+public class FakeMediaStore extends ContentProvider {
     private static final List<Map<String, Object>> ROWS = new ArrayList<>();
 
     /** Empties the table and registers the provider for the current Robolectric app. */

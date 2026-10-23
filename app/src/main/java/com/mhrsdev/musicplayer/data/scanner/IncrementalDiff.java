@@ -11,7 +11,7 @@ import java.util.Set;
  * tracks vanished. A file counts as changed when its modified time, size or path differs (a re-download or a move can
  * keep the timestamp). Keeps only ids in memory, never the scanned rows.
  */
-public final class IncrementalDiff {
+public class IncrementalDiff {
     public enum Change { UNCHANGED, ADDED, UPDATED }
 
     private final Map<String, Stored> stored;
