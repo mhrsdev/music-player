@@ -1,4 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="window_background">#FFFBFE</color>
-    <color name="ic_launcher_background">#1C1B1F</color>
+    <!-- Light scheme (DESIGN.md 2.1). values-night holds the dark scheme. -->
+    <color name="mp_background">#F7F9FF</color>
+    <color name="mp_surface_container_lowest">#FFFFFF</color>
+    <color name="mp_surface_container_low">#F1F3FA</color>
+    <color name="mp_surface_container">#EAEEF5</color>
+    <color name="mp_surface_container_high">#E4E8EF</color>
+    <color name="mp_surface_container_highest">#DEE3EA</color>
+    <color name="mp_on_surface">#181C21</color>
+    <color name="mp_on_surface_variant">#414851</color>
+    <color name="mp_outline">#717883</color>
+    <color name="mp_outline_variant">#C1C7D2</color>
+    <color name="mp_primary">#2F5F95</color>
+    <color name="mp_on_primary">#FFFFFF</color>
+    <color name="mp_primary_container">#D4E3FF</color>
+    <color name="mp_on_primary_container">#001C3A</color>
+    <color name="mp_secondary_container">#D6E3F7</color>
+    <color name="mp_on_secondary_container">#0F1D2C</color>
+    <color name="mp_tertiary">#006A62</color>
+    <color name="mp_error">#BA1A1A</color>
+
+    <!-- Black (AMOLED) overrides: only background + surface containers change. -->
+    <color name="mp_black_background">#000000</color>
+    <color name="mp_black_surface_container_low">#0C0E11</color>
+    <color name="mp_black_surface_container">#111418</color>
+    <color name="mp_black_surface_container_high">#1A1E23</color>
+    <color name="mp_black_surface_container_highest">#24292F</color>
+    <color name="mp_black_outline_variant">#2E343C</color>
+    <color name="mp_black_secondary_container">#2B394A</color>
+
+    <color name="window_background">@color/mp_background</color>
+    <color name="ic_launcher_background">#0F1216</color>
 </resources>

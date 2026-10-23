@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 48dp icon button with a circular ripple; tint with app:tint / android:tint per screen. -->
+    <style name="Widget.MusicPlayer.IconButton" parent="">
+        <item name="android:layout_width">@dimen/mp_touch_target</item>
+        <item name="android:layout_height">@dimen/mp_touch_target</item>
+        <item name="android:minWidth">@dimen/mp_touch_target</item>
+        <item name="android:minHeight">@dimen/mp_touch_target</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:tint">?attr/mpOnSurfaceVariant</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.Display" parent="">
+        <item name="android:textSize">@dimen/mp_text_display</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+    </style>
+    <style name="TextAppearance.MusicPlayer.Headline" parent="">
+        <item name="android:textSize">@dimen/mp_text_headline</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+    </style>
+    <style name="TextAppearance.MusicPlayer.Title" parent="">
+        <item name="android:textSize">@dimen/mp_text_title</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+    </style>
+    <style name="TextAppearance.MusicPlayer.Body" parent="">
+        <item name="android:textSize">@dimen/mp_text_body</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+    </style>
+    <style name="TextAppearance.MusicPlayer.Supporting" parent="">
+        <item name="android:textSize">@dimen/mp_text_supporting</item>
+        <item name="android:textColor">?attr/mpOnSurfaceVariant</item>
+    </style>
+    <style name="TextAppearance.MusicPlayer.Label" parent="">
+        <item name="android:textSize">@dimen/mp_text_label</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/mpOnSurfaceVariant</item>
+    </style>
+</resources>
