@@ -21,19 +21,35 @@ public record AccentScheme(int primary, int onPrimary, int container, int onCont
         float s = hsl[1] < 0.08f ? 0.18f : Math.max(0.35f, Math.min(0.80f, hsl[1]));
         if (hsl[1] < 0.08f) h = 212f;
         if (dark) {
+            int onPrimary = ColorMath.hslToRgb(h, s, 0.16f);
+            int onContainer = ColorMath.hslToRgb(h, s, 0.91f);
             return new AccentScheme(
-                    ColorMath.hslToRgb(h, s, 0.80f),
-                    ColorMath.hslToRgb(h, s, 0.16f),
-                    ColorMath.hslToRgb(h, s * 0.85f, 0.27f),
-                    ColorMath.hslToRgb(h, s, 0.91f),
+                    guard(h, s, 0.80f, onPrimary, +1),
+                    onPrimary,
+                    guard(h, s * 0.85f, 0.27f, onContainer, -1),
+                    onContainer,
                     ColorMath.hslToRgb(h, s, 0.35f));
         }
+        int onContainer = ColorMath.hslToRgb(h, s, 0.12f);
         return new AccentScheme(
-                ColorMath.hslToRgb(h, s, 0.36f),
+                guard(h, s, 0.36f, 0xFFFFFFFF, -1),
                 0xFFFFFFFF,
-                ColorMath.hslToRgb(h, s, 0.90f),
-                ColorMath.hslToRgb(h, s, 0.12f),
+                guard(h, s, 0.90f, onContainer, +1),
+                onContainer,
                 ColorMath.hslToRgb(h, s, 0.82f));
+    }
+
+    /**
+     * Contrast guard: HSL lightness is not perceptual (yellow at L .36 is far brighter than blue), so move the
+     * lightness away from {@code against} ({@code dir} +1 lighter / -1 darker) until text on it reaches 4.5:1.
+     */
+    static int guard(float h, float s, float l, int against, int dir) {
+        int c = ColorMath.hslToRgb(h, s, l);
+        for (int i = 0; i < 40 && ColorMath.contrast(c, against) < 4.5; i++) {
+            l = ColorMath.clamp01(l + dir * 0.02f);
+            c = ColorMath.hslToRgb(h, s, l);
+        }
+        return c;
     }
 
     public static AccentScheme lerp(AccentScheme a, AccentScheme b, float t) {

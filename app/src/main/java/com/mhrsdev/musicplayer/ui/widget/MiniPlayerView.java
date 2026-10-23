@@ -195,8 +195,15 @@ public class MiniPlayerView extends LinearLayout {
         next.setImageTintList(ColorStateList.valueOf(scheme.onContainer()));
         progressPaint.setColor(scheme.primary());
         trackPaint.setColor((scheme.onContainer() & 0x00FFFFFF) | 0x33000000);
-        bgPaint.setShader(null);
+        updateBackground();
         invalidate();
+    }
+
+    private void updateBackground() {
+        if (getWidth() == 0 || accent == null) return;
+        int c = accent.container();
+        bgPaint.setShader(new LinearGradient(0, 0, getWidth(), 0,
+                c, com.mhrsdev.musicplayer.ui.theme.ColorMath.lerp(c, 0xFF000000, 0.25f), Shader.TileMode.CLAMP));
     }
 
     public ArtworkView getArtworkView() {
@@ -210,15 +217,10 @@ public class MiniPlayerView extends LinearLayout {
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
         bounds.set(0, 0, w, h);
-        bgPaint.setShader(null);
+        updateBackground();
     }
 
     @Override protected void onDraw(Canvas canvas) {
-        if (bgPaint.getShader() == null && getWidth() > 0) {
-            int c = accent.container();
-            bgPaint.setShader(new LinearGradient(0, 0, getWidth(), 0,
-                    c, com.mhrsdev.musicplayer.ui.theme.ColorMath.lerp(c, 0xFF000000, 0.25f), Shader.TileMode.CLAMP));
-        }
         canvas.drawRoundRect(bounds, radius, radius, bgPaint);
         float left = radius, right = getWidth() - radius, y = getHeight() - 5 * d;
         float x = SeekMath.xFor(position, duration, left, right);
