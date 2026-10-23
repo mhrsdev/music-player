@@ -9,7 +9,7 @@ import com.mhrsdev.musicplayer.domain.model.UpdateState;
 import com.mhrsdev.musicplayer.domain.repository.UpdateRepository;
 
 /** Update screen: the repository's state and settings, and the user's intents. The flow itself lives in the repository. */
-public final class UpdateViewModel extends ViewModel {
+public class UpdateViewModel extends ViewModel {
     private final UpdateRepository updates;
 
     UpdateViewModel(UpdateRepository updates) {

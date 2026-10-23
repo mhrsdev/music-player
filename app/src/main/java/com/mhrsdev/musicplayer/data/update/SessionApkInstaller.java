@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /** {@link ApkInstaller} on {@link PackageInstaller} sessions: the APK is streamed in, so no FileProvider is needed. */
-final class SessionApkInstaller implements ApkInstaller {
+class SessionApkInstaller implements ApkInstaller {
     private final Context context;
 
     SessionApkInstaller(Context context) {

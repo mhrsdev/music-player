@@ -44,6 +44,7 @@
                 android:id="@+id/player_lyrics_toggle"
                 style="@style/Player.IconButton"
                 android:contentDescription="@string/player_show_lyrics"
+                android:visibility="invisible"
                 android:src="@drawable/player_ic_lyrics" />
 
             <Space

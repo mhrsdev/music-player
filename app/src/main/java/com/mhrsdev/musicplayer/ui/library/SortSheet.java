@@ -9,7 +9,7 @@ import com.mhrsdev.musicplayer.ui.library.SortOrder.Field;
 import java.util.List;
 
 /** "Sort by" sheet: one row per field (current one checked) and the direction. */
-public final class SortSheet extends ActionSheet {
+public class SortSheet extends ActionSheet {
     private static final String TAG = "sort_sheet";
     @Nullable private SortOrder current;
     @Nullable private Callback<SortOrder> onPick;

@@ -10,7 +10,7 @@ import com.mhrsdev.musicplayer.MusicPlayerApp;
  * Target of the widget buttons (not exported). Works with the app process dead: the Application builds the player
  * and restores the queue, and the controller restarts the playback service like it does for the in-app buttons.
  */
-public final class WidgetActionReceiver extends BroadcastReceiver {
+public class WidgetActionReceiver extends BroadcastReceiver {
     static final String ACTION_PREVIOUS = "com.mhrsdev.musicplayer.widget.PREVIOUS";
     static final String ACTION_PLAY_PAUSE = "com.mhrsdev.musicplayer.widget.PLAY_PAUSE";
     static final String ACTION_NEXT = "com.mhrsdev.musicplayer.widget.NEXT";

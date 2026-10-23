@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Finds the local track id for a {@link TrackRef}: by {@link TrackRef#key()} first, then by stored path. */
-public final class TrackMatcher {
+public class TrackMatcher {
     private final Map<String, String> byKey = new HashMap<>();
     private final Map<String, String> byPath = new HashMap<>();
 
