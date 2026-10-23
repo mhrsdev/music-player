@@ -15,6 +15,8 @@ import java.util.List;
 public final class ShortcutIntents {
     public static final String ACTION_SHUFFLE_ALL = "com.mhrsdev.musicplayer.action.SHUFFLE_ALL";
     public static final String ACTION_LIKED = "com.mhrsdev.musicplayer.action.LIKED";
+    /** Voice search ("play ...") from Assistant or a head unit; opens search. */
+    static final String ACTION_PLAY_FROM_SEARCH = "android.media.action.MEDIA_PLAY_FROM_SEARCH";
     public static final String ACTION_SEARCH = "com.mhrsdev.musicplayer.action.SEARCH";
 
     private ShortcutIntents() { }
@@ -24,7 +26,7 @@ public final class ShortcutIntents {
         String action = intent == null ? null : intent.getAction();
         if (action == null) return false;
         switch (action) {
-            case ACTION_SEARCH -> nav.openTab(ScreenNavigator.Tab.SEARCH);
+            case ACTION_SEARCH, ACTION_PLAY_FROM_SEARCH -> nav.openTab(ScreenNavigator.Tab.SEARCH);
             case ACTION_LIKED -> nav.openTrackList(ScreenNavigator.TrackList.LIKED, null);
             case ACTION_SHUFFLE_ALL -> shuffleAll(context, container);
             default -> { return false; }

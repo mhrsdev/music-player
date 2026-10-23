@@ -13,6 +13,7 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.session.DefaultMediaNotificationProvider;
 import androidx.media3.session.LibraryResult;
 import androidx.media3.session.MediaLibraryService;
+import androidx.media3.session.SessionError;
 import androidx.media3.session.MediaSession;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
@@ -123,7 +124,7 @@ public class PlaybackService extends MediaLibraryService {
                 MediaSession.ControllerInfo browser, String mediaId) {
             return browseExecutor.submit(() -> {
                 MediaItem item = tree.item(mediaId);
-                return item == null ? LibraryResult.<MediaItem>ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
+                return item == null ? LibraryResult.<MediaItem>ofError(SessionError.ERROR_BAD_VALUE)
                         : LibraryResult.ofItem(item, null);
             });
         }
