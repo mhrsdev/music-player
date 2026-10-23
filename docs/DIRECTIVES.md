@@ -353,3 +353,28 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Also in this stretch (verbatim, summarised):** "دکمه پخش خوبه دکمه توقف زشته ولی اگه پیشنهاد بهتری داره میتونه ارائه بده" (play button good, PAUSE button ugly — M1 to propose options, D19); "اگه آهنگ فایل lyric نداره پس نیازی به اینم نیست" (hide the lyrics button when the track has no lyrics → L1); "رفرش کردن لیستش کلا باگ هستش، برای این که یه موزیکی که دانلود کردم رو اضافه کنم ناچار شدم Clear Data کنم" (library refresh broken → F1/F2: rescan on every foreground, MediaStore observer while visible, force rescan, pending/non-music filters).
 
 **Summary:** (1) take the full build, (2) update README/docs, (3) the sample/screenshot data must show **real songs with real covers** instead of the invented empty-looking placeholders → R2 (CC/public-domain tracks + covers, metadata only; audio not committed; debug-only assets; CREDITS.md). Final README screenshot refresh happens after the UI agents finish.
+
+---
+
+## D21 — 2026-10-23 — Next version: headphone/device features; dependency tidy; no `final` classes; Java 17
+
+**Original (verbatim):**
+
+> و برای نسخه بعدی قابلیت کنترل هندزفری و هدفون ایناهم اضافه کن
+> و یا شناسایی دیوایسی که باهاش داری اهنگو گوش
+> یا بخش همزمان یه اهنگ از دو دیوایس و قابلیت کنترل ولوم و مشخصات جدا برای هر دیوایس(نمایشش درصورتی که چنتا کانکت شده بود)
+> activity = "1.13.0"
+> fragment = "1.9.1"
+> lifecycle = "2.11.0"
+> recyclerview = "1.4.0"
+> constraintlayout = "2.2.2"
+>
+> وقتی AppCompat میزنی نیازی نیست بزنی
+> clude now removed Final Class Dont Using Final mod
+> try to using java 17
+
+**Summary / interpretation:**
+1. **Next version (v0.3.0 feature):** (a) headphone/earbud/headset **controls** (button mapping: single/double/triple press, auto-resume on connect, pause on disconnect); (b) **detect the device** the music is playing on; (c) **simultaneous playback to two devices** + **per-device volume and per-device profile** (shown only when several outputs are connected). Supervisor feasibility note: Android has **no public API for playing one app's audio on two Bluetooth devices at once** (only OEM features such as Samsung Dual Audio / Android LE-Audio "audio sharing"); we implement listing all connected outputs, showing the active one, switching output through the system output switcher, per-device volume display/adjust (AudioManager keeps per-device volumes) and **per-device sound profiles** (EQ/bass/etc. keyed by device), and deep-link to the system's dual-audio/audio-sharing settings where the OEM offers it. → agent O1.
+2. **Dependencies:** the version-catalog lines `activity 1.13.0, fragment 1.9.1, lifecycle 2.11.0, recyclerview 1.4.0, constraintlayout 2.2.2` — "when you add AppCompat you don't need to add (these)": drop redundant direct declarations that AppCompat/Material already bring transitively (verify with `:app:dependencies` that no version regresses and the build stays green).
+3. **Code rule: do NOT use the `final` modifier on classes** (remove existing `final class`; records/enums stay as they are; `static final` constants and `final` fields where semantically needed are fine). (Interpretation of "Final Class Dont Using Final mod".)
+4. **Use Java 17** (source/target 17; use its idioms where they simplify: records, `instanceof` pattern matching, switch expressions, text blocks for SQL, `var` sparingly; no APIs above minSdk without desugaring).
