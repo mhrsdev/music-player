@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
+import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -63,7 +64,7 @@ public class AmbientBackdropView extends View {
     private boolean animating;
     private final long start = SystemClock.uptimeMillis();
     @Nullable private String wantedKey;
-    private final Runnable frame = this::frame;
+    private final PeriodicTick ticker = new PeriodicTick(FRAME_MS, this::frame);
     private final ArtworkLoader.Callback onArt = this::onArtwork;
     private boolean pendingAnimate;
     private int pendingSeed;
@@ -137,8 +138,7 @@ public class AmbientBackdropView extends View {
         boolean run = on && mode == Mode.FULL && MotionPolicy.decorativeMotionEnabled(getContext());
         if (run == animating) return;
         animating = run;
-        removeCallbacks(frame);
-        if (run) postOnAnimation(frame);
+        if (run) ticker.start(); else ticker.stop();
     }
 
     public boolean isAnimating() { return animating; }
@@ -175,11 +175,12 @@ public class AmbientBackdropView extends View {
         build(front);
     }
 
-    private void frame() {
-        if (!animating) return;
-        if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE || !isShown()) { animating = false; return; }
+    /** One drift frame; false (stop) the moment the view is not on screen. */
+    private boolean frame() {
+        if (!animating) return false;
+        if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE || !isShown()) { animating = false; return false; }
         invalidate();
-        postOnAnimationDelayed(frame, FRAME_MS);
+        return true;
     }
 
     private void drawLayer(Canvas c, Layer l, int alpha, float sec) {
@@ -197,7 +198,7 @@ public class AmbientBackdropView extends View {
 
     @Override protected void onDetachedFromWindow() {
         if (fade != null) fade.cancel();
-        removeCallbacks(frame);
+        ticker.stop();
         animating = false;
         super.onDetachedFromWindow();
     }

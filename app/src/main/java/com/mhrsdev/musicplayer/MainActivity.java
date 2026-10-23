@@ -309,6 +309,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Nullable private String miniTrackId;
+    private boolean notificationsChecked;
 
     private void renderMini(PlaybackState s) {
         Track t = s == null ? null : s.currentTrack();
@@ -319,7 +320,10 @@ public class MainActivity extends AppCompatActivity
             miniTrackId = t.id();
             binding.mini.bind(t);
         }
-        if (s.playing()) askNotificationsOnce();
+        if (s.playing() && !notificationsChecked) { // once: a permission IPC + prefs read at 4 Hz is pure waste
+            notificationsChecked = true;
+            askNotificationsOnce();
+        }
         binding.mini.setPlaying(s.playing());
         binding.mini.setBuffering(s.buffering());
         binding.mini.setProgress(s.positionMs(), s.durationMs());

@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
+import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -72,6 +73,10 @@ public class MorphPlayPauseView extends View {
     private boolean bound;
     private boolean buffering;
     private boolean visibleToUser;
+    private final PeriodicTick arcTick = new PeriodicTick(0, () -> {
+        invalidate();
+        return buffering && visibleToUser;
+    });
     @ColorInt private int containerColor;
     @ColorInt private int iconColor;
 
@@ -219,6 +224,7 @@ public class MorphPlayPauseView extends View {
     }
 
     @Override protected void onDetachedFromWindow() {
+        arcTick.stop();
         morphSpring.snapTo(playing ? 1f : 0f);
         scaleSpring.snapTo(1f);
         super.onDetachedFromWindow();
@@ -246,7 +252,7 @@ public class MorphPlayPauseView extends View {
             arcRect.set(cx - u * 1.3f, cy - u * 1.3f, cx + u * 1.3f, cy + u * 1.3f);
             float start = motion ? (SystemClock.uptimeMillis() - origin) % 1000L * 0.36f : 0f;
             canvas.drawArc(arcRect, start, 270f, false, arcPaint);
-            if (motion) postInvalidateOnAnimation();
+            if (motion) arcTick.start(); // one frame per display frame on the shared driver, only while buffering
             return;
         }
         for (int i = 0; i < 16; i++) cur[i] = playPts[i] + (pausePts[i] - playPts[i]) * m;

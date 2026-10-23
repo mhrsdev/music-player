@@ -109,7 +109,7 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
         h.b.explicit.setVisibility(track && r.track().explicit() ? View.VISIBLE : View.GONE);
         h.b.duration.setVisibility(track ? View.VISIBLE : View.GONE);
         h.b.more.setVisibility(track ? View.VISIBLE : View.GONE);
-        h.b.more.setContentDescription(c.getString(R.string.library_more, title));
+        h.moreTitle = title; // label is built on demand (TalkBack), not by a format() per bind
         if (track) h.b.more.setOnClickListener(v -> TrackMenu.show(v, r.track()));
         if (r.kind() == SearchResult.Kind.ARTIST) {
             Art.artist(h.b.art, art, title, seed);
@@ -130,10 +130,18 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
 
     static class Holder extends RecyclerView.ViewHolder {
         final LibraryRowTrackBinding b;
+        String moreTitle;
 
         Holder(LibraryRowTrackBinding b) {
             super(b.getRoot());
             this.b = b;
+            b.more.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+                @Override public void onInitializeAccessibilityNodeInfo(View host,
+                        android.view.accessibility.AccessibilityNodeInfo info) {
+                    super.onInitializeAccessibilityNodeInfo(host, info);
+                    if (moreTitle != null) info.setContentDescription(host.getContext().getString(R.string.library_more, moreTitle));
+                }
+            });
         }
     }
 }

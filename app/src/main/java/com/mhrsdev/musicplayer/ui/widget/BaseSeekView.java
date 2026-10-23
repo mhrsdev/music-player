@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
+import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -44,6 +45,12 @@ public abstract class BaseSeekView extends View implements SeekBarView {
     protected boolean playing;
     protected boolean motionAllowed = true;
     private boolean visibleToUser;
+    /** Set by onDraw: the tick keeps invalidating until a draw finds nothing left to animate. */
+    private boolean moreFrames;
+    private final PeriodicTick frameTick = new PeriodicTick(Tokens.DECOR_FRAME_MS, () -> {
+        invalidate();
+        return moreFrames;
+    });
     private boolean dragging;
     private float thumbGrow; // 0 idle, 1 dragging
     private long lastFrameMs;
@@ -146,9 +153,15 @@ public abstract class BaseSeekView extends View implements SeekBarView {
         motionAllowed = MotionPolicy.decorativeMotionEnabled(getContext());
     }
 
+    @Override protected void onDetachedFromWindow() {
+        frameTick.stop();
+        super.onDetachedFromWindow();
+    }
+
     @Override public void onVisibilityAggregated(boolean isVisible) {
         super.onVisibilityAggregated(isVisible);
         visibleToUser = isVisible;
+        if (!isVisible) frameTick.stop();
         if (isVisible) {
             lastFrameMs = 0;
             invalidate();
@@ -174,7 +187,8 @@ public abstract class BaseSeekView extends View implements SeekBarView {
         canvas.drawRoundRect(thumbX - tw, cy - half, thumbX + tw, cy + half, tw, tw, thumbPaint);
 
         boolean more = thumbGrow != growTarget || (wantsFrames() && canAnimate());
-        if (more) postInvalidateDelayed(Tokens.DECOR_FRAME_MS);
+        moreFrames = more;
+        if (more) frameTick.start(); // 30 fps on the shared frame driver; no-op while already running
     }
 
     // ---- Input ----

@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.ui.player;
 
+import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -47,7 +48,7 @@ public class PlayerBackdropView extends View {
     static final long DRIFT_FRAME_MS = 66; // <= 15 fps
     private boolean animating;
     private long driftStart = android.os.SystemClock.uptimeMillis();
-    private final Runnable driftFrame = this::driftFrame;
+    private final PeriodicTick ticker = new PeriodicTick(DRIFT_FRAME_MS, this::driftFrame);
 
     private Layer back = new Layer(), front = new Layer();
     private final Paint scrim = new Paint();
@@ -177,17 +178,16 @@ public class PlayerBackdropView extends View {
         boolean run = on && PlayerPalette.motionAllowed(getContext());
         if (run == animating) return;
         animating = run;
-        removeCallbacks(driftFrame);
-        if (run) postOnAnimation(driftFrame);
+        if (run) ticker.start(); else ticker.stop();
     }
 
     public boolean isAnimating() { return animating; }
 
-    private void driftFrame() {
-        if (!animating) return;
-        if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE || !isShown()) { animating = false; return; }
+    private boolean driftFrame() {
+        if (!animating) return false;
+        if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE || !isShown()) { animating = false; return false; }
         invalidate();
-        postOnAnimationDelayed(driftFrame, DRIFT_FRAME_MS);
+        return true;
     }
 
     private void drawLayer(Canvas c, Layer l, int alpha) {
@@ -211,7 +211,7 @@ public class PlayerBackdropView extends View {
 
     @Override protected void onDetachedFromWindow() {
         if (anim != null) anim.cancel();
-        removeCallbacks(driftFrame);
+        ticker.stop();
         animating = false;
         super.onDetachedFromWindow();
     }
