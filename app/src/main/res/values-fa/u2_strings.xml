@@ -69,4 +69,7 @@
     <string name="u2_detail_added">افزوده‌شده در</string>
     <string name="u2_detail_plays">دفعات پخش</string>
     <string name="u2_kbps">%1$d کیلوبیت بر ثانیه</string>
+    <string name="u2_empty_liked">هنوز آهنگی نپسندیده‌اید</string>
+    <string name="u2_empty_history">هنوز چیزی پخش نشده</string>
+    <string name="u2_empty_songs_body">آهنگ‌های این دستگاه پس از اسکن اینجا می‌آیند.</string>
 </resources>

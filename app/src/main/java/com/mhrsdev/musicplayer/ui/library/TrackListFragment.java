@@ -44,6 +44,7 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
     private TrackList kind;
     private TrackAdapter tracks;
     private HeaderAdapter header;
+    private EmptyAdapter empty;
     private SortPrefs sortPrefs;
     private ItemTouchHelper touchHelper;
     private String playingFrom = "";
@@ -80,7 +81,9 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
         tracks.setReorderable(kind == TrackList.PLAYLIST);
         LinearLayoutManager lm = new LinearLayoutManager(requireContext());
         b.list.setLayoutManager(lm);
-        b.list.setAdapter(new ConcatAdapter(header, tracks));
+        empty = new EmptyAdapter();
+        b.list.setAdapter(new ConcatAdapter(header, tracks, empty));
+        StateView.hide(b.state);
         b.list.setHasFixedSize(true);
         b.scroller.attach(b.list, 1);
         if (kind == TrackList.PLAYLIST) {
@@ -102,11 +105,7 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
             tracks.submitList(list);
             b.scroller.setData(list.size(), rows.sections());
             header.setCount(list);
-            if (list.isEmpty()) {
-                showEmpty();
-            } else {
-                StateView.hide(b.state);
-            }
+            empty.setShown(list.isEmpty());
         });
         vm.getSort().observe(getViewLifecycleOwner(), s -> header.notifyItemChanged(0));
         exitSelection = new OnBackPressedCallback(false) {
@@ -117,24 +116,43 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
         bindSelectionBar(c);
     }
 
-    private void showEmpty() {
-        // keep the header (play / playlist options) usable: centre the empty state in the space below it
-        b.list.post(() -> {
-            if (b == null) return;
-            View first = b.list.getChildAt(0);
-            View root = b.state.stateRoot;
-            root.setPaddingRelative(root.getPaddingStart(), first == null ? 0 : first.getBottom(), root.getPaddingEnd(),
-                    root.getPaddingBottom());
+    private void bindEmpty(com.mhrsdev.musicplayer.databinding.U2ListEmptyBinding e) {
+        e.emptyIcon.setImageResource(symbol());
+        e.emptyTitle.setText(kind == TrackList.PLAYLIST ? R.string.library_playlist_empty : emptyTitle());
+        int body = emptyText();
+        e.emptyBody.setVisibility(body == 0 ? View.GONE : View.VISIBLE);
+        if (body != 0) e.emptyBody.setText(body);
+        boolean find = kind == TrackList.PLAYLIST || kind == TrackList.LIKED || kind == TrackList.SONGS;
+        e.emptyAction.setVisibility(find ? View.VISIBLE : View.GONE);
+        e.emptyAction.setText(R.string.u2_find_songs);
+        e.emptyAction.setOnClickListener(v -> {
+            ScreenNavigator nav = ScreenNavigator.from(requireContext());
+            if (nav != null) nav.openTab(ScreenNavigator.Tab.SEARCH);
         });
-        if (kind == TrackList.PLAYLIST) {
-            StateView.empty(b.state, getString(R.string.library_playlist_empty), getString(R.string.u2_playlist_empty_body),
-                    getString(R.string.u2_find_songs), v -> {
-                        ScreenNavigator nav = ScreenNavigator.from(requireContext());
-                        if (nav != null) nav.openTab(ScreenNavigator.Tab.SEARCH);
-                    });
-        } else {
-            StateView.empty(b.state, getString(emptyText()), null, null, null);
-        }
+    }
+
+    /** The list's symbol: empty-state badge and the cover of the built-in lists. */
+    private int symbol() {
+        return switch (kind) {
+            case LIKED -> R.drawable.ic_mp_heart_filled;
+            case HISTORY -> R.drawable.nav_ic_history;
+            case MOST_PLAYED -> R.drawable.u2_ic_trending;
+            case RECENT, NEVER_PLAYED -> R.drawable.u2_ic_sparkle;
+            case YEAR -> R.drawable.u2_ic_calendar;
+            case PLAYLIST -> R.drawable.library_ic_playlist;
+            case ALBUM -> R.drawable.library_ic_album;
+            case ARTIST -> R.drawable.library_ic_artist;
+            default -> R.drawable.ic_mp_note;
+        };
+    }
+
+    private int emptyTitle() {
+        return switch (kind) {
+            case LIKED -> R.string.u2_empty_liked;
+            case HISTORY, MOST_PLAYED -> R.string.u2_empty_history;
+            case NEVER_PLAYED -> R.string.u2_never_played_empty;
+            default -> R.string.library_empty;
+        };
     }
 
     private int fallbackTitle() {
@@ -149,13 +167,14 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
         };
     }
 
+    /** Hint under the empty title; 0 = none. */
     private int emptyText() {
         return switch (kind) {
             case LIKED -> R.string.library_liked_empty;
             case HISTORY, MOST_PLAYED -> R.string.library_history_empty;
-            case PLAYLIST -> R.string.library_playlist_empty;
-            case NEVER_PLAYED -> R.string.u2_never_played_empty;
-            default -> R.string.library_empty;
+            case PLAYLIST -> R.string.u2_playlist_empty_body;
+            case SONGS -> R.string.u2_empty_songs_body;
+            default -> 0;
         };
     }
 
@@ -303,6 +322,41 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
         b = null;
     }
 
+    private int dp(int v) {
+        return Math.round(v * getResources().getDisplayMetrics().density);
+    }
+
+    /** Empty state as its own row under the header: never overlaps it at any width or font scale. */
+    private final class EmptyAdapter extends RecyclerView.Adapter<EmptyAdapter.Holder> {
+        private boolean shown;
+
+        void setShown(boolean show) {
+            if (show == shown) return;
+            shown = show;
+            if (show) notifyItemInserted(0); else notifyItemRemoved(0);
+        }
+
+        @Override public int getItemCount() { return shown ? 1 : 0; }
+
+        @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new Holder(com.mhrsdev.musicplayer.databinding.U2ListEmptyBinding.inflate(
+                    LayoutInflater.from(parent.getContext()), parent, false));
+        }
+
+        @Override public void onBindViewHolder(@NonNull Holder h, int position) {
+            bindEmpty(h.b);
+        }
+
+        final class Holder extends RecyclerView.ViewHolder {
+            final com.mhrsdev.musicplayer.databinding.U2ListEmptyBinding b;
+
+            Holder(com.mhrsdev.musicplayer.databinding.U2ListEmptyBinding b) {
+                super(b.getRoot());
+                this.b = b;
+            }
+        }
+    }
+
     /** Single header row inside the list so the whole screen scrolls and recycles together. */
     private final class HeaderAdapter extends RecyclerView.Adapter<HeaderAdapter.Holder> {
         private TrackListViewModel.Header header;
@@ -332,7 +386,9 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
             ScriptFont.setText(h.b.title, title);
             String songs = getResources().getQuantityString(R.plurals.library_songs, count, count)
                     + " · " + Format.duration(totalMs, getResources().getConfiguration().getLocales().get(0));
-            String sub = header != null && header.subtitle() != null ? header.subtitle() + " · " + songs : songs;
+            String own = header == null ? null : header.subtitle();
+            String sub = count == 0 ? own : own != null ? own + " · " + songs : songs;
+            h.b.subtitle.setVisibility(sub == null ? View.GONE : View.VISIBLE);
             ScriptFont.setText(h.b.subtitle, sub);
             List<String> covers = header == null ? List.of() : header.artworkUris();
             int seed = header == null ? 0 : header.seed();
@@ -342,6 +398,11 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
             if (playlist) {
                 h.b.mosaic.setCornerRadiusDp(32);
                 h.b.mosaic.setCovers(covers, seed);
+            } else if (header != null && header.title() == null) {
+                // built-in list: its symbol on the seeded gradient (a blank monogram suppresses the note glyph)
+                h.b.art.setCircle(false);
+                h.b.art.setCornerRadiusDp(32);
+                h.b.art.setMonogram(" ", seed);
             } else if (header != null && header.circle()) {
                 Art.artist(h.b.art, covers.isEmpty() ? null : covers.get(0), title, seed);
             } else {
@@ -351,10 +412,23 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
             h.b.shuffle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.nav_ic_shuffle, 0, 0, 0);
             h.b.play.setOnClickListener(v -> vm.playAt(0, playingFrom));
             h.b.shuffle.setOnClickListener(v -> vm.shuffle(playingFrom));
-            h.b.play.setEnabled(count > 0);
-            h.b.shuffle.setEnabled(count > 0);
-            h.b.play.setAlpha(count > 0 ? 1f : 0.38f);
-            h.b.shuffle.setAlpha(count > 0 ? 1f : 0.38f);
+            // empty list: a smaller cover leaves room for the empty state above the mini player
+            ViewGroup.LayoutParams box = h.b.artBox.getLayoutParams();
+            int side = dp(count > 0 ? 200 : 144);
+            if (box.width != side) {
+                box.width = side;
+                box.height = side;
+                h.b.artBox.setLayoutParams(box);
+            }
+            h.b.artIcon.getLayoutParams().width = h.b.artIcon.getLayoutParams().height = dp(count > 0 ? 88 : 64);
+            boolean builtIn = !playlist && header != null && header.title() == null;
+            h.b.artIcon.setVisibility(builtIn ? View.VISIBLE : View.GONE);
+            if (builtIn) h.b.artIcon.setImageResource(symbol());
+            // nothing to play: hide Play / Shuffle (a playlist keeps its options button)
+            h.b.play.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+            h.b.shuffle.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+            h.b.actions.setVisibility(count > 0 || playlist ? View.VISIBLE : View.GONE);
+            ((ViewGroup.MarginLayoutParams) h.b.headerMore.getLayoutParams()).setMarginStart(count > 0 ? dp(12) : 0);
             h.b.headerMore.setVisibility(playlist ? View.VISIBLE : View.GONE);
             h.b.headerMore.setOnClickListener(TrackListFragment.this::playlistMenu);
 

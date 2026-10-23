@@ -69,4 +69,7 @@
     <string name="u2_detail_added">Added</string>
     <string name="u2_detail_plays">Plays</string>
     <string name="u2_kbps">%1$d kbps</string>
+    <string name="u2_empty_liked">No liked songs yet</string>
+    <string name="u2_empty_history">Nothing played yet</string>
+    <string name="u2_empty_songs_body">Songs on this device show up here after a scan.</string>
 </resources>
