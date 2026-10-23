@@ -75,6 +75,17 @@
             android:layout_marginBottom="8dp"
             android:background="?attr/mpOutlineVariant" />
 
+        <!-- Primary actions as a row of tiles (track menu: play next / queue / playlist). -->
+        <LinearLayout
+            android:id="@+id/sheet_tiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/sheet_rows"
             android:layout_width="match_parent"

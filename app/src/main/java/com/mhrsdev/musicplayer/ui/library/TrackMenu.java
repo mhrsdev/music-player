@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.mhrsdev.musicplayer.domain.model.Track;
 
 /** Entry point used by every track row in the app (Home, Search, Library): opens the shared {@link TrackMenuSheet}. */
-public final class TrackMenu {
+public class TrackMenu {
     private TrackMenu() { }
 
     public static void show(View anchor, Track track) {

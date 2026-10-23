@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * selection changes are dispatched as payloads that only flip the row's check state. In reorder mode a drag
  * handle is shown and {@link #moveLocal} moves rows without waiting for the database.
  */
-public final class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
+public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
 
     public interface Listener {
         void onTrackClick(List<Track> list, int position);
@@ -189,7 +189,7 @@ public final class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder
         h.b.art.setArtwork(null, 0); // drops the pending load key: a late bitmap is not applied to a reused row
     }
 
-    final class Holder extends RecyclerView.ViewHolder {
+    class Holder extends RecyclerView.ViewHolder {
         final LibraryRowTrackBinding b;
 
         @SuppressLint("ClickableViewAccessibility")

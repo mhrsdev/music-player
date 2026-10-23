@@ -35,7 +35,7 @@ import java.util.Set;
  * lists: header + track rows, sort, multi-select with a contextual bar, and (playlists) rename / delete with undo,
  * swipe-to-remove with undo and drag-to-reorder.
  */
-public final class TrackListFragment extends Fragment implements TrackAdapter.Listener {
+public class TrackListFragment extends Fragment implements TrackAdapter.Listener {
     private static final String ARG_KIND = "kind";
     private static final String ARG_ID = "id";
 
@@ -108,6 +108,11 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
             empty.setShown(list.isEmpty());
         });
         vm.getSort().observe(getViewLifecycleOwner(), s -> header.notifyItemChanged(0));
+        SortSheet.listen(getParentFragmentManager(), getViewLifecycleOwner(), picked -> {
+            sortPrefs.put(kind, picked);
+            vm.setSort(picked);
+        });
+        PlaylistMenuSheet.listen(getParentFragmentManager(), getViewLifecycleOwner(), this::onPlaylistAction);
         exitSelection = new OnBackPressedCallback(false) {
             @Override public void handleOnBackPressed() { vm.clearSelection(); }
         };
@@ -249,13 +254,21 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
 
     private void playlistMenu(View anchor) {
         TrackListViewModel.Header h = vm.getHeader().getValue();
-        if (h == null) return;
-        PlaylistMenuSheet.show(requireActivity(), h, () -> PlaylistDialogs.rename(requireContext(),
-                h.title() == null ? "" : h.title(), vm::rename), () -> PlaylistDialogs.confirmDelete(requireContext(),
-                h.title() == null ? "" : h.title(), this::deletePlaylist), () -> {
-                    ScreenNavigator nav = ScreenNavigator.from(requireContext());
-                    if (nav != null) nav.openTab(ScreenNavigator.Tab.SEARCH);
-                });
+        if (h != null) PlaylistMenuSheet.show(getParentFragmentManager(), vm.id(), h);
+    }
+
+    private void onPlaylistAction(String playlistId, PlaylistMenuSheet.Action action) {
+        TrackListViewModel.Header h = vm.getHeader().getValue();
+        if (!playlistId.equals(vm.id()) || h == null) return;
+        String name = h.title() == null ? "" : h.title();
+        switch (action) {
+            case RENAME -> PlaylistDialogs.rename(requireContext(), name, vm::rename);
+            case DELETE -> PlaylistDialogs.confirmDelete(requireContext(), name, this::deletePlaylist);
+            case ADD_SONGS -> {
+                ScreenNavigator nav = ScreenNavigator.from(requireContext());
+                if (nav != null) nav.openTab(ScreenNavigator.Tab.SEARCH);
+            }
+        }
     }
 
     private void deletePlaylist() {
@@ -269,7 +282,7 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
         getParentFragmentManager().popBackStack();
     }
 
-    private final class PlaylistTouch extends ItemTouchHelper.Callback {
+    private class PlaylistTouch extends ItemTouchHelper.Callback {
         private int dragFrom = -1, dragTo = -1;
 
         @Override public int getMovementFlags(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder h) {
@@ -327,7 +340,7 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
     }
 
     /** Empty state as its own row under the header: never overlaps it at any width or font scale. */
-    private final class EmptyAdapter extends RecyclerView.Adapter<EmptyAdapter.Holder> {
+    private class EmptyAdapter extends RecyclerView.Adapter<EmptyAdapter.Holder> {
         private boolean shown;
 
         void setShown(boolean show) {
@@ -347,7 +360,7 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
             bindEmpty(h.b);
         }
 
-        final class Holder extends RecyclerView.ViewHolder {
+        class Holder extends RecyclerView.ViewHolder {
             final com.mhrsdev.musicplayer.databinding.U2ListEmptyBinding b;
 
             Holder(com.mhrsdev.musicplayer.databinding.U2ListEmptyBinding b) {
@@ -358,7 +371,7 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
     }
 
     /** Single header row inside the list so the whole screen scrolls and recycles together. */
-    private final class HeaderAdapter extends RecyclerView.Adapter<HeaderAdapter.Holder> {
+    private class HeaderAdapter extends RecyclerView.Adapter<HeaderAdapter.Holder> {
         private TrackListViewModel.Header header;
         private String title = "";
         private int count;
@@ -440,15 +453,12 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
                 String arrow = order.field() == SortOrder.Field.DEFAULT ? "" : order.ascending() ? "  ↑" : "  ↓";
                 h.b.sort.setText(getString(SortSheet.label(order.field())) + arrow);
                 h.b.sort.setContentDescription(getString(R.string.u2_sort_by) + ": " + getString(SortSheet.label(order.field())));
-                h.b.sort.setOnClickListener(v -> SortSheet.show(getParentFragmentManager(), order, picked -> {
-                    sortPrefs.put(kind, picked);
-                    vm.setSort(picked);
-                }));
+                h.b.sort.setOnClickListener(v -> SortSheet.show(getParentFragmentManager(), order));
             }
             h.b.select.setOnClickListener(v -> vm.selectAll());
         }
 
-        final class Holder extends RecyclerView.ViewHolder {
+        class Holder extends RecyclerView.ViewHolder {
             final LibraryListHeaderBinding b;
 
             Holder(LibraryListHeaderBinding b) {

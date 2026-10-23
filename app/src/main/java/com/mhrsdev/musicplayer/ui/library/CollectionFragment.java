@@ -30,9 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Two-column grid of albums, artists (circular, DESIGN.md 04) or playlists. */
-public final class CollectionFragment extends Fragment {
+public class CollectionFragment extends Fragment {
     private static final String ARG_KIND = "kind";
     private LibraryCollectionBinding b;
+    private CellAdapter adapter;
 
     public static CollectionFragment newInstance(Collection kind) {
         CollectionFragment f = new CollectionFragment();
@@ -63,14 +64,16 @@ public final class CollectionFragment extends Fragment {
                 .get(LibraryViewModel.class);
         Resources r = getResources();
         b.back.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
-        CellAdapter adapter = new CellAdapter(cell -> Screens.openTrackList(this, switch (kind) {
+        adapter = new CellAdapter(cell -> Screens.openTrackList(this, switch (kind) {
             case ALBUMS -> TrackList.ALBUM;
             case ARTISTS -> TrackList.ARTIST;
             case PLAYLISTS -> TrackList.PLAYLIST;
             case YEARS -> TrackList.YEAR;
         }, cell.id()));
         if (kind == Collection.PLAYLISTS) {
-            adapter.longClick = cell -> playlistOptions(c, cell);
+            adapter.longClick = this::playlistOptions;
+            PlaylistMenuSheet.listen(getParentFragmentManager(), getViewLifecycleOwner(),
+                    (id, action) -> onPlaylistAction(c, id, action));
             b.newPlaylist.setVisibility(View.VISIBLE);
             b.newPlaylist.setOnClickListener(v -> PlaylistDialogs.create(requireContext(), c.library,
                     p -> { if (p != null && isAdded()) Screens.openTrackList(this, TrackList.PLAYLIST, p.id()); }));
@@ -128,14 +131,24 @@ public final class CollectionFragment extends Fragment {
         }
     }
 
-    /** Long-press on a playlist: rename / delete (with undo). */
-    private void playlistOptions(AppContainer c, Cell cell) {
+    /** Long-press on a playlist: rename / add songs / delete (with undo). */
+    private void playlistOptions(Cell cell) {
         TrackListViewModel.Header h = new TrackListViewModel.Header(cell.title(), null, cell.seed(), false,
                 cell.mosaic() == null ? List.of() : cell.mosaic());
-        PlaylistMenuSheet.show(requireActivity(), h,
-                () -> PlaylistDialogs.rename(requireContext(), cell.title(), name -> c.libraryAdmin().renamePlaylist(cell.id(), name)),
-                () -> PlaylistDialogs.confirmDelete(requireContext(), cell.title(), () -> deletePlaylist(c, cell)),
-                () -> Screens.openTrackList(this, TrackList.PLAYLIST, cell.id()));
+        PlaylistMenuSheet.show(getParentFragmentManager(), cell.id(), h);
+    }
+
+    private void onPlaylistAction(AppContainer c, String id, PlaylistMenuSheet.Action action) {
+        Cell cell = null;
+        for (Cell x : adapter.getCurrentList()) if (x.id().equals(id)) cell = x;
+        if (cell == null) return;
+        Cell target = cell;
+        switch (action) {
+            case RENAME -> PlaylistDialogs.rename(requireContext(), target.title(),
+                    name -> c.libraryAdmin().renamePlaylist(target.id(), name));
+            case DELETE -> PlaylistDialogs.confirmDelete(requireContext(), target.title(), () -> deletePlaylist(c, target));
+            case ADD_SONGS -> Screens.openTrackList(this, TrackList.PLAYLIST, target.id());
+        }
     }
 
     private void deletePlaylist(AppContainer c, Cell cell) {
@@ -174,7 +187,7 @@ public final class CollectionFragment extends Fragment {
         b = null;
     }
 
-    private static final class CellAdapter extends ListAdapter<Cell, CellAdapter.Holder> {
+    private static class CellAdapter extends ListAdapter<Cell, CellAdapter.Holder> {
         interface Listener {
             void onClick(Cell cell);
         }
@@ -220,7 +233,7 @@ public final class CollectionFragment extends Fragment {
             });
         }
 
-        static final class Holder extends RecyclerView.ViewHolder {
+        static class Holder extends RecyclerView.ViewHolder {
             final LibraryGridItemBinding b;
 
             Holder(LibraryGridItemBinding b) {

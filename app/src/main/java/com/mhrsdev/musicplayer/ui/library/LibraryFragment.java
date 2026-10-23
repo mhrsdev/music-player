@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Library hub (DESIGN.md 03). */
-public final class LibraryFragment extends Fragment {
+public class LibraryFragment extends Fragment {
     private LibraryFragmentBinding b;
 
     @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,

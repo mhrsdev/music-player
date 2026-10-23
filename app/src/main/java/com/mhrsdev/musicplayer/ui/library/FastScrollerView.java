@@ -21,7 +21,7 @@ import java.util.List;
  * moment; dragging it jumps through the list and shows the current letter in a bubble. Draws only when visible,
  * allocates nothing per frame, and lets touches outside its edge strip fall through to the list.
  */
-public final class FastScrollerView extends View {
+public class FastScrollerView extends View {
     private static final long HIDE_DELAY_MS = 1200;
     private static final int MIN_ITEMS = 40;
 

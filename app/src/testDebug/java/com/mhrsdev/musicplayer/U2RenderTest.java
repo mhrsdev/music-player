@@ -98,7 +98,7 @@ public class U2RenderTest {
         MainActivity a = start();
         a.openTrackList(ScreenNavigator.TrackList.SONGS, null);
         settle();
-        SortSheet.show(a.getSupportFragmentManager(), new SortOrder(SortOrder.Field.TITLE, true), o -> { });
+        SortSheet.show(a.getSupportFragmentManager(), new SortOrder(SortOrder.Field.TITLE, true));
         settle();
         save(a, "sort_sheet", "sort-sheet-dark");
     }
