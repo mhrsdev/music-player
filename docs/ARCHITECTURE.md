@@ -1,8 +1,8 @@
 # Architecture (initial contract — sub-agents may refine, must update this file when they do)
 
 ## Stack
-- Kotlin, Jetpack Compose, **Material 3 Expressive** (`androidx.compose.material3` latest alpha/stable that has `MaterialExpressiveTheme`, `LoadingIndicator`, wavy `Slider`/`LinearWavyProgressIndicator`, `MaterialShapes` + shape morphing), Navigation Compose, Coil (artwork), Palette/own color extraction for backdrop, Media3 (ExoPlayer + MediaSessionService), Room (library, likes, playlists, history), DataStore (settings), Hilt or Koin (DI — pick one, keep simple).
-- minSdk 26, targetSdk/compileSdk latest stable. Single `:app` module to start (package-by-layer inside).
+- Kotlin, Jetpack Compose, **Material 3 Expressive** (`androidx.compose.material3` latest alpha/stable that has `MaterialExpressiveTheme`, `LoadingIndicator`, wavy `Slider`/`LinearWavyProgressIndicator`, `MaterialShapes` + shape morphing), Navigation Compose, Coil (artwork), Palette/own color extraction for backdrop, Media3 (ExoPlayer + MediaSessionService), Room (library, likes, playlists, history), DataStore (settings), **Koin** (DI — chosen in T1: no codegen, no kapt/KSP coupling).
+- minSdk 26, compileSdk/targetSdk **37**, AGP 9.4.1 (built-in Kotlin), Kotlin 2.4.21, Gradle 9.8.2. (Latest stable AndroidX — Compose 1.12, core 1.19, navigation 2.10 — requires AGP >= 9.1 and compileSdk 37.) **Material 3 Expressive needs `material3` 1.5.0-beta02** (stable 1.4.0 lacks `MaterialShapes`/wavy indicators; verified in the AAR); it is pinned in `gradle/libs.versions.toml` over the Compose BOM 2026.09.00. The module opts in to `ExperimentalMaterial3ExpressiveApi` globally via compiler arg. Single `:app` module to start (package-by-layer inside).
 
 ## Product scope
 - **Phase 1 (this build):** local-device music library (MediaStore scan, permission flow) + full player experience + synced lyrics (LRC embedded/sidecar file, fallback to **LRCLIB** public API) + likes, playlists, history, queue, sleep timer, search, artists/albums.
@@ -17,7 +17,19 @@ ui/            ALL Compose UI (owned by the UI agent): theme/, components/, home
 ```
 `ui/` depends only on `domain/` interfaces (+ `PlayerController`, `*Repository`). A `fake/` set of in-memory implementations with realistic sample data (Neffex-style tracks, covers via generated gradients) lets UI be built and previewed before data/playback land.
 
-## Contracts the UI relies on (defined in `domain/`)
+## Contracts the UI relies on (defined in `domain/`) — FINAL signatures (T1)
+Models: `domain/model/Models.kt` (package `com.mhrsdev.musicplayer.domain.model`). Interfaces: `domain/repository/Contracts.kt` (package `...domain.repository`). Read those two files; they are the source of truth. Refinements vs the first draft:
+- Artwork: models carry `artworkUri: String?` + `placeholderSeed: Int`; when the URI is null the UI draws a deterministic gradient from the seed.
+- `PlayerController.play(tracks, startIndex, playingFrom)` starts a queue; `resume()/pause()/togglePlayPause()`; `addToQueue(track, index?)` (also used to undo a removal); `playNext(track)`; `shuffleQueue()` sets `PlaybackState.canUndoShuffle`, `undoShuffleQueue()` restores; sleep timer = `setSleepTimer(minutes)`, `setSleepTimerEndOfTrack()`, `cancelSleepTimer()`; state exposes `SleepTimer` (`Off | Countdown(remainingMs,totalMs) | EndOfTrack`).
+- `PlaybackState` also has `playingFrom` (the "Playing from … · N min left" chip; `remainingQueueMs` helper), `isBuffering`, `hasNext/hasPrevious`.
+- `LibraryRepository` adds `allTracks`, `album/artist/playlist(id)`, `albumTracks/artistTracks/playlistTracks`, `recordPlay`, `createPlaylist`, `addToPlaylist`; `search` returns `Flow<List<SearchResult>>` (sealed: `OfTrack|OfAlbum|OfArtist|OfPlaylist`). `SearchFilter = ALL, SONGS, ALBUMS, ARTISTS, PLAYLISTS` (no VIDEOS in Phase 1; the reference's Videos chip belongs to a future online `MusicSource`).
+- `Lyrics(trackId, lines, isSynced, source)` with `activeLineIndex(positionMs)`; unsynced lines have `timeMs = LyricLine.UNSYNCED`. Sample lyrics: track-3 plain, track-4 none, track-34..37 Persian synced, rest synced English.
+- `HomeSection(id,title,subtitle,style: HERO_CAROUSEL|CAROUSEL|LIST, items: List<HomeItem>)`, `HomeItem = OfTrack|OfAlbum|OfPlaylist`.
+- `MusicSource(id, displayName, suspend search, suspend resolvePlayableUri)`.
+- DI: Koin module `di/AppModule.kt` binds the fakes to the interfaces; UI gets them via `koinInject<T>()` / `koinViewModel()`. T8 swaps bindings.
+- Fakes (`fake/`): `SampleData` (37 tracks, 7 artists incl. NEFFEX and a Persian artist, 7 albums, 3 playlists, seeded likes/history), `FakePlayerController` (coroutine-ticker simulation, starts paused mid-track in a 12-item queue), `FakeLibraryRepository`, `FakeLyricsRepository`, `FakeHomeFeedSource`, `FakeMusicSource`.
+
+Original draft contract (kept for reference):
 - `PlayerController`: `state: StateFlow<PlaybackState>` (current track, isPlaying, positionMs, durationMs, shuffle, repeatMode, queue, currentIndex, sleepTimer), commands: play/pause/seek/next/prev/skipTo/toggleShuffle/cycleRepeat/moveQueueItem/removeFromQueue/shuffleQueue()+undo/setSleepTimer.
 - `LibraryRepository`: `likedTracks`, `albums`, `artists`, `playlists`, `history`, `recentlySaved`, `search(query, filter)`, `toggleLike`.
 - `LyricsRepository`: `lyricsFor(track): Flow<Lyrics?>` (synced lines with timestamps, or plain).

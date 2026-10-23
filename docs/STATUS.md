@@ -6,8 +6,8 @@ _Last updated: 2026-10-23 — D2 (design skill) received_
 - Goal: Android music player, Material 3 Expressive UI that beats the reference screenshots in `docs/design-reference/`.
 - Branches: `main` = final deliverable (supervisor merges). Working branch: `ccr-b49e5e2a-53r8m3`.
 - Models: UI → Opus 5.5. Everything else → Sonnet 5.5. Supervisor writes no product code.
-- Environment: JDK + Gradle present; **no Android SDK preinstalled** (T1 must install/verify it or document the limitation).
-- How to build: _(filled by T1)_
+- Environment: JDK 21 + Gradle present; Android SDK installed by T1 at `/opt/android-sdk` (platform 37, build-tools 37.0.0; reinstall steps in README.md). Network (dl.google.com, Maven Central/Google, services.gradle.org) works through the proxy.
+- How to build: `export ANDROID_HOME=/opt/android-sdk && ./gradlew assembleDebug lint test` (SDK install steps + details in `README.md`; SDK lives outside the repo, `local.properties` is gitignored). JDK 21, Gradle wrapper 9.8.2, AGP 9.4.1, compileSdk 37.
 
 ## Decisions
 | # | Decision | Why / status |
