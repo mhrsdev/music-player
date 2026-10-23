@@ -44,6 +44,16 @@ android {
 
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // Robolectric/Roborazzi screenshot tests need merged resources (fonts, strings).
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            // JVM screenshot renders (test/.../ui/screenshots) only run with -Pscreenshots and write PNGs
+            // to app/build/outputs/roborazzi. The default `test` task skips them (fast, no android-all download).
+            val shots = project.findProperty("screenshots") != null
+            it.systemProperty("screenshots", shots.toString())
+            it.systemProperty("roborazzi.test.record", shots.toString())
+            it.maxHeapSize = "3g"
+        }
     }
 }
 
@@ -64,6 +74,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.palette)
+    implementation(libs.material.color.utilities)
 
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
@@ -100,4 +111,9 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.test.manifest)
 }

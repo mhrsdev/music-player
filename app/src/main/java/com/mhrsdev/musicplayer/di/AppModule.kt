@@ -10,6 +10,11 @@ import com.mhrsdev.musicplayer.fake.FakeLibraryRepository
 import com.mhrsdev.musicplayer.fake.FakeLyricsRepository
 import com.mhrsdev.musicplayer.fake.FakeMusicSource
 import com.mhrsdev.musicplayer.fake.FakePlayerController
+import com.mhrsdev.musicplayer.domain.repository.WaveformRepository
+import com.mhrsdev.musicplayer.fake.FakeWaveformRepository
+import com.mhrsdev.musicplayer.ui.settings.DataStoreUiSettingsRepository
+import com.mhrsdev.musicplayer.ui.settings.UiSettingsRepository
+import org.koin.android.ext.koin.androidContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,4 +32,8 @@ val appModule = module {
     single<LyricsRepository> { FakeLyricsRepository() }
     single<HomeFeedSource> { FakeHomeFeedSource(get()) }
     single<MusicSource> { FakeMusicSource() }
+    // T2: amplitude profiles for the Waveform/Bars seek styles. T-W replaces this with the real extractor.
+    single<WaveformRepository> { FakeWaveformRepository() }
+    // T2: UI-only preferences (theme mode, seek-bar style, …), DataStore-backed.
+    single<UiSettingsRepository> { DataStoreUiSettingsRepository(androidContext()) }
 }
