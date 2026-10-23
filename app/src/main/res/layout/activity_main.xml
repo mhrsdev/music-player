@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     android:background="?attr/mpBackground">
 
+    <!-- Home ambient glow (DESIGN.md expression budget #1): full-bleed from y=0 under the transparent status bar,
+         eased to alpha 0, pinned behind the scroller so it never ends in a hard edge. Static: no per-frame work. -->
+    <View
+        android:id="@+id/home_glow"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:visibility="gone" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/screen_container"
         android:layout_width="match_parent"
@@ -15,8 +24,7 @@
         android:id="@+id/bottom_scrim"
         android:layout_width="match_parent"
         android:layout_height="140dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/nav_bottom_scrim" />
+        android:layout_gravity="bottom" />
 
     <LinearLayout
         android:id="@+id/chrome"
@@ -30,8 +38,8 @@
             android:id="@+id/mini_player_slot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginHorizontal="@dimen/mp_dock_margin_h"
+            android:layout_marginBottom="@dimen/mp_dock_gap">
 
             <com.mhrsdev.musicplayer.ui.widget.MiniPlayerView
                 android:id="@+id/mini"
@@ -45,7 +53,7 @@
             android:id="@+id/nav_slot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp">
+            android:layout_marginHorizontal="@dimen/mp_dock_margin_h">
 
             <com.mhrsdev.musicplayer.ui.widget.FloatingNavView
                 android:id="@+id/nav"

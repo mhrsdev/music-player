@@ -58,6 +58,36 @@ public class U1RenderTest {
     @Test @Config(qualifiers = "w800dp-h1280dp-night-mdpi")
     public void search800() throws Exception { render(ScreenNavigator.Tab.SEARCH, "ra", "search-results-800", 800, 1280); }
 
+    /** Owner's phone: 1080x2400 at 420dpi = 411dp wide, Persian (RTL). */
+    @Test @Config(qualifiers = "fa-w411dp-h914dp-night-xxhdpi")
+    public void homeFa411() throws Exception { render(ScreenNavigator.Tab.HOME, null, "home-fa-411", 411, 914); }
+
+    @Test @Config(qualifiers = "fa-w411dp-h914dp-night-xxhdpi")
+    public void homeFa411Scrolled() throws Exception { render(ScreenNavigator.Tab.HOME, null, "home-fa-411-bottom", 411, 914, true); }
+
+    // Top of Home (owner: seam under the status bar, hard glow edge, squeezed neighbours): 1080x2400 + 360dp.
+    @Test @Config(qualifiers = "w411dp-h914dp-night-xxhdpi")
+    public void homeTop1080() throws Exception { render(ScreenNavigator.Tab.HOME, null, "home-top-1080x2400-dark", 411, 914); }
+
+    @Test @Config(qualifiers = "w360dp-h800dp-notnight-xxhdpi")
+    public void homeTop360Light() throws Exception { render(ScreenNavigator.Tab.HOME, null, "home-top-360-light", 360, 800); }
+
+    @Test @Config(qualifiers = "fa-w360dp-h800dp-night-xxhdpi")
+    public void homeTop360Fa() throws Exception { render(ScreenNavigator.Tab.HOME, null, "home-top-360-fa-dark", 360, 800); }
+
+    // Dock spacing (owner: 'margin is not enough'): light+dark, en+fa, 360 and 411 dp.
+    @Test @Config(qualifiers = "w360dp-h800dp-notnight-xxhdpi")
+    public void dock360Light() throws Exception { render(ScreenNavigator.Tab.HOME, null, "dock-360-light", 360, 800, true); }
+
+    @Test @Config(qualifiers = "fa-w360dp-h800dp-night-xxhdpi")
+    public void dock360FaDark() throws Exception { render(ScreenNavigator.Tab.HOME, null, "dock-360-fa-dark", 360, 800, true); }
+
+    @Test @Config(qualifiers = "fa-w411dp-h914dp-notnight-xxhdpi")
+    public void dock411FaLight() throws Exception { render(ScreenNavigator.Tab.HOME, null, "dock-411-fa-light", 411, 914, true); }
+
+    @Test @Config(qualifiers = "w411dp-h914dp-night-xxhdpi")
+    public void dock411Dark() throws Exception { render(ScreenNavigator.Tab.LIBRARY, null, "dock-411-dark", 411, 914); }
+
     @Test @Config(qualifiers = "w800dp-h1280dp-night-mdpi")
     public void home800() throws Exception { render(ScreenNavigator.Tab.HOME, null, "home-800", 800, 1280); }
 
@@ -68,6 +98,11 @@ public class U1RenderTest {
     public void home360Font13() throws Exception { render(ScreenNavigator.Tab.HOME, null, "home-360-font1.3", 360, 800); }
 
     private void render(ScreenNavigator.Tab tab, String query, String name, int wDp, int hDp) throws Exception {
+        render(tab, query, name, wDp, hDp, false);
+    }
+
+    private void render(ScreenNavigator.Tab tab, String query, String name, int wDp, int hDp, boolean scrollToEnd)
+            throws Exception {
         android.app.Application app = org.robolectric.RuntimeEnvironment.getApplication();
         org.robolectric.shadows.ShadowApplication sa = Shadow.extract(app);
         sa.grantPermissions(android.Manifest.permission.READ_MEDIA_AUDIO,
@@ -93,6 +128,15 @@ public class U1RenderTest {
                 View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
         root.layout(0, 0, w, h);
         settle();
+        if (scrollToEnd) {
+            androidx.recyclerview.widget.RecyclerView rv = findList(root);
+            if (rv != null && rv.getAdapter() != null) {
+                rv.scrollToPosition(rv.getAdapter().getItemCount() - 1);
+                settle();
+                rv.scrollBy(0, 100000);
+                settle();
+            }
+        }
         root.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
         root.layout(0, 0, w, h);
@@ -107,6 +151,18 @@ public class U1RenderTest {
             bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
         }
         assertTrue(out.length() > 0);
+    }
+
+    private static androidx.recyclerview.widget.RecyclerView findList(View v) {
+        if (v instanceof androidx.recyclerview.widget.RecyclerView rv && rv.getLayoutManager() != null
+                && rv.getLayoutManager().canScrollVertically()) return rv;
+        if (v instanceof android.view.ViewGroup g) {
+            for (int i = 0; i < g.getChildCount(); i++) {
+                androidx.recyclerview.widget.RecyclerView r = findList(g.getChildAt(i));
+                if (r != null) return r;
+            }
+        }
+        return null;
     }
 
     private static void settle() throws InterruptedException {

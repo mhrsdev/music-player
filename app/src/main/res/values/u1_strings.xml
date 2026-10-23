@@ -48,10 +48,11 @@
     <string name="search_empty_library_body">Add songs to your phone or choose folders in Settings, then search here.</string>
     <string name="search_open_settings">Choose folders</string>
     <string name="search_prompt_body">Search songs, albums, artists and playlists on this phone. Works offline.</string>
-    <string name="search_play_next">Play next</string>
-    <string name="search_add_queue">Add to queue</string>
-    <string name="search_add_playlist">Add to playlist</string>
-    <string name="search_queued">Added to queue</string>
-    <string name="search_play_next_done">Plays next</string>
-    <string name="search_results_count">%1$d results</string>
+    <string name="home_section_recent">Recently added</string>
+    <string name="home_section_throwbacks">Throwbacks</string>
+    <string name="home_section_playlists">Your playlists</string>
+    <string name="home_section_quick_picks">Quick picks</string>
+    <string name="home_section_continue">Continue listening</string>
+    <string name="home_section_most_played">Most played</string>
+    <string name="home_section_liked">Liked songs</string>
 </resources>

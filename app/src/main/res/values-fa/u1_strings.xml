@@ -47,10 +47,11 @@
     <string name="search_empty_library_body">آهنگ‌ها را به گوشی اضافه کنید یا در تنظیمات پوشه‌ها را انتخاب کنید، سپس اینجا جست‌وجو کنید.</string>
     <string name="search_open_settings">انتخاب پوشه‌ها</string>
     <string name="search_prompt_body">آهنگ‌ها، آلبوم‌ها، هنرمندان و فهرست‌های پخش این گوشی را جست‌وجو کنید. بدون اینترنت هم کار می‌کند.</string>
-    <string name="search_play_next">پخش بعدی</string>
-    <string name="search_add_queue">افزودن به صف</string>
-    <string name="search_add_playlist">افزودن به فهرست پخش</string>
-    <string name="search_queued">به صف اضافه شد</string>
-    <string name="search_play_next_done">بعد از این پخش می‌شود</string>
-    <string name="search_results_count">%1$d نتیجه</string>
+    <string name="home_section_recent">تازه اضافه‌شده</string>
+    <string name="home_section_throwbacks">خاطره‌انگیزها</string>
+    <string name="home_section_playlists">فهرست‌های پخش شما</string>
+    <string name="home_section_quick_picks">انتخاب‌های سریع</string>
+    <string name="home_section_continue">ادامهٔ گوش دادن</string>
+    <string name="home_section_most_played">پرپخش‌ترین‌ها</string>
+    <string name="home_section_liked">آهنگ‌های پسندیده</string>
 </resources>
