@@ -1,38 +1,49 @@
 package com.mhrsdev.musicplayer.data.db
 
-import androidx.room.Dao
+import android.content.Context
 import androidx.room.Database
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey
-import androidx.room.Query
+import androidx.room.Room
 import androidx.room.RoomDatabase
-import kotlinx.coroutines.flow.Flow
+import androidx.room.migration.Migration
 
 /**
- * Minimal Room placeholder so KSP + schema export are exercised by the build.
- * T5 replaces this with the real schema (tracks, playlists, history, likes). Not wired into DI yet.
+ * Single Room database for the local library and user data.
+ *
+ * Migration strategy: schemas are exported to `app/schemas/` (see `room.schemaLocation` in build.gradle.kts)
+ * and committed. Every version bump MUST add a [Migration] to [MIGRATIONS]; destructive fallback is NOT enabled
+ * because likes, playlists and history are user data. Scanner-derived tables (track/album/artist) could be
+ * recreated by a rescan, but their ids are referenced by user data, so we migrate rather than drop.
  */
-@Entity(tableName = "liked_track")
-data class LikedTrackEntity(
-    @PrimaryKey val trackId: String,
-    val likedAtMs: Long,
+@Database(
+    entities = [
+        TrackEntity::class,
+        AlbumEntity::class,
+        ArtistEntity::class,
+        PlaylistEntity::class,
+        PlaylistTrackCrossRef::class,
+        LikedTrackEntity::class,
+        PlayHistoryEntity::class,
+    ],
+    version = 1,
+    exportSchema = true,
 )
-
-@Dao
-interface LikedTrackDao {
-    @Query("SELECT * FROM liked_track ORDER BY likedAtMs DESC")
-    fun observeAll(): Flow<List<LikedTrackEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(entity: LikedTrackEntity)
-
-    @Query("DELETE FROM liked_track WHERE trackId = :trackId")
-    suspend fun delete(trackId: String)
-}
-
-@Database(entities = [LikedTrackEntity::class], version = 1, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun likedTrackDao(): LikedTrackDao
+    abstract fun trackDao(): TrackDao
+    abstract fun albumDao(): AlbumDao
+    abstract fun artistDao(): ArtistDao
+    abstract fun playlistDao(): PlaylistDao
+    abstract fun likeDao(): LikeDao
+    abstract fun historyDao(): HistoryDao
+
+    companion object {
+        const val NAME = "music_player.db"
+
+        /** Append new migrations here (oldest first). Empty while the schema is at version 1. */
+        val MIGRATIONS: Array<Migration> = emptyArray()
+
+        fun create(context: Context): AppDatabase =
+            Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, NAME)
+                .addMigrations(*MIGRATIONS)
+                .build()
+    }
 }
