@@ -6,7 +6,7 @@ Read this file first, then `docs/STATUS.md`, then `docs/DIRECTIVES.md`. Those th
 
 - **Supervisor (the top-level agent in the chat)**: manages and monitors only. Relays the owner's instructions to sub-agents, tracks tasks, reviews results, merges. **Does not write product code.** Its only direct edits are to `docs/STATUS.md`, `docs/DIRECTIVES.md`, `CLAUDE.md` and git operations.
 - **UI sub-agent**: model **Opus 5.5** (`model: "opus"`). Owns everything under `app/src/main/java/.../ui/` and visual design (XML + custom Views in Java, own visual identity, animation, theming).
-- **All other sub-agents**: model **Sonnet 5.5** (`model: "sonnet"`). Build system, data, playback service, lyrics, tests, CI, etc. They must follow the **ponytail** skill (`.claude/skills/ponytail`, owner D8); the UI sub-agent uses **design-atelier** instead. D7 structure rules win over ponytail's minimalism when they conflict.
+- **All other sub-agents**: model **Sonnet 5.5** (`model: "sonnet"`). Build system, data, playback service, lyrics, tests, CI, etc. They must follow the **ponytail** skill (`.claude/skills/ponytail`, owner D8); the UI sub-agent uses **design-atelier** (+ `ui-ux-pro-max`, owner D10) instead. D7 structure rules win over ponytail's minimalism when they conflict.
 - **Parallelism (owner D8):** several sub-agents may run at the same time, each in its own `git worktree` + `task/<id>-<slug>` branch, touching only its own package/files.
 
 ## Design skill (set by the owner — mandatory for UI work)

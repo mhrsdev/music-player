@@ -68,6 +68,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D10 archived: ui-ux-pro-max skill installed + relayed to the UI agent.
 - 2026-10-23: D9 archived and relayed to T2b (god-tier UI/UX, reasonable battery).
 - 2026-10-23: D8 archived: parallel agents allowed (replaces D5), ponytail skill installed in .claude/skills and mandatory for non-UI agents, UI must be prettier/own-identity, battery+RAM minimal. T2b told; T1b launched in parallel.
 - 2026-10-23: D7 archived (Q-J answered: Java only, MVVM, no Room, tidy queries, Gradle 9.0.0). CLAUDE.md got "Hard code rules". Plan rewritten (new T1b re-scaffold). T2b launched (Opus).

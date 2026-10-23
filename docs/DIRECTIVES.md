@@ -180,3 +180,14 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > بهترین UI/UX رو میخوام
 
 **Summary:** Tell the UI agent (Opus) the design must be outstanding ("god-tier") while battery use stays reasonable. Owner wants the best possible UI/UX. Relayed to T2b; balance = beautiful where cheap, documented low-power fallbacks.
+
+---
+
+## D10 — 2026-10-23 — Give the designer the ui-ux-pro-max skill
+
+**Original (verbatim):**
+
+> این اسکیلم به دیزاینر بده
+> https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+
+**Summary:** Give the UI/design sub-agent (Opus) the `ui-ux-pro-max` skill. Installed (reviewed: local CSV data + pure-Python search script, no network/exec of external code; MIT) at `.claude/skills/ui-ux-pro-max`. Run it as `python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system|--domain ux|motion|typography|color ...` (no `-I`). It is web-leaning; its output is advice only — design-atelier + owner directives (D2, D6–D9) win.
