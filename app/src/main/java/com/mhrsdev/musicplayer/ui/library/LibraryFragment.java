@@ -64,6 +64,8 @@ public class LibraryFragment extends Fragment {
         b.hubPlaylists.setOnClickListener(v -> Screens.openCollection(this, Collection.PLAYLISTS));
         b.hubArtists.setOnClickListener(v -> Screens.openCollection(this, Collection.ARTISTS));
         b.hubHistory.setOnClickListener(v -> Screens.openTrackList(this, TrackList.HISTORY, null));
+        b.hubGenres.setOnClickListener(v -> com.mhrsdev.musicplayer.ui.home.SectionPageFragment.open(this, "genres", null));
+        b.hubFolders.setOnClickListener(v -> com.mhrsdev.musicplayer.ui.home.SectionPageFragment.open(this, "folders", null));
         b.hubSongs.setOnClickListener(v -> Screens.openTrackList(this, TrackList.SONGS, null));
         b.hubMostPlayed.setOnClickListener(v -> Screens.openTrackList(this, TrackList.MOST_PLAYED, null));
         b.hubRecentAdded.setOnClickListener(v -> Screens.openTrackList(this, TrackList.RECENT, null));

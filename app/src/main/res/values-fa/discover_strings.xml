@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_sec_new_releases">تازه‌های کتابخانه</string>
+    <string name="home_sec_continue">ادامه‌ی پخش</string>
+    <string name="home_sec_jump_back_in">دوباره سراغشان برو</string>
+    <string name="home_sec_mixes">ساخته‌شده برای تو</string>
+    <string name="home_sec_quick_picks">انتخاب‌های سریع</string>
+    <string name="home_sec_playlists">پلی‌لیست‌های تو</string>
+    <string name="home_sec_favorites">محبوب‌های تو</string>
+    <string name="home_sec_top_month">پرپخش‌ترین‌های این ماه</string>
+    <string name="home_sec_top_all_time">پرپخش‌ترین‌های همیشه</string>
+    <string name="home_sec_forgotten">محبوب‌های فراموش‌شده</string>
+    <string name="home_sec_on_this_day">همین روزها در سال %1$s</string>
+    <string name="home_sec_artists">هنرمندانی که دوستشان داری</string>
+    <string name="home_sec_unfinished">آلبوم‌هایی که تمامشان نکرده‌ای</string>
+    <string name="home_sec_random">انتخاب‌های تصادفی</string>
+    <string name="home_sec_decades">دهه‌ها</string>
+    <string name="home_sec_genres">ژانرها</string>
+    <string name="home_sec_folders">پوشه‌ها</string>
+    <string name="home_sec_stats">شنیدن‌های تو</string>
+    <string name="home_sec_throwbacks">خاطره‌بازی</string>
+
+    <string name="home_sub_mixes">از روی آنچه گوش می‌دهی، هر روز تازه</string>
+    <string name="home_sub_forgotten">روزی دوستشان داشتی، دو ماه است نشنیده‌ای</string>
+    <string name="home_sub_throwbacks">آلبوم‌هایی که مدتی است پخش نکرده‌ای</string>
+    <string name="home_sub_random">با هر تازه‌سازی، چند انتخاب تازه</string>
+
+    <string name="home_mix_daily">میکس روزانه %1$s</string>
+    <string name="home_mix_late_night">آخر شب</string>
+    <string name="home_mix_morning">صبحگاهی</string>
+    <string name="home_mix_upbeat">پرانرژی</string>
+    <string name="home_mix_decade">دهه‌ی %1$s</string>
+    <string name="home_mix_with">با %1$s</string>
+
+    <string name="home_shuffle_library">پخش تصادفی همه</string>
+    <string name="home_surprise">غافلگیرم کن</string>
+    <string name="home_refreshed">انتخاب‌های تازه</string>
+    <string name="home_resume">ادامه</string>
+    <string name="home_unknown_artist">هنرمند ناشناس</string>
+    <string name="home_unknown_album">آلبوم ناشناس</string>
+    <string name="home_play_now">پخش</string>
+    <string name="home_list_separator">"، "</string>
+
+    <string name="home_stat_songs">آهنگ</string>
+    <string name="home_stat_hours">ساعت موسیقی</string>
+    <string name="home_stat_artists">هنرمند</string>
+    <string name="home_stat_plays_month">پخش این ماه</string>
+    <string name="home_stat_top_artist">هنرمند برتر این ماه: %1$s</string>
+    <string name="home_stat_listened_month">%1$s شنیدن در این ماه</string>
+
+    <string name="library_genres">ژانرها</string>
+    <string name="library_folders">پوشه‌ها</string>
+    <string name="library_sort_name">الفبا</string>
+    <string name="library_sort_count">بیشترین آهنگ</string>
+    <string name="library_sort_year">جدیدترین</string>
+</resources>

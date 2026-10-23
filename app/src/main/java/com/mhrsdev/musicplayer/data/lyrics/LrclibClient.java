@@ -6,15 +6,25 @@ import com.mhrsdev.musicplayer.domain.model.Track;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
- * LRCLIB (https://lrclib.net) lookup: exact {@code /api/get} first (needs title, artist, album and duration), then
- * {@code /api/search}; synced lyrics are preferred and the result must match the track's duration within 3 s.
- * Sends only title / artist / album / duration. At most two requests per call; a failed /get falls through to /search.
+ * LRCLIB (https://lrclib.net) lookup with cleaned metadata ({@link LyricsQueryNormalizer}), at most
+ * {@link #MAX_REQUESTS} requests per track:
+ * <ol>
+ *   <li>{@code /api/get} with the tags as they are (title, artist, album, duration) when all four are known;</li>
+ *   <li>{@code /api/get} with the CLEANED artist/title (and album when known), only if cleaning changed something;</li>
+ *   <li>{@code /api/search?q=<cleaned title>}: a hit must match the duration within 3 s and score at least
+ *       {@link LyricsMatch#ACCEPT} on title + artist similarity.</li>
+ * </ol>
+ * Synced lyrics are preferred. Sends only title / artist / album / duration. Never asks when the cleaned title is
+ * empty. A failed /get falls through; a failed /search is reported (IOException) so the UI can offer Retry.
  */
-public final class LrclibClient implements LyricsSource {
+public class LrclibClient implements LyricsSource {
     public static final String DEFAULT_BASE_URL = "https://lrclib.net/api";
+    static final int MAX_REQUESTS = 3;
     private final HttpFetcher http;
     private final String baseUrl;
 
@@ -29,30 +39,70 @@ public final class LrclibClient implements LyricsSource {
 
     @Nullable
     @Override public Found load(Track track, CancelToken cancel) throws IOException {
-        String title = track.title();
-        if (title == null || title.trim().isEmpty()) return null;
-        String artist = known(track.artistName());
-        String album = known(track.albumTitle());
+        String cTitle = LyricsQueryNormalizer.title(track.title());
+        if (cTitle.isEmpty()) return null;
+        String cArtist = LyricsQueryNormalizer.artist(track.artistName());
+        String cAlbum = LyricsQueryNormalizer.album(track.albumTitle());
+        String title = known(track.title()), artist = known(track.artistName()), album = known(track.albumTitle());
         int sec = (int) Math.round(track.durationMs() / 1000.0);
+        int requests = 0;
 
-        if (artist != null && album != null && sec > 0) {
-            try {
-                String body = http.get(baseUrl + "/get?" + param("track_name", title) + "&" + param("artist_name", artist)
-                        + "&" + param("album_name", album) + "&duration=" + sec, cancel);
-                Candidate exact = body == null ? null : LrclibJson.parseObject(body);
-                if (exact != null && exact.instrumental()) return null;
-                if (exact != null && exact.durationMatches(sec)) {
-                    Found found = LrclibJson.toFound(exact);
-                    if (found != null) return found;
-                }
-            } catch (IOException e) {
-                // /get is the busier endpoint (503s are common); /search may still answer, so only fail if it fails too
-            }
+        if (title != null && artist != null && album != null && sec > 0) {
+            requests++;
+            Lookup r = get(title, artist, album, sec, cancel);
+            if (r.stop) return r.found;
         }
         if (cancel.isCancelled()) return null;
-        String query = "/search?" + param("track_name", title) + (artist == null ? "" : "&" + param("artist_name", artist));
-        String body = http.get(baseUrl + query, cancel);
-        return body == null ? null : LrclibJson.toFound(LrclibJson.pickBest(LrclibJson.parseArray(body), sec));
+        boolean changed = !cTitle.equals(title) || !cArtist.equals(artist == null ? "" : artist)
+                || !cAlbum.equals(album == null ? "" : album);
+        if (!cArtist.isEmpty() && sec > 0 && (changed || requests == 0) && requests < MAX_REQUESTS - 1) {
+            requests++;
+            Lookup r = get(cTitle, cArtist, cAlbum.isEmpty() ? null : cAlbum, sec, cancel);
+            if (r.stop) return r.found;
+        }
+        if (cancel.isCancelled()) return null;
+        String body = http.get(baseUrl + "/search?" + param("q", cTitle), cancel);
+        if (body == null) return null;
+        return LrclibJson.toFound(LrclibJson.pickFuzzy(LrclibJson.parseArray(body), cTitle, cArtist, sec));
+    }
+
+    /**
+     * Manual search ("Search manually" dialog): free text artist + title, all candidates with lyrics, best first.
+     * One request.
+     */
+    public List<Candidate> search(String artist, String title, CancelToken cancel) throws IOException {
+        String q = (LyricsQueryNormalizer.title(title) + " " + LyricsQueryNormalizer.artist(artist)).trim();
+        List<Candidate> out = new ArrayList<>();
+        if (q.isEmpty()) return out;
+        String body = http.get(baseUrl + "/search?" + param("q", q), cancel);
+        if (body == null) return out;
+        for (Candidate c : LrclibJson.parseArray(body)) if (c.hasLyrics() && !c.instrumental()) out.add(c);
+        String t = LyricsQueryNormalizer.title(title), a = LyricsQueryNormalizer.artist(artist);
+        out.sort((x, y) -> {
+            if ((x.synced() != null) != (y.synced() != null)) return x.synced() != null ? -1 : 1;
+            return Double.compare(LyricsMatch.score(t, a, y.trackName(), y.artistName()),
+                    LyricsMatch.score(t, a, x.trackName(), x.artistName()));
+        });
+        return out;
+    }
+
+    /** Result of one /get: {@code stop} = answer final (found, or instrumental). */
+    private record Lookup(boolean stop, @Nullable Found found) { }
+
+    private Lookup get(String title, String artist, @Nullable String album, int sec, CancelToken cancel) {
+        try {
+            String body = http.get(baseUrl + "/get?" + param("track_name", title) + "&" + param("artist_name", artist)
+                    + (album == null ? "" : "&" + param("album_name", album)) + "&duration=" + sec, cancel);
+            Candidate exact = body == null ? null : LrclibJson.parseObject(body);
+            if (exact != null && exact.instrumental()) return new Lookup(true, null);
+            if (exact != null && exact.durationMatches(sec)) {
+                Found found = LrclibJson.toFound(exact);
+                if (found != null) return new Lookup(true, found);
+            }
+        } catch (IOException e) {
+            // /get is the busier endpoint (503s are common); the next variant may still answer
+        }
+        return new Lookup(false, null);
     }
 
     /** MediaStore reports missing tags as "&lt;unknown&gt;". */

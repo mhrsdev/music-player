@@ -171,7 +171,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, t.artistName());
         h.b.duration.setText(Format.duration(t.durationMs(), locale));
         h.b.explicit.setVisibility(t.explicit() ? View.VISIBLE : View.GONE);
-        h.b.more.setContentDescription(h.itemView.getContext().getString(R.string.library_more, t.title()));
+        h.title = t.title(); // the "More options for <title>" label is built on demand (TalkBack), not by a format() per bind
         h.b.drag.setVisibility(reorderable ? View.VISIBLE : View.GONE);
         Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 12, false, CoverSpec.forTrack(t));
         bindSelection(h, t);
@@ -193,11 +193,19 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
 
     class Holder extends RecyclerView.ViewHolder {
         final LibraryRowTrackBinding b;
+        @Nullable String title;
 
         @SuppressLint("ClickableViewAccessibility")
         Holder(LibraryRowTrackBinding b) {
             super(b.getRoot());
             this.b = b;
+            b.more.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+                @Override public void onInitializeAccessibilityNodeInfo(View host,
+                        android.view.accessibility.AccessibilityNodeInfo info) {
+                    super.onInitializeAccessibilityNodeInfo(host, info);
+                    if (title != null) info.setContentDescription(host.getContext().getString(R.string.library_more, title));
+                }
+            });
             itemView.setOnClickListener(v -> {
                 int p = getBindingAdapterPosition();
                 if (p != RecyclerView.NO_POSITION) listener.onTrackClick(getCurrentList(), p);

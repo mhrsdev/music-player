@@ -17,6 +17,16 @@ public class LyricsScrollPolicy {
     /** Milliseconds until auto-scroll resumes (0 if active). */
     public long remainingPauseMs(long nowMs) { return Math.max(0L, PAUSE_MS - (nowMs - userScrolledAt)); }
 
+    /**
+     * "Back to current line" chip: only for 4+ lines, a valid active line, and while that line is not completely
+     * visible ({@code first}/{@code last} = completely visible positions, -1 when unknown).
+     */
+    public static boolean showBackChip(int lineCount, int active, int first, int last) {
+        if (lineCount < 4 || active < 0) return false;
+        if (first < 0 || last < 0) return true;
+        return active < first || active > last;
+    }
+
     /** Alpha for a line: active 1, upcoming .60, past .50 (DESIGN §8 measured alphas); unsynced lyrics are all 1. */
     public static float alphaFor(int line, int active, boolean synced) {
         if (!synced) return 1f;

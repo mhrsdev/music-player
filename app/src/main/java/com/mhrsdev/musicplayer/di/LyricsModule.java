@@ -10,6 +10,7 @@ import com.mhrsdev.musicplayer.data.lyrics.LyricsResolver;
 import com.mhrsdev.musicplayer.data.lyrics.MediaStoreFileLocator;
 import com.mhrsdev.musicplayer.data.lyrics.SidecarLyricsSource;
 import com.mhrsdev.musicplayer.data.lyrics.UrlConnectionFetcher;
+import com.mhrsdev.musicplayer.data.lyrics.UserLyricsStore;
 import com.mhrsdev.musicplayer.domain.repository.LyricsRepository;
 import java.util.Arrays;
 import java.util.function.BooleanSupplier;
@@ -34,14 +35,34 @@ public final class LyricsModule {
             BooleanSupplier onlineAllowed) {
         AudioFileLocator files = new MediaStoreFileLocator(context.getApplicationContext().getContentResolver());
         String userAgent = "MusicPlayer/" + versionName + " (https://github.com/mhrsdev/music-player)";
+        UserLyricsStore userStore = new UserLyricsStore(new java.io.File(context.getFilesDir(), "lyrics"));
+        LrclibClient lrclib = new LrclibClient(new UrlConnectionFetcher(userAgent));
         LyricsResolver resolver = new LyricsResolver(
-                Arrays.asList(new EmbeddedLyricsSource(files), new SidecarLyricsSource(files)),
-                new LrclibClient(new UrlConnectionFetcher(userAgent)),
+                Arrays.asList(userStore, new EmbeddedLyricsSource(files), new SidecarLyricsSource(files)),
+                lrclib,
                 cache,
                 System::currentTimeMillis,
                 onlineAllowed);
         ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         executor.allowCoreThreadTimeOut(true);
-        return new LyricsRepositoryImpl(resolver, executor);
+        android.content.ContentResolver cr = context.getApplicationContext().getContentResolver();
+        return new LyricsRepositoryImpl(resolver, executor, lrclib, userStore, uri -> readDocument(cr, uri));
+    }
+
+    /** The user's picked lyrics document, at most 512 KB, charset sniffed like sidecar files. */
+    private static String readDocument(android.content.ContentResolver cr, String uri) throws java.io.IOException {
+        try (java.io.InputStream in = cr.openInputStream(android.net.Uri.parse(uri))) {
+            if (in == null) throw new java.io.IOException("cannot open " + uri);
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n, total = 0;
+            while ((n = in.read(buf)) > 0 && total < 512 * 1024) {
+                out.write(buf, 0, n);
+                total += n;
+            }
+            return UserLyricsStore.decode(out.toByteArray());
+        } catch (SecurityException e) {
+            throw new java.io.IOException(e);
+        }
     }
 }

@@ -28,6 +28,10 @@ public record Track(
         int trackNumber,
         long addedAtMs) {
 
+    /** Stored artist / album name when the file has no tag (the UI shows a localized label instead). */
+    public static final String UNKNOWN_ARTIST = "Unknown artist";
+    public static final String UNKNOWN_ALBUM = "Unknown album";
+
     /** Copy of this track with a different like flag. */
     public Track withLiked(boolean liked) {
         return new Track(id, title, artistId, artistName, albumId, albumTitle, durationMs, artworkUri,

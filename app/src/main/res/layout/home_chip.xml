@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chip"
+    style="@style/Search.Chip"
+    android:drawablePadding="8dp"
+    android:drawableTint="?attr/mpOnSurfaceVariant"
+    android:maxLines="1"
+    android:maxWidth="220dp"
+    android:ellipsize="end"
+    android:textDirection="anyRtl" />

@@ -98,6 +98,18 @@ public class ArtworkResolverTest {
         assertEquals(2, fb.embeddedCalls.get()); // stopped at the first track with art
     }
 
+    /** Perf: the same cover asked at another size goes straight to the track that had the art (no probing of 1 and 2). */
+    @Test public void secondSizeOfAnAlbumSkipsTheFailedProbes() {
+        FakeBackend fb = new FakeBackend();
+        fb.albums.put("7", List.of(ref("1"), ref("2"), ref("3")));
+        fb.embedded.put("content://media/external/audio/media/3", png(800, Color.RED));
+        ArtworkResolver r = new ArtworkResolver(fb);
+        assertNotNull(r.resolve("content://media/external/audio/albumart/7", 200));
+        assertEquals(3, fb.embeddedCalls.get());
+        assertNotNull(r.resolve("content://media/external/audio/albumart/7", 100));
+        assertEquals("only the winner was read again", 4, fb.embeddedCalls.get());
+    }
+
     @Test public void legacyAlbumArtUriStillUsedWhenItOpens() {
         FakeBackend fb = new FakeBackend();
         fb.streams.put("content://media/external/audio/albumart/9", png(64, Color.BLUE));

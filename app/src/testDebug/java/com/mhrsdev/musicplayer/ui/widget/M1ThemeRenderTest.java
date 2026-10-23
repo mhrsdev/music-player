@@ -108,7 +108,8 @@ public class M1ThemeRenderTest {
         chip.setChecked(true);
         chrome.addView(chip, new LinearLayout.LayoutParams(-2, -2));
         MiniPlayerView mini = new MiniPlayerView(c);
-        mini.bind(SampleData.TRACKS.get(fa ? 33 : 0));
+        mini.bind(fa ? SampleData.TRACKS.stream().filter(t -> ScriptFont.hasArabicScript(t.title())).findFirst()
+                .orElse(SampleData.TRACKS.get(0)) : SampleData.TRACKS.get(0)); // first Persian track, not a fixed index
         mini.setPlaying(true);
         LinearLayout.LayoutParams mlp = new LinearLayout.LayoutParams(-1, -2);
         mlp.topMargin = pad;

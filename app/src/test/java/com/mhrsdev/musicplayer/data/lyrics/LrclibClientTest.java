@@ -52,12 +52,14 @@ public class LrclibClientTest {
         LyricsSource.Found f = client.load(TestTracks.queen(), new CancelToken());
         assertTrue(f.text().contains("break free"));
         assertEquals(2, http.urls.size());
-        assertEquals("https://x/api/search?track_name=I+Want+To+Break+Free&artist_name=Queen", http.urls.get(1));
+        // tags are already clean, so the cleaned /get is skipped: raw /get, then the title search
+        assertEquals("https://x/api/search?q=I+Want+To+Break+Free", http.urls.get(1));
     }
 
     @Test public void getResultWithWrongDurationFallsBackToSearch() throws IOException {
         http.responses.put("/get", "{\"duration\":300,\"syncedLyrics\":\"[00:01.00]wrong song\"}");
-        http.responses.put("/search", "[{\"duration\":261,\"syncedLyrics\":\"[00:01.00]right\"}]");
+        http.responses.put("/search", "[{\"duration\":261,\"trackName\":\"I Want To Break Free\",\"artistName\":\"Queen\","
+                + "\"syncedLyrics\":\"[00:01.00]right\"}]");
         assertEquals("[00:01.00]right", client.load(TestTracks.queen(), new CancelToken()).text());
     }
 
@@ -73,15 +75,17 @@ public class LrclibClientTest {
         Track unknownArtist = TestTracks.track("t", "Song", "<unknown>", "Album", 200_000, null);
         assertNull(client.load(noAlbum, new CancelToken()));
         assertNull(client.load(unknownArtist, new CancelToken()));
-        assertEquals("https://x/api/search?track_name=Song&artist_name=Queen", http.urls.get(0));
-        assertEquals("https://x/api/search?track_name=Song", http.urls.get(1));
+        // no album: the cleaned /get without album (fails here), then the search; unknown artist: search only
+        assertEquals("https://x/api/get?track_name=Song&artist_name=Queen&duration=200", http.urls.get(0));
+        assertEquals("https://x/api/search?q=Song", http.urls.get(1));
+        assertEquals("https://x/api/search?q=Song", http.urls.get(2));
+        assertEquals(3, http.urls.size());
     }
 
     @Test public void persianMetadataIsPercentEncodedAsUtf8() throws IOException {
         http.responses.put("/search", "[]");
         client.load(TestTracks.track("t", "سلام", "سهراب", "", 0, null), new CancelToken());
-        assertEquals("https://x/api/search?track_name=%D8%B3%D9%84%D8%A7%D9%85&artist_name=%D8%B3%D9%87%D8%B1%D8%A7%D8%A8",
-                http.urls.get(0));
+        assertEquals("https://x/api/search?q=%D8%B3%D9%84%D8%A7%D9%85", http.urls.get(0));
     }
 
     @Test public void blankTitleMakesNoRequest() throws IOException {
@@ -102,10 +106,33 @@ public class LrclibClientTest {
 
     @Test public void failedGetStillTriesSearch() throws IOException {
         http.responses.put("/get", new IOException("HTTP 503"));
-        http.responses.put("/search", "[{\"duration\":261,\"syncedLyrics\":\"[00:01.00]via search\"}]");
+        http.responses.put("/search", "[{\"duration\":261,\"trackName\":\"I want to break free\",\"artistName\":\"Queen\","
+                + "\"syncedLyrics\":\"[00:01.00]via search\"}]");
         assertEquals("[00:01.00]via search", client.load(TestTracks.queen(), new CancelToken()).text());
         http.responses.put("/get", "not json");
         assertEquals("[00:01.00]via search", client.load(TestTracks.queen(), new CancelToken()).text());
+    }
+
+    @Test public void watermarkedTagsAreCleanedAndAtMostThreeRequestsAreMade() throws IOException {
+        http.responses.put("/get", null);
+        http.responses.put("/search", "[{\"duration\":201,\"trackName\":\"Ghalbam\",\"artistName\":\"Reza Shiri\","
+                + "\"syncedLyrics\":\"[00:01.00]line\"},{\"duration\":201,\"trackName\":\"Other song\",\"artistName\":\"X\","
+                + "\"syncedLyrics\":\"[00:01.00]wrong\"}]");
+        Track t = TestTracks.track("t", "Ghalbam", "Reza Shiri @RozMusic.com", "Ghalbam - Single", 200_000, null);
+        assertEquals("[00:01.00]line", client.load(t, new CancelToken()).text());
+        assertEquals(3, http.urls.size());
+        assertTrue(http.urls.get(0).contains("artist_name=Reza+Shiri+%40RozMusic.com"));
+        assertEquals("https://x/api/get?track_name=Ghalbam&artist_name=Reza+Shiri&album_name=Ghalbam+-+Single&duration=200",
+                http.urls.get(1));
+        assertEquals("https://x/api/search?q=Ghalbam", http.urls.get(2));
+    }
+
+    @Test public void fuzzySearchRejectsUnrelatedOrWrongDuration() throws IOException {
+        http.responses.put("/get", null);
+        http.responses.put("/search", "[{\"duration\":261,\"trackName\":\"Bohemian Rhapsody\",\"artistName\":\"Queen\","
+                + "\"syncedLyrics\":\"[00:01.00]no\"},{\"duration\":300,\"trackName\":\"I Want To Break Free\","
+                + "\"artistName\":\"Queen\",\"syncedLyrics\":\"[00:01.00]no\"}]");
+        assertNull(client.load(TestTracks.queen(), new CancelToken()));
     }
 
     @Test public void searchFailureAndBadJsonPropagateAsIoException() {

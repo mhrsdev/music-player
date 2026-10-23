@@ -14,7 +14,12 @@ final class LrclibJson {
     static final double DURATION_TOLERANCE_SEC = 3.0;
 
     /** One LRCLIB record; {@code synced}/{@code plain} are null when absent or blank. */
-    record Candidate(double durationSec, boolean instrumental, @Nullable String synced, @Nullable String plain) {
+    record Candidate(double durationSec, boolean instrumental, @Nullable String synced, @Nullable String plain,
+            @Nullable String trackName, @Nullable String artistName, @Nullable String albumName) {
+
+        Candidate(double durationSec, boolean instrumental, @Nullable String synced, @Nullable String plain) {
+            this(durationSec, instrumental, synced, plain, null, null, null);
+        }
 
         boolean hasLyrics() {
             return synced != null || plain != null;
@@ -48,6 +53,27 @@ final class LrclibJson {
         }
     }
 
+    /**
+     * Fuzzy pick for a free-text search: the candidate must match the duration (when known) and score at least
+     * {@link LyricsMatch#ACCEPT} on title + artist similarity; synced beats plain, then the higher score.
+     */
+    @Nullable
+    static Candidate pickFuzzy(List<Candidate> candidates, String title, String artist, int trackSec) {
+        Candidate best = null;
+        double bestScore = -1;
+        for (Candidate c : candidates) {
+            if (c.instrumental() || !c.hasLyrics() || !c.durationMatches(trackSec)) continue;
+            double score = LyricsMatch.score(title, artist, c.trackName(), c.artistName());
+            if (score < LyricsMatch.ACCEPT) continue;
+            boolean better;
+            if (best == null) better = true;
+            else if ((c.synced() != null) != (best.synced() != null)) better = c.synced() != null;
+            else better = score > bestScore;
+            if (better) { best = c; bestScore = score; }
+        }
+        return best;
+    }
+
     /** Synced lyrics first, then closest duration; null when nothing has lyrics within the tolerance. */
     @Nullable
     static Candidate pickBest(List<Candidate> candidates, int trackSec) {
@@ -73,7 +99,8 @@ final class LrclibJson {
 
     private static Candidate candidate(JSONObject o) {
         return new Candidate(o.optDouble("duration", -1), o.optBoolean("instrumental", false),
-                text(o, "syncedLyrics"), text(o, "plainLyrics"));
+                text(o, "syncedLyrics"), text(o, "plainLyrics"), text(o, "trackName"), text(o, "artistName"),
+                text(o, "albumName"));
     }
 
     @Nullable

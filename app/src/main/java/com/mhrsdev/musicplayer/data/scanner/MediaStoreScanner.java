@@ -67,6 +67,7 @@ public class MediaStoreScanner {
      */
     public boolean isStale() {
         if (state.getLong(KEY_SCANNED_AT, 0) == 0) return true;
+        if (new TrackQueries(helper.getWritableDatabase()).needsRescan()) return true; // v4 migration: fill new columns
         if (!filterSignature().equals(state.getString(KEY_FILTERS, ""))) return true;
         long now = generation.getAsLong();
         return now < 0 || now != state.getLong(KEY_GENERATION, -1);
@@ -112,7 +113,7 @@ public class MediaStoreScanner {
                 IncrementalDiff.Change change = diff.visit(String.valueOf(audio.id()), audio.modifiedMs(),
                         audio.sizeBytes(), audio.path());
                 if (change == IncrementalDiff.Change.UNCHANGED && !force) continue;
-                tracks.upsert(audio.toTrack(), audio.modifiedMs(), audio.sizeBytes(), audio.path());
+                tracks.upsert(audio.toTrack(), audio.modifiedMs(), audio.sizeBytes(), audio.path(), audio.genre());
                 if (change == IncrementalDiff.Change.ADDED) added++;
                 else if (change == IncrementalDiff.Change.UPDATED) updated++;
                 if (++written % CHUNK == 0) { // commit and reopen: partial progress is safe, the diff is idempotent
@@ -135,10 +136,14 @@ public class MediaStoreScanner {
         return new ScanResult(true, added, updated, removed);
     }
 
+    /** COLUMNS, then IS_PENDING (API 29+) at {@link #COLUMN_PENDING}, then GENRE (API 30+). */
+    @android.annotation.SuppressLint("InlinedApi")
     private static String[] projection() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return COLUMNS;
-        String[] out = java.util.Arrays.copyOf(COLUMNS, COLUMNS.length + 1);
+        boolean genre = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R;
+        String[] out = java.util.Arrays.copyOf(COLUMNS, COLUMNS.length + (genre ? 2 : 1));
         out[COLUMN_PENDING] = MediaStore.Audio.Media.IS_PENDING;
+        if (genre) out[COLUMN_PENDING + 1] = MediaStore.Audio.Media.GENRE;
         return out;
     }
 
@@ -147,7 +152,14 @@ public class MediaStoreScanner {
         return new ScannedAudio(c.getLong(0), c.getString(1), c.getString(2), c.getString(3), c.getLong(4),
                 c.getString(5), c.getLong(6), c.getLong(7), c.getInt(8), c.getInt(9),
                 c.getLong(10) * 1000, c.getLong(11) * 1000, c.getString(12), c.getLong(13), c.getInt(14) != 0, special,
-                hasPending && c.getInt(COLUMN_PENDING) != 0);
+                hasPending && c.getInt(COLUMN_PENDING) != 0, genre(c));
+    }
+
+    /** GENRE is projected on API 30+ only; found by name so the column order stays free. */
+    @android.annotation.SuppressLint("InlinedApi")
+    private static String genre(Cursor c) {
+        int i = c.getColumnIndex(MediaStore.Audio.Media.GENRE);
+        return i < 0 ? null : ScannedAudio.cleanGenre(c.getString(i));
     }
 
     private long minDurationMs() {

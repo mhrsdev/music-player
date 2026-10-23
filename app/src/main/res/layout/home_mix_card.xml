@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="152dp"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:background="@drawable/library_row_bg"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <FrameLayout
+        android:id="@+id/art_frame"
+        android:layout_width="match_parent"
+        android:layout_height="144dp">
+
+        <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+            android:id="@+id/art"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/home_mix_scrim" />
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:ellipsize="end"
+            android:gravity="start"
+            android:maxLines="2"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="12dp"
+            android:textAlignment="viewStart"
+            android:textColor="#FFFFFFFF"
+            android:textDirection="anyRtl"
+            android:textAppearance="@style/TextAppearance.MusicPlayer.Headline"
+            android:textSize="20sp"
+            android:importantForAccessibility="no" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAlignment="viewStart"
+        android:textDirection="locale"
+        android:textAppearance="@style/TextAppearance.MusicPlayer.Supporting" />
+</LinearLayout>

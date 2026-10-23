@@ -60,9 +60,22 @@ public class Motion {
         return MotionPolicy.decorativeMotionEnabled(c);
     }
 
+    /** Below API 33: the global setting, read once and cached (no per-frame Settings lookup). */
+    private static float cachedScale = -1f;
+
     /** System animator duration scale (developer options); springs run slower by the same factor. */
     public static float durationScale() {
-        float s = ValueAnimator.getDurationScale();
+        float s;
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            s = ValueAnimator.getDurationScale();
+        } else {
+            if (cachedScale < 0f) {
+                Context c = app;
+                cachedScale = c == null ? 1f : android.provider.Settings.Global.getFloat(c.getContentResolver(),
+                        android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
+            }
+            s = cachedScale;
+        }
         return s > 0f ? s : 1f;
     }
 

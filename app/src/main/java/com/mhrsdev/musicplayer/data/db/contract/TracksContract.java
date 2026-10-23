@@ -23,6 +23,9 @@ public final class TracksContract {
     public static final String COL_MODIFIED_MS = "modified_ms";
     /** File size and absolute path as of the last scan: with {@link #COL_MODIFIED_MS} they tell the scanner a file changed. */
     public static final String COL_SIZE_BYTES = "size_bytes";
+    /** MediaStore genre (API 30+), null when unknown. */
+    public static final String COL_GENRE = "genre";
+    /** Absolute file path (change detection + folder browser), null when MediaStore has none. */
     public static final String COL_PATH = "path";
 
     public static final String CREATE = "CREATE TABLE " + TABLE + " ("
@@ -40,13 +43,8 @@ public final class TracksContract {
             + COL_ADDED_AT_MS + " INTEGER NOT NULL, "
             + COL_MODIFIED_MS + " INTEGER NOT NULL, "
             + COL_SIZE_BYTES + " INTEGER NOT NULL DEFAULT 0, "
-            + COL_PATH + " TEXT)";
-
-    /** v3 -> v4: columns the incremental scan compares besides the modified time. */
-    public static final String[] ADD_SIGNATURE_COLUMNS = {
-        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_SIZE_BYTES + " INTEGER NOT NULL DEFAULT 0",
-        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_PATH + " TEXT"
-    };
+            + COL_PATH + " TEXT, "
+            + COL_GENRE + " TEXT)";
 
     /** Table plus the indices the album / artist / recently-added queries use. */
     public static final String[] SCHEMA = {
@@ -54,6 +52,18 @@ public final class TracksContract {
         "CREATE INDEX idx_tracks_album ON " + TABLE + " (" + COL_ALBUM_ID + ")",
         "CREATE INDEX idx_tracks_artist ON " + TABLE + " (" + COL_ARTIST_ID + ")",
         "CREATE INDEX idx_tracks_added ON " + TABLE + " (" + COL_ADDED_AT_MS + ")"
+    };
+
+    /**
+     * The single v3 -> v4 step: size + path (incremental-scan signature, folder browser) and genre.
+     * {@code modified_ms = -1} marks every row stale so the next scan re-reads it and fills the new columns
+     * ({@code TrackQueries.needsRescan} makes {@code MediaStoreScanner.isStale} true until then).
+     */
+    public static final String[] UPGRADE_V4 = {
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_SIZE_BYTES + " INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_PATH + " TEXT",
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_GENRE + " TEXT",
+        "UPDATE " + TABLE + " SET " + COL_MODIFIED_MS + " = -1"
     };
 
     private TracksContract() { }

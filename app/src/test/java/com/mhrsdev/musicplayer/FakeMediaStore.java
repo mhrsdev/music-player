@@ -41,6 +41,7 @@ public class FakeMediaStore extends ContentProvider {
         r.put(MediaStore.Audio.Media.SIZE, size);
         r.put(MediaStore.Audio.Media.IS_MUSIC, music ? 1 : 0);
         r.put(MediaStore.Audio.Media.IS_PENDING, pending ? 1 : 0);
+        r.put(MediaStore.Audio.Media.GENRE, "Pop"); // projected on API 30+ (Home genres)
         ROWS.add(r);
     }
 

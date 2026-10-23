@@ -52,6 +52,8 @@ public class ArtworkResolver {
             "Cover.jpg", "Folder.jpg", "Front.jpg", "AlbumArt.jpg", "AlbumArtSmall.jpg"};
 
     private final Backend backend;
+    /** Track that gave an album its cover, so other sizes of the same cover skip the failed probes before it. */
+    private final android.util.LruCache<String, AudioRef> winners = new android.util.LruCache<>(256);
 
     public ArtworkResolver(Backend backend) { this.backend = backend; }
 
@@ -63,10 +65,15 @@ public class ArtworkResolver {
             Bitmap b = thumbnail(Uri.parse("content://media/external/audio/albums/" + albumId), sizePx);
             if (b == null) b = decodeStream(uri, sizePx);
             if (b != null) return b;
+            AudioRef known = winners.get(albumId);
+            if (known != null && (b = fromAudio(known, sizePx)) != null) return b;
             try {
                 for (AudioRef ref : backend.albumTracks(albumId, ALBUM_TRACK_LIMIT)) {
                     b = fromAudio(ref, sizePx);
-                    if (b != null) return b;
+                    if (b != null) {
+                        winners.put(albumId, ref);
+                        return b;
+                    }
                 }
             } catch (Exception ignored) {
                 // no permission / provider gone: no art
@@ -152,11 +159,13 @@ public class ArtworkResolver {
         }
     }
 
-    /** Downsample to about {@code sizePx}; RGB_565 for opaque JPEG at row/card sizes (half the memory). */
+    /** Downsample to about {@code sizePx}; RGB_565 for opaque JPEG up to hero size (half the memory). */
     private static void prepare(BitmapFactory.Options o, int sizePx) {
         o.inSampleSize = ArtworkLoader.sampleSize(o.outWidth, o.outHeight, sizePx);
         boolean opaque = "image/jpeg".equals(o.outMimeType);
-        o.inPreferredConfig = sizePx <= 320 && opaque || sizePx <= 160 ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;
+        // A hero cover is ~1000 px: 4 MB in ARGB_8888, more than half of the whole cache on a 128 MB heap, so every
+        // scroll re-decoded it. Opaque JPEG has no alpha to lose; 565 (dithered by the decoder) halves it.
+        o.inPreferredConfig = sizePx <= 1100 && opaque || sizePx <= 160 ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;
         o.inJustDecodeBounds = false;
     }
 }
