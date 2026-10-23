@@ -58,5 +58,5 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.androidx.arch.core.testing
-    testImplementation 'org.json:json:20250517' // real org.json for JVM tests; android.jar's is a stub
+    testImplementation libs.json // real org.json for JVM tests; android.jar's is a stub
 }

@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 
 public class LyricsTextDecoderTest {
-    private static final String FA = "[00:01.00]سلام دنیا، چگونه‌ای؟ گژپ";
+    private static final String FA = "[00:01.00]سلام دنیا، چگونه\u200Cای؟ گژپ";
 
     private static byte[] concat(byte[] a, byte[] b) {
         byte[] out = new byte[a.length + b.length];
@@ -31,7 +31,7 @@ public class LyricsTextDecoderTest {
 
     @Test public void legacyWindows1256PersianIsDetected() {
         // cp1256 has no Persian yeh (U+06CC); old files used Arabic yeh (U+064A)
-        String fa = "[00:01.00]سلام دنيا چگونه‌اي گژپ";
+        String fa = "[00:01.00]سلام دنيا چگونه\u200Cاي گژپ";
         assertEquals(fa, LyricsTextDecoder.decode(fa.getBytes(Charset.forName("windows-1256"))));
     }
 

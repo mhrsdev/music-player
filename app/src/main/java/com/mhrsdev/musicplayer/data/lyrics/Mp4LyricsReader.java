@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 
-/** Reads the iTunes-style {@code moov/udta/meta/ilst/©lyr} atom of an M4A/MP4 file (plain text). */
+/** Reads the iTunes-style {@code moov/udta/meta/ilst/\u00A9lyr} atom of an M4A/MP4 file (plain text). */
 final class Mp4LyricsReader {
     private static final int MAX_ATOM = 1024 * 1024;
-    private static final String[] PATH = {"moov", "udta", "meta", "ilst", "©lyr", "data"};
+    private static final String[] PATH = {"moov", "udta", "meta", "ilst", "\u00A9lyr", "data"};
 
     private Mp4LyricsReader() { }
 

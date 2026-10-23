@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Lyrics stored inside the audio file: ID3v2 USLT/SYLT (MP3), Vorbis comments (FLAC), {@code ©lyr} (M4A/MP4).
+ * Lyrics stored inside the audio file: ID3v2 USLT/SYLT (MP3), Vorbis comments (FLAC), {@code \u00A9lyr} (M4A/MP4).
  * Ogg Vorbis/Opus comments are not read (would need an Ogg page walker). Only the tag area is read, never the audio.
  */
 public final class EmbeddedLyricsSource implements LyricsSource {

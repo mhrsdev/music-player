@@ -11,7 +11,7 @@ import java.util.Locale;
 /**
  * LRCLIB (https://lrclib.net) lookup: exact {@code /api/get} first (needs title, artist, album and duration), then
  * {@code /api/search}; synced lyrics are preferred and the result must match the track's duration within 3 s.
- * Sends only title / artist / album / duration. At most two requests per call.
+ * Sends only title / artist / album / duration. At most two requests per call; a failed /get falls through to /search.
  */
 public final class LrclibClient implements LyricsSource {
     public static final String DEFAULT_BASE_URL = "https://lrclib.net/api";
@@ -36,13 +36,17 @@ public final class LrclibClient implements LyricsSource {
         int sec = (int) Math.round(track.durationMs() / 1000.0);
 
         if (artist != null && album != null && sec > 0) {
-            String body = http.get(baseUrl + "/get?" + param("track_name", title) + "&" + param("artist_name", artist)
-                    + "&" + param("album_name", album) + "&duration=" + sec, cancel);
-            Candidate exact = body == null ? null : LrclibJson.parseObject(body);
-            if (exact != null && exact.instrumental()) return null;
-            if (exact != null && exact.durationMatches(sec)) {
-                Found found = LrclibJson.toFound(exact);
-                if (found != null) return found;
+            try {
+                String body = http.get(baseUrl + "/get?" + param("track_name", title) + "&" + param("artist_name", artist)
+                        + "&" + param("album_name", album) + "&duration=" + sec, cancel);
+                Candidate exact = body == null ? null : LrclibJson.parseObject(body);
+                if (exact != null && exact.instrumental()) return null;
+                if (exact != null && exact.durationMatches(sec)) {
+                    Found found = LrclibJson.toFound(exact);
+                    if (found != null) return found;
+                }
+            } catch (IOException e) {
+                // /get is the busier endpoint (503s are common); /search may still answer, so only fail if it fails too
             }
         }
         if (cancel.isCancelled()) return null;

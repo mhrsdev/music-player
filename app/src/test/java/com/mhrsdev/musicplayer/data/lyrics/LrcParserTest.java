@@ -109,13 +109,13 @@ public class LrcParserTest {
     }
 
     @Test public void bomAndInvisibleMarksBeforeTags() {
-        ParsedLrc p = parse("﻿[ti:x]\n‏[00:01.00]‏سلام");
+        ParsedLrc p = parse("\uFEFF[ti:x]\n\u200F[00:01.00]\u200Fسلام");
         assertLine(p.lines().get(0), 1_000, "سلام");
         assertEquals("x", p.metadata().get("ti"));
     }
 
     @Test public void persianTextIsKeptIntact() {
-        String fa = "دلم برات تنگ شده، ای یار مهربان ‌می‌روم";
+        String fa = "دلم برات تنگ شده، ای یار مهربان \u200Cمی\u200Cروم";
         ParsedLrc p = parse("[00:05.00]" + fa);
         assertEquals(fa, p.lines().get(0).text());
     }

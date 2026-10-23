@@ -100,13 +100,22 @@ public class LrclibClientTest {
         assertNull(new LrclibClient(cancelling, "https://x/api").load(TestTracks.queen(), token));
     }
 
-    @Test public void networkFailureAndBadJsonPropagateAsIoException() {
+    @Test public void failedGetStillTriesSearch() throws IOException {
         http.responses.put("/get", new IOException("HTTP 503"));
+        http.responses.put("/search", "[{\"duration\":261,\"syncedLyrics\":\"[00:01.00]via search\"}]");
+        assertEquals("[00:01.00]via search", client.load(TestTracks.queen(), new CancelToken()).text());
+        http.responses.put("/get", "not json");
+        assertEquals("[00:01.00]via search", client.load(TestTracks.queen(), new CancelToken()).text());
+    }
+
+    @Test public void searchFailureAndBadJsonPropagateAsIoException() {
+        http.responses.put("/get", null);
+        http.responses.put("/search", new IOException("HTTP 503"));
         try {
             client.load(TestTracks.queen(), new CancelToken());
             fail();
         } catch (IOException expected) { }
-        http.responses.put("/get", "not json");
+        http.responses.put("/search", "not json");
         try {
             client.load(TestTracks.queen(), new CancelToken());
             fail();

@@ -180,7 +180,7 @@ public final class LrcParser {
             }
             if (sb == null) sb = new StringBuilder(s.length()).append(s, 0, i);
             int d = Character.digit(c, 10);
-            sb.append(d >= 0 ? (char) ('0' + d) : c == '٫' ? '.' : c == '：' ? ':' : c);
+            sb.append(d >= 0 ? (char) ('0' + d) : c == '\u066B' ? '.' : c == '\uFF1A' ? ':' : c);
         }
         return sb == null ? s : sb.toString();
     }
@@ -198,7 +198,7 @@ public final class LrcParser {
     }
 
     private static boolean isInvisible(char c) {
-        return c == ' ' || c == '\t' || c == '﻿' || c == '​' || c == '‎' || c == '‏'
-                || c == '؜' || (c >= '‪' && c <= '‮') || (c >= '⁦' && c <= '⁩');
+        return c == ' ' || c == '\t' || c == '\uFEFF' || c == '\u200B' || c == '\u200E' || c == '\u200F'
+                || c == '\u061C' || (c >= '\u202A' && c <= '\u202E') || (c >= '\u2066' && c <= '\u2069');
     }
 }
