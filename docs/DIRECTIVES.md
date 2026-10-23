@@ -272,3 +272,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 3. Add an **auto-update system** that automatically fetches the newest release from GitHub (checks GitHub Releases, downloads the APK, verifies, installs). Supervisor design: check only on app foreground ≤ 1×/day + manual button (no background polling → battery), SHA-256 + signing-certificate check, user confirms the system installer.
 
 **Supervisor risk note (owner decision pending):** an APK update only installs over the old app if both are signed with the SAME key. CI currently falls back to a throw-away debug key (different on every runner) → updates would fail. A fixed release keystore is required (owner asked: key as GitHub secrets vs. committed keystore).
+
+---
+
+## D17 — 2026-10-23 — Signing key decision + first real-device bug report
+
+**Signing key (answer to supervisor's question):** "کلید محرمانه توی Secrets (پیشنهاد من)" → the release keystore lives ONLY in GitHub Actions secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Supervisor generated the keystore (RSA 4096, alias `mowj`, validity 30 y, SHA-256 cert fingerprint `2E:59:CE:52:…:AA:CD`) and sent the files + instructions to the owner in chat; **nothing secret is committed**. Until the owner adds the secrets, release builds fall back to the debug key (updates then won't install). v0.1.0 was debug-signed → one-time uninstall/reinstall needed when moving to the first release-key build.
+
+**Bug report (owner, verbatim):** "باگ" + a real-device screenshot of the Home screen (Persian/RTL) running v0.1.0. First real-device evidence. Visible bugs: (1) mini-player play button drawn as a distorted irregular polygon; (2) floating nav + mini-player translucent, list content ('Quick picks', captions) shows through/behind and no bottom padding; (3) Home section titles in English ('Recently added', 'Throwbacks', 'Quick picks') in the Persian UI; (4) hero carousel: left neighbour is a squeezed narrow pill; (5) artwork missing (gradient placeholders) for many albums while others load. Routed: (1) U3, (2)(3)(4) U1, (5) E-perf — all as first, separately-pushed fixes.
