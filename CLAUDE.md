@@ -30,6 +30,7 @@ Commit these updates together with the related work so a chat switch loses nothi
 
 ## Layout
 
+- `docs/design/` — **owner-approved design v1 (D13) — the visual target**; implement it as XML + custom Views in Java. (v2 is rejected; only on branch `task/t2b-design-revision`.)
 - `docs/design-reference/` — owner's reference screenshots (target look & feel, must be matched and *improved on*).
 - `docs/ARCHITECTURE.md` — module/package layout and contracts between UI and the rest.
 - App code under `app/` (**Java only**, XML + custom Views, MVVM, Media3, framework SQLite — see Hard code rules).

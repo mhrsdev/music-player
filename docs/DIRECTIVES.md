@@ -215,3 +215,13 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > میتونی از حداکثر ۸ ساب ایجنت استفاده کنی
 
 **Summary:** Supervisor has **~1 hour** for the whole project and may run **up to 8 sub-agents in parallel**. Plan compressed: UI split into three parallel Opus agents with strict file ownership (T2 foundation/widgets, T3 screens, T4 player/queue/lyrics) started now on the WIP design v2 (no waiting for approval — owner's design feedback is applied as a follow-up); T8 wiring + T9 QA start as soon as data/playback/lyrics/waveform land; merge to `main` at the end. Honest limit: no device/emulator here, so on-device polish remains a follow-up round.
+
+---
+
+## D13 — 2026-10-23 — Use the previous (v1) design
+
+**Original (verbatim):**
+
+> نه دیزاین قبلی خوب بود همونو استفاده کن
+
+**Summary:** After seeing design v2, the owner says **the previous design (v1, `docs/design/` as approved in D4) was good — use that one.** Supervisor actions: `docs/design/` restored to v1 on the working branch; v2 stays archived only on branch `task/t2b-design-revision` (do not use it as the visual target; the only thing worth reading there is `png/17-player-bars.png` for the Bars seek-bar interaction idea). UI agents T2/T3/T4 were told to retarget to v1. v1 was specced for Compose/M3 Expressive, so implementers must build the **same look as XML + custom Views in Java** (wavy progress, cookie/scalloped morphing play button, floating pill nav, hero carousel, blurred-artwork player, etc. drawn as custom Views) and add the **Bars** seek-bar style (D4) which v1 only describes in text. D6 "less Google-like" is superseded for the visual target by this decision; the battery/RAM rules (no live full-screen blur, draw-phase animation only while visible+playing, Still/low-power fallback) still apply. Design open questions D-A..D-F from v2 are void; v1's defaults K5-K9 stand.
