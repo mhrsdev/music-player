@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- U1: settings (folders, rescan, feature screens, about) and search polish. -->
+<resources>
+    <string name="settings_lang_sub">Choosing فارسی switches the whole app to right-to-left with Persian numerals.</string>
+    <string name="settings_player_lyrics">Player &amp; lyrics</string>
+    <string name="settings_folders_only">Only these folders are scanned</string>
+    <string name="settings_folders_add">Add folder</string>
+    <string name="settings_folders_exclude">Skip a folder</string>
+    <string name="settings_folders_exclude_sub">Hide voice notes, ringtones or downloads from the library</string>
+    <string name="settings_folder_skipped">Skipped · %1$s</string>
+    <string name="settings_folder_remove">Remove %1$s</string>
+    <string name="settings_folder_internal">Internal storage</string>
+    <string name="settings_folder_added_f">%1$s added. Updating your library…</string>
+    <string name="settings_folder_excluded_f">%1$s will be skipped. Updating your library…</string>
+    <string name="settings_folder_exists">That folder is already in the list</string>
+    <string name="settings_folders_no_picker">This phone has no folder picker</string>
+    <string name="settings_folders_unsupported_title">Can’t use this folder</string>
+    <string name="settings_folders_unsupported">Pick a folder on the phone’s storage or SD card. Cloud folders and the Downloads shortcut don’t have a location the library can scan.</string>
+    <string name="settings_rescan">Rescan library</string>
+    <string name="settings_rescan_sub">%1$s · find new and changed songs</string>
+    <string name="settings_rescan_running">Scanning your music…</string>
+    <string name="settings_rescan_nochange">%1$s · already up to date</string>
+    <string name="settings_rescan_done">%1$s · %2$s added, %3$s updated, %4$s removed</string>
+    <string name="settings_rescan_failed">Couldn’t scan. Allow access to music and try again.</string>
+    <plurals name="settings_songs">
+        <item quantity="one">%1$s song</item>
+        <item quantity="other">%1$s songs</item>
+    </plurals>
+    <string name="settings_more">More</string>
+    <string name="settings_feature_sound">Sound &amp; equalizer</string>
+    <string name="settings_feature_sound_sub">Equalizer, bass boost, speed and loudness</string>
+    <string name="settings_feature_backup">Backup &amp; restore</string>
+    <string name="settings_feature_backup_sub">Save playlists and likes to a file</string>
+    <string name="settings_feature_update">Updates</string>
+    <string name="settings_feature_update_sub">Check GitHub for a newer version</string>
+    <string name="settings_feature_unavailable">This screen isn’t available in this build</string>
+    <string name="settings_license">License</string>
+    <string name="settings_license_sub">MIT · free and open source</string>
+    <string name="settings_source">Source code</string>
+
+    <string name="search_recent">Recent searches</string>
+    <string name="search_recent_clear">Clear</string>
+    <string name="search_recent_clear_desc">Clear recent searches</string>
+    <string name="search_recent_remove">Remove %1$s from recent searches</string>
+    <string name="search_no_results_body">Check the spelling, or try fewer words.</string>
+    <string name="search_no_results_body_filtered">Check the spelling, or look in all categories.</string>
+    <string name="search_empty_library">No music on this phone yet</string>
+    <string name="search_empty_library_body">Add songs to your phone or choose folders in Settings, then search here.</string>
+    <string name="search_open_settings">Choose folders</string>
+    <string name="search_prompt_body">Search songs, albums, artists and playlists on this phone. Works offline.</string>
+    <string name="home_section_recent">Recently added</string>
+    <string name="home_section_throwbacks">Throwbacks</string>
+    <string name="home_section_playlists">Your playlists</string>
+    <string name="home_section_quick_picks">Quick picks</string>
+    <string name="home_section_continue">Continue listening</string>
+    <string name="home_section_most_played">Most played</string>
+    <string name="home_section_liked">Liked songs</string>
+</resources>

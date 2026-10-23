@@ -210,8 +210,12 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void updateBackground() {
-        if (getWidth() == 0 || accent == null) return;
-        int c = accent.container();
+        if (accent == null) {
+            bgPaint.setColor(Tokens.color(getContext(), R.attr.mpPrimaryContainer) | 0xFF000000);
+            return;
+        }
+        if (getWidth() == 0) return;
+        int c = accent.container() | 0xFF000000; // opaque over scrolling content
         bgPaint.setShader(new LinearGradient(0, 0, getWidth(), 0,
                 c, com.mhrsdev.musicplayer.ui.theme.ColorMath.lerp(c, 0xFF000000, 0.25f), Shader.TileMode.CLAMP));
     }

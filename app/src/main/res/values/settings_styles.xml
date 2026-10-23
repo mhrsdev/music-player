@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Grouped card (DESIGN.md 09). -->
+    <style name="Settings.Card" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginHorizontal">16dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:background">@drawable/settings_card_bg</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingVertical">8dp</item>
+    </style>
+    <style name="Settings.CardTitle" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+    <style name="Settings.CardSwitch" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+    <style name="Settings.CardSub" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/mpOnSurfaceVariant</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+    <style name="Settings.ChipStrip" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+</resources>
