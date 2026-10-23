@@ -13,7 +13,7 @@ import com.mhrsdev.musicplayer.databinding.HomeCardBinding;
 import com.mhrsdev.musicplayer.domain.model.HomeItem;
 import com.mhrsdev.musicplayer.ui.library.Art;
 
-/** Cards inside a Home carousel. The hero variant is wide (272 dp) with the play button on the cover. */
+/** Cards inside a Home carousel. The hero variant is the focused-card width of {@link HeroCarousel} with the cookie play on the cover. */
 final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
 
     interface Listener {
@@ -47,8 +47,9 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
         HomeCardBinding b = HomeCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         if (hero) {
             float d = parent.getResources().getDisplayMetrics().density;
-            b.getRoot().getLayoutParams().width = Math.round(272 * d);
-            b.artFrame.getLayoutParams().height = Math.round(264 * d);
+            int w = HeroCarousel.cardWidth(parent.getWidth(), d);
+            b.getRoot().getLayoutParams().width = w;
+            b.artFrame.getLayoutParams().height = w - Math.round(8 * d);
         }
         return new Holder(b);
     }
@@ -82,10 +83,10 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
                 art = item.playlist().artworkUris().isEmpty() ? null : item.playlist().artworkUris().get(0);
             }
         }
-        h.b.title.setText(title);
-        h.b.subtitle.setText(subtitle);
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, title);
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, subtitle);
         Art.bind(h.b.art, art, seed, hero ? 28 : 24, false);
-        boolean showPlay = hero && position == 0;
+        boolean showPlay = hero;
         h.b.play.setVisibility(showPlay ? View.VISIBLE : View.GONE);
         h.b.play.setOnClickListener(v -> listener.onItemClick(item));
         h.itemView.setOnClickListener(v -> listener.onItemClick(item));

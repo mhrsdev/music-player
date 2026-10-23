@@ -142,7 +142,7 @@ public class TrackRowView extends LinearLayout {
 
     public void bind(Track track) {
         art.bind(track);
-        title.setText(track.title());
+        ScriptFont.setText(title, track.title());
         baseSubtitle = track.artistName();
         explicit.setVisibility(track.explicit() ? VISIBLE : GONE);
         Locale l = getResources().getConfiguration().getLocales().get(0);
@@ -161,7 +161,7 @@ public class TrackRowView extends LinearLayout {
         if (start < 0 || end > t.length() || start >= end) return;
         SpannableString s = new SpannableString(t.toString());
         s.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        title.setText(s);
+        ScriptFont.setText(title, s);
     }
 
     public void setGroupPosition(@GroupPosition int position) {
@@ -200,7 +200,7 @@ public class TrackRowView extends LinearLayout {
     }
 
     private void applySubtitle() {
-        subtitle.setText(missing ? getContext().getString(R.string.mp_track_missing) : baseSubtitle);
+        ScriptFont.setText(subtitle, missing ? getContext().getString(R.string.mp_track_missing) : baseSubtitle);
     }
 
     private void updateBackground() {

@@ -36,8 +36,8 @@ final class CardAdapter extends ListAdapter<Track, CardAdapter.Holder> {
 
     @Override public void onBindViewHolder(@NonNull Holder h, int position) {
         Track t = getItem(position);
-        h.b.title.setText(t.title());
-        h.b.subtitle.setText(t.artistName());
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, t.title());
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, t.artistName());
         Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 24, false);
         h.itemView.setContentDescription(t.title() + ", " + t.artistName());
         h.itemView.setOnClickListener(v -> {

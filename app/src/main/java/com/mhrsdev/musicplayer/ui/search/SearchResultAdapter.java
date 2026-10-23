@@ -93,8 +93,8 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
                 seed = r.playlist().placeholderSeed();
             }
         }
-        h.b.title.setText(Highlight.apply(title, query));
-        h.b.subtitle.setText(sub);
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, Highlight.apply(title, query));
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, sub);
         h.b.explicit.setVisibility(track && r.track().explicit() ? View.VISIBLE : View.GONE);
         h.b.duration.setVisibility(track ? View.VISIBLE : View.GONE);
         h.b.more.setVisibility(track ? View.VISIBLE : View.GONE);

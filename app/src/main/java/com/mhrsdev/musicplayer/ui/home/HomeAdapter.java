@@ -85,7 +85,11 @@ final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHo
                 return new Bound<>(LibraryRowTrackBinding.inflate(inf, parent, false));
             default: {
                 HomeCarouselBinding b = HomeCarouselBinding.inflate(inf, parent, false);
-                b.carousel.setLayoutManager(new LinearLayoutManager(parent.getContext(), RecyclerView.HORIZONTAL, false));
+                if (type == Row.HERO) {
+                    HeroCarousel.attach(b.carousel);
+                } else {
+                    b.carousel.setLayoutManager(new LinearLayoutManager(parent.getContext(), RecyclerView.HORIZONTAL, false));
+                }
                 b.carousel.setAdapter(new HomeCardAdapter(type == Row.HERO, listener));
                 if (type == Row.CAROUSEL) b.carousel.setRecycledViewPool(cardPool);
                 return new Bound<>(b);
@@ -97,7 +101,7 @@ final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHo
         Row row = getItem(position);
         Object b = ((Bound<?>) holder).b;
         if (b instanceof HomeHeaderBinding h) {
-            h.title.setText(row.section().title());
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.title, row.section().title());
             HomeSectionStyle style = row.section().style();
             h.action.setVisibility(style == HomeSectionStyle.CAROUSEL ? View.GONE : View.VISIBLE);
             if (style == HomeSectionStyle.LIST) {
@@ -111,8 +115,8 @@ final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHo
             }
         } else if (b instanceof LibraryRowTrackBinding t) {
             Track track = row.track();
-            t.title.setText(track.title());
-            t.subtitle.setText(track.artistName());
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(t.title, track.title());
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(t.subtitle, track.artistName());
             t.duration.setText(Format.duration(track.durationMs(),
                     holder.itemView.getResources().getConfiguration().getLocales().get(0)));
             t.explicit.setVisibility(track.explicit() ? View.VISIBLE : View.GONE);
