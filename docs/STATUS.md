@@ -46,13 +46,14 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 ### In progress
 
 
-- 🔄 **T5** [Sonnet + ponytail] Data layer (SQLite DB + MediaStore scanner + repos + settings). Branch `task/t5-data-java`, worktree `../wt-t5`.
 - 🔄 **T7** [Sonnet + ponytail] Lyrics (LRC parser/sidecar/embedded + LRCLIB + cache). Branch `task/t7-lyrics-java`, worktree `../wt-t7`.
 
 
 - 🔄 **T2** [Opus] UI foundation: theme/tokens, custom widgets (Wavy/Waveform/Bars seek bars, morph play button, floating nav, mini-player), image loader. Branch `task/t2-ui-foundation-java`, worktree `../wt-t2`. Owns `ui/theme`, `ui/widget`, `res/values`, drawables.
 - 🔄 **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings, nav shell. Branch `task/t3-screens`, worktree `../wt-t3`.
 - 🔄 **T4** [Opus] Player: full player, lyrics view, queue sheet, mini-player wiring. Branch `task/t4-player`, worktree `../wt-t4`.
+
+- 🔄 **T8** [Sonnet+ponytail] Wiring: AppContainer → real Data/Playback/Waveform(/Lyrics) modules. Branch `task/t8-wiring`, worktree `../wt-t8`.
 
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
@@ -64,12 +65,12 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 - ⬜ **T7** [Sonnet] Lyrics: embedded/sidecar LRC parser + LRCLIB client + cache.
 - ⬜ **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings (against fakes).
 - ⬜ **T4** [Opus] Player: mini-player → full player, lyrics view, queue sheet (drag, undo, sleep timer).
-- ⬜ **T8** [Sonnet] Wire UI ↔ real data/playback, instrumentation smoke tests, unit tests.
 - ⬜ **T9** [Sonnet] QA: release build, lint, battery audit checklist (wakelocks, idle-after-pause), README.
 - ⬜ **T10** Supervisor: merge into `main`, verify `main` builds.
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T5** [Sonnet+ponytail] Data merged: `data/db` (DbHelper v2, contract/ + query/ classes, all SQL there), `data/scanner` (incremental MediaStore scanner), `data/repository` (SqliteLibraryRepository, LocalHomeFeedSource, SqliteWaveformStore), `data/settings/SettingsStore`, `di/DataModule`; 55 JVM tests (Robolectric 4.16 test-only dep for real SQLite), build+lint green (agent-reported). Not verified on device: MediaStore query, album-art URI (UI needs placeholder/loadThumbnail fallback). Extra repo methods outside the interface: rescan/scanIfStale/isScanning/renamePlaylist/deletePlaylist/removeFromPlaylist/moveInPlaylist → T8 exposes.
 - ✅ **T6** [Sonnet+ponytail] Playback merged: `playback/` (PlayerHolder single ExoPlayer, ExoPlayerController, PlaybackService MediaSessionService stops 60 s after pause, PlaybackStore, SleepTimerLogic w/ fade, PlayCountListener), `di/PlaybackModule`, 18 JVM tests, build green (agent-reported). T8: create controller in `MusicPlayerApp.onCreate` via `PlaybackModule.createController(ctx, library::recordPlay)`. Not verified on device: notification, Bluetooth, FGS start on Android 14+; audio offload not enabled; fakes without mediaUri are unplayable.
 - ❌ **T2b** [Opus] Design v2 — REJECTED by owner (D13), v1 is the target again; v2 lives only on branch `task/t2b-design-revision`. (Old entry:) `docs/design/DESIGN.md` v2 + 18 PNGs (new `17-player-bars.png`). Own identity (Readex Pro + Vazirmatn, 42 custom icons, Persian arch/tile language, 'Deck' = mini-player+nav, lamp controls, 3 real-loudness seek bars, 'Still' low-power mode, 64px pre-blurred backdrop, ≤30 fps wave only while playing+visible). Screenshots sent to owner in chat. Not verified: any Android run; not mocked: tablet/landscape, overflow menus, sleep-timer sheet, permission-denied states. **Open owner questions D-A..D-F** (see below).
 - ✅ **T-W** [Sonnet+ponytail] Waveform extractor merged: `data/waveform` (WaveformMath, SamplingPlan sparse windows ~25% decode, EnvelopeBuilder, WaveformExtractor MediaCodec glue, WaveformStore + in-memory/file impls, WaveformRepositoryImpl with lazy/observer-driven work + battery-saver skip, `di/WaveformModule`), 45 JVM tests, build green (agent-reported). NOT verified: MediaCodec decode on a real device. T8 should bind `WaveformStore` to SQLite and call `prefetch(next track)`.

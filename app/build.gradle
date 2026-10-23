@@ -39,6 +39,7 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
     }
 }
 
@@ -58,5 +59,9 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.androidx.arch.core.testing
+<<<<<<< HEAD
     testImplementation libs.org.json // real org.json for PlaybackStore's JSON codec (android.jar's is a stub)
+=======
+    testImplementation libs.robolectric
+>>>>>>> origin/task/t5-data-java
 }
