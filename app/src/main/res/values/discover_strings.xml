@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home feed v2 (H1): section titles keyed by section id (ui/home/SectionText), mixes, stats. -->
+<resources>
+    <string name="home_sec_new_releases">Recently added</string>
+    <string name="home_sec_continue">Continue listening</string>
+    <string name="home_sec_jump_back_in">Jump back in</string>
+    <string name="home_sec_mixes">Made for you</string>
+    <string name="home_sec_quick_picks">Quick picks</string>
+    <string name="home_sec_playlists">Your playlists</string>
+    <string name="home_sec_favorites">Your favorites</string>
+    <string name="home_sec_top_month">Most played this month</string>
+    <string name="home_sec_top_all_time">Most played of all time</string>
+    <string name="home_sec_forgotten">Forgotten favorites</string>
+    <string name="home_sec_on_this_day">On this day in %1$s</string>
+    <string name="home_sec_artists">Artists you love</string>
+    <string name="home_sec_unfinished">Albums you haven\'t finished</string>
+    <string name="home_sec_random">Random picks</string>
+    <string name="home_sec_decades">Decades</string>
+    <string name="home_sec_genres">Genres</string>
+    <string name="home_sec_folders">Folders</string>
+    <string name="home_sec_stats">Your listening</string>
+    <string name="home_sec_throwbacks">Throwbacks</string>
+
+    <string name="home_sub_mixes">Built from what you play, refreshed daily</string>
+    <string name="home_sub_forgotten">Loved once, not heard for two months</string>
+    <string name="home_sub_throwbacks">Albums you haven\'t played in a while</string>
+    <string name="home_sub_random">A new handful on every refresh</string>
+
+    <string name="home_mix_daily">Daily mix %1$s</string>
+    <string name="home_mix_late_night">Late night</string>
+    <string name="home_mix_morning">Morning</string>
+    <string name="home_mix_upbeat">Upbeat</string>
+    <string name="home_mix_decade">%1$ss</string>
+    <string name="home_mix_with">with %1$s</string>
+
+    <string name="home_shuffle_library">Shuffle library</string>
+    <string name="home_surprise">Surprise me</string>
+    <string name="home_refreshed">New picks</string>
+    <string name="home_resume">Resume</string>
+    <string name="home_play_now">Play</string>
+    <string name="home_list_separator">, </string>
+
+    <string name="home_stat_songs">Songs</string>
+    <string name="home_stat_hours">Hours of music</string>
+    <string name="home_stat_artists">Artists</string>
+    <string name="home_stat_plays_month">Plays this month</string>
+    <string name="home_stat_top_artist">Top artist this month: %1$s</string>
+    <string name="home_stat_listened_month">%1$s listened this month</string>
+
+    <string name="library_genres">Genres</string>
+    <string name="library_folders">Folders</string>
+    <string name="library_sort_name">A–Z</string>
+    <string name="library_sort_count">Most songs</string>
+    <string name="library_sort_year">Newest</string>
+</resources>
