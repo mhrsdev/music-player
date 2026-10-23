@@ -1,0 +1,24 @@
+<resources>
+    <!-- Native SeekBar (slider semantics for free), painted with the design tokens. 48 dp touch height. -->
+    <style name="Sound.Slider" parent="">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:paddingHorizontal">24dp</item>
+        <item name="android:progressTint">?attr/mpPrimary</item>
+        <item name="android:progressBackgroundTint">?attr/mpOutlineVariant</item>
+        <item name="android:thumbTint">?attr/mpPrimary</item>
+    </style>
+    <style name="Sound.Value" parent="TextAppearance.MusicPlayer.Numeric">
+        <item name="android:textColor">?attr/mpPrimary</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+    <style name="Sound.Reset" parent="">
+        <item name="android:minHeight">56dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingHorizontal">28dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">?attr/mpOnSecondaryContainer</item>
+        <item name="android:background">@drawable/library_tonal_button</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

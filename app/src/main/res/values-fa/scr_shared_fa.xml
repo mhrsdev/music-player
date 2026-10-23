@@ -1,6 +1,6 @@
 <resources>
     <!-- Persian for strings owned by other modules (added by T3 together with values-fa; move into each owner's file later). -->
-    <string name="app_name">پخش‌کننده‌ی موسیقی</string>
+    <string name="app_name">موج</string>
     <string name="placeholder_sections">بخش‌های خانه: %1$d</string>
     <string name="mp_cd_seek">جابه‌جایی</string>
     <string name="mp_seek_state">%1$s از %2$s</string>

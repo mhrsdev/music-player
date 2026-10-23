@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ system splash: static adaptive launcher icon (default) on the theme background (paper / ink via values-night).
+     Keep Theme.MusicPlayer itself empty in values/themes.xml: put shared items in Base.Theme.MusicPlayer.
+     Below API 31 the starting window simply shows android:windowBackground (same colour), so no compat library is needed. -->
+<resources>
+    <style name="Theme.MusicPlayer" parent="Base.Theme.MusicPlayer">
+        <item name="android:windowSplashScreenBackground">@color/mp_background</item>
+    </style>
+</resources>
