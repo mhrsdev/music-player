@@ -26,6 +26,12 @@ public final class ThemeApplier {
         return ThemeController.themeResFor(toMode(theme));
     }
 
+    /** The language in effect ("" = system). API 33+ lets the system Settings change it behind our back, so ask AppCompat. */
+    public static String currentLanguage() {
+        LocaleListCompat locales = AppCompatDelegate.getApplicationLocales();
+        return locales.isEmpty() ? "" : locales.get(0).getLanguage();
+    }
+
     public static void applyLanguage(String tag) {
         AppCompatDelegate.setApplicationLocales(tag.isEmpty()
                 ? LocaleListCompat.getEmptyLocaleList() : LocaleListCompat.forLanguageTags(tag));

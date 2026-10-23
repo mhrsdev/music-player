@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.PowerManager;
+import android.os.Process;
 import androidx.core.content.ContextCompat;
 import com.mhrsdev.musicplayer.BuildConfig;
 import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
@@ -74,6 +75,13 @@ public final class AppContainer {
         ThreadPoolExecutor io = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         io.allowCoreThreadTimeOut(true);
         ioExecutor = io;
+        // Library scans get their own low-priority thread so Home / search reads never queue behind a 10k-row scan.
+        ThreadPoolExecutor scan = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+                r -> new Thread(() -> {
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                    r.run();
+                }, "scan"));
+        scan.allowCoreThreadTimeOut(true);
         settings = new SettingsStore(appContext);
         musicSource = new FakeMusicSource();
 
@@ -88,7 +96,7 @@ public final class AppContainer {
             waveform = new FakeWaveformRepository();
             homeFeed = new FakeHomeFeedSource(library);
         } else {
-            DataModule data = DataModule.create(appContext, io, settings);
+            DataModule data = DataModule.create(appContext, io, scan, settings);
             library = data.library;
             libraryAdmin = data.library;
             libraryBrowser = data.browser;

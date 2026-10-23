@@ -88,6 +88,7 @@ public final class SettingsFragment extends Fragment {
         b.batterySaver.setOnCheckedChangeListener((v, on) -> vm.setBatterySaver(on));
         b.version.setText(getString(R.string.settings_version, versionName()));
 
+        vm.refresh();
         vm.getState().observe(getViewLifecycleOwner(), s -> {
             for (int i = 0; i < themes.length; i++) themes[i].setSelected(Theme.values()[i] == s.theme());
             for (int i = 0; i < seeks.length; i++) seeks[i].setSelected(SeekStyle.values()[i] == s.seekStyle());
