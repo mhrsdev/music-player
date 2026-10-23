@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Track row: ripple; activated (multi-select) = tonal rounded fill. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#33888888">
+    <item>
+        <selector>
+            <item android:state_activated="true">
+                <shape><corners android:radius="16dp" /><solid android:color="?attr/mpSecondaryContainer" /></shape>
+            </item>
+            <item><color android:color="@android:color/transparent" /></item>
+        </selector>
+    </item>
+    <item android:id="@android:id/mask"><shape><corners android:radius="16dp"/><solid android:color="#FFFFFFFF"/></shape></item>
+</ripple>

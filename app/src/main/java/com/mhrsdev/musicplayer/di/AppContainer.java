@@ -12,6 +12,7 @@ import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
 import com.mhrsdev.musicplayer.domain.repository.HomeFeedSource;
 import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
+import com.mhrsdev.musicplayer.domain.repository.LibraryBrowser;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
 import com.mhrsdev.musicplayer.domain.repository.LyricsRepository;
 import com.mhrsdev.musicplayer.domain.repository.MusicSource;
@@ -56,6 +57,7 @@ public final class AppContainer {
     private final boolean useFakes;
     private final SettingsStore settings;
     private final LibraryAdmin libraryAdmin;
+    private final LibraryBrowser libraryBrowser;
     private final AtomicBoolean foregroundScanDone = new AtomicBoolean();
 
     public AppContainer(Context context) {
@@ -76,6 +78,7 @@ public final class AppContainer {
             FakeLibraryRepository fake = new FakeLibraryRepository();
             library = fake;
             libraryAdmin = fake;
+            libraryBrowser = fake;
             player = new FakePlayerController();
             lyrics = new FakeLyricsRepository();
             waveform = new FakeWaveformRepository();
@@ -84,6 +87,7 @@ public final class AppContainer {
             DataModule data = DataModule.create(appContext, io, settings);
             library = data.library;
             libraryAdmin = data.library;
+            libraryBrowser = data.browser;
             homeFeed = data.homeFeed;
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
@@ -102,6 +106,11 @@ public final class AppContainer {
     /** Scanning and the extra playlist edits (rename, delete, remove, reorder). */
     public LibraryAdmin libraryAdmin() {
         return libraryAdmin;
+    }
+
+    /** Smart lists, years, play counts, batch playlist edits, track details, forgetting deleted files. */
+    public LibraryBrowser libraryBrowser() {
+        return libraryBrowser;
     }
 
     /** Call when the user grants the audio permission: runs the first scan (or a stale one). */

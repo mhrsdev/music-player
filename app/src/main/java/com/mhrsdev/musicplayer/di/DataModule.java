@@ -4,6 +4,7 @@ import android.content.Context;
 import com.mhrsdev.musicplayer.data.db.DbHelper;
 import com.mhrsdev.musicplayer.data.repository.ChangeNotifier;
 import com.mhrsdev.musicplayer.data.repository.LocalHomeFeedSource;
+import com.mhrsdev.musicplayer.data.repository.SqliteLibraryBrowser;
 import com.mhrsdev.musicplayer.data.repository.SqliteLibraryRepository;
 import com.mhrsdev.musicplayer.data.repository.SqliteWaveformStore;
 import com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner;
@@ -22,6 +23,8 @@ public final class DataModule {
     /** Also the entry point for {@code rescan}, {@code scanIfStale} and the extra playlist edits. */
     public final SqliteLibraryRepository library;
     public final LocalHomeFeedSource homeFeed;
+    /** Smart lists, years, batch playlist edits, track details. */
+    public final SqliteLibraryBrowser browser;
     /** Persistent waveform cache, ready to hand to {@code WaveformModule} (blocking calls, background thread). */
     public final SqliteWaveformStore waveformStore;
 
@@ -32,6 +35,7 @@ public final class DataModule {
         ChangeNotifier notifier = new ChangeNotifier();
         library = new SqliteLibraryRepository(dbHelper, io, notifier, scanner);
         homeFeed = new LocalHomeFeedSource(dbHelper, io, notifier);
+        browser = new SqliteLibraryBrowser(dbHelper, io, notifier, context.getContentResolver());
         waveformStore = new SqliteWaveformStore(dbHelper);
     }
 
