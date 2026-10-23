@@ -14,13 +14,17 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.mhrsdev.musicplayer.ui.widget.AmbientBackdropView;
+import com.mhrsdev.musicplayer.ui.widget.AmbientField;
+import com.mhrsdev.musicplayer.ui.widget.AmbientPalette;
+
 /**
  * Artwork-light backdrop (DESIGN §2.3) without live blur: the cover pre-downscaled once per track to a tiny bitmap
  * ({@link #prepare}) and upscaled with bilinear filtering (= a soft blur), a radial glow of the cover's color and the
  * measured scrim.
  *
- * <p>Living colour field (L1): four large soft radial gradients in the cover's own colours (the averages of the tiny
- * bitmap's quadrants, taken once per track) drift on slow sine paths (periods 19-31 s). It animates at <= 15 fps only
+ * <p>Living colour field (L1): the shared {@link AmbientField} engine with {@link AmbientPalette} colours (ColorExtractor
+ * seed + quadrant averages of the tiny bitmap, once per track) drifts on slow sine paths (periods 19-31 s). It animates at <= 15 fps only
  * while {@link #setAnimating} is on (player visible and playing) and decorative motion is allowed; otherwise the same
  * field is drawn once, still. Per frame only the shaders' local matrices move: no allocation, no bitmap, no blur.
  * On track change the new layer fades in (alpha only, 600 ms).
@@ -36,21 +40,11 @@ public class PlayerBackdropView extends View {
         final Matrix matrix = new Matrix();
         @Nullable Bitmap bitmap;
         PlayerPalette palette;
-        final Paint[] blobs = new Paint[BLOBS];
-        final Matrix[] blobMatrix = new Matrix[BLOBS];
-        Layer() {
-            for (int i = 0; i < BLOBS; i++) {
-                blobs[i] = new Paint(Paint.ANTI_ALIAS_FLAG);
-                blobMatrix[i] = new Matrix();
-            }
-        }
+        /** Shared colour-field engine (also behind {@link AmbientBackdropView}). */
+        final AmbientField field = new AmbientField();
     }
 
-    private static final int BLOBS = 4;
     static final long DRIFT_FRAME_MS = 66; // <= 15 fps
-    /** Base centres (fractions of w/h), drift periods (s) and phases of the four colour blobs. */
-    private static final float[] BX = {0.18f, 0.86f, 0.24f, 0.78f}, BY = {0.16f, 0.30f, 0.70f, 0.86f};
-    private static final float[] PERIOD = {23f, 31f, 19f, 27f}, PHASE = {0f, 1.7f, 3.1f, 4.4f};
     private boolean animating;
     private long driftStart = android.os.SystemClock.uptimeMillis();
     private final Runnable driftFrame = this::driftFrame;
@@ -172,47 +166,10 @@ public class PlayerBackdropView extends View {
             l.matrix.setScale(scale, scale);
             l.matrix.postTranslate((w - l.bitmap.getWidth() * scale) / 2f, (h - l.bitmap.getHeight() * scale) / 2f);
         }
-        int[] colors = blobColors(l.bitmap, p);
-        float r = Math.max(w, h) * 0.55f;
-        for (int i = 0; i < BLOBS; i++) {
-            // unit-radius gradient at the origin; the drift only moves/scales it through the local matrix
-            l.blobs[i].setShader(new RadialGradient(0, 0, 1f, new int[]{colors[i], colors[i] & 0x00FFFFFF},
-                    null, Shader.TileMode.CLAMP));
-            l.blobMatrix[i].setScale(r, r);
-        }
-    }
-
-    /**
-     * Four colours for the field: the average of each quadrant of the tiny cover (so they are the cover's own hues),
-     * saturation lifted a little; without artwork the palette's glow/container colours.
-     */
-    static int[] blobColors(@Nullable Bitmap bm, PlayerPalette p) {
-        int[] out = new int[BLOBS];
-        if (bm == null || bm.isRecycled()) {
-            int[] f = {p.glow, p.container, p.deep, p.glow};
-            for (int i = 0; i < BLOBS; i++) out[i] = (f[i] & 0x00FFFFFF) | 0x8C000000;
-            return out;
-        }
-        int w = bm.getWidth(), h = bm.getHeight();
-        int[] px = new int[w * h];
-        bm.getPixels(px, 0, w, 0, 0, w, h);
-        for (int q = 0; q < BLOBS; q++) {
-            int x0 = (q % 2) * w / 2, y0 = (q / 2) * h / 2;
-            long r = 0, g = 0, b = 0, n = 0;
-            for (int y = y0; y < y0 + h / 2; y++) {
-                for (int x = x0; x < x0 + w / 2; x++) {
-                    int c = px[y * w + x];
-                    r += (c >> 16) & 0xFF; g += (c >> 8) & 0xFF; b += c & 0xFF; n++;
-                }
-            }
-            if (n == 0) n = 1;
-            float[] hsv = new float[3];
-            android.graphics.Color.RGBToHSV((int) (r / n), (int) (g / n), (int) (b / n), hsv);
-            hsv[1] = Math.min(1f, hsv[1] * 1.3f + 0.05f);
-            out[q] = (android.graphics.Color.HSVToColor(hsv) & 0x00FFFFFF) | 0x9E000000;
-        }
-        // quadrant order TL, TR, BL, BR matches the blob centres
-        return out;
+        boolean dark = !light;
+        AmbientPalette ap = l.bitmap != null ? AmbientPalette.fromBitmap(l.bitmap, dark)
+                : AmbientPalette.fromSeed(p.glow, dark);
+        l.field.setColors(ap.blobs());
     }
 
     /** Player visible and playing: drift (if motion is allowed). Otherwise one still frame. */
@@ -233,32 +190,6 @@ public class PlayerBackdropView extends View {
         postOnAnimationDelayed(driftFrame, DRIFT_FRAME_MS);
     }
 
-    /** Pure drift path: blob {@code i} centre offset at {@code sec}, as a fraction of the size (|x|,|y| <= 0.12). */
-    static float driftX(int i, float sec) {
-        return 0.12f * (float) Math.sin(2 * Math.PI * sec / PERIOD[i] + PHASE[i]);
-    }
-
-    static float driftY(int i, float sec) {
-        return 0.09f * (float) Math.cos(2 * Math.PI * sec / (PERIOD[i] * 1.3f) + PHASE[i] * 0.7f);
-    }
-
-    private void drawBlobs(Canvas c, Layer l, int alpha, float sec) {
-        int w = getWidth(), h = getHeight();
-        float r = Math.max(w, h) * 0.55f;
-        for (int i = 0; i < BLOBS; i++) {
-            Paint p = l.blobs[i];
-            if (p.getShader() == null) continue;
-            float cx = w * (BX[i] + driftX(i, sec)), cy = h * (BY[i] + driftY(i, sec));
-            float breathe = 1f + 0.06f * (float) Math.sin(2 * Math.PI * sec / (PERIOD[i] * 0.8f) + PHASE[i]);
-            Matrix m = l.blobMatrix[i];
-            m.setScale(r * breathe, r * breathe);
-            m.postTranslate(cx, cy);
-            p.getShader().setLocalMatrix(m);
-            p.setAlpha(alpha);
-            c.drawRect(0, 0, w, h, p);
-        }
-    }
-
     private void drawLayer(Canvas c, Layer l, int alpha) {
         int w = getWidth(), h = getHeight();
         l.base.setAlpha(alpha);
@@ -267,7 +198,7 @@ public class PlayerBackdropView extends View {
             l.art.setAlpha(alpha * 3 / 4);
             c.drawBitmap(l.bitmap, l.matrix, l.art);
         }
-        drawBlobs(c, l, alpha * 7 / 10, (android.os.SystemClock.uptimeMillis() - driftStart) / 1000f);
+        l.field.draw(c, w, h, alpha * 7 / 10, (android.os.SystemClock.uptimeMillis() - driftStart) / 1000f, 1f);
         l.glow.setAlpha(alpha);
         c.drawRect(0, 0, w, h, l.glow);
     }

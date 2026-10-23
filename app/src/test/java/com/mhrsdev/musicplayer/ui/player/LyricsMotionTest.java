@@ -36,8 +36,8 @@ public class LyricsMotionTest {
     @Test public void backdropDriftStaysSmall() {
         for (int i = 0; i < 4; i++) {
             for (float t = 0; t < 120; t += 0.7f) {
-                assertTrue(Math.abs(PlayerBackdropView.driftX(i, t)) <= 0.12f + 1e-6);
-                assertTrue(Math.abs(PlayerBackdropView.driftY(i, t)) <= 0.09f + 1e-6);
+                assertTrue(Math.abs(com.mhrsdev.musicplayer.ui.widget.AmbientField.driftX(i, t)) <= 0.12f + 1e-6);
+                assertTrue(Math.abs(com.mhrsdev.musicplayer.ui.widget.AmbientField.driftY(i, t)) <= 0.09f + 1e-6);
             }
         }
     }
