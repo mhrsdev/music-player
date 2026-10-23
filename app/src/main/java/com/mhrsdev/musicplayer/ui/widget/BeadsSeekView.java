@@ -42,6 +42,11 @@ public class BeadsSeekView extends FrameSeekView {
         return !wobble.isSettled();
     }
 
+    /** The release wobble lasts ~0.5 s: draw it at display rate so it does not judder. */
+    @Override protected float frameInterval() {
+        return 0f;
+    }
+
     @Override protected boolean advance(float dt) {
         wobble.step(dt);
         return true;
@@ -60,8 +65,12 @@ public class BeadsSeekView extends FrameSeekView {
         boolean handled = super.onTouchEvent(e);
         if (wasDragging && !isDragging()) {
             // released: dip, rebound once, rest
-            wobble.setTarget(1f);
-            wobble.setVelocity(Spring.kickFor(0.22f, Spring.Preset.JIGGLE.stiffness, Spring.Preset.JIGGLE.dampingRatio));
+            if (canAnimate()) {
+                wobble.setTarget(1f);
+                wobble.setVelocity(Spring.kickFor(0.22f, Spring.Preset.JIGGLE.stiffness, Spring.Preset.JIGGLE.dampingRatio));
+            } else {
+                wobble.snapTo(1f); // reduce motion / battery saver: no wobble
+            }
             updateFrames();
         }
         return handled;

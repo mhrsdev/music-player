@@ -36,6 +36,11 @@ public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.
         return true;
     }
 
+    /** Seconds between redraws: {@code 1/30} for ripples; a short spring may ask for every frame (0). */
+    protected float frameInterval() {
+        return FRAME;
+    }
+
     /** Re-evaluates whether to receive frames; call after anything that changes {@link #needsFrames()}. */
     protected final void updateFrames() {
         boolean want = needsFrames() && canAnimate() && isAttachedToWindow();
@@ -61,7 +66,7 @@ public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.
             return false;
         }
         pending += dt;
-        if (pending >= FRAME) {
+        if (pending >= frameInterval()) {
             if (advance(pending)) invalidate();
             pending = 0f;
         }

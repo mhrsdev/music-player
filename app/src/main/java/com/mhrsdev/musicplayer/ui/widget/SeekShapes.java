@@ -91,4 +91,28 @@ public class SeekShapes {
     public static float clamp01(float v) {
         return v < 0f ? 0f : (v > 1f ? 1f : v);
     }
+
+    /**
+     * A song-shaped sample envelope (120 buckets: soft intro, verse, loud chorus, breakdown, chorus, fade out) for
+     * style previews; deterministic, built once per call (not on a draw path).
+     */
+    public static float[] sampleEnvelope() {
+        float[] wf = new float[120];
+        long seed = 25;
+        for (int i = 0; i < wf.length; i++) {
+            float f = i / 119f;
+            float shape;
+            if (f < 0.08f) shape = 0.15f + f / 0.08f * 0.25f;
+            else if (f < 0.3f) shape = 0.45f;
+            else if (f < 0.48f) shape = 0.82f;
+            else if (f < 0.58f) shape = 0.35f;
+            else if (f < 0.85f) shape = 0.88f;
+            else shape = 0.88f * (1f - (f - 0.85f) / 0.15f) + 0.05f;
+            float beat = (i % 4 == 0) ? 0.1f : 0f;
+            seed = (seed * 6364136223846793005L + 1442695040888963407L);
+            float noise = ((seed >>> 40) & 0xFFFF) / 65535f - 0.5f;
+            wf[i] = Math.max(0.04f, Math.min(1f, shape + beat + noise * 0.22f));
+        }
+        return wf;
+    }
 }

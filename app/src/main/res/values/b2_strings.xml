@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- D25 seek-bar styles (B2): names, one-line descriptions, picker sheet. -->
+<resources>
+    <string name="seek_style_ribbon">Ribbon</string>
+    <string name="seek_style_pulse">Pulse dots</string>
+    <string name="seek_style_ladder">LED ladder</string>
+    <string name="seek_style_mountain">Mountain</string>
+    <string name="seek_style_beads">Thread &amp; beads</string>
+    <string name="seek_style_liquid">Liquid</string>
+    <string name="seek_style_wavy_desc">A gentle wave that flows while music plays</string>
+    <string name="seek_style_waveform_desc">The whole song\'s loudness in soft layers</string>
+    <string name="seek_style_bars_desc">Loudness as slim bars, the lightest on battery</string>
+    <string name="seek_style_ribbon_desc">A thick glowing ribbon with a pearl cap</string>
+    <string name="seek_style_pulse_desc">Dots sized by the music that swell around the thumb</string>
+    <string name="seek_style_ladder_desc">A level meter of lit blocks that follows the loudness</string>
+    <string name="seek_style_mountain_desc">One smooth ridge drawn from the song\'s loudness</string>
+    <string name="seek_style_beads_desc">A fine thread with a bead at every minute</string>
+    <string name="seek_style_liquid_desc">A glass tube filling with liquid that ripples to the beat</string>
+    <string name="seek_style_sheet_sub">Applies right away. Motion runs only while music plays.</string>
+    <string name="seek_style_selected">Selected</string>
+    <string name="seek_style_cd">Seek bar, %1$s</string>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="seek_style_ribbon">روبان</string>
+    <string name="seek_style_pulse">نقطه‌های تپنده</string>
+    <string name="seek_style_ladder">پله‌های نور</string>
+    <string name="seek_style_mountain">کوهستان</string>
+    <string name="seek_style_beads">نخ و مهره</string>
+    <string name="seek_style_liquid">مایع</string>
+    <string name="seek_style_wavy_desc">موجی آرام که هنگام پخش جاری می‌شود</string>
+    <string name="seek_style_waveform_desc">بلندی صدای کل آهنگ در چند لایهٔ نرم</string>
+    <string name="seek_style_bars_desc">بلندی صدا با میله‌های باریک؛ کم‌مصرف‌ترین</string>
+    <string name="seek_style_ribbon_desc">روبانی ضخیم و درخشان با سری مرواریدی</string>
+    <string name="seek_style_pulse_desc">نقطه‌هایی هم‌اندازهٔ موسیقی که دور نشانگر بزرگ می‌شوند</string>
+    <string name="seek_style_ladder_desc">نمایشگر سطح با خانه‌های روشن که بلندی صدا را دنبال می‌کند</string>
+    <string name="seek_style_mountain_desc">یک خط‌الرأس نرم از بلندی صدای آهنگ</string>
+    <string name="seek_style_beads_desc">نخی ظریف با یک مهره برای هر دقیقه</string>
+    <string name="seek_style_liquid_desc">لوله‌ای شیشه‌ای پر از مایعی که با موسیقی موج برمی‌دارد</string>
+    <string name="seek_style_sheet_sub">بلافاصله اعمال می‌شود. حرکت فقط هنگام پخش موسیقی است.</string>
+    <string name="seek_style_selected">انتخاب‌شده</string>
+    <string name="seek_style_cd">نوار پیشرفت، %1$s</string>
+</resources>

@@ -20,7 +20,6 @@ import org.robolectric.annotation.GraphicsMode;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Random;
 import java.util.function.Function;
 
 /**
@@ -48,23 +47,8 @@ public class B2SeekStylesRenderTest {
             new Style("Liquid", LiquidSeekView::new),
     };
 
-    /** A song-shaped envelope: soft intro, verse, loud chorus, breakdown, chorus, fade out. Deterministic. */
     static float[] songEnvelope() {
-        float[] wf = new float[120];
-        Random r = new Random(25);
-        for (int i = 0; i < wf.length; i++) {
-            float f = i / 119f;
-            float shape;
-            if (f < 0.08f) shape = 0.15f + f / 0.08f * 0.25f;
-            else if (f < 0.3f) shape = 0.45f;
-            else if (f < 0.48f) shape = 0.82f;
-            else if (f < 0.58f) shape = 0.35f;
-            else if (f < 0.85f) shape = 0.88f;
-            else shape = 0.88f * (1f - (f - 0.85f) / 0.15f) + 0.05f;
-            float beat = (i % 4 == 0) ? 0.1f : 0f;
-            wf[i] = Math.max(0.04f, Math.min(1f, shape + beat + (r.nextFloat() - 0.5f) * 0.22f));
-        }
-        return wf;
+        return SeekShapes.sampleEnvelope();
     }
 
     static Bitmap renderBar(BaseSeekView v, int wPx, int hPx) {

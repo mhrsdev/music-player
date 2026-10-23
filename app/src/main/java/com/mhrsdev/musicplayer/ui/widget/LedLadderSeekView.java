@@ -33,10 +33,10 @@ public class LedLadderSeekView extends BaseSeekView {
 
     public LedLadderSeekView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        colW = 3.5f * density;
-        colGap = 1.75f * density;
-        blockH = 2.75f * density;
-        blockGap = 1.25f * density;
+        colW = 4.5f * density;
+        colGap = 2f * density;
+        blockH = 3f * density;
+        blockGap = 1.5f * density;
         block.setStyle(Paint.Style.FILL);
     }
 
@@ -69,7 +69,7 @@ public class LedLadderSeekView extends BaseSeekView {
                 litColors[r] = SeekShapes.blend(activeColor, 0xFFFFFFFF, r < ROWS - 2 ? r * 0.06f : 0.28f + (r - 3) * 0.12f);
             }
             dimColor = inactiveColor;
-            ghostColor = SeekShapes.withAlpha(inactiveColor, 0.28f);
+            ghostColor = SeekShapes.withAlpha(inactiveColor, 0.16f);
             colorsValid = true;
         }
         float total = ROWS * blockH + (ROWS - 1) * blockGap;
@@ -77,7 +77,7 @@ public class LedLadderSeekView extends BaseSeekView {
         float n = levels.length;
         float used = n * colW + (n - 1) * colGap;
         float x0 = left + (right - left - used) / 2f;
-        float rr = 1f * density;
+        float rr = 1.25f * density;
         for (int i = 0; i < n; i++) {
             float x = x0 + i * (colW + colGap);
             boolean played = x + colW / 2f <= thumbX;

@@ -26,6 +26,8 @@ public class LiquidSeekView extends FrameSeekView {
     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint shine = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint cap = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint bubble = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final float pillH;
     private boolean shapesValid;
     private float builtCy = -1f;
@@ -36,13 +38,16 @@ public class LiquidSeekView extends FrameSeekView {
 
     public LiquidSeekView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        pillH = 16f * density;
+        pillH = 18f * density;
         glass.setStyle(Paint.Style.FILL);
         fill.setStyle(Paint.Style.FILL);
         shine.setStyle(Paint.Style.STROKE);
         shine.setStrokeCap(Paint.Cap.ROUND);
         shine.setStrokeWidth(1.5f * density);
         cap.setStyle(Paint.Style.FILL);
+        ring.setStyle(Paint.Style.STROKE);
+        ring.setStrokeWidth(2f * density);
+        bubble.setStyle(Paint.Style.FILL);
     }
 
     @Override protected boolean needsFrames() {
@@ -69,7 +74,9 @@ public class LiquidSeekView extends FrameSeekView {
                 new float[] {0f, 0.45f, 1f}, Shader.TileMode.CLAMP));
         glass.setColor(SeekShapes.withAlpha(inactiveColor, 0.75f));
         shine.setColor(SeekShapes.withAlpha(0xFFFFFFFF, 0.7f));
-        cap.setColor(SeekShapes.blend(activeColor, 0xFFFFFFFF, 0.85f));
+        cap.setColor(SeekShapes.blend(activeColor, 0xFFFFFFFF, 0.88f));
+        ring.setColor(activeColor);
+        bubble.setColor(SeekShapes.withAlpha(0xFFFFFFFF, 0.45f));
         builtCy = cy;
         shapesValid = true;
     }
@@ -81,8 +88,9 @@ public class LiquidSeekView extends FrameSeekView {
         if (thumbX <= left + 0.5f) return;
         boolean moving = playing && isAnimating();
         float loud = SeekShapes.loudnessAt(waveform, SeekMath.fraction(position, duration));
-        float ripple = moving ? (0.8f + 1.8f * loud) * density : 0f;
-        float bulge = 3.5f * density;
+        // paused: the last ripple stays frozen (still reads as liquid, costs nothing)
+        float ripple = (moving ? 0.8f + 1.8f * loud : 0.7f) * density;
+        float bulge = 6f * density;
         liquid.rewind();
         meniscus.rewind();
         liquid.moveTo(left - r, cy - r);
@@ -106,13 +114,21 @@ public class LiquidSeekView extends FrameSeekView {
         shine.setAlpha(70);
         canvas.drawLine(left + r * 0.6f, cy - r * 0.45f, thumbX - r, cy - r * 0.45f, shine);
         shine.setAlpha(178);
+        // three small bubbles suspended in the liquid
+        float span = thumbX - left;
+        if (span > 6f * r) {
+            canvas.drawCircle(left + span * 0.28f, cy + r * 0.25f, 1.4f * density, bubble);
+            canvas.drawCircle(left + span * 0.55f, cy - r * 0.05f, 1.0f * density, bubble);
+            canvas.drawCircle(left + span * 0.78f, cy + r * 0.35f, 1.7f * density, bubble);
+        }
         canvas.restoreToCount(s);
     }
 
-    /** A pale capsule floating on the meniscus: 22 dp tall, 30 dp while dragging. */
+    /** A pearl drop riding the meniscus: 12 dp, 18 dp while dragging, ringed in the accent so it reads in both themes. */
     @Override protected void drawThumb(Canvas canvas, float thumbX, float cy, float grow) {
-        float half = (11f + 4f * grow) * density;
-        float w = (2.5f + 1f * grow) * density;
-        canvas.drawRoundRect(thumbX - w, cy - half, thumbX + w, cy + half, w, w, cap);
+        float rr = (6f + 3f * grow) * density;
+        float x = Math.max(trackLeft() + rr, thumbX);
+        canvas.drawCircle(x, cy, rr, cap);
+        canvas.drawCircle(x, cy, rr - ring.getStrokeWidth() / 2f, ring);
     }
 }
