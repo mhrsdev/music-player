@@ -10,10 +10,13 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.service.notification.StatusBarNotification;
 import androidx.media3.common.Player;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.ui.widget.ArtworkResolver;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
@@ -27,6 +30,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.android.controller.ServiceController;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.GraphicsMode;
 import org.robolectric.shadow.api.Shadow;
 import org.robolectric.shadows.ShadowContextWrapper;
 import org.robolectric.shadows.ShadowLooper;
@@ -37,18 +41,35 @@ import org.robolectric.shadows.ShadowService;
  * with {@link PlaybackService} in the foreground and a notification on the playback channel with title and artist.
  */
 @RunWith(RobolectricTestRunner.class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = 35, application = Application.class)
 public class PlaybackNotificationTest {
+    private static final String MEDIA_URI = "content://media/external/audio/media/7";
+
+    /** Provider with no art anywhere; tests override the one source they exercise. */
+    private static class NoArtBackend implements ArtworkResolver.Backend {
+        @Override public Bitmap thumbnail(android.net.Uri uri, int sizePx) { return null; }
+        @Override public java.io.InputStream open(android.net.Uri uri) { return null; }
+        @Override public byte[] embeddedPicture(android.net.Uri audioUri) { return null; }
+        @Override public java.util.List<ArtworkResolver.AudioRef> albumTracks(String albumId, int limit) { return Collections.emptyList(); }
+        @Override public ArtworkResolver.AudioRef audio(String audioId) { return null; }
+        @Override public boolean isFile(File f) { return false; }
+    }
+
     private Context app;
     private ExoPlayerController controller;
     private ServiceController<PlaybackService> service;
 
     /** Plays one track through the real controller and runs the service the controller asked for. */
     private StatusBarNotification playAndStartService() throws Exception {
+        return playAndStartService(null);
+    }
+
+    private StatusBarNotification playAndStartService(String artworkUri) throws Exception {
         app = RuntimeEnvironment.getApplication();
         File wav = new File(app.getCacheDir(), "tone.wav");
         writeSilentWav(wav);
-        Track track = new Track("1", "Song Title", "ar", "Artist Name", "al", "Album", 2_000L, null, 0,
+        Track track = new Track("1", "Song Title", "ar", "Artist Name", "al", "Album", 2_000L, artworkUri, 0,
                 android.net.Uri.fromFile(wav).toString(), false, false, 0, 0, 0L);
         controller = new ExoPlayerController(app, null, null);
         controller.play(Collections.singletonList(track), 0, null);
@@ -76,6 +97,58 @@ public class PlaybackNotificationTest {
 
     private ShadowService shadow() {
         return (ShadowService) Shadow.extract(service.get());
+    }
+
+    /** A MediaStore track whose only cover is the picture embedded in the file: the notification must carry it. */
+    @Test public void notificationGetsCoverFromEmbeddedPicture() throws Exception {
+        java.io.ByteArrayOutputStream png = new java.io.ByteArrayOutputStream();
+        Bitmap big = Bitmap.createBitmap(1024, 1024, Bitmap.Config.ARGB_8888);
+        big.eraseColor(Color.RED);
+        big.compress(Bitmap.CompressFormat.PNG, 100, png);
+        ArtworkLoader.backendOverride = new NoArtBackend() {
+            @Override public java.util.List<ArtworkResolver.AudioRef> albumTracks(String albumId, int limit) {
+                return Collections.singletonList(new ArtworkResolver.AudioRef(android.net.Uri.parse(MEDIA_URI), null));
+            }
+            @Override public byte[] embeddedPicture(android.net.Uri audioUri) { return png.toByteArray(); }
+        };
+        try {
+            playAndStartService("content://media/external/audio/albumart/3");
+            NotificationManager nm = (NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE);
+            boolean cover = false;
+            for (int i = 0; i < 200 && !cover; i++) { // the cover arrives asynchronously and re-posts
+                ShadowLooper.idleMainLooper();
+                for (StatusBarNotification sbn : nm.getActiveNotifications()) {
+                    cover |= sbn.getNotification().getLargeIcon() != null;
+                }
+                if (!cover) Thread.sleep(25);
+            }
+            assertTrue("notification has no cover", cover);
+        } finally {
+            ArtworkLoader.backendOverride = null;
+        }
+    }
+
+    @Test public void loaderProducesSmallRgb565FromEmbeddedPicture() throws Exception {
+        java.io.ByteArrayOutputStream png = new java.io.ByteArrayOutputStream();
+        Bitmap big = Bitmap.createBitmap(2000, 1000, Bitmap.Config.ARGB_8888);
+        big.eraseColor(Color.BLUE);
+        big.compress(Bitmap.CompressFormat.PNG, 100, png);
+        ArtworkLoader.backendOverride = new NoArtBackend() {
+            @Override public byte[] embeddedPicture(android.net.Uri audioUri) { return png.toByteArray(); }
+        };
+        try {
+            ArtworkLoader loader = new ArtworkLoader(RuntimeEnvironment.getApplication());
+            Bitmap b = loader.loadBitmap(android.net.Uri.parse(MEDIA_URI)).get(10, java.util.concurrent.TimeUnit.SECONDS);
+            assertEquals(Bitmap.Config.RGB_565, b.getConfig());
+            assertTrue(Math.max(b.getWidth(), b.getHeight()) <= ArtworkLoader.MAX_PX);
+            assertEquals(b, loader.loadBitmap(android.net.Uri.parse(MEDIA_URI)).get()); // second call: cache
+            try {
+                new ArtworkLoader(RuntimeEnvironment.getApplication()).loadBitmap(android.net.Uri.parse("file:///none.jpg")).get();
+                org.junit.Assert.fail("expected no artwork");
+            } catch (java.util.concurrent.ExecutionException expected) { /* Media3 shows the notification without a cover */ }
+        } finally {
+            ArtworkLoader.backendOverride = null;
+        }
     }
 
     @Test public void playingThroughControllerPostsForegroundMediaNotification() throws Exception {
