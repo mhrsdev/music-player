@@ -105,7 +105,8 @@ public final class TrackQueries {
                 + " IS NOT NULL ORDER BY ps." + PlayStatsContract.COL_PLAY_COUNT + " DESC LIMIT " + limit;
         List<TrackStat> out = new ArrayList<>();
         try (Cursor c = db.rawQuery(sql, null)) {
-            while (c.moveToNext()) out.add(new TrackStat(read(c), c.getInt(13), c.getLong(14)));
+            Map<String, String> shared = new HashMap<>();
+            while (c.moveToNext()) out.add(new TrackStat(read(c, shared), c.getInt(13), c.getLong(14)));
         }
         return out;
     }
@@ -152,16 +153,27 @@ public final class TrackQueries {
 
     private List<Track> run(String tail, String... args) {
         List<Track> out = new ArrayList<>();
+        Map<String, String> shared = new HashMap<>();
         try (Cursor c = db.rawQuery(SELECT + tail, args.length == 0 ? null : args)) {
-            while (c.moveToNext()) out.add(read(c));
+            while (c.moveToNext()) out.add(read(c, shared));
         }
         return out;
     }
 
-    private static Track read(Cursor c) {
-        String albumId = c.getString(4);
-        return new Track(c.getString(0), c.getString(1), c.getString(2), c.getString(3), albumId, c.getString(5),
-                c.getLong(6), c.getString(7), Seeds.of(albumId), c.getString(8), false, c.getInt(12) != 0,
-                c.getInt(9), c.getInt(10) % 1000, c.getLong(11));
+    /**
+     * {@code shared} makes the artist / album / artwork strings of one result list a single instance each: a 10k-track
+     * library holds a few hundred of them instead of 50k copies (about 2 MB less heap while the list is alive).
+     */
+    private static Track read(Cursor c, Map<String, String> shared) {
+        String albumId = shared(shared, c.getString(4));
+        return new Track(c.getString(0), c.getString(1), shared(shared, c.getString(2)), shared(shared, c.getString(3)),
+                albumId, shared(shared, c.getString(5)), c.getLong(6), shared(shared, c.getString(7)), Seeds.of(albumId),
+                c.getString(8), false, c.getInt(12) != 0, c.getInt(9), c.getInt(10) % 1000, c.getLong(11));
+    }
+
+    private static String shared(Map<String, String> shared, String s) {
+        if (s == null) return null;
+        String known = shared.putIfAbsent(s, s);
+        return known == null ? s : known;
     }
 }

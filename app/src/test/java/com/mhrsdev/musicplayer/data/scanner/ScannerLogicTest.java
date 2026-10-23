@@ -38,7 +38,7 @@ public class ScannerLogicTest {
         Track t = audio(null, "My Song.final.flac", "<unknown>", 0).toTrack();
         assertEquals("My Song.final", t.title());
         assertEquals("Unknown artist", t.artistName());
-        assertNull(t.artworkUri());
+        assertEquals("content://media/external/audio/media/42", t.artworkUri()); // no album: the file is the art source
         assertEquals("Unknown title", audio(" ", null, "a", 1).toTrack().title());
     }
 
