@@ -33,6 +33,18 @@ public final class ShellViewModel extends ViewModel {
         player.togglePlayPause();
     }
 
+    public void next() {
+        player.next();
+    }
+
+    public void previous() {
+        player.previous();
+    }
+
+    public void pause() {
+        player.pause();
+    }
+
     public static ViewModelProvider.Factory factory(PlayerController player) {
         return new ViewModelProvider.Factory() {
             @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> c) {

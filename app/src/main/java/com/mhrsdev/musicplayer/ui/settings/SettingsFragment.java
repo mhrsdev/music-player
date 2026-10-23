@@ -16,6 +16,7 @@ import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.databinding.SettingsFragmentBinding;
 import com.mhrsdev.musicplayer.ui.settings.SettingsStore.SeekStyle;
 import com.mhrsdev.musicplayer.ui.settings.SettingsStore.Theme;
+import com.mhrsdev.musicplayer.ui.theme.ThemeController;
 import java.text.NumberFormat;
 import java.util.Objects;
 
@@ -39,8 +40,12 @@ public final class SettingsFragment extends Fragment {
         for (int i = 0; i < themes.length; i++) {
             Theme t = Theme.values()[i];
             themes[i].setOnClickListener(v -> {
+                Theme before = Objects.requireNonNull(vm.getState().getValue()).theme();
+                if (before == t) return;
                 vm.setTheme(t);
                 ThemeApplier.applyNightMode(t);
+                // Black is a separate theme resource (not just night mode), so switching to/from it recreates.
+                if (before == Theme.BLACK || t == Theme.BLACK) requireActivity().recreate();
             });
         }
         TextView[] seeks = {b.seekWavy, b.seekWaveform, b.seekBars};
@@ -75,7 +80,10 @@ public final class SettingsFragment extends Fragment {
             sleepChips[i] = chip;
         }
 
-        b.artworkColors.setOnCheckedChangeListener((v, on) -> vm.setArtworkColors(on));
+        b.artworkColors.setOnCheckedChangeListener((v, on) -> {
+            vm.setArtworkColors(on);
+            ThemeController.get(requireContext()).setArtworkColorsEnabled(on);
+        });
         b.onlineLyrics.setOnCheckedChangeListener((v, on) -> vm.setOnlineLyrics(on));
         b.batterySaver.setOnCheckedChangeListener((v, on) -> vm.setBatterySaver(on));
         b.version.setText(getString(R.string.settings_version, versionName()));

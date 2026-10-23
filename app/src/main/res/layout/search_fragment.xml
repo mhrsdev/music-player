@@ -20,7 +20,7 @@
             android:layout_height="24dp"
             android:importantForAccessibility="no"
             android:src="@drawable/nav_ic_search"
-            android:tint="@color/scr_on_surface_variant" />
+            android:tint="?attr/mpOnSurfaceVariant" />
 
         <EditText
             android:id="@+id/query"
@@ -35,8 +35,8 @@
             android:inputType="text"
             android:maxLines="1"
             android:textAlignment="viewStart"
-            android:textColor="@color/scr_on_surface"
-            android:textColorHint="@color/scr_on_surface_variant"
+            android:textColor="?attr/mpOnSurface"
+            android:textColorHint="?attr/mpOnSurfaceVariant"
             android:textSize="17sp" />
 
         <ImageButton
@@ -46,7 +46,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/search_clear"
             android:src="@drawable/search_ic_close"
-            android:tint="@color/scr_on_surface_variant"
+            android:tint="?attr/mpOnSurfaceVariant"
             android:visibility="gone" />
     </LinearLayout>
 

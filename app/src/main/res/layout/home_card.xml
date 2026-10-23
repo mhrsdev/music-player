@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="144dp">
 
-        <ImageView
+        <com.mhrsdev.musicplayer.ui.widget.ArtworkView
             android:id="@+id/art"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -28,7 +28,7 @@
             android:contentDescription="@string/nav_play"
             android:elevation="6dp"
             android:src="@drawable/nav_ic_play"
-            android:tint="@color/scr_on_primary"
+            android:tint="?attr/mpOnPrimary"
             android:visibility="gone" />
     </FrameLayout>
 
@@ -41,7 +41,7 @@
         android:maxLines="1"
         android:textAlignment="viewStart"
         android:textDirection="anyRtl"
-        android:textColor="@color/scr_on_surface"
+        android:textColor="?attr/mpOnSurface"
         android:textSize="16sp"
         android:textStyle="bold" />
 
@@ -53,6 +53,6 @@
         android:maxLines="1"
         android:textAlignment="viewStart"
         android:textDirection="anyRtl"
-        android:textColor="@color/scr_on_surface_variant"
+        android:textColor="?attr/mpOnSurfaceVariant"
         android:textSize="14sp" />
 </LinearLayout>

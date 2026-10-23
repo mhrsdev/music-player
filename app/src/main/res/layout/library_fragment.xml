@@ -27,7 +27,7 @@
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
+            <com.mhrsdev.musicplayer.ui.widget.ArtworkView
                 android:id="@+id/liked_art"
                 android:layout_width="120dp"
                 android:layout_height="136dp"
@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/library_liked"
-                    android:textColor="@color/scr_on_surface"
+                    android:textColor="?attr/mpOnSurface"
                     android:textSize="26sp"
                     android:textStyle="bold" />
 
@@ -103,7 +103,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/library_albums"
-                        android:textColor="@color/scr_on_surface"
+                        android:textColor="?attr/mpOnSurface"
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
@@ -114,7 +114,7 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
-                <ImageView
+                <com.mhrsdev.musicplayer.ui.widget.ArtworkView
                     android:id="@+id/hub_albums_peek"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
@@ -126,7 +126,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="@color/scr_on_surface_variant" />
+                    android:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -152,7 +152,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/library_playlists"
-                        android:textColor="@color/scr_on_surface"
+                        android:textColor="?attr/mpOnSurface"
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
@@ -163,7 +163,7 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
-                <ImageView
+                <com.mhrsdev.musicplayer.ui.widget.ArtworkView
                     android:id="@+id/hub_playlists_peek"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
@@ -175,7 +175,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="@color/scr_on_surface_variant" />
+                    android:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -201,7 +201,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/library_artists"
-                        android:textColor="@color/scr_on_surface"
+                        android:textColor="?attr/mpOnSurface"
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
@@ -212,7 +212,7 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
-                <ImageView
+                <com.mhrsdev.musicplayer.ui.widget.ArtworkView
                     android:id="@+id/hub_artists_peek"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
@@ -224,7 +224,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="@color/scr_on_surface_variant" />
+                    android:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -250,7 +250,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/library_history"
-                        android:textColor="@color/scr_on_surface"
+                        android:textColor="?attr/mpOnSurface"
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
@@ -265,7 +265,10 @@
                     android:id="@+id/hub_history_peek"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:importantForAccessibility="no" />
+                    android:importantForAccessibility="no"
+                    android:scaleType="center"
+                    android:src="@drawable/nav_ic_history"
+                    android:tint="?attr/mpOnSurfaceVariant" />
 
                 <ImageView
                     android:layout_width="48dp"
@@ -273,7 +276,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="@color/scr_on_surface_variant" />
+                    android:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
         <TextView

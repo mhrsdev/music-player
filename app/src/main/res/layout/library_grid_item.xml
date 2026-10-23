@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <com.mhrsdev.musicplayer.ui.library.SquareImageView
+    <com.mhrsdev.musicplayer.ui.library.SquareArtworkView
         android:id="@+id/art"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textDirection="anyRtl"
-        android:textColor="@color/scr_on_surface"
+        android:textColor="?attr/mpOnSurface"
         android:textSize="16sp"
         android:textStyle="bold" />
 
@@ -31,6 +31,6 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textDirection="anyRtl"
-        android:textColor="@color/scr_on_surface_variant"
+        android:textColor="?attr/mpOnSurfaceVariant"
         android:textSize="14sp" />
 </LinearLayout>

@@ -23,9 +23,9 @@
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:drawablePadding="6dp"
-        android:drawableTint="@color/scr_on_surface_variant"
+        android:drawableTint="?attr/mpOnSurfaceVariant"
         android:gravity="center"
         android:paddingHorizontal="12dp"
-        android:textColor="@color/scr_on_surface_variant"
+        android:textColor="?attr/mpOnSurfaceVariant"
         android:textSize="15sp" />
 </LinearLayout>

@@ -52,8 +52,6 @@ public final class LibraryFragment extends Fragment {
         b.hubPlaylists.setOnClickListener(v -> Screens.openCollection(this, Collection.PLAYLISTS));
         b.hubArtists.setOnClickListener(v -> Screens.openCollection(this, Collection.ARTISTS));
         b.hubHistory.setOnClickListener(v -> Screens.openTrackList(this, TrackList.HISTORY, null));
-        Art.bind(b.hubHistoryPeek, null, 4, 16, false);
-        b.hubHistoryPeek.setImageResource(R.drawable.nav_ic_history);
 
         vm.getAlbums().observe(getViewLifecycleOwner(), list -> {
             int n = list.size();
@@ -63,12 +61,13 @@ public final class LibraryFragment extends Fragment {
         vm.getPlaylists().observe(getViewLifecycleOwner(), list -> {
             int n = list.size();
             b.hubPlaylistsSub.setText(r.getQuantityString(R.plurals.library_playlists_count, n, n));
-            Art.bind(b.hubPlaylistsPeek, null, n > 0 ? list.get(0).placeholderSeed() : 2, 16, false);
+            Art.bind(b.hubPlaylistsPeek, n > 0 && !list.get(0).artworkUris().isEmpty() ? list.get(0).artworkUris().get(0) : null,
+                    n > 0 ? list.get(0).placeholderSeed() : 2, 16, false);
         });
         vm.getArtists().observe(getViewLifecycleOwner(), list -> {
             int n = list.size();
             b.hubArtistsSub.setText(r.getQuantityString(R.plurals.library_artists_count, n, n));
-            Art.bind(b.hubArtistsPeek, null, n > 0 ? list.get(0).placeholderSeed() : 3, 0, true);
+            if (n > 0) Art.artist(b.hubArtistsPeek, list.get(0).imageUri(), list.get(0).name(), list.get(0).placeholderSeed());
         });
         vm.getHistory().observe(getViewLifecycleOwner(), list -> b.hubHistorySub.setText(list.isEmpty()
                 ? getString(R.string.library_history_empty) : list.get(0).title()));

@@ -14,7 +14,7 @@
         android:id="@+id/state_progress"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:indeterminateTint="@color/scr_primary" />
+        android:indeterminateTint="?attr/mpPrimary" />
 
     <ImageView
         android:id="@+id/state_icon"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:textColor="@color/scr_on_surface"
+        android:textColor="?attr/mpOnSurface"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textColor="@color/scr_on_surface_variant"
+        android:textColor="?attr/mpOnSurfaceVariant"
         android:textSize="15sp" />
 
     <TextView
@@ -52,7 +52,7 @@
         android:focusable="true"
         android:gravity="center"
         android:paddingHorizontal="20dp"
-        android:textColor="@color/scr_primary"
+        android:textColor="?attr/mpPrimary"
         android:textSize="15sp"
         android:textStyle="bold"
         android:visibility="gone" />
