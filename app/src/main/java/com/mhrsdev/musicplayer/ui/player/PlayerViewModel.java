@@ -116,6 +116,11 @@ public final class PlayerViewModel extends ViewModel {
     public LiveData<Boolean> getShowLyrics() { return showLyrics; }
 
     public void togglePlayPause() { player.togglePlayPause(); }
+    /** "Stop": pause and rewind the current song (PlayerController has no stop). */
+    public void stop() {
+        player.pause();
+        player.seekTo(0L);
+    }
     public void next() { player.next(); }
     public void previous() { player.previous(); }
     public void seekTo(long positionMs) { player.seekTo(Math.max(0L, positionMs)); }
