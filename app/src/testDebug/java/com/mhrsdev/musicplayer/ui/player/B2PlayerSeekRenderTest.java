@@ -83,6 +83,9 @@ public class B2PlayerSeekRenderTest {
     public void pickerSheetFa() throws Exception { picker("fa-dark"); }
 
     private void picker(String tag) throws Exception {
+        // Robolectric runs vsync back to back, so a playing preview would tick forever inside idle(): render the
+        // still frame (animator scale 0 = the same path as reduce motion / battery saver).
+        animatorScale(0f);
         FragmentActivity a = host(SeekBarStyle.PULSE_DOTS);
         player(a);
         SeekStylePickerSheet sheet = new SeekStylePickerSheet();
@@ -108,6 +111,41 @@ public class B2PlayerSeekRenderTest {
         idle();
         assertEquals(SeekBarStyle.BEADS,
                 ((MusicPlayerApp) a.getApplication()).getContainer().settings().seekBarStyle().getValue());
+    }
+
+    /** Frames flow only while playing, attached/visible and motion allowed; they stop the moment one is false. */
+    @Test @Config(sdk = 35, qualifiers = "w360dp-h800dp-night-xhdpi")
+    public void framesOnlyWhilePlayingAndMotionAllowed() throws Exception {
+        animatorScale(1f);
+        FragmentActivity a = Robolectric.buildActivity(WidgetGalleryActivity.class).setup().get();
+        com.mhrsdev.musicplayer.ui.widget.FrameSeekView[] views = {
+                new LiquidSeekView(a), new com.mhrsdev.musicplayer.ui.widget.PulseDotsSeekView(a)};
+        for (com.mhrsdev.musicplayer.ui.widget.FrameSeekView v : views) {
+            ((ViewGroup) content(a)).addView(v, new ViewGroup.LayoutParams(720, 112));
+            v.setDuration(200_000);
+            assertTrue(!v.isAnimating());
+            v.setPlaying(true);
+            assertTrue("animates while playing + visible", v.isAnimating());
+            v.setVisibility(View.GONE);
+            assertTrue("stops when hidden", !v.isAnimating());
+            v.setVisibility(View.VISIBLE);
+            assertTrue(v.isAnimating());
+            v.setPlaying(false);
+            assertTrue("static when paused", !v.isAnimating());
+            animatorScale(0f);
+            v.setPlaying(true);
+            assertTrue("animator scale 0: fully static", !v.isAnimating());
+            v.setPlaying(false);
+            animatorScale(1f);
+            v.setPlaying(true);
+            ((ViewGroup) content(a)).removeView(v);
+            assertTrue("stops when detached", !v.isAnimating());
+        }
+    }
+
+    private static void animatorScale(float s) {
+        android.provider.Settings.Global.putFloat(org.robolectric.RuntimeEnvironment.getApplication().getContentResolver(),
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, s);
     }
 
     private static FragmentActivity host(SeekBarStyle style) throws Exception {

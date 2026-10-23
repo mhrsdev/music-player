@@ -80,7 +80,7 @@ public class SeekStylePickerSheet extends BottomSheetDialogFragment {
         root.addView(handle, hl);
 
         TextView title = text(c, R.string.settings_seek_style, 22, R.attr.mpOnSurface, true);
-        title.setAccessibilityHeading(true);
+        androidx.core.view.ViewCompat.setAccessibilityHeading(title, true);
         title.setPadding(dp(c, 8), dp(c, 16), dp(c, 8), dp(c, 2));
         root.addView(title);
         TextView sub = text(c, R.string.seek_style_sheet_sub, 14, R.attr.mpOnSurfaceVariant, false);

@@ -90,7 +90,7 @@ public class LiquidSeekView extends FrameSeekView {
         float loud = SeekShapes.loudnessAt(waveform, SeekMath.fraction(position, duration));
         // paused: the last ripple stays frozen (still reads as liquid, costs nothing)
         float ripple = (moving ? 0.8f + 1.8f * loud : 0.7f) * density;
-        float bulge = 6f * density;
+        float bulge = 7f * density;
         liquid.rewind();
         meniscus.rewind();
         liquid.moveTo(left - r, cy - r);
@@ -124,9 +124,12 @@ public class LiquidSeekView extends FrameSeekView {
         canvas.restoreToCount(s);
     }
 
-    /** A pearl drop riding the meniscus: 12 dp, 18 dp while dragging, ringed in the accent so it reads in both themes. */
+    /**
+     * A pearl drop at the tip of the meniscus: 10 dp (16 dp while dragging), small enough that the curved liquid
+     * edge stays visible above and below it; ringed in the accent so it reads in both themes.
+     */
     @Override protected void drawThumb(Canvas canvas, float thumbX, float cy, float grow) {
-        float rr = (6f + 3f * grow) * density;
+        float rr = (5f + 3f * grow) * density;
         float x = Math.max(trackLeft() + rr, thumbX);
         canvas.drawCircle(x, cy, rr, cap);
         canvas.drawCircle(x, cy, rr - ring.getStrokeWidth() / 2f, ring);
