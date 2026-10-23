@@ -378,3 +378,20 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 2. **Dependencies:** the version-catalog lines `activity 1.13.0, fragment 1.9.1, lifecycle 2.11.0, recyclerview 1.4.0, constraintlayout 2.2.2` — "when you add AppCompat you don't need to add (these)": drop redundant direct declarations that AppCompat/Material already bring transitively (verify with `:app:dependencies` that no version regresses and the build stays green).
 3. **Code rule: do NOT use the `final` modifier on classes** (remove existing `final class`; records/enums stay as they are; `static final` constants and `final` fields where semantically needed are fine). (Interpretation of "Final Class Dont Using Final mod".)
 4. **Use Java 17** (source/target 17; use its idioms where they simplify: records, `instanceof` pattern matching, switch expressions, text blocks for SQL, `var` sparingly; no APIs above minSdk without desugaring).
+
+---
+
+## D22 — 2026-10-23 — Pause button = option B; backgrounds follow song/content; generated covers; fullscreen; friend's phone dock bug
+
+**Original (verbatim, several short messages):**
+
+> اره ولی دکمه شروع همین دکمه فعلی خوبه ولی استپ همون نمونه که گفتی بکنش
+> و اینکه پس زمینه با اهنگ و محتوا تغییر کنه
+> تو اپدیت بعدی واسه اهنگایی که جلد ندارن برنامه خودش یدونه بسازه
+> (earlier: "تو اپدیت بعدی یادت باشه برنامه فول اسکرین بشه کامل"; "باگ تو بعضی گوشیا — مال من اکیه مال دوستم نه" + screenshot: dock touching the bottom edge, black strip)
+
+**Summary:**
+1. **Play button stays as is; PAUSE = M1's option B** (squircle ↔ circle with centred bars); no cookie/scalloped outline.
+2. **Backgrounds must change with the song and the content** (player/lyrics, Home glow from focused hero/current track, album/artist/playlist headers from their covers) via a reusable `AmbientBackdropView` (FULL animated only in player; SOFT static elsewhere). → L1 engine, H1, U2.
+3. **Songs without a cover get an app-generated one** (deterministic generative art, album-shared, Persian-capable, cached, used in UI + notification/widget) → agent G1.
+4. **Fully full-screen (edge-to-edge, cutouts, optional immersive player)** and the **dock/bottom-inset bug on the friend's phone** → U1 (task/u1b-fullscreen).
