@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="queue_more">گزینه‌های صف</string>
+    <string name="queue_jump_current">رفتن به آهنگ فعلی</string>
+    <string name="queue_save_playlist">ذخیرهٔ صف به‌عنوان فهرست پخش</string>
+    <string name="queue_save_playlist_default">صف من</string>
+    <string name="queue_save">ذخیره</string>
+    <string name="queue_cancel">لغو</string>
+    <string name="queue_saved">در %1$s ذخیره شد</string>
+    <string name="queue_save_failed">فهرست پخش ذخیره نشد</string>
+    <string name="queue_clear">پاک کردن آهنگ‌های بعدی</string>
+    <string name="queue_cleared">آهنگ‌های بعدی پاک شد</string>
+    <string name="queue_dedupe">حذف تکراری‌ها</string>
+    <string name="queue_deduped">%1$s آهنگ تکراری حذف شد</string>
+    <string name="queue_no_duplicates">آهنگ تکراری‌ای در صف نیست</string>
+    <string name="queue_playing_from_h">در حال پخش از %1$s · %2$s ساعت و %3$s دقیقه مانده</string>
+    <string name="queue_left_h">%1$s ساعت و %2$s دقیقه مانده</string>
+    <string name="queue_now_playing_cd">%1$s، در حال پخش. برای برگشت به پخش‌کننده دو بار بزنید</string>
+
+    <string name="sleep_status_off">پخش ادامه دارد</string>
+    <string name="sleep_status_min">توقف تا %1$s دقیقهٔ دیگر</string>
+    <string name="sleep_status_end">با پایان این آهنگ متوقف می‌شود</string>
+    <string name="sleep_custom">دلخواه</string>
+    <string name="sleep_less">۵ دقیقه کمتر</string>
+    <string name="sleep_more">۵ دقیقه بیشتر</string>
+    <string name="sleep_start">شروع</string>
+    <string name="sleep_turn_off">خاموش کردن</string>
+
+    <string name="player_share">اشتراک‌گذاری</string>
+    <string name="player_share_chooser">اشتراک‌گذاری آهنگ</string>
+    <string name="player_sound">صدا</string>
+    <string name="player_stop">توقف</string>
+    <string name="player_stopped">متوقف شد</string>
+    <string name="player_up_next">بعدی · %1$s</string>
+    <string name="player_up_next_cd">آهنگ بعدی: %1$s. صف را باز می‌کند</string>
+    <string name="player_back_10">۱۰ ثانیه عقب</string>
+    <string name="player_forward_10">۱۰ ثانیه جلو</string>
+    <string name="player_hint_back_10">۱۰ ثانیه عقب</string>
+    <string name="player_hint_forward_10">۱۰ ثانیه جلو</string>
+    <string name="player_now_playing_cd">در حال پخش %1$s از %2$s</string>
+
+    <string name="lyrics_smaller">متن کوچک‌تر</string>
+    <string name="lyrics_larger">متن بزرگ‌تر</string>
+    <string name="lyrics_earlier">متن نیم ثانیه زودتر</string>
+    <string name="lyrics_later">متن نیم ثانیه دیرتر</string>
+    <string name="lyrics_offset_value">%1$s ثانیه</string>
+    <string name="lyrics_offset_cd">زمان‌بندی متن %1$s ثانیه. برای بازنشانی دو بار بزنید</string>
+    <string name="lyrics_copied">خط کپی شد</string>
+</resources>

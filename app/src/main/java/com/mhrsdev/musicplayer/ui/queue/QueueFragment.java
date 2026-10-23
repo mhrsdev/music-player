@@ -61,13 +61,14 @@ public final class QueueFragment extends BottomSheetDialogFragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         AppContainer c = ((MusicPlayerApp) requireActivity().getApplication()).getContainer();
-        vm = new ViewModelProvider(this, QueueViewModel.factory(c.player)).get(QueueViewModel.class);
+        vm = new ViewModelProvider(this, QueueViewModel.factory(c.player, c.library)).get(QueueViewModel.class);
 
         adapter = new QueueAdapter(new QueueAdapter.Actions() {
             @Override public void onPlay(int pos) { vm.play(pos); }
             @Override public void onStartDrag(RecyclerView.ViewHolder h) { touchHelper.startDrag(h); }
             @Override public void onMoveA11y(int from, int to) { vm.move(from, to); }
             @Override public void onRemove(int pos) { removeWithUndo(pos); }
+            @Override public void onCurrent() { dismissAllowingStateLoss(); }
         });
         b.queueList.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.queueList.setAdapter(adapter);
@@ -78,7 +79,8 @@ public final class QueueFragment extends BottomSheetDialogFragment {
             vm.shuffle();
             snackbar(getString(R.string.queue_shuffled), vm::undoShuffle);
         });
-        b.queueSleep.setOnClickListener(v -> showSleepTimerPicker());
+        b.queueSleep.setOnClickListener(v -> SleepTimerSheet.show(getParentFragmentManager()));
+        b.queueMore.setOnClickListener(this::showMenu);
 
         vm.getUi().observe(getViewLifecycleOwner(), this::render);
     }
@@ -89,9 +91,12 @@ public final class QueueFragment extends BottomSheetDialogFragment {
         NumberFormat nf = NumberFormat.getIntegerInstance(loc);
         adapter.submit(ui.current(), ui.upNext());
         b.queueEmpty.setVisibility(ui.current() == null ? View.VISIBLE : View.GONE);
-        String left = nf.format(ui.minutesLeft());
+        int mins = ui.minutesLeft();
+        String left = nf.format(mins), hh = nf.format(mins / 60), mm = nf.format(mins % 60);
+        boolean hours = mins >= 60;
         b.queuePlayingFrom.setText(ui.playingFrom() == null
-                ? getString(R.string.queue_min_left, left)
+                ? (hours ? getString(R.string.queue_left_h, hh, mm) : getString(R.string.queue_min_left, left))
+                : hours ? getString(R.string.queue_playing_from_h, ui.playingFrom(), hh, mm)
                 : getString(R.string.queue_playing_from, ui.playingFrom(), left));
         switch (ui.sleepKind()) {
             case COUNTDOWN:
@@ -110,38 +115,66 @@ public final class QueueFragment extends BottomSheetDialogFragment {
         }
     }
 
-    private void showSleepTimerPicker() {
-        Locale loc = getResources().getConfiguration().getLocales().get(0);
-        NumberFormat nf = NumberFormat.getIntegerInstance(loc);
-        int[] presets = QueueViewModel.SLEEP_PRESETS_MIN;
-        CharSequence[] items = new CharSequence[presets.length + 2];
-        for (int i = 0; i < presets.length; i++) items[i] = getString(R.string.queue_sleep_preset, nf.format(presets[i]));
-        items[presets.length] = getString(R.string.queue_sleep_end_of_track);
-        items[presets.length + 1] = getString(R.string.queue_sleep_off);
-        // The Settings "default" is pre-marked; a tap still applies immediately.
-        int preselected = presets.length; // 0 minutes = end of track
-        int defaultMinutes = ((MusicPlayerApp) requireActivity().getApplication()).getContainer().settings().sleepTimerMinutes().getValue();
-        for (int i = 0; i < presets.length; i++) if (presets[i] == defaultMinutes) preselected = i;
+    private void showMenu(View anchor) {
+        android.widget.PopupMenu menu = new android.widget.PopupMenu(requireContext(), anchor);
+        boolean hasNext = adapter.upNextCount() > 0;
+        menu.getMenu().add(0, 1, 0, R.string.queue_jump_current);
+        menu.getMenu().add(0, 2, 1, R.string.queue_save_playlist).setEnabled(adapter.getItemCount() > 0);
+        menu.getMenu().add(0, 3, 2, R.string.queue_dedupe).setEnabled(hasNext);
+        menu.getMenu().add(0, 4, 3, R.string.queue_clear).setEnabled(hasNext);
+        menu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 1: b.queueList.smoothScrollToPosition(0); break;
+                case 2: askPlaylistName(); break;
+                case 3: {
+                    java.util.List<QueueViewModel.Removed> r = vm.removeDuplicates();
+                    if (r.isEmpty()) snackbar(getString(R.string.queue_no_duplicates), null);
+                    else snackbar(getString(R.string.queue_deduped,
+                            NumberFormat.getIntegerInstance(locale()).format(r.size())), () -> vm.undoRemoveAll(r));
+                    break;
+                }
+                default: {
+                    java.util.List<QueueViewModel.Removed> r = vm.clearUpNext();
+                    if (!r.isEmpty()) snackbar(getString(R.string.queue_cleared), () -> vm.undoRemoveAll(r));
+                }
+            }
+            return true;
+        });
+        menu.show();
+    }
+
+    private void askPlaylistName() {
+        android.widget.EditText name = new android.widget.EditText(requireContext());
+        name.setSingleLine(true);
+        name.setText(R.string.queue_save_playlist_default);
+        name.selectAll();
+        name.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
+        android.widget.FrameLayout box = new android.widget.FrameLayout(requireContext());
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        box.setPadding(pad, pad / 2, pad, 0);
+        box.addView(name);
+        android.content.Context app = requireContext().getApplicationContext();
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.player_sleep_timer)
-                .setSingleChoiceItems(items, preselected, (d, which) -> {
-                    if (which < presets.length) vm.setSleepTimer(presets[which]);
-                    else if (which == presets.length) vm.setSleepTimerEndOfTrack();
-                    else vm.cancelSleepTimer();
-                    d.dismiss();
-                })
+                .setTitle(R.string.queue_save_playlist)
+                .setView(box)
+                .setNegativeButton(R.string.queue_cancel, null)
+                .setPositiveButton(R.string.queue_save, (d, w) -> vm.saveAsPlaylist(name.getText().toString(), p ->
+                        android.widget.Toast.makeText(app, p == null ? app.getString(R.string.queue_save_failed)
+                                : app.getString(R.string.queue_saved, p.name()), android.widget.Toast.LENGTH_SHORT).show()))
                 .show();
     }
+
+    private Locale locale() { return getResources().getConfiguration().getLocales().get(0); }
 
     private void removeWithUndo(int upNextPos) {
         QueueViewModel.Removed r = vm.remove(upNextPos);
         if (r != null) snackbar(getString(R.string.queue_removed, r.track().title()), () -> vm.undoRemove(r));
     }
 
-    private void snackbar(String text, Runnable undo) {
-        Snackbar.make(b.queueRoot, text, Snackbar.LENGTH_LONG)
-                .setAction(R.string.queue_undo, v -> undo.run())
-                .show();
+    private void snackbar(String text, @Nullable Runnable undo) {
+        Snackbar s = Snackbar.make(b.queueRoot, text, Snackbar.LENGTH_LONG);
+        if (undo != null) s.setAction(R.string.queue_undo, v -> undo.run());
+        s.show();
     }
 
     private final class TouchCallback extends ItemTouchHelper.Callback {
