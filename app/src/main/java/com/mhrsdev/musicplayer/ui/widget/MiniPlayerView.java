@@ -238,6 +238,7 @@ public class MiniPlayerView extends LinearLayout {
         }
     }
 
+    @android.annotation.SuppressLint("ClickableViewAccessibility") // taps reach performClick via onSingleTapUp
     @Override public boolean onTouchEvent(MotionEvent e) {
         return gestures.onTouchEvent(e) || super.onTouchEvent(e);
     }
