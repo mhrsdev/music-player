@@ -13,3 +13,11 @@ for (const o of ctx.ALL) {
   writeFileSync(resolve(here, '../options', `${o.id}-mono.svg`), x(ctx.optMark(o, 512, '#0F1216')));
 }
 console.log('exported', ctx.ALL.length);
+
+// Final mark (RECOMMENDED) -> docs/brand/logo.svg, src/mark.svg (gradient), src/mark-mono.svg (currentColor).
+const ctx2 = {}; vm.createContext(ctx2);
+vm.runInContext(readFileSync(resolve(here, 'options.js'), 'utf8') + ';' + readFileSync(resolve(here, 'brand.js'), 'utf8') + ';this.icon = icon; this.mark = mark;', ctx2);
+writeFileSync(resolve(here, '../logo.svg'), x(ctx2.icon(512, 'rounded')));
+writeFileSync(resolve(here, 'mark.svg'), x(ctx2.mark(490, 'grad')));
+writeFileSync(resolve(here, 'mark-mono.svg'), x(ctx2.mark(490, 'currentColor').replace('<svg ', '<svg color="#0F1216" ')));
+console.log('exported final mark');

@@ -136,7 +136,7 @@ const MASKS = {
 function optIcon(opt, px, mask = 'circle', o = {}) {
   const id = 'o' + (++_oid);
   const themed = o.themed; // {bg, fg}
-  const defs = `<defs><clipPath id="${id}c">${MASKS[mask]}</clipPath>
+  const defs = `<defs><clipPath id="${id}c">${MASKS[mask] || ''}</clipPath>
     <linearGradient id="${id}b" gradientUnits="userSpaceOnUse" x1="22" y1="18" x2="86" y2="90"><stop offset="0" stop-color="#1D4A80"/><stop offset="0.55" stop-color="#1B6787"/><stop offset="1" stop-color="#0E8C84"/></linearGradient>
     <radialGradient id="${id}g" gradientUnits="userSpaceOnUse" cx="40" cy="30" r="52"><stop offset="0" stop-color="#9EF2E7" stop-opacity="0.38"/><stop offset="1" stop-color="#9EF2E7" stop-opacity="0"/></radialGradient>
     <linearGradient id="${id}f" gradientUnits="userSpaceOnUse" x1="0" y1="26" x2="0" y2="80"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CDEFEA"/></linearGradient></defs>`;
@@ -145,11 +145,18 @@ function optIcon(opt, px, mask = 'circle', o = {}) {
     : `<rect width="108" height="108" fill="url(#${id}b)"/><rect width="108" height="108" fill="url(#${id}g)"/>
        <g transform="translate(0 1.8)" opacity="0.28">${markSVG(opt, { color: '#05182C' })}</g>
        ${markSVG(opt, { color: `url(#${id}f)`, accent: '#9EF2E7' })}`;
-  return `<svg viewBox="18 18 72 72" width="${px}" height="${px}">${defs}<g clip-path="url(#${id}c)">${body}</g></svg>`;
+  const full = mask === 'none';
+  const guides = o.guides ? '<rect x="18" y="18" width="72" height="72" fill="none" stroke="#FF4FD8" stroke-width="0.4"/><circle cx="54" cy="54" r="33" fill="none" stroke="#FF4FD8" stroke-width="0.4" stroke-dasharray="1.5 1.5"/>' : '';
+  return `<svg viewBox="${full ? '0 0 108 108' : '18 18 72 72'}" width="${px}" height="${px}">${defs}<g${full ? '' : ` clip-path="url(#${id}c)"`}>${body}</g>${guides}</svg>`;
 }
 // Mark alone (status bar / one colour): crop to the content box.
 function optMark(opt, px, color) {
   return `<svg viewBox="22 22 64 64" width="${px}" height="${px}">${markSVG(opt, { color })}</svg>`;
 }
-for (const o of FAMILY) o.scale = 0.92;
+for (const o of FAMILY) o.scale = 0.84; // keeps every corner inside the 66dp safe circle
 const RECOMMENDED = 'M2';
+
+// Status-bar icon (res/drawable/ic_stat_playback.xml): 24-unit box, mark fitted 22 wide.
+function statIcon(opt, px, color) {
+  return `<svg viewBox="0 0 24 24" width="${px}" height="${px}"><g transform="translate(-7.93 -8.47) scale(0.3722)">${markSVG(Object.assign({}, opt, { scale: 1 }), { color })}</g></svg>`;
+}
