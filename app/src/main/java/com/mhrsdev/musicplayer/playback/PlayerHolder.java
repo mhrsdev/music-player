@@ -1,6 +1,7 @@
 package com.mhrsdev.musicplayer.playback;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import androidx.annotation.OptIn;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
@@ -13,6 +14,7 @@ import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer;
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.extractor.DefaultExtractorsFactory;
+import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 
 /**
  * The one ExoPlayer of the process, shared by {@link ExoPlayerController} (UI side) and {@link PlaybackService}
@@ -21,9 +23,11 @@ import androidx.media3.extractor.DefaultExtractorsFactory;
  * kept for the life of the process; the service only releases codecs with {@code stop()} when idle.
  */
 @OptIn(markerClass = UnstableApi.class)
-final class PlayerHolder {
+class PlayerHolder {
     private static ExoPlayer player;
     private static PlaybackStore store;
+    /** SharedPreferences keeps listeners weakly: this strong reference is what keeps the setting live. */
+    private static SharedPreferences.OnSharedPreferenceChangeListener noisyListener;
 
     private PlayerHolder() {}
 
@@ -48,14 +52,28 @@ final class PlayerHolder {
                             .setUsage(C.USAGE_MEDIA)
                             .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
                             .build(), /* handleAudioFocus= */ true)
-                    .setHandleAudioBecomingNoisy(true)
+                    .setHandleAudioBecomingNoisy(SettingsStore.readHeadset(app).pauseOnDisconnect())
                     .setWakeMode(C.WAKE_MODE_LOCAL) // CPU wake lock only while actually playing local files
                     .build();
             store = new PlaybackStore(app);
             store.restoreAndAttach(p);
             player = p;
+            noisyListener = (prefs, key) -> p.setHandleAudioBecomingNoisy(SettingsStore.readHeadset(app).pauseOnDisconnect());
+            app.getSharedPreferences("settings", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(noisyListener);
         }
         return player;
+    }
+
+    /** True when a media button has something to resume: the live queue, or the saved one in a fresh process. */
+    static synchronized boolean hasQueue(Context context) {
+        return player != null ? player.getMediaItemCount() > 0 : PlaybackStore.hasSavedQueue(context.getApplicationContext());
+    }
+
+    /** Tests only: releases the player so the next {@link #get} builds a fresh one from the saved state. */
+    static synchronized void resetForTest() {
+        if (player != null) player.release();
+        player = null;
+        store = null;
     }
 
     static synchronized PlaybackStore store(Context context) {

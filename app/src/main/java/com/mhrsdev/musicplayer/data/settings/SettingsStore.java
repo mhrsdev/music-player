@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Looper;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import com.mhrsdev.musicplayer.domain.model.HeadsetAction;
+import com.mhrsdev.musicplayer.domain.model.HeadsetConfig;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +18,7 @@ import java.util.Set;
  * updates when its setter is called; setters may be called from any thread and persist asynchronously ({@code apply}).
  * Values are loaded once in the constructor, so reading {@code getValue()} from a background thread is fine.
  */
-public final class SettingsStore {
+public class SettingsStore {
     public static final int DEFAULT_SLEEP_TIMER_MINUTES = 30;
 
     private static final String PREFS = "settings";
@@ -32,6 +34,9 @@ public final class SettingsStore {
     private static final String K_EXCLUDE = "folders_exclude";
     private static final String K_MIN_TRACK_SECONDS = "min_track_seconds";
     private static final String K_REDUCE_MOTION = "reduce_motion";
+    private static final String K_HS_SINGLE = "headset_single", K_HS_DOUBLE = "headset_double",
+            K_HS_TRIPLE = "headset_triple", K_HS_LONG = "headset_long", K_HS_CONNECT = "headset_resume_on_connect",
+            K_HS_DISCONNECT = "headset_pause_on_disconnect", K_HS_CALL = "headset_resume_after_call";
     /** Files shorter than this are skipped by the scanner (ringtones, notification sounds, voice notes). */
     public static final int DEFAULT_MIN_TRACK_SECONDS = 30;
 
@@ -54,6 +59,7 @@ public final class SettingsStore {
     private final MutableLiveData<Set<String>> excludedFolders;
     private final MutableLiveData<Integer> minTrackSeconds;
     private final MutableLiveData<Boolean> reduceMotion;
+    private final MutableLiveData<HeadsetConfig> headset;
 
     public SettingsStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -69,6 +75,42 @@ public final class SettingsStore {
         excludedFolders = new MutableLiveData<>(readSet(K_EXCLUDE));
         minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_TRACK_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
         reduceMotion = new MutableLiveData<>(prefs.getBoolean(K_REDUCE_MOTION, false));
+        headset = new MutableLiveData<>(readHeadset(prefs));
+    }
+
+    /** Headset / Bluetooth button behaviour and connect / disconnect / call handling. */
+    public LiveData<HeadsetConfig> headset() {
+        return headset;
+    }
+
+    public void setHeadset(HeadsetConfig value) {
+        prefs.edit().putString(K_HS_SINGLE, value.single().name()).putString(K_HS_DOUBLE, value.doublePress().name())
+                .putString(K_HS_TRIPLE, value.triple().name()).putString(K_HS_LONG, value.longPress().name())
+                .putBoolean(K_HS_CONNECT, value.resumeOnConnect()).putBoolean(K_HS_DISCONNECT, value.pauseOnDisconnect())
+                .putBoolean(K_HS_CALL, value.resumeAfterCall()).apply();
+        publish(headset, value);
+    }
+
+    /** Fresh read for the playback service, which must not see a stale snapshot of what the UI just changed. */
+    public static HeadsetConfig readHeadset(Context context) {
+        return readHeadset(context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE));
+    }
+
+    private static HeadsetConfig readHeadset(SharedPreferences p) {
+        HeadsetConfig d = HeadsetConfig.DEFAULT;
+        return new HeadsetConfig(action(p, K_HS_SINGLE, d.single()), action(p, K_HS_DOUBLE, d.doublePress()),
+                action(p, K_HS_TRIPLE, d.triple()), action(p, K_HS_LONG, d.longPress()),
+                p.getBoolean(K_HS_CONNECT, d.resumeOnConnect()), p.getBoolean(K_HS_DISCONNECT, d.pauseOnDisconnect()),
+                p.getBoolean(K_HS_CALL, d.resumeAfterCall()));
+    }
+
+    private static HeadsetAction action(SharedPreferences p, String key, HeadsetAction fallback) {
+        try {
+            String stored = p.getString(key, null);
+            return stored == null ? fallback : HeadsetAction.valueOf(stored);
+        } catch (IllegalArgumentException | ClassCastException removedValueOrOldType) {
+            return fallback;
+        }
     }
 
     public LiveData<ThemeMode> theme() {

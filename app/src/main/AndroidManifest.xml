@@ -74,7 +74,7 @@
 
         <!-- Headset / Bluetooth media buttons, also when the app process is not running. -->
         <receiver
-            android:name="androidx.media3.session.MediaButtonReceiver"
+            android:name=".playback.MediaButtonRestartReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
