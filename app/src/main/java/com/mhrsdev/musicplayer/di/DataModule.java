@@ -23,12 +23,12 @@ public final class DataModule {
     /** Also the entry point for {@code rescan}, {@code scanIfStale} and the extra playlist edits. */
     public final SqliteLibraryRepository library;
     public final LocalHomeFeedSource homeFeed;
-    /** Cache storage for the waveform task's extractor (blocking calls, background thread). */
+    /** Persistent waveform cache, ready to hand to {@code WaveformModule} (blocking calls, background thread). */
     public final SqliteWaveformStore waveformStore;
 
-    private DataModule(Context context, Executor io) {
+    private DataModule(Context context, Executor io, SettingsStore settings) {
         dbHelper = new DbHelper(context);
-        settings = new SettingsStore(context);
+        this.settings = settings;
         scanner = new MediaStoreScanner(context, dbHelper, settings);
         ChangeNotifier notifier = new ChangeNotifier();
         library = new SqliteLibraryRepository(dbHelper, io, notifier, scanner);
@@ -36,8 +36,9 @@ public final class DataModule {
         waveformStore = new SqliteWaveformStore(dbHelper);
     }
 
-    public static DataModule create(Context context, Executor io) {
-        return new DataModule(context, io);
+    /** @param settings shared with the rest of the app (the scanner reads the folder filters from it) */
+    public static DataModule create(Context context, Executor io, SettingsStore settings) {
+        return new DataModule(context, io, settings);
     }
 
     /** Lyrics cache for the lyrics task. Opens the database: call from a background thread. */

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * Real {@link PlayerController} on top of the process-wide ExoPlayer ({@link PlayerHolder}). Main thread only.
@@ -51,14 +52,22 @@ public final class ExoPlayerController implements PlayerController {
     private final Runnable sleepTask = this::onSleepWake;
     private final Runnable playCountTask = this::onPlayCountWake;
     @Nullable private final PlayCountListener playCountListener;
+    @Nullable private final Consumer<Track> nextTrackListener;
+    @Nullable private String notifiedNextId;
 
     private List<Track> queue = Collections.emptyList();
     private int consecutiveErrors;
 
-    /** @param playCountListener told once per real listen of a track (wire to {@code LibraryRepository.recordPlay}) */
-    public ExoPlayerController(Context context, @Nullable PlayCountListener playCountListener) {
+    /**
+     * @param playCountListener told once per real listen of a track (wire to {@code LibraryRepository.recordPlay})
+     * @param nextTrackListener told, while playing, whenever the track queued next changes (e.g. to prefetch its
+     *                          waveform); event-driven, adds no timers or observers
+     */
+    public ExoPlayerController(Context context, @Nullable PlayCountListener playCountListener,
+            @Nullable Consumer<Track> nextTrackListener) {
         this.appContext = context.getApplicationContext();
         this.playCountListener = playCountListener;
+        this.nextTrackListener = nextTrackListener;
         player = PlayerHolder.get(appContext);
         store = PlayerHolder.store(appContext);
         queue = readQueue();
@@ -344,6 +353,16 @@ public final class ExoPlayerController implements PlayerController {
                 queue.isEmpty() ? null : store.playingFrom(), shuffler.canUndo());
     }
 
+    /** Only while playing (nothing is prefetched for a paused player) and only when the next track changed. */
+    private void notifyNextTrack() {
+        if (nextTrackListener == null || !player.isPlaying()) return;
+        int index = player.getNextMediaItemIndex();
+        Track next = index >= 0 && index < queue.size() ? queue.get(index) : null;
+        if (next == null || next.id().equals(notifiedNextId)) return;
+        notifiedNextId = next.id();
+        nextTrackListener.accept(next);
+    }
+
     private RepeatMode repeatMode() {
         switch (player.getRepeatMode()) {
             case Player.REPEAT_MODE_ALL: return RepeatMode.ALL;
@@ -404,6 +423,7 @@ public final class ExoPlayerController implements PlayerController {
 
         @Override public void onEvents(Player p, Player.Events events) {
             publish();
+            notifyNextTrack();
         }
     }
 }
