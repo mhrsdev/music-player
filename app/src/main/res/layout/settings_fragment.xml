@@ -29,8 +29,12 @@
             </HorizontalScrollView>
         </LinearLayout>
         <LinearLayout style="@style/Settings.Card">
+            <androidx.appcompat.widget.SwitchCompat android:id="@+id/dynamic_color" style="@style/Settings.CardSwitch" android:visibility="gone" />
+            <TextView android:id="@+id/dynamic_color_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:visibility="gone" android:text="@string/settings_dynamic_color_sub" />
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/artwork_colors" style="@style/Settings.CardSwitch" android:text="@string/settings_artwork_colors" />
             <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_artwork_colors_sub" />
+            <androidx.appcompat.widget.SwitchCompat android:id="@+id/reduce_motion" style="@style/Settings.CardSwitch" android:text="@string/settings_reduce_motion" />
+            <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_reduce_motion_sub" />
         </LinearLayout>
 
         <!-- Language -->
@@ -54,10 +58,18 @@
             <LinearLayout android:id="@+id/folders_list" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="8dp" />
             <LinearLayout android:id="@+id/folders_actions" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
         </LinearLayout>
+        <LinearLayout style="@style/Settings.Card">
+            <TextView style="@style/Settings.CardTitle" android:text="@string/settings_min_length" />
+            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                <LinearLayout android:id="@+id/min_length_row" style="@style/Settings.ChipStrip" android:paddingBottom="4dp" />
+            </HorizontalScrollView>
+            <TextView style="@style/Settings.CardSub" android:text="@string/settings_min_length_sub" />
+        </LinearLayout>
         <LinearLayout android:id="@+id/rescan_card" style="@style/Settings.Card" />
 
-        <!-- Player & lyrics -->
-        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_player_lyrics" />
+        <!-- Playback -->
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_playback" />
+        <LinearLayout android:id="@+id/sound_card" style="@style/Settings.Card" />
         <LinearLayout style="@style/Settings.Card">
             <TextView style="@style/Settings.CardTitle" android:text="@string/settings_seek_style" />
             <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
@@ -67,28 +79,55 @@
                     <TextView android:id="@+id/seek_bars" style="@style/Search.Chip" android:text="@string/settings_seek_bars" />
                 </LinearLayout>
             </HorizontalScrollView>
-        </LinearLayout>
-        <LinearLayout style="@style/Settings.Card">
-            <androidx.appcompat.widget.SwitchCompat android:id="@+id/online_lyrics" style="@style/Settings.CardSwitch" android:text="@string/settings_lyrics_online" />
-            <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_lyrics_online_sub" />
-        </LinearLayout>
-        <LinearLayout style="@style/Settings.Card">
             <TextView style="@style/Settings.CardTitle" android:text="@string/settings_sleep_default" />
             <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
                 <LinearLayout android:id="@+id/sleep_row" style="@style/Settings.ChipStrip" />
             </HorizontalScrollView>
         </LinearLayout>
+
+        <!-- Lyrics -->
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_lyrics" />
         <LinearLayout style="@style/Settings.Card">
-            <androidx.appcompat.widget.SwitchCompat android:id="@+id/battery_saver" style="@style/Settings.CardSwitch" android:text="@string/settings_battery_saver" />
-            <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_battery_saver_sub" />
+            <androidx.appcompat.widget.SwitchCompat android:id="@+id/online_lyrics" style="@style/Settings.CardSwitch" android:text="@string/settings_lyrics_online" />
+            <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_lyrics_online_sub" />
         </LinearLayout>
 
+        <!-- Notifications -->
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_notifications" />
+        <LinearLayout android:id="@+id/notif_card" style="@style/Settings.Card" />
+
+        <!-- Battery -->
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_battery" />
+        <LinearLayout style="@style/Settings.Card">
+            <TextView style="@style/Settings.CardTitle" android:text="@string/settings_battery_saver" />
+            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                <LinearLayout style="@style/Settings.ChipStrip" android:paddingBottom="4dp">
+                    <TextView android:id="@+id/battery_auto" style="@style/Search.Chip" android:text="@string/settings_battery_auto" />
+                    <TextView android:id="@+id/battery_on" style="@style/Search.Chip" android:text="@string/settings_battery_on" />
+                    <TextView android:id="@+id/battery_off" style="@style/Search.Chip" android:text="@string/settings_battery_off" />
+                </LinearLayout>
+            </HorizontalScrollView>
+            <TextView android:id="@+id/battery_sub" style="@style/Settings.CardSub" />
+        </LinearLayout>
+
+        <!-- Storage -->
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_storage" />
+        <LinearLayout android:id="@+id/storage_card" style="@style/Settings.Card" />
+
         <!-- Feature screens from other packages (FeatureScreens registry); hidden when none is in the build. -->
-        <TextView android:id="@+id/features_label" style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_more" />
+        <TextView android:id="@+id/features_label" style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_backup_updates" />
         <LinearLayout android:id="@+id/features_card" style="@style/Settings.Card" />
 
         <!-- About -->
         <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_about" />
-        <LinearLayout android:id="@+id/about_card" style="@style/Settings.Card" />
+        <LinearLayout android:id="@+id/about_card" style="@style/Settings.Card">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:focusable="true" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="16dp" android:paddingVertical="12dp">
+                <ImageView android:layout_width="56dp" android:layout_height="56dp" android:importantForAccessibility="no" android:src="@mipmap/ic_launcher" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/app_name" android:textAlignment="viewStart" android:textColor="?attr/mpOnSurface" android:textSize="22sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/about_version" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAlignment="viewStart" android:textColor="?attr/mpOnSurfaceVariant" android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

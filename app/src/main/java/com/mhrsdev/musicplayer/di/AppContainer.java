@@ -9,20 +9,28 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.os.Process;
 import androidx.core.content.ContextCompat;
 import com.mhrsdev.musicplayer.BuildConfig;
+import com.mhrsdev.musicplayer.appwidget.WidgetUpdater;
 import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
+import com.mhrsdev.musicplayer.data.update.UpdateModule;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
 import com.mhrsdev.musicplayer.domain.repository.AudioEffectsController;
+import com.mhrsdev.musicplayer.domain.repository.BackupService;
 import com.mhrsdev.musicplayer.domain.repository.HomeFeedSource;
 import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
+import com.mhrsdev.musicplayer.domain.repository.LibraryBrowser;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
 import com.mhrsdev.musicplayer.domain.repository.LyricsRepository;
 import com.mhrsdev.musicplayer.domain.repository.MusicSource;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
+import com.mhrsdev.musicplayer.domain.repository.UpdateRepository;
 import com.mhrsdev.musicplayer.domain.repository.WaveformRepository;
 import com.mhrsdev.musicplayer.fake.FakeAudioEffects;
+import com.mhrsdev.musicplayer.fake.FakeBackupService;
+import com.mhrsdev.musicplayer.playback.NowPlayingBridge;
 import com.mhrsdev.musicplayer.fake.FakeHomeFeedSource;
 import com.mhrsdev.musicplayer.fake.FakeLibraryRepository;
 import com.mhrsdev.musicplayer.fake.FakeLyricsRepository;
@@ -58,6 +66,7 @@ public final class AppContainer {
     public final LyricsRepository lyrics;
     public final WaveformRepository waveform;
     public final HomeFeedSource homeFeed;
+    public final BackupService backup;
     /** Always the fake: there is no online catalog in Phase 1. */
     public final MusicSource musicSource;
 
@@ -65,10 +74,12 @@ public final class AppContainer {
     private final boolean useFakes;
     private final SettingsStore settings;
     private final LibraryAdmin libraryAdmin;
+    private final LibraryBrowser libraryBrowser;
     private final AudioEffectsController audioEffects;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Runnable observedScan = this::scanAfterMediaChange;
     private ContentObserver mediaObserver;
+    private UpdateRepository updates;
 
     public AppContainer(Context context) {
         this(context, USE_FAKES);
@@ -81,6 +92,13 @@ public final class AppContainer {
         ThreadPoolExecutor io = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         io.allowCoreThreadTimeOut(true);
         ioExecutor = io;
+        // Library scans get their own low-priority thread so Home / search reads never queue behind a 10k-row scan.
+        ThreadPoolExecutor scan = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+                r -> new Thread(() -> {
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                    r.run();
+                }, "scan"));
+        scan.allowCoreThreadTimeOut(true);
         settings = new SettingsStore(appContext);
         musicSource = new FakeMusicSource();
 
@@ -88,19 +106,25 @@ public final class AppContainer {
             FakeLibraryRepository fake = new FakeLibraryRepository();
             library = fake;
             libraryAdmin = fake;
+            libraryBrowser = fake;
             player = new FakePlayerController();
             audioEffects = new FakeAudioEffects();
             lyrics = new FakeLyricsRepository();
             waveform = new FakeWaveformRepository();
             homeFeed = new FakeHomeFeedSource(library);
+            backup = new FakeBackupService();
         } else {
-            DataModule data = DataModule.create(appContext, io, settings);
+            DataModule data = DataModule.create(appContext, io, scan, settings);
             library = data.library;
             libraryAdmin = data.library;
+            libraryBrowser = data.browser;
             homeFeed = data.homeFeed;
+            backup = data.backup;
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
+            // Home-screen widgets: redrawn on track / play-pause changes only, and only while this process lives.
+            NowPlayingBridge.attach(appContext, np -> WidgetUpdater.update(appContext, np, io));
             audioEffects = PlaybackModule.createAudioEffects(appContext);
             lyrics = LyricsModule.create(appContext, BuildConfig.VERSION_NAME,
                     new SqliteLyricsCacheStore(data.dbHelper, System::currentTimeMillis),
@@ -123,6 +147,17 @@ public final class AppContainer {
         return libraryAdmin;
     }
 
+    /** Smart lists, years, play counts, batch playlist edits, track details, forgetting deleted files. */
+    public LibraryBrowser libraryBrowser() {
+        return libraryBrowser;
+    }
+
+    /** Self-update from GitHub Releases; created on first use (no network or disk work until a check runs). */
+    public synchronized UpdateRepository updates() {
+        if (updates == null) updates = UpdateModule.create(appContext, BuildConfig.VERSION_NAME, BuildConfig.GITHUB_REPO);
+        return updates;
+    }
+
     /** Call when the user grants the audio permission: runs the first scan (or a stale one). */
     public void onAudioPermissionGranted() {
         libraryAdmin.scanIfStale();
@@ -131,10 +166,11 @@ public final class AppContainer {
     /**
      * Call on EVERY activity start: an incremental scan if MediaStore changed (throttled to once per
      * {@link #FOREGROUND_SCAN_THROTTLE_MS}; the generation check makes it nearly free), and watches MediaStore for new
-     * files while the app is visible. Pair with {@link #onAppBackground()}.
+     * files while the app is visible; also runs the automatic update check if it is due (at most daily). Pair with {@link #onAppBackground()}.
      */
     public void onAppForeground() {
         if (useFakes) return;
+        updates().checkIfDue();
         if (mediaObserver == null) {
             mediaObserver = new ContentObserver(mainHandler) {
                 @Override public void onChange(boolean selfChange) {

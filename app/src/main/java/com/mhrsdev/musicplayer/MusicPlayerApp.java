@@ -21,6 +21,7 @@ public class MusicPlayerApp extends Application {
         // Cheap: one static write per change of the setting, no polling.
         container.settings().batterySaver().observeForever(mode -> MotionPolicy.setBatterySaverOverride(
                 mode == BatterySaverMode.AUTO ? null : mode == BatterySaverMode.ON));
+        container.settings().reduceMotion().observeForever(MotionPolicy::setAppReduceMotion);
         // Below API 33 AppCompat keeps the chosen locale only in memory: re-apply the stored choice on every start.
         if (Build.VERSION.SDK_INT < 33) ThemeApplier.applyLanguage(container.settings().language().getValue());
         registerActivityLifecycleCallbacks(new VisibilityCallbacks());

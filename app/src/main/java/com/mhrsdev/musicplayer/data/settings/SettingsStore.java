@@ -6,7 +6,9 @@ import android.os.Looper;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,7 +32,14 @@ public final class SettingsStore {
     private static final String K_INCLUDE = "folders_include";
     private static final String K_EXCLUDE = "folders_exclude";
     private static final String K_NON_MUSIC = "include_non_music";
-    private static final String K_MIN_SECONDS = "min_track_seconds";
+    private static final String K_MIN_TRACK_SECONDS = "min_track_seconds";
+    private static final String K_REDUCE_MOTION = "reduce_motion";
+
+    private static final int MAX_BACKUP_STRING = 32;
+    private static final Map<String, Class<?>> BACKUP_TYPES = Map.of(
+            K_THEME, String.class, K_ARTWORK_COLORS, Boolean.class, K_SEEK_BAR, String.class, K_LANGUAGE, String.class,
+            K_LYRICS_ONLINE, Boolean.class, K_LYRICS_SIZE, String.class, K_SLEEP_MINUTES, Integer.class,
+            K_BATTERY_SAVER, String.class);
 
     private final SharedPreferences prefs;
     private final MutableLiveData<ThemeMode> theme;
@@ -45,6 +54,7 @@ public final class SettingsStore {
     private final MutableLiveData<Set<String>> excludedFolders;
     private final MutableLiveData<Boolean> includeNonMusic;
     private final MutableLiveData<Integer> minTrackSeconds;
+    private final MutableLiveData<Boolean> reduceMotion;
 
     public SettingsStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -59,7 +69,8 @@ public final class SettingsStore {
         includedFolders = new MutableLiveData<>(readSet(K_INCLUDE));
         excludedFolders = new MutableLiveData<>(readSet(K_EXCLUDE));
         includeNonMusic = new MutableLiveData<>(prefs.getBoolean(K_NON_MUSIC, false));
-        minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
+        minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_TRACK_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
+        reduceMotion = new MutableLiveData<>(prefs.getBoolean(K_REDUCE_MOTION, false));
     }
 
     public LiveData<ThemeMode> theme() {
@@ -168,14 +179,55 @@ public final class SettingsStore {
         publish(includeNonMusic, value);
     }
 
-    /** Audio shorter than this many seconds is not scanned. Changing it needs a rescan. */
+    /** The settings a backup carries (folder lists are device paths, so they stay out), by key. */
+    public Map<String, Object> exportBackup() {
+        Map<String, Object> all = new HashMap<>(prefs.getAll());
+        all.keySet().retainAll(BACKUP_TYPES.keySet());
+        return all;
+    }
+
+    /** Writes the known keys of {@code values} whose type matches, then refreshes every LiveData. Returns how many were applied. */
+    public int importBackup(Map<String, Object> values) {
+        SharedPreferences.Editor edit = prefs.edit();
+        int applied = 0;
+        for (Map.Entry<String, Class<?>> type : BACKUP_TYPES.entrySet()) {
+            Object v = values.get(type.getKey());
+            if (v == null || !type.getValue().isInstance(v)) continue;
+            if (v instanceof String s) edit.putString(type.getKey(), s.length() <= MAX_BACKUP_STRING ? s : "");
+            else if (v instanceof Boolean b) edit.putBoolean(type.getKey(), b);
+            else edit.putInt(type.getKey(), (Integer) v);
+            applied++;
+        }
+        edit.apply();
+        publish(theme, readEnum(K_THEME, ThemeMode.SYSTEM));
+        publish(artworkColors, prefs.getBoolean(K_ARTWORK_COLORS, true));
+        publish(seekBarStyle, readEnum(K_SEEK_BAR, SeekBarStyle.WAVY));
+        publish(language, prefs.getString(K_LANGUAGE, ""));
+        publish(lyricsOnline, prefs.getBoolean(K_LYRICS_ONLINE, true));
+        publish(lyricsTextSize, readEnum(K_LYRICS_SIZE, LyricsTextSize.MEDIUM));
+        publish(sleepTimerMinutes, prefs.getInt(K_SLEEP_MINUTES, DEFAULT_SLEEP_TIMER_MINUTES));
+        publish(batterySaver, readEnum(K_BATTERY_SAVER, BatterySaverMode.AUTO));
+        return applied;
+    }
+
+    /** Minimum track length in seconds the scanner keeps (0 = keep everything). Changing it needs a rescan. */
     public LiveData<Integer> minTrackSeconds() {
         return minTrackSeconds;
     }
 
     public void setMinTrackSeconds(int seconds) {
-        prefs.edit().putInt(K_MIN_SECONDS, seconds).apply();
-        publish(minTrackSeconds, seconds);
+        prefs.edit().putInt(K_MIN_TRACK_SECONDS, Math.max(0, seconds)).apply();
+        publish(minTrackSeconds, Math.max(0, seconds));
+    }
+
+    /** App-level "reduce motion": decorative animation off regardless of the system setting. */
+    public LiveData<Boolean> reduceMotion() {
+        return reduceMotion;
+    }
+
+    public void setReduceMotion(boolean value) {
+        prefs.edit().putBoolean(K_REDUCE_MOTION, value).apply();
+        publish(reduceMotion, value);
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {

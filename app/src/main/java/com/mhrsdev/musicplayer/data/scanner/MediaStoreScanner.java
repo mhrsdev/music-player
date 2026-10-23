@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
-import android.os.Process;
 import android.provider.MediaStore;
 import com.mhrsdev.musicplayer.data.db.DbHelper;
 import com.mhrsdev.musicplayer.data.db.query.TrackQueries;
@@ -20,9 +19,12 @@ import java.util.function.LongSupplier;
  * Reads music from MediaStore into the {@code tracks} table: incremental (only new / changed rows are written, vanished
  * ids deleted), single transaction, low thread priority. Permission-agnostic: the caller ensures READ_MEDIA_AUDIO
  * (API 33+) or READ_EXTERNAL_STORAGE (<= 32); without it {@link #scan} returns {@link ScanResult#FAILED} and leaves the
- * library untouched. Both methods block: call them from the io executor. Nothing here schedules itself (no polling).
+ * library untouched. Both methods block: call them from a low-priority background thread (the scan executor). Nothing here schedules itself (no polling).
  */
 public class MediaStoreScanner {
+    /** Rows per transaction: short write locks, so likes / play counts / playlist edits never wait for a whole scan. */
+    static final int CHUNK = 500;
+
     private static final String PREFS = "scanner_state";
     private static final String KEY_SCANNED_AT = "scanned_at_ms";
     private static final String KEY_GENERATION = "media_generation";
@@ -70,6 +72,11 @@ public class MediaStoreScanner {
         return now < 0 || now != state.getLong(KEY_GENERATION, -1);
     }
 
+    /** When the last completed scan finished (epoch ms), 0 if never. For the Settings screen. */
+    public static long lastScanAtMs(Context context) {
+        return context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_SCANNED_AT, 0);
+    }
+
     /** Incremental scan (rows whose time, size and path match are not written). */
     public ScanResult scan() {
         return scan(false);
@@ -77,13 +84,7 @@ public class MediaStoreScanner {
 
     /** @param force also re-writes unchanged rows (manual refresh, or when MediaStore tags were edited in place) */
     public ScanResult scan(boolean force) {
-        int oldPriority = Process.getThreadPriority(Process.myTid());
-        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-        try {
-            return scanInternal(force);
-        } finally {
-            Process.setThreadPriority(oldPriority);
-        }
+        return scanInternal(force); // runs on the low-priority scan thread
     }
 
     private ScanResult scanInternal(boolean force) {
@@ -99,6 +100,7 @@ public class MediaStoreScanner {
         int added = 0;
         int updated = 0;
         int removed;
+        int written = 0;
         db.beginTransaction();
         try (Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection(),
                 null, null, null)) {
@@ -113,6 +115,11 @@ public class MediaStoreScanner {
                 tracks.upsert(audio.toTrack(), audio.modifiedMs(), audio.sizeBytes(), audio.path());
                 if (change == IncrementalDiff.Change.ADDED) added++;
                 else if (change == IncrementalDiff.Change.UPDATED) updated++;
+                if (++written % CHUNK == 0) { // commit and reopen: partial progress is safe, the diff is idempotent
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
+                    db.beginTransaction();
+                }
             }
             removed = tracks.deleteByIds(diff.missingIds()); // likes / history / playlist rows stay, hidden until it returns
             new WaveformQueries(db).deleteOrphans();

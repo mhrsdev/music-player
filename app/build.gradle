@@ -17,6 +17,8 @@ android {
         targetSdk 37
         versionCode = Integer.parseInt("${project.findProperty('appVersionCode') ?: '1'}")
         versionName = "${project.findProperty('appVersionName') ?: '0.1.0'}"
+        // GitHub repository (owner/name) that publishes the releases the app updates from: -PgithubRepo=owner/name
+        buildConfigField 'String', 'GITHUB_REPO', "\"${project.findProperty('githubRepo') ?: 'mhrsdev/music-player-mowj'}\""
     }
 
     signingConfigs {

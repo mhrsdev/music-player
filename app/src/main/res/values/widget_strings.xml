@@ -1,0 +1,17 @@
+<resources>
+    <string name="widget_empty_title">Pick a song</string>
+    <string name="widget_empty_subtitle">Tap to open the app</string>
+    <string name="widget_preview_title">Golden Hour</string>
+    <string name="widget_preview_artist">Sample artist</string>
+    <string name="widget_label_compact">Mowj · Bar</string>
+    <string name="widget_label_square">Mowj · Cover</string>
+    <string name="widget_label_wide">Mowj · Now playing</string>
+    <string name="widget_desc_compact">A slim player bar with previous, play and next.</string>
+    <string name="widget_desc_square">A big cover with playback controls.</string>
+    <string name="widget_desc_wide">Cover, title, artist, progress and controls.</string>
+    <string name="widget_cd_previous">Previous</string>
+    <string name="widget_cd_next">Next</string>
+    <string name="widget_cd_play">Play</string>
+    <string name="widget_cd_pause">Pause</string>
+    <string name="widget_cd_open">Open the player</string>
+</resources>

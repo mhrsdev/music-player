@@ -1,0 +1,5 @@
+<resources>
+    <!-- Android 12+: follow the launcher's own widget corner radius. -->
+    <dimen name="widget_radius">@android:dimen/system_app_widget_background_radius</dimen>
+    <dimen name="widget_cover_radius">@android:dimen/system_app_widget_inner_radius</dimen>
+</resources>

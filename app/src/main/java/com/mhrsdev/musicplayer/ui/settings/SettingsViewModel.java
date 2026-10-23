@@ -30,6 +30,9 @@ public final class SettingsViewModel extends ViewModel {
 
     public LiveData<State> getState() { return state; }
 
+    /** Re-reads the store; the language can change outside the app (system per-app language, API 33+). */
+    public void refresh() { publish(); }
+
     public void setTheme(SettingsStore.Theme t) { store.setTheme(t); publish(); }
 
     public void setArtworkColors(boolean on) { store.setArtworkColors(on); publish(); }

@@ -1,6 +1,7 @@
 package com.mhrsdev.musicplayer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.mhrsdev.musicplayer.databinding.ActivityMainBinding;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.playback.PlaybackService;
 import com.mhrsdev.musicplayer.ui.home.HomeFragment;
 import com.mhrsdev.musicplayer.ui.library.CollectionFragment;
 import com.mhrsdev.musicplayer.ui.library.LibraryFragment;
@@ -195,17 +197,21 @@ public class MainActivity extends AppCompatActivity
     private void layoutDockForWidth() {
         if (!com.mhrsdev.musicplayer.ui.nav.Adaptive.isWide(this)) return;
         int gap = getResources().getDimensionPixelSize(R.dimen.mp_dock_gap);
+        int side = getResources().getDimensionPixelSize(R.dimen.mp_dock_margin_h);
         binding.chrome.setOrientation(android.widget.LinearLayout.HORIZONTAL);
         binding.chrome.setGravity(android.view.Gravity.CENTER_VERTICAL | android.view.Gravity.CENTER_HORIZONTAL);
         android.widget.LinearLayout.LayoutParams mini = (android.widget.LinearLayout.LayoutParams) binding.miniPlayerSlot.getLayoutParams();
         mini.width = 0;
         mini.weight = 1f;
         mini.bottomMargin = 0;
+        // Set both relative margins: once one is relative, the XML left/right ones are ignored.
+        mini.setMarginStart(side);
         mini.setMarginEnd(gap);
         binding.miniPlayerSlot.setLayoutParams(mini);
         android.widget.LinearLayout.LayoutParams nav = (android.widget.LinearLayout.LayoutParams) binding.navSlot.getLayoutParams();
         nav.width = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
         nav.setMarginStart(0);
+        nav.setMarginEnd(side);
         binding.navSlot.setLayoutParams(nav);
         binding.miniPlayerSlot.setVisibility(View.GONE); // renderMini shows it with the mini-player
     }
@@ -280,7 +286,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private final ActivityResultLauncher<String> notificationPermission =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> { });
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) startService(new Intent(this, PlaybackService.class)); // re-posts the dropped notification
+            });
 
     /** Android 13+: the media notification needs it. Asked once, on the first play; playback works if denied. */
     private void askNotificationsOnce() {

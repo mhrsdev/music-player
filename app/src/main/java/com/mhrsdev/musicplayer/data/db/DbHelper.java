@@ -28,6 +28,8 @@ public final class DbHelper extends SQLiteOpenHelper {
     }
 
     @Override public void onConfigure(SQLiteDatabase db) {
+        // WAL: readers (Home, search) run on their own connection and never wait for a writer such as the scan.
+        db.enableWriteAheadLogging();
         db.setForeignKeyConstraintsEnabled(true);
     }
 
