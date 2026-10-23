@@ -47,4 +47,9 @@
     <string name="lyrics_offset_value">%1$s s</string>
     <string name="lyrics_offset_cd">Lyrics timing %1$s seconds. Double-tap to reset</string>
     <string name="lyrics_copied">Line copied</string>
+    <string name="player_bt_title">Show your device\'s name</string>
+    <string name="player_bt_rationale">Allow Nearby devices access so this chip can show which Bluetooth speaker or headphones are playing. Nothing else is used.</string>
+    <string name="player_bt_allow">Allow</string>
+    <string name="player_bt_settings">Open settings</string>
+    <string name="player_bt_snack">Show the Bluetooth device\'s name here?</string>
 </resources>
