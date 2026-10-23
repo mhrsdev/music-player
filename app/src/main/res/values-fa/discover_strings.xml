@@ -37,7 +37,7 @@
     <string name="home_refreshed">انتخاب‌های تازه</string>
     <string name="home_resume">ادامه</string>
     <string name="home_play_now">پخش</string>
-    <string name="home_list_separator">، </string>
+    <string name="home_list_separator">"، "</string>
 
     <string name="home_stat_songs">آهنگ</string>
     <string name="home_stat_hours">ساعت موسیقی</string>

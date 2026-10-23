@@ -38,7 +38,7 @@
     <string name="home_refreshed">New picks</string>
     <string name="home_resume">Resume</string>
     <string name="home_play_now">Play</string>
-    <string name="home_list_separator">, </string>
+    <string name="home_list_separator">", "</string>
 
     <string name="home_stat_songs">Songs</string>
     <string name="home_stat_hours">Hours of music</string>

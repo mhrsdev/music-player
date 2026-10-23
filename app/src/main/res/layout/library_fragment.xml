@@ -343,6 +343,74 @@
 
         </LinearLayout>
 
+        <!-- H1: Genres / Folders (data from the Home feed: tracks.genre / tracks.path, DB v4). -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp">
+
+        <FrameLayout
+            android:id="@+id/hub_genres"
+            android:layout_width="0dp"
+            android:layout_height="88dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:background="@drawable/library_tile_bg"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginStart="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_mp_note"
+                app:tint="?attr/mpPrimary" />
+
+            <TextView
+                style="@style/Library.TileTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingStart="56dp"
+                android:paddingEnd="16dp"
+                android:text="@string/library_genres" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/hub_folders"
+            android:layout_width="0dp"
+            android:layout_height="88dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:background="@drawable/library_tile_bg"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginStart="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_mp_folder"
+                app:tint="?attr/mpPrimary" />
+
+            <TextView
+                style="@style/Library.TileTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingStart="56dp"
+                android:paddingEnd="16dp"
+                android:text="@string/library_folders" />
+        </FrameLayout>
+
+        </LinearLayout>
+
         <TextView
             style="@style/Scr.SectionTitle"
             android:layout_width="match_parent"
