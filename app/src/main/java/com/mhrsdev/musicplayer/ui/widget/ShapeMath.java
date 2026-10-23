@@ -8,7 +8,8 @@ public final class ShapeMath {
 
     private ShapeMath() {}
 
-    /** Unit-radius distance of the squircle edge at angle {@code t} (radians). 1 on axes, ~0.84 on diagonals. */
+    /** Unit-radius distance of the squircle edge at angle {@code t} (radians). 1 on axes, ~1.19 on diagonals
+     * (the point (0.84, 0.84)), so it fills a square view like a 30%-corner squircle. */
     public static float squircle(double t) {
         double c = Math.abs(Math.cos(t)), s = Math.abs(Math.sin(t));
         return (float) Math.pow(Math.pow(c, SQUIRCLE_N) + Math.pow(s, SQUIRCLE_N), -1.0 / SQUIRCLE_N);
