@@ -9,10 +9,19 @@ import java.util.List;
  *
  * @param source free text such as "Embedded", "LRC file", "LRCLIB"; may be null
  */
-public record Lyrics(String trackId, List<LyricLine> lines, boolean synced, String source) {
+public record Lyrics(String trackId, List<LyricLine> lines, boolean synced, String source, boolean failed) {
 
     public Lyrics {
         lines = Collections.unmodifiableList(new ArrayList<>(lines));
+    }
+
+    public Lyrics(String trackId, List<LyricLine> lines, boolean synced, String source) {
+        this(trackId, lines, synced, source, false);
+    }
+
+    /** No lyrics because the online lookup failed (offline, HTTP error, timeout): the UI offers Retry. */
+    public static Lyrics failed(String trackId) {
+        return new Lyrics(trackId, Collections.emptyList(), false, null, true);
     }
 
     /** The "nothing found" result. */
