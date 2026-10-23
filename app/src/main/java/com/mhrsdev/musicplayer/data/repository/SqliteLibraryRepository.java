@@ -45,6 +45,7 @@ public final class SqliteLibraryRepository implements LibraryRepository, Library
 
     private final DbHelper helper;
     private final Executor io;
+    private final Executor scanIo;
     private final ChangeNotifier notifier;
     private final MediaStoreScanner scanner;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -59,9 +60,11 @@ public final class SqliteLibraryRepository implements LibraryRepository, Library
     private final LiveData<List<Track>> history;
     private final LiveData<List<Track>> recentlySaved;
 
-    public SqliteLibraryRepository(DbHelper helper, Executor io, ChangeNotifier notifier, MediaStoreScanner scanner) {
+    public SqliteLibraryRepository(DbHelper helper, Executor io, Executor scanIo, ChangeNotifier notifier,
+            MediaStoreScanner scanner) {
         this.helper = helper;
         this.io = io;
+        this.scanIo = scanIo;
         this.notifier = notifier;
         this.scanner = scanner;
         int tracksAndLikes = ChangeNotifier.TRACKS | ChangeNotifier.LIKES;
@@ -226,14 +229,14 @@ public final class SqliteLibraryRepository implements LibraryRepository, Library
 
     /** App-start hook: scans only if MediaStore changed since the last scan (or never scanned). Needs the permission. */
     @Override public void scanIfStale() {
-        io.execute(() -> {
+        scanIo.execute(() -> {
             if (scanner.isStale()) scanNow(null);
         });
     }
 
     /** Manual rescan. {@code callback} (may be null) gets the result on the main thread; FAILED if one is already running. */
     @Override public void rescan(@Nullable Callback<ScanResult> callback) {
-        io.execute(() -> scanNow(callback));
+        scanIo.execute(() -> scanNow(callback));
     }
 
     private void scanNow(@Nullable Callback<ScanResult> callback) {

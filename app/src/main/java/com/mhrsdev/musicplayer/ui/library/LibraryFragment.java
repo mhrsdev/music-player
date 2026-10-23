@@ -33,7 +33,7 @@ public final class LibraryFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
         AppContainer c = Screens.container(this);
-        LibraryViewModel vm = new ViewModelProvider(this, LibraryViewModel.factory(c.library, c.player))
+        LibraryViewModel vm = new ViewModelProvider(this, LibraryViewModel.factory(c.library, c.player, c.libraryBrowser()))
                 .get(LibraryViewModel.class);
         Resources r = getResources();
         String likedLabel = getString(R.string.library_liked);
@@ -60,6 +60,15 @@ public final class LibraryFragment extends Fragment {
         b.hubPlaylists.setOnClickListener(v -> Screens.openCollection(this, Collection.PLAYLISTS));
         b.hubArtists.setOnClickListener(v -> Screens.openCollection(this, Collection.ARTISTS));
         b.hubHistory.setOnClickListener(v -> Screens.openTrackList(this, TrackList.HISTORY, null));
+        b.hubSongs.setOnClickListener(v -> Screens.openTrackList(this, TrackList.SONGS, null));
+        b.hubMostPlayed.setOnClickListener(v -> Screens.openTrackList(this, TrackList.MOST_PLAYED, null));
+        b.hubRecentAdded.setOnClickListener(v -> Screens.openTrackList(this, TrackList.RECENT, null));
+        b.hubNeverPlayed.setOnClickListener(v -> Screens.openTrackList(this, TrackList.NEVER_PLAYED, null));
+        b.hubYears.setOnClickListener(v -> Screens.openCollection(this, Collection.YEARS));
+        b.hubNewPlaylist.setOnClickListener(v -> com.mhrsdev.musicplayer.ui.playlist.PlaylistDialogs.create(
+                requireContext(), c.library, p -> {
+                    if (p != null && isAdded()) Screens.openTrackList(this, TrackList.PLAYLIST, p.id());
+                }));
 
         vm.getAlbums().observe(getViewLifecycleOwner(), list -> {
             int n = list.size();

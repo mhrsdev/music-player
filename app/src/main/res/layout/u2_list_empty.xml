@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Empty state of a track list: its own row BELOW the header (never overlaps it), centred, wraps any font scale. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingHorizontal="32dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="32dp">
+
+    <ImageView
+        android:id="@+id/empty_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/u2_empty_badge"
+        android:importantForAccessibility="no"
+        android:padding="20dp"
+        app:tint="?attr/mpOnSecondaryContainer" />
+
+    <TextView
+        android:id="@+id/empty_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="?attr/mpOnSurface"
+        android:textDirection="anyRtl"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/empty_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.15"
+        android:textAlignment="center"
+        android:textColor="?attr/mpOnSurfaceVariant"
+        android:textDirection="anyRtl"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/empty_action"
+        style="@style/U2.ActionPill"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="0dp"
+        android:background="@drawable/nav_button_primary"
+        android:drawableStart="@drawable/ic_mp_search"
+        android:drawableTint="?attr/mpOnPrimary"
+        android:textColor="?attr/mpOnPrimary"
+        android:textStyle="bold"
+        android:visibility="gone" />
+</LinearLayout>

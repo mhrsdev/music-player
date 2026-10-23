@@ -101,7 +101,8 @@ final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHo
         Row row = getItem(position);
         Object b = ((Bound<?>) holder).b;
         if (b instanceof HomeHeaderBinding h) {
-            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.title, row.section().title());
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.title,
+                    HomeSectionTitles.title(h.getRoot().getResources(), row.section()));
             HomeSectionStyle style = row.section().style();
             h.action.setVisibility(style == HomeSectionStyle.CAROUSEL ? View.GONE : View.VISIBLE);
             if (style == HomeSectionStyle.LIST) {

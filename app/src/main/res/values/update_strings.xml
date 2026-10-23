@@ -1,0 +1,50 @@
+<resources>
+    <string name="update_title">App updates</string>
+    <string name="update_current">Installed version</string>
+    <string name="update_status_idle">Check for updates</string>
+    <string name="update_status_checking">Checking…</string>
+    <string name="update_status_up_to_date">You’re up to date</string>
+    <string name="update_status_available">Version %1$s is available</string>
+    <string name="update_status_downloading">Downloading… %1$s</string>
+    <string name="update_status_verifying">Checking the download…</string>
+    <string name="update_status_ready">Ready to install</string>
+    <string name="update_sub_available">Download size: %1$s</string>
+    <string name="update_sub_prerelease">Pre-release · Download size: %1$s</string>
+    <string name="update_sub_ready">Version %1$s was downloaded and verified.</string>
+    <string name="update_btn_download">Download and install</string>
+    <string name="update_btn_install">Install</string>
+    <string name="update_btn_retry">Try again</string>
+    <string name="update_btn_check">Check now</string>
+    <string name="update_btn_skip">Skip this version</string>
+    <string name="update_notes_title">What’s new</string>
+    <string name="update_settings">Settings</string>
+    <string name="update_auto">Check automatically</string>
+    <string name="update_auto_sub">At most once a day, when the app opens. Nothing runs in the background.</string>
+    <string name="update_pre">Include pre-releases</string>
+    <string name="update_pre_sub">Early test versions. Every 0.x release is a pre-release, so keep this on for now.</string>
+    <string name="update_wifi">Only on Wi-Fi</string>
+    <string name="update_wifi_sub">Skips the automatic check on mobile data. Checking by hand always works.</string>
+    <string name="update_last_checked">Last checked: %1$s</string>
+    <string name="update_never_checked">Never checked</string>
+    <string name="update_allow_installs">Allow installs from Music Player, then come back.</string>
+
+    <string name="update_err_network">Couldn’t reach GitHub</string>
+    <string name="update_err_network_sub">Check your connection and try again.</string>
+    <string name="update_err_rate">GitHub is busy</string>
+    <string name="update_err_rate_sub">Too many requests. Try again in a few minutes.</string>
+    <string name="update_err_bad">Unexpected answer from GitHub</string>
+    <string name="update_err_bad_sub">Try again later.</string>
+    <string name="update_err_download">Download failed</string>
+    <string name="update_err_download_sub">The file didn’t arrive completely. Try again.</string>
+    <string name="update_err_checksum">The download didn’t match its checksum</string>
+    <string name="update_err_checksum_sub">The file was deleted and will not be installed. Try again.</string>
+    <string name="update_err_invalid">Not a valid update</string>
+    <string name="update_err_invalid_sub">The downloaded file is not this app. It was deleted.</string>
+    <string name="update_err_signature">This release is signed with a different key</string>
+    <string name="update_err_signature_sub">Android only installs an update when it is signed with the same key as the installed app, so this release can’t replace it. To get it, uninstall Music Player once and install the new version. Playlists, likes and history stored in the app are lost when you uninstall.</string>
+    <string name="update_err_install">Installation didn’t finish</string>
+    <string name="update_err_install_sub">Android stopped the install. You can try again.</string>
+
+    <string name="update_banner">Update available: %1$s</string>
+    <string name="update_banner_dismiss">Skip this version</string>
+</resources>

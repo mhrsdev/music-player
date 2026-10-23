@@ -21,6 +21,31 @@
             android:contentDescription="@string/nav_back"
             android:src="@drawable/nav_ic_back"
             app:tint="?attr/mpOnSurface" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/new_playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/nav_button_primary"
+            android:clickable="true"
+            android:drawablePadding="6dp"
+            android:drawableStart="@drawable/u2_ic_add"
+            android:drawableTint="?attr/mpOnPrimary"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingStart="14dp"
+            android:paddingEnd="18dp"
+            android:text="@string/library_new_playlist"
+            android:textColor="?attr/mpOnPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
     </LinearLayout>
 
     <TextView

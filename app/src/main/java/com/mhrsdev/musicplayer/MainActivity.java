@@ -30,9 +30,12 @@ import com.mhrsdev.musicplayer.ui.library.CollectionFragment;
 import com.mhrsdev.musicplayer.ui.library.LibraryFragment;
 import com.mhrsdev.musicplayer.ui.library.TrackListFragment;
 import com.mhrsdev.musicplayer.ui.nav.AudioPermission;
+import com.mhrsdev.musicplayer.ui.nav.BottomChrome;
+import com.mhrsdev.musicplayer.ui.nav.HomeGlow;
 import com.mhrsdev.musicplayer.ui.nav.PermissionFragment;
 import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
+import com.mhrsdev.musicplayer.ui.nav.ScrollToTop;
 import com.mhrsdev.musicplayer.ui.nav.ShellViewModel;
 import com.mhrsdev.musicplayer.ui.search.SearchFragment;
 import com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore;
@@ -71,12 +74,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        applySystemBarAppearance();
         applyInsets();
 
         shell = new ViewModelProvider(this,
                 ShellViewModel.factory(((MusicPlayerApp) getApplication()).getContainer().player))
                 .get(ShellViewModel.class);
 
+        layoutDockForWidth();
         bindNav();
         bindMiniPlayer();
 
@@ -111,14 +116,104 @@ public class MainActivity extends AppCompatActivity
         out.putInt(STATE_TAB, shell.getTab().getValue().ordinal());
     }
 
+    /**
+     * Edge-to-edge: content (Home's glow) draws under transparent bars; icons follow the APP theme (which may differ
+     * from the system one), so they stay readable on light and dark backgrounds.
+     */
+    private void applySystemBarAppearance() {
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        boolean night = (getResources().getConfiguration().uiMode
+                & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        androidx.core.view.WindowInsetsControllerCompat c =
+                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        c.setAppearanceLightStatusBars(!night);
+        c.setAppearanceLightNavigationBars(!night);
+    }
+
+    private int insetBottom;
+    private int dockPx = -1;
+
     private void applyInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
             binding.screenContainer.setPadding(bars.left, bars.top, bars.right, 0);
-            int gap = Math.round(12 * getResources().getDisplayMetrics().density);
+            insetBottom = bars.bottom;
+            sizeGlow(bars.top);
+            int gap = getResources().getDimensionPixelSize(R.dimen.mp_dock_margin_b);
             binding.chrome.setPadding(bars.left, 0, bars.right, bars.bottom + gap);
+            updateDock();
             return insets;
         });
+        sizeGlow(0);
+        binding.bottomScrim.setBackground(new BottomChrome.Scrim(
+                com.mhrsdev.musicplayer.ui.theme.Tokens.color(this, R.attr.mpBackground),
+                getResources().getDimensionPixelSize(R.dimen.mp_dock_scrim_fade)));
+        binding.chrome.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            if (b - t != ob - ot) v.post(this::updateDock);
+        });
+        getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+            @Override public void onFragmentViewCreated(FragmentManager fm, Fragment f, View view, Bundle state) {
+                if (dockPx >= 0) BottomChrome.apply(view, dockPx);
+            }
+        }, true);
+    }
+
+    /** Glow height: status-bar inset + ~45% of the window; its gradient is fully transparent at the end. */
+    private void sizeGlow(int insetTop) {
+        int h = insetTop + Math.round(getResources().getDisplayMetrics().heightPixels * 0.45f);
+        android.view.ViewGroup.LayoutParams lp = binding.homeGlow.getLayoutParams();
+        if (lp.height != h) {
+            lp.height = h;
+            binding.homeGlow.setLayoutParams(lp);
+        }
+        if (binding.homeGlow.getBackground() == null) binding.homeGlow.setBackground(HomeGlow.create(this));
+    }
+
+    /** Recomputes the space the dock takes and hands it to the scrim and every scrolling screen. */
+    private void updateDock() {
+        boolean shown = binding.chrome.getVisibility() == View.VISIBLE && binding.chrome.getHeight() > 0;
+        int dock = shown ? binding.chrome.getHeight() : insetBottom;
+        int px = dock + getResources().getDimensionPixelSize(R.dimen.mp_dock_content_clearance);
+        int scrimH = shown ? dock + getResources().getDimensionPixelSize(R.dimen.mp_dock_scrim_fade) : 0;
+        android.view.ViewGroup.LayoutParams lp = binding.bottomScrim.getLayoutParams();
+        if (lp.height != scrimH && scrimH > 0) {
+            lp.height = scrimH;
+            binding.bottomScrim.setLayoutParams(lp);
+        }
+        if (px == dockPx) return;
+        dockPx = px;
+        for (Fragment f : getSupportFragmentManager().getFragments()) {
+            if (f.getView() != null) BottomChrome.apply(f.getView(), px);
+            for (Fragment child : f.getChildFragmentManager().getFragments()) {
+                if (child.getView() != null) BottomChrome.apply(child.getView(), px);
+            }
+        }
+    }
+
+    /**
+     * Wide windows (tablet, landscape, unfolded): mini-player and nav share one row so the dock costs half the height.
+     * Same views and spacing tokens as on phones; only the arrangement changes.
+     */
+    private void layoutDockForWidth() {
+        if (!com.mhrsdev.musicplayer.ui.nav.Adaptive.isWide(this)) return;
+        int gap = getResources().getDimensionPixelSize(R.dimen.mp_dock_gap);
+        int side = getResources().getDimensionPixelSize(R.dimen.mp_dock_margin_h);
+        binding.chrome.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        binding.chrome.setGravity(android.view.Gravity.CENTER_VERTICAL | android.view.Gravity.CENTER_HORIZONTAL);
+        android.widget.LinearLayout.LayoutParams mini = (android.widget.LinearLayout.LayoutParams) binding.miniPlayerSlot.getLayoutParams();
+        mini.width = 0;
+        mini.weight = 1f;
+        mini.bottomMargin = 0;
+        // Set both relative margins: once one is relative, the XML left/right ones are ignored.
+        mini.setMarginStart(side);
+        mini.setMarginEnd(gap);
+        binding.miniPlayerSlot.setLayoutParams(mini);
+        android.widget.LinearLayout.LayoutParams nav = (android.widget.LinearLayout.LayoutParams) binding.navSlot.getLayoutParams();
+        nav.width = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+        nav.setMarginStart(0);
+        nav.setMarginEnd(side);
+        binding.navSlot.setLayoutParams(nav);
+        binding.miniPlayerSlot.setVisibility(View.GONE); // renderMini shows it with the mini-player
     }
 
     // ---- floating nav + mini-player (T2 widgets) ----
@@ -133,7 +228,13 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override public void onItemReselected(int id) {
-                openTab(shell.getTab().getValue());
+                // Reselecting a tab: first back to its root, then (already at the root) scroll to the top.
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    openTab(shell.getTab().getValue());
+                } else {
+                    Fragment current = getSupportFragmentManager().findFragmentById(R.id.screen_container);
+                    if (current != null && current.getView() != null) ScrollToTop.scroll(current.getView());
+                }
             }
         });
         shell.getTab().observe(this, selected -> {
@@ -145,8 +246,10 @@ public class MainActivity extends AppCompatActivity
 
     private void updateBackToHome() {
         if (backToHome == null) return;
-        backToHome.setEnabled(!permissionFlow && shell.getTab().getValue() != Tab.HOME
-                && getSupportFragmentManager().getBackStackEntryCount() == 0);
+        boolean root = getSupportFragmentManager().getBackStackEntryCount() == 0;
+        backToHome.setEnabled(!permissionFlow && shell.getTab().getValue() != Tab.HOME && root);
+        binding.homeGlow.setVisibility(!permissionFlow && root && shell.getTab().getValue() == Tab.HOME
+                ? View.VISIBLE : View.GONE);
     }
 
     private void bindMiniPlayer() {
@@ -170,6 +273,7 @@ public class MainActivity extends AppCompatActivity
     private void renderMini(PlaybackState s) {
         Track t = s == null ? null : s.currentTrack();
         binding.mini.setVisibility(t == null ? View.GONE : View.VISIBLE);
+        if (com.mhrsdev.musicplayer.ui.nav.Adaptive.isWide(this)) binding.miniPlayerSlot.setVisibility(binding.mini.getVisibility());
         if (t == null) return;
         if (!t.id().equals(miniTrackId)) {
             miniTrackId = t.id();
@@ -230,13 +334,24 @@ public class MainActivity extends AppCompatActivity
         push(CollectionFragment.newInstance(kind));
     }
 
+    @Override public void openFragment(Fragment f, String tag) {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment top = fm.findFragmentById(R.id.screen_container);
+        if (top != null && tag.equals(top.getTag())) return;
+        push(f, tag);
+    }
+
     private void push(Fragment f) {
+        push(f, null);
+    }
+
+    private void push(Fragment f, @Nullable String tag) {
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out,
                         android.R.animator.fade_in, android.R.animator.fade_out)
-                .replace(R.id.screen_container, f)
-                .addToBackStack(null)
+                .replace(R.id.screen_container, f, tag)
+                .addToBackStack(tag)
                 .commit();
     }
 

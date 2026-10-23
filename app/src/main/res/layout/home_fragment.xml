@@ -3,12 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Ambient glow at the top of Home (DESIGN.md expression budget #1). Static: no per-frame work. -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:background="@drawable/home_glow" />
-
+    <!-- The ambient top glow is drawn full-bleed by the shell (activity_main home_glow), under the status bar. -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"

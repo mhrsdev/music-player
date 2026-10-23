@@ -43,4 +43,5 @@ Commit these updates together with the related work so a chat switch loses nothi
 - **Clean code, proper folder structure** (package-by-layer with feature sub-packages, small focused classes).
 - **Gradle 9.0.0** wrapper (verify AGP compatibility; report to owner before deviating).
 - **UI bar (D8):** very beautiful, own exclusive identity (not Google-looking), polished; **battery and RAM use must be very low** (hard requirement).
+- **No `final` classes (owner D21):** never declare `final class`; remove existing ones (records/enums unchanged; `static final` constants and `final` fields are fine). **Java 17** language level; use its idioms where they simplify (records, `instanceof` patterns, switch expressions, text blocks for SQL). Don't declare dependencies that AppCompat/Material already bring in transitively (activity/fragment/lifecycle...) unless a higher pinned version is truly needed.
 - Battery efficiency is a hard requirement (see `docs/ARCHITECTURE.md`).

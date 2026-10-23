@@ -48,13 +48,13 @@ public class FloatingNavView extends LinearLayout {
         super(context, attrs);
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
-        int pad = (int) Tokens.dp(context, 8f);
+        int pad = getResources().getDimensionPixelSize(R.dimen.mp_dock_pad_v);
         setPadding(pad, pad, pad, pad);
         setMinimumHeight((int) Tokens.dp(context, 68f));
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(Tokens.dp(context, 34f));
         int high = Tokens.color(context, R.attr.mpSurfaceContainerHigh);
-        bg.setColor((high & 0x00FFFFFF) | 0xEB000000); // 92% opaque, no live blur
+        bg.setColor(high | 0xFF000000); // opaque: list content must never show through (owner, real device)
         setBackground(bg);
         setElevation(Tokens.dp(context, 6f));
         selectedBg = Tokens.color(context, R.attr.mpSecondaryContainer);
@@ -81,7 +81,7 @@ public class FloatingNavView extends LinearLayout {
         item.setId(id);
         item.setOrientation(HORIZONTAL);
         item.setGravity(Gravity.CENTER);
-        int h = (int) Tokens.dp(c, 52f), padH = (int) Tokens.dp(c, 14f);
+        int h = (int) Tokens.dp(c, 52f), padH = (int) Tokens.dp(c, 16f);
         item.setPadding(padH, 0, padH, 0);
         item.setMinimumWidth((int) Tokens.dp(c, 56f));
         item.setClickable(true);
@@ -120,7 +120,7 @@ public class FloatingNavView extends LinearLayout {
             }
         });
         LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, h);
-        lp.setMarginStart(getChildCount() == 0 ? 0 : (int) Tokens.dp(c, 2f));
+        lp.setMarginStart(getChildCount() == 0 ? 0 : getResources().getDimensionPixelSize(R.dimen.mp_dock_item_gap));
         addView(item, lp);
     }
 

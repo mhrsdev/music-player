@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dock (mini-player + floating nav) spacing tokens. Same on phone, landscape and tablet. -->
+<resources>
+    <dimen name="mp_dock_margin_h">16dp</dimen>
+    <dimen name="mp_dock_gap">12dp</dimen>
+    <dimen name="mp_dock_margin_b">12dp</dimen>
+    <dimen name="mp_dock_pad_v">8dp</dimen>
+    <dimen name="mp_dock_item_gap">4dp</dimen>
+    <!-- Extra room between the last list item and the top of the dock. -->
+    <dimen name="mp_dock_content_clearance">16dp</dimen>
+    <!-- How far the background fade reaches above the dock. -->
+    <dimen name="mp_dock_scrim_fade">40dp</dimen>
+</resources>
