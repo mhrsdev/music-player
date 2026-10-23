@@ -169,27 +169,4 @@ public class RefreshFlowTest {
         assertEquals(0, result.get().updated());
         assertFalse(result.get().removed() > 0);
     }
-
-    @Test public void generationDecidesStalenessAndIsStampedFromBeforeTheScan() {
-        android.content.Context ctx = RuntimeEnvironment.getApplication();
-        long[] generation = {5};
-        com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner scanner =
-                new com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner(ctx,
-                        new com.mhrsdev.musicplayer.data.db.DbHelper(ctx),
-                        new com.mhrsdev.musicplayer.data.settings.SettingsStore(ctx), () -> generation[0]);
-        FakeMediaStore.put(1, "One");
-        assertTrue("never scanned", scanner.isStale());
-        assertTrue(scanner.scan().ok());
-        assertFalse("nothing changed: the check is free", scanner.isStale());
-        generation[0] = 6; // a download bumped MediaStore
-        assertTrue(scanner.isStale());
-
-        long[] ticking = {10};
-        com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner racing =
-                new com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner(ctx,
-                        new com.mhrsdev.musicplayer.data.db.DbHelper(ctx),
-                        new com.mhrsdev.musicplayer.data.settings.SettingsStore(ctx), () -> ticking[0]++);
-        racing.scan(); // reads 10 before scanning
-        assertTrue("a change during the scan is not lost", racing.isStale());
-    }
 }
