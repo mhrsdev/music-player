@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * future, which Media3 treats as "no artwork". One worker thread that exits after 10 s idle.
  */
 @OptIn(markerClass = UnstableApi.class)
-final class ArtworkLoader implements BitmapLoader {
+class ArtworkLoader implements BitmapLoader {
     static final int MAX_PX = 512;
 
     /** Test seam: replaces the platform access of loaders created afterwards. */

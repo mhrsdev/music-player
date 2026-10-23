@@ -69,7 +69,7 @@ public class PlaybackNotificationTest {
         app = RuntimeEnvironment.getApplication();
         File wav = new File(app.getCacheDir(), "tone.wav");
         writeSilentWav(wav);
-        Track track = new Track("1", "Song Title", "ar", "Artist Name", "al", "Album", 2_000L, artworkUri, 0,
+        Track track = new Track("1", "Song Title", "ar", "Artist Name", "al", "Album", 300_000L, artworkUri, 0,
                 android.net.Uri.fromFile(wav).toString(), false, false, 0, 0, 0L);
         controller = new ExoPlayerController(app, null, null);
         controller.play(Collections.singletonList(track), 0, null);
@@ -87,6 +87,12 @@ public class PlaybackNotificationTest {
             if (posted == null) Thread.sleep(25);
         }
         assertNotNull("no media notification posted", posted);
+        // "Playing" for Media3 means READY: wait for it, or the task-removal tests race the first buffering.
+        for (int i = 0; i < 400 && PlayerHolder.get(app).getPlaybackState() != Player.STATE_READY; i++) {
+            ShadowLooper.idleMainLooper();
+            Thread.sleep(25);
+        }
+        assertEquals(Player.STATE_READY, PlayerHolder.get(app).getPlaybackState());
         return posted;
     }
 
@@ -183,12 +189,13 @@ public class PlaybackNotificationTest {
         assertTrue("service kept running while paused", shadow().isStoppedBySelf());
     }
 
+    /** 5 minutes of 8 kHz 8-bit mono: long enough that the track never ends while a slow CI machine runs the test. */
     private static void writeSilentWav(File file) throws Exception {
-        int rate = 8000, samples = rate * 2;
-        ByteBuffer b = ByteBuffer.allocate(44 + samples * 2).order(ByteOrder.LITTLE_ENDIAN);
-        b.put("RIFF".getBytes()).putInt(36 + samples * 2).put("WAVEfmt ".getBytes()).putInt(16)
-                .putShort((short) 1).putShort((short) 1).putInt(rate).putInt(rate * 2).putShort((short) 2)
-                .putShort((short) 16).put("data".getBytes()).putInt(samples * 2);
+        int rate = 8000, samples = rate * 300;
+        ByteBuffer b = ByteBuffer.allocate(44 + samples).order(ByteOrder.LITTLE_ENDIAN);
+        b.put("RIFF".getBytes()).putInt(36 + samples).put("WAVEfmt ".getBytes()).putInt(16)
+                .putShort((short) 1).putShort((short) 1).putInt(rate).putInt(rate).putShort((short) 1)
+                .putShort((short) 8).put("data".getBytes()).putInt(samples);
         try (FileOutputStream out = new FileOutputStream(file)) {
             out.write(b.array());
         }
