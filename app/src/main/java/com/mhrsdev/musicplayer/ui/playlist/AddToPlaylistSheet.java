@@ -27,7 +27,6 @@ import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
-import com.mhrsdev.musicplayer.ui.widget.ArtworkView;
 
 import java.util.List;
 
@@ -37,17 +36,25 @@ import java.util.List;
  */
 public final class AddToPlaylistSheet extends BottomSheetDialogFragment {
     public static final String TAG = "add_to_playlist";
-    private static final String ARG_TRACK = "track_id", ARG_TITLE = "track_title";
+    private static final String ARG_TRACKS = "track_ids", ARG_TITLE = "track_title";
 
     private LinearLayout list;
     private LibraryRepository library;
 
     public static void show(@NonNull FragmentManager fm, @NonNull Track track) {
-        if (fm.findFragmentByTag(TAG) != null) return;
+        show(fm, java.util.Collections.singletonList(track));
+    }
+
+    /** Adds several tracks at once (multi-select); duplicates already in the chosen playlist are skipped. */
+    public static void show(@NonNull FragmentManager fm, @NonNull List<Track> tracks) {
+        if (tracks.isEmpty() || fm.findFragmentByTag(TAG) != null) return;
         AddToPlaylistSheet s = new AddToPlaylistSheet();
         Bundle a = new Bundle();
-        a.putString(ARG_TRACK, track.id());
-        a.putString(ARG_TITLE, track.title());
+        String[] ids = new String[tracks.size()];
+        for (int i = 0; i < ids.length; i++) ids[i] = tracks.get(i).id();
+        a.putStringArray(ARG_TRACKS, ids);
+        a.putString(ARG_TITLE, tracks.size() == 1 ? tracks.get(0).title() : null);
+        a.putInt("count", tracks.size());
         s.setArguments(a);
         s.show(fm, TAG);
     }
@@ -68,6 +75,10 @@ public final class AddToPlaylistSheet extends BottomSheetDialogFragment {
         androidx.core.view.ViewCompat.setAccessibilityHeading(title, true);
         root.addView(title);
         String trackTitle = requireArguments().getString(ARG_TITLE);
+        int count = requireArguments().getInt("count", 1);
+        if (TextUtils.isEmpty(trackTitle) && count > 1) {
+            trackTitle = getResources().getQuantityString(R.plurals.playlist_track_count, count, count);
+        }
         if (!TextUtils.isEmpty(trackTitle)) {
             TextView sub = text(c, trackTitle, 14, onVariant);
             sub.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
@@ -130,10 +141,10 @@ public final class AddToPlaylistSheet extends BottomSheetDialogFragment {
             row.setGravity(Gravity.CENTER_VERTICAL);
             row.setMinimumHeight(dp(64));
             row.setBackgroundResource(ripple.resourceId);
-            ArtworkView art = new ArtworkView(c, null);
+            com.mhrsdev.musicplayer.ui.library.MosaicArtView art = new com.mhrsdev.musicplayer.ui.library.MosaicArtView(c);
             art.setCornerRadiusDp(12);
             art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-            art.setArtwork(p.artworkUris().isEmpty() ? null : p.artworkUris().get(0), p.placeholderSeed());
+            art.setCovers(p.artworkUris(), p.placeholderSeed());
             LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(48), dp(48));
             alp.setMarginEnd(dp(16));
             row.addView(art, alp);
@@ -152,11 +163,14 @@ public final class AddToPlaylistSheet extends BottomSheetDialogFragment {
     }
 
     private void addAndClose(Playlist p) {
-        String trackId = requireArguments().getString(ARG_TRACK);
-        if (trackId == null) return;
-        library.addToPlaylist(p.id(), trackId);
-        Context c = getContext();
-        if (c != null) Toast.makeText(c, getString(R.string.playlist_added, p.name()), Toast.LENGTH_SHORT).show();
+        String[] ids = requireArguments().getStringArray(ARG_TRACKS);
+        if (ids == null) return;
+        Context app = requireContext().getApplicationContext();
+        String added = getString(R.string.playlist_added, p.name());
+        String dup = getString(R.string.u2_already_in_playlist, p.name());
+        ((MusicPlayerApp) requireActivity().getApplication()).getContainer().libraryBrowser()
+                .addAllToPlaylist(p.id(), java.util.Arrays.asList(ids),
+                        n -> Toast.makeText(app, n == 0 ? dup : added, Toast.LENGTH_SHORT).show());
         dismissAllowingStateLoss();
     }
 

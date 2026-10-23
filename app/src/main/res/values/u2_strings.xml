@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="u2_songs">Songs</string>
+    <string name="u2_most_played">Most played</string>
+    <string name="u2_never_played">Never played</string>
+    <string name="u2_never_played_empty">You have played every song. Nice.</string>
+    <string name="u2_recently_added">Recently added</string>
+    <string name="u2_years">Years</string>
+    <string name="u2_add_songs">Add songs</string>
+    <string name="u2_find_songs">Find songs</string>
+    <string name="u2_playlist_empty_body">Use “Add to playlist” on any song, or search for something to add.</string>
+    <string name="u2_no_playlists">No playlists yet</string>
+    <string name="u2_no_playlists_body">Collect songs for a mood, a trip or a workout.</string>
+    <string name="u2_playlist_options">Playlist options</string>
+    <string name="u2_rename_playlist">Rename playlist</string>
+    <string name="u2_rename">Rename</string>
+    <string name="u2_delete_playlist">Delete playlist</string>
+    <string name="u2_delete_playlist_message">Delete “%1$s”? The songs stay in your library.</string>
+    <string name="u2_playlist_deleted">Deleted “%1$s”</string>
+    <string name="u2_removed_from_playlist">Removed “%1$s”</string>
+    <string name="u2_remove_from_playlist">Remove from this playlist</string>
+    <string name="u2_already_in_playlist">Already in %1$s</string>
+    <string name="u2_reorder">Drag to reorder</string>
+    <string name="u2_playing_next">“%1$s” plays next</string>
+    <string name="u2_added_to_queue">Added “%1$s” to the queue</string>
+    <string name="u2_go_album">Go to album</string>
+    <string name="u2_go_artist">Go to artist</string>
+    <string name="u2_details">Track details</string>
+    <string name="u2_share">Share</string>
+    <string name="u2_share_failed">No app can receive this file</string>
+    <string name="u2_delete">Delete</string>
+    <string name="u2_delete_device">Delete from device</string>
+    <string name="u2_delete_confirm_one">Permanently delete “%1$s” from this device?</string>
+    <plurals name="u2_delete_confirm_many">
+        <item quantity="one">Permanently delete %d song from this device?</item>
+        <item quantity="other">Permanently delete %d songs from this device?</item>
+    </plurals>
+    <plurals name="u2_deleted">
+        <item quantity="one">Deleted %d song</item>
+        <item quantity="other">Deleted %d songs</item>
+    </plurals>
+    <string name="u2_delete_failed">This file can’t be deleted</string>
+    <string name="u2_select">Select</string>
+    <string name="u2_select_all">Select all</string>
+    <string name="u2_selection_done">Done selecting</string>
+    <plurals name="u2_selected">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
+    <string name="u2_sort_by">Sort by</string>
+    <string name="u2_sort_default">Default order</string>
+    <string name="u2_sort_title">Title</string>
+    <string name="u2_sort_artist">Artist</string>
+    <string name="u2_sort_album">Album</string>
+    <string name="u2_sort_date_added">Date added</string>
+    <string name="u2_sort_duration">Length</string>
+    <string name="u2_sort_most_played">Most played</string>
+    <string name="u2_sort_reverse">Reverse order</string>
+    <string name="u2_detail_title">Title</string>
+    <string name="u2_detail_artist">Artist</string>
+    <string name="u2_detail_album">Album</string>
+    <string name="u2_detail_year">Year</string>
+    <string name="u2_detail_track_no">Track number</string>
+    <string name="u2_detail_duration">Length</string>
+    <string name="u2_detail_bitrate">Bitrate</string>
+    <string name="u2_detail_format">Format</string>
+    <string name="u2_detail_size">Size</string>
+    <string name="u2_detail_path">Location</string>
+    <string name="u2_detail_added">Added</string>
+    <string name="u2_detail_plays">Plays</string>
+    <string name="u2_kbps">%1$d kbps</string>
+</resources>
