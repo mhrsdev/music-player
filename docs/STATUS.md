@@ -44,8 +44,8 @@ _Last updated: 2026-10-23 — D16 phase 2 started (name Mowj/موج, logo, auto-
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
+- 🔄 **N1** [Sonnet] Media notification + lock-screen controls missing on real device (D18) → `task/n1-notification`.
 **Phase 2 (D16) — up to 8 agents in parallel, worktrees `../wt-<id>`, branches `task/<id>-<slug>`:**
-- 🔄 **A-brand** [Opus] Name **Mowj/موج** + logo: adaptive/monochrome icon, notification icon, splash, `docs/brand/` assets.
 - 🔄 **B-update** [Sonnet] GitHub auto-update (`data/update`, `ui/update/UpdateFragment`).
 - 🔄 **U1** [Opus] Settings (rescan, SAF folder picker, rows/registry), search + empty states, landscape/tablet.
 - 🔄 **U2** [Opus] Library management (playlist CRUD, sort, genres/folders/years, track details/share/delete, long-press menus).
@@ -78,6 +78,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **A-brand** [Opus] Name **Mowj/موج** + logo merged: wave-stroke curling into م, lapis→turquoise; adaptive+monochrome launcher icon, ic_stat_playback, Android 12 splash theme, app_name en/fa, `docs/brand/` (BRAND.md, logo, wordmarks, social preview, icon sheet), Robolectric icon render test; build green (agent-reported). Not verified on device (launcher masks, themed icon, splash). README header not yet updated with logo.
 - ✅ **R1/P2/P3 + all earlier** merged into ccr; **supervisor-run full build green**: `:app:assembleDebug test lint :app:assembleRelease` (0 test failures, lint clean, release APK 3.17 MB, 0 `.kt/.kts`). R1: release signing (env keystore, debug-key fallback), `.github/workflows/release.yml` (tag `v*` → build → GitHub pre-release with APK + sha256), README.md/README.fa.md/CHANGELOG, MIT LICENSE. P2: contrast guard + light player, lyrics offline Retry, cover-flight transition, output chip, Add-to-playlist sheet, real queue artwork. P3: liked collage, 2×2 library grid, keyline hero carousel, skeletons, ScriptFont. Missing: search/empty-state polish, queue-sheet render, word-sweep, loaded-track renders, device run.
 - ✅ **F1** [Sonnet+ponytail] Integration audit merged. Fixed: first scan after permission grant (FirstRunFlowTest), Home scanning/empty states + action, POST_NOTIFICATIONS requested on first play (API 33+), language re-applied on API 26–32, nav tab restored after process death, waveform requested only for Waveform/Bars styles, Add-to-playlist in track menu (create/pick). Verified only by reading/Robolectric (no device).
 - ✅ **P1** [Opus] Polish merged: bundled fonts (Google Sans Flex subset 110 KB + Vazirmatn 114 KB, OFL notices in assets/licenses), v1 type ramp, morph play buttons on Home/Library, Persian-in-English subtitle fix, Robolectric screen renders (`docs/screens/p1-*.png`, `ScreenRenderTest` + `FakeRenderApp`). Not done (→ P3): liked collage, 2×2 library grid, carousel snap, skeletons, search/artist polish, per-script font.
@@ -105,6 +106,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - Online (needs owner decision, K2): legal catalog provider.
 
 ## Change log
+- 2026-10-23: D18: owner's 4 more real-device screenshots → N1 launched (notification/lock screen), U3 told (clipped title + BT device name), U1 (dock/bottom padding). A-brand merged.
+- 2026-10-23: **v0.1.0 pre-release is LIVE** on GitHub (Release workflow run #1 success; https://github.com/mhrsdev/music-player/releases/tag/v0.1.0). Owner chose signing key in Secrets (D17); keystore generated + sent to owner (not committed). Owner sent first real-device screenshot with bugs → routed to U1/U3/E (see D17). Phase 2 agents running.
 - 2026-10-23: **ccr → main fast-forward; tag v0.1.0 pushed** (release workflow builds the GitHub pre-release; APK also sent to owner in chat). Phase 2 (full-featured version) next, see backlog.
 - 2026-10-23: everything merged into ccr (green full build). Next: ccr → main (fast-forward), tag v0.1.0 (pre-release via Actions), APK sent to owner. Then phase 2 (backlog above).
 - 2026-10-23: D15: MIT license added (LICENSE); README license section to say MIT.
