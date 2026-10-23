@@ -1,6 +1,7 @@
 package com.mhrsdev.musicplayer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.mhrsdev.musicplayer.databinding.ActivityMainBinding;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.playback.PlaybackService;
 import com.mhrsdev.musicplayer.ui.home.HomeFragment;
 import com.mhrsdev.musicplayer.ui.library.CollectionFragment;
 import com.mhrsdev.musicplayer.ui.library.LibraryFragment;
@@ -180,7 +182,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private final ActivityResultLauncher<String> notificationPermission =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> { });
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) startService(new Intent(this, PlaybackService.class)); // re-posts the dropped notification
+            });
 
     /** Android 13+: the media notification needs it. Asked once, on the first play; playback works if denied. */
     private void askNotificationsOnce() {
