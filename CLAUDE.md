@@ -5,7 +5,7 @@ Read this file first, then `docs/STATUS.md`, then `docs/DIRECTIVES.md`. Those th
 ## Roles (set by the owner — mandatory)
 
 - **Supervisor (the top-level agent in the chat)**: manages and monitors only. Relays the owner's instructions to sub-agents, tracks tasks, reviews results, merges. **Does not write product code.** Its only direct edits are to `docs/STATUS.md`, `docs/DIRECTIVES.md`, `CLAUDE.md` and git operations.
-- **UI sub-agent**: model **Opus 5.5** (`model: "opus"`). Owns everything under `app/src/main/java/.../ui/` and visual design (Compose, Material 3 Expressive, animation, theming).
+- **UI sub-agent**: model **Opus 5.5** (`model: "opus"`). Owns everything under `app/src/main/java/.../ui/` and visual design (XML + custom Views in Java, own visual identity, animation, theming).
 - **All other sub-agents**: model **Sonnet 5.5** (`model: "sonnet"`). Build system, data, playback service, lyrics, tests, CI, etc.
 
 ## Design skill (set by the owner — mandatory for UI work)
@@ -31,4 +31,13 @@ Commit these updates together with the related work so a chat switch loses nothi
 
 - `docs/design-reference/` — owner's reference screenshots (target look & feel, must be matched and *improved on*).
 - `docs/ARCHITECTURE.md` — module/package layout and contracts between UI and the rest.
-- App code under `app/` (Kotlin, Jetpack Compose, Media3).
+- App code under `app/` (**Java only**, XML + custom Views, MVVM, Media3, framework SQLite — see Hard code rules).
+
+## Hard code rules (owner D7 — mandatory for every sub-agent)
+
+- **No Kotlin**: no `.kt`/`.kts` files anywhere; Gradle build files are Groovy `.gradle`. Java only (`.java`).
+- **MVVM**: View (Activity/Fragment/custom View) ⇄ ViewModel (LiveData/observable state) ⇄ Repository.
+- **No Room.** Use the Android framework database (`SQLiteOpenHelper`/`SQLiteDatabase`). Keep all SQL tidy: table/column constants + dedicated query/DAO classes, no SQL strings scattered around.
+- **Clean code, proper folder structure** (package-by-layer with feature sub-packages, small focused classes).
+- **Gradle 9.0.0** wrapper (verify AGP compatibility; report to owner before deviating).
+- Battery efficiency is a hard requirement (see `docs/ARCHITECTURE.md`).

@@ -119,3 +119,30 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 - **Java**: the approved design/implementation is **Jetpack Compose, which is Kotlin-only**. Java means rewriting the UI layer with XML Views/custom Views (custom drawn views are fine for wavy/bars seekbars) and losing Compose/M3-Expressive APIs; Media3/Room/Koin-or-Hilt all work from Java. Java brings **no battery or performance benefit** (battery is decided by wakelocks, tick rates, animation/scan scheduling — not language). Recommendation: **keep Kotlin** (Android's first-class language; Java interop is full). Decision is the owner's: **OPEN QUESTION Q-J — must be asked first in the new chat.** Until answered, no further UI code is written.
 - **Battery**: adopted as a hard requirement (see docs/ARCHITECTURE.md → "Battery & efficiency").
 - **Less Google-look**: adopted; requires a design revision (task T2b, Opus) of DESIGN.md before more UI code: custom-drawn controls/shapes/typography/motion with own identity (closer to Melodiha), M3 used only as an invisible foundation (accessibility/semantics), no stock-looking M3 widgets.
+
+---
+
+## D7 — 2026-10-23 — Answer to Q-J: Java only, MVVM, no Room, tidy queries, clean structure, Gradle 9.0.0
+
+**Question asked (supervisor):** project language — Kotlin + MVVM (recommended; keeps approved Compose UI) vs Java + MVVM (UI rewritten with XML/custom Views, no battery benefit).
+
+**Original answer (verbatim):**
+
+> الان میگم
+> قوانین زیر را رعایت کن 
+> استفاده از kt ممنوع است
+> از معماری mvvm کمک بگیر
+> از room کمک نگیر سیع کن از دیتابیس خود اندروید کمک بگیری
+> کوعری ها رو مرتب بزن 
+> کد های تمیز با پوشه بندی درست 
+> از گردل 9.0.0 کمک بگیر
+
+**Summary (hard rules):**
+1. **No Kotlin at all** — every source file is Java (`.java`). Build scripts must be Groovy `.gradle` (no `.kts`) so no `.kt/.kts` exists in the repo. Resolves Q-J: **Java**.
+2. Architecture **MVVM** (ViewModel + LiveData/observable state, Repository layer).
+3. **No Room.** Use Android's built-in database: `SQLiteOpenHelper` / `SQLiteDatabase` (framework SQLite).
+4. "کوعری ها رو مرتب بزن" — read by the supervisor as **"keep the (database) queries tidy"** (typo for "کوئری"): all SQL lives in dedicated query/DAO classes with named constants, no SQL scattered across the code. (Assumption — owner can correct.)
+5. **Clean code with proper packaging/folder structure** (package-by-layer + feature sub-packages, small focused classes).
+6. **Gradle 9.0.0** (wrapper). Supervisor note: AGP/Gradle compatibility must be verified by the build agent; if Gradle 9.0.0 cannot work with any available AGP, report to owner before deviating.
+
+**Consequences (supervisor):** the Compose/Kotlin scaffold (T1), the approved Compose-based UI plan, and the Kotlin WIP branches (`task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform`) are obsolete as code (design PNGs/spec stay as the visual target; UI becomes XML/custom Views). Re-scaffold in Java (T1b). Wavy / Waveform / Bars seek bars become custom `View`s.
