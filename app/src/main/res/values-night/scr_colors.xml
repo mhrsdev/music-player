@@ -1,18 +1,3 @@
 <resources>
-    <color name="scr_bg">#0F1216</color>
-    <color name="scr_surface_low">#171A1F</color>
-    <color name="scr_surface">#1B1F24</color>
-    <color name="scr_surface_high">#252A30</color>
-    <color name="scr_on_surface">#E2E2E9</color>
-    <color name="scr_on_surface_variant">#BFC6D2</color>
-    <color name="scr_outline_variant">#3F4650</color>
-    <color name="scr_primary">#A6C8FF</color>
-    <color name="scr_on_primary">#00315F</color>
-    <color name="scr_primary_container">#1E4878</color>
-    <color name="scr_on_primary_container">#D4E3FF</color>
-    <color name="scr_secondary_container">#364659</color>
-    <color name="scr_on_secondary_container">#D6E3F7</color>
-    <color name="scr_tertiary">#7FD6CB</color>
     <color name="scr_liked">#F0C46A</color>
-    <color name="scr_error">#FFB4AB</color>
 </resources>

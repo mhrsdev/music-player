@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true" android:color="@color/scr_on_secondary_container"/>
-    <item android:color="@color/scr_on_surface_variant"/>
+    <item android:state_selected="true" android:color="?attr/mpOnSecondaryContainer"/>
+    <item android:color="?attr/mpOnSurfaceVariant"/>
 </selector>

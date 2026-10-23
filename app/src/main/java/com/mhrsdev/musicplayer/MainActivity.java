@@ -2,7 +2,6 @@ package com.mhrsdev.musicplayer;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -20,7 +19,6 @@ import com.mhrsdev.musicplayer.databinding.ActivityMainBinding;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.home.HomeFragment;
-import com.mhrsdev.musicplayer.ui.library.Art;
 import com.mhrsdev.musicplayer.ui.library.CollectionFragment;
 import com.mhrsdev.musicplayer.ui.library.LibraryFragment;
 import com.mhrsdev.musicplayer.ui.library.TrackListFragment;
@@ -32,7 +30,11 @@ import com.mhrsdev.musicplayer.ui.nav.ShellViewModel;
 import com.mhrsdev.musicplayer.ui.search.SearchFragment;
 import com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore;
 import com.mhrsdev.musicplayer.ui.settings.SettingsFragment;
+import com.mhrsdev.musicplayer.ui.settings.SettingsStore;
 import com.mhrsdev.musicplayer.ui.settings.ThemeApplier;
+import com.mhrsdev.musicplayer.ui.theme.ThemeController;
+import com.mhrsdev.musicplayer.ui.widget.FloatingNavView;
+import com.mhrsdev.musicplayer.ui.widget.MiniPlayerView;
 
 /**
  * Single-activity shell: top-level tabs in {@code screen_container}, detail screens pushed on the back stack,
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity
 
     /** T4's screens, resolved by name so the shell compiles before (and independently of) them. */
     private static final String PLAYER_FRAGMENT = "com.mhrsdev.musicplayer.ui.player.PlayerFragment";
-    private static final String QUEUE_FRAGMENT = "com.mhrsdev.musicplayer.ui.queue.QueueFragment";
+    private static final String QUEUE_FRAGMENT = "com.mhrsdev.musicplayer.ui.queue.QueueSheetFragment";
     private static final String PLAYER_TAG = "player";
     private static final String QUEUE_TAG = "queue";
     private static final String STATE_PERMISSION = "permission_flow";
@@ -54,7 +56,9 @@ public class MainActivity extends AppCompatActivity
     private OnBackPressedCallback backToHome;
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
-        ThemeApplier.applyNightMode(new PrefsSettingsStore(this).getTheme());
+        SettingsStore.Theme theme = new PrefsSettingsStore(this).getTheme();
+        ThemeApplier.applyNightMode(theme);
+        setTheme(ThemeApplier.themeRes(theme));
         EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -106,24 +110,24 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    // ---- floating nav (temporary until T2's FloatingNavView) ----
+    // ---- floating nav + mini-player (T2 widgets) ----
+
+    private static final int[] NAV_IDS = {R.id.mp_nav_home, R.id.mp_nav_search, R.id.mp_nav_library, R.id.mp_nav_settings};
 
     private void bindNav() {
-        TextView[] tabs = {binding.nav.tabHome, binding.nav.tabSearch, binding.nav.tabLibrary, binding.nav.tabSettings};
-        Tab[] values = Tab.values();
-        for (int i = 0; i < tabs.length; i++) {
-            Tab t = values[i];
-            tabs[i].setOnClickListener(v -> openTab(t));
-        }
-        shell.getTab().observe(this, selected -> {
-            int on = getColor(R.color.scr_tertiary);
-            int off = getColor(R.color.scr_on_surface_variant);
-            for (int i = 0; i < tabs.length; i++) {
-                boolean s = values[i] == selected;
-                tabs[i].setSelected(s);
-                tabs[i].setTextColor(s ? getColor(R.color.scr_on_surface) : off);
-                tabs[i].setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(s ? on : off));
+        binding.nav.addDefaultItems();
+        binding.nav.setOnItemSelectedListener(new FloatingNavView.OnItemSelectedListener() {
+            @Override public void onItemSelected(int id) {
+                for (int i = 0; i < NAV_IDS.length; i++) if (NAV_IDS[i] == id) openTab(Tab.values()[i]);
             }
+
+            @Override public void onItemReselected(int id) {
+                openTab(shell.getTab().getValue());
+            }
+        });
+        shell.getTab().observe(this, selected -> {
+            int id = NAV_IDS[selected.ordinal()];
+            if (binding.nav.getSelectedItem() != id) binding.nav.setSelectedItem(id, true);
             updateBackToHome();
         });
     }
@@ -134,23 +138,35 @@ public class MainActivity extends AppCompatActivity
                 && getSupportFragmentManager().getBackStackEntryCount() == 0);
     }
 
-    // ---- mini-player (temporary until T2's MiniPlayerView) ----
-
     private void bindMiniPlayer() {
-        binding.mini.miniRoot.setOnClickListener(v -> openFullPlayer());
-        binding.mini.miniPlay.setOnClickListener(v -> shell.togglePlayPause());
+        binding.mini.setListener(new MiniPlayerView.Listener() {
+            @Override public void onOpen() { openFullPlayer(); }
+
+            @Override public void onPlayPause() { shell.togglePlayPause(); }
+
+            @Override public void onNext() { shell.next(); }
+
+            @Override public void onPrevious() { shell.previous(); }
+
+            @Override public void onDismiss() { shell.pause(); }
+        });
+        ThemeController.get(this).accent().observe(this, binding.mini::setAccent);
         shell.getPlayback().observe(this, this::renderMini);
     }
 
+    @Nullable private String miniTrackId;
+
     private void renderMini(PlaybackState s) {
         Track t = s == null ? null : s.currentTrack();
-        binding.mini.miniRoot.setVisibility(t == null ? View.GONE : View.VISIBLE);
+        binding.mini.setVisibility(t == null ? View.GONE : View.VISIBLE);
         if (t == null) return;
-        binding.mini.miniTitle.setText(t.title());
-        binding.mini.miniArtist.setText(t.artistName());
-        Art.bind(binding.mini.miniArt, t.artworkUri(), t.placeholderSeed(), 16, false);
-        binding.mini.miniPlay.setImageResource(s.playing() ? R.drawable.nav_ic_pause : R.drawable.nav_ic_play);
-        binding.mini.miniPlay.setContentDescription(getString(s.playing() ? R.string.nav_pause : R.string.nav_play));
+        if (!t.id().equals(miniTrackId)) {
+            miniTrackId = t.id();
+            binding.mini.bind(t);
+        }
+        binding.mini.setPlaying(s.playing());
+        binding.mini.setBuffering(s.buffering());
+        binding.mini.setProgress(s.positionMs(), s.durationMs());
     }
 
     // ---- ScreenNavigator ----

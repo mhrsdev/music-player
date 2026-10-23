@@ -64,13 +64,14 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
         String title;
         String sub;
         int seed;
-        boolean circle = false;
+        String art = null;
         boolean track = r.kind() == SearchResult.Kind.TRACK;
         switch (r.kind()) {
             case TRACK -> {
                 title = r.track().title();
                 sub = r.track().artistName();
                 seed = r.track().placeholderSeed();
+                art = r.track().artworkUri();
                 h.b.duration.setText(Format.duration(r.track().durationMs(),
                         c.getResources().getConfiguration().getLocales().get(0)));
             }
@@ -78,12 +79,13 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
                 title = r.album().title();
                 sub = c.getString(R.string.search_kind_album) + " · " + r.album().artistName();
                 seed = r.album().placeholderSeed();
+                art = r.album().artworkUri();
             }
             case ARTIST -> {
                 title = r.artist().name();
                 sub = c.getString(R.string.search_kind_artist);
                 seed = r.artist().placeholderSeed();
-                circle = true;
+                art = r.artist().imageUri();
             }
             default -> {
                 title = r.playlist().name();
@@ -98,7 +100,11 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
         h.b.more.setVisibility(track ? View.VISIBLE : View.GONE);
         h.b.more.setContentDescription(c.getString(R.string.library_more, title));
         if (track) h.b.more.setOnClickListener(v -> TrackMenu.show(v, r.track()));
-        Art.bind(h.b.art, null, seed, 12, circle);
+        if (r.kind() == SearchResult.Kind.ARTIST) {
+            Art.artist(h.b.art, art, title, seed);
+        } else {
+            Art.bind(h.b.art, art, seed, 12, false);
+        }
         h.itemView.setOnClickListener(v -> listener.onResultClick(r));
     }
 

@@ -8,7 +8,7 @@
     android:orientation="horizontal"
     android:paddingStart="8dp">
 
-    <ImageView
+    <com.mhrsdev.musicplayer.ui.widget.ArtworkView
         android:id="@+id/art"
         android:layout_width="52dp"
         android:layout_height="52dp"
@@ -29,7 +29,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textDirection="anyRtl"
-            android:textColor="@color/scr_on_surface"
+            android:textColor="?attr/mpOnSurface"
             android:textSize="17sp" />
 
         <LinearLayout
@@ -47,7 +47,7 @@
                 android:contentDescription="@string/search_explicit"
                 android:gravity="center"
                 android:text="E"
-                android:textColor="@color/scr_bg"
+                android:textColor="?attr/mpBackground"
                 android:textSize="10.5sp"
                 android:textStyle="bold"
                 android:visibility="gone"
@@ -63,7 +63,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textDirection="anyRtl"
-                android:textColor="@color/scr_on_surface_variant"
+                android:textColor="?attr/mpOnSurfaceVariant"
                 android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
@@ -74,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:fontFeatureSettings="tnum"
-        android:textColor="@color/scr_on_surface_variant"
+        android:textColor="?attr/mpOnSurfaceVariant"
         android:textSize="14sp" />
 
     <ImageButton
@@ -83,5 +83,5 @@
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/nav_ic_more"
-        android:tint="@color/scr_on_surface_variant" />
+        android:tint="?attr/mpOnSurfaceVariant" />
 </LinearLayout>

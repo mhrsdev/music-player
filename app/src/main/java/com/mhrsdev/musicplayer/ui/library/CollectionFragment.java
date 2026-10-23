@@ -41,7 +41,7 @@ public final class CollectionFragment extends Fragment {
     }
 
     /** Grid cell model shared by the three kinds. */
-    record Cell(String id, String title, String subtitle, int seed, boolean circle) { }
+    record Cell(String id, String title, String subtitle, @Nullable String art, int seed, boolean circle) { }
 
     @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle state) {
@@ -69,7 +69,7 @@ public final class CollectionFragment extends Fragment {
                 b.title.setText(R.string.library_albums);
                 vm.getAlbums().observe(getViewLifecycleOwner(), list -> {
                     List<Cell> cells = new ArrayList<>();
-                    for (Album a : list) cells.add(new Cell(a.id(), a.title(), a.artistName(), a.placeholderSeed(), false));
+                    for (Album a : list) cells.add(new Cell(a.id(), a.title(), a.artistName(), a.artworkUri(), a.placeholderSeed(), false));
                     show(adapter, cells);
                 });
             }
@@ -80,7 +80,7 @@ public final class CollectionFragment extends Fragment {
                     for (Artist a : list) {
                         cells.add(new Cell(a.id(), a.name(),
                                 r.getQuantityString(R.plurals.library_songs, a.trackCount(), a.trackCount()),
-                                a.placeholderSeed(), true));
+                                a.imageUri(), a.placeholderSeed(), true));
                     }
                     show(adapter, cells);
                 });
@@ -92,7 +92,7 @@ public final class CollectionFragment extends Fragment {
                     for (Playlist p : list) {
                         cells.add(new Cell(p.id(), p.name(),
                                 r.getQuantityString(R.plurals.library_songs, p.trackCount(), p.trackCount()),
-                                p.placeholderSeed(), false));
+                                p.artworkUris().isEmpty() ? null : p.artworkUris().get(0), p.placeholderSeed(), false));
                     }
                     show(adapter, cells);
                 });
@@ -141,8 +141,11 @@ public final class CollectionFragment extends Fragment {
             int gravity = cell.circle() ? Gravity.CENTER_HORIZONTAL : Gravity.START;
             h.b.title.setGravity(gravity);
             h.b.subtitle.setGravity(gravity);
-            Art.bind(h.b.art, null, cell.seed(), 24, cell.circle());
-            if (cell.circle()) Monogram.apply(h.b.art, cell.title());
+            if (cell.circle()) {
+                Art.artist(h.b.art, cell.art(), cell.title(), cell.seed());
+            } else {
+                Art.bind(h.b.art, cell.art(), cell.seed(), 24, false);
+            }
             h.itemView.setContentDescription(cell.title() + ", " + cell.subtitle());
             h.itemView.setOnClickListener(v -> listener.onClick(cell));
         }

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/scr_bg"
+    android:background="?attr/mpBackground"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="32dp">
@@ -19,7 +19,7 @@
         android:layout_marginTop="32dp"
         android:gravity="center"
         android:text="@string/nav_perm_title"
-        android:textColor="@color/scr_on_surface"
+        android:textColor="?attr/mpOnSurface"
         android:textSize="26sp"
         android:textStyle="bold" />
 
@@ -30,7 +30,7 @@
         android:gravity="center"
         android:lineSpacingMultiplier="1.2"
         android:text="@string/nav_perm_body"
-        android:textColor="@color/scr_on_surface_variant"
+        android:textColor="?attr/mpOnSurfaceVariant"
         android:textSize="15sp" />
 
     <TextView
@@ -40,7 +40,7 @@
         android:layout_marginTop="12dp"
         android:gravity="center"
         android:text="@string/nav_perm_denied"
-        android:textColor="@color/scr_error"
+        android:textColor="?attr/mpError"
         android:textSize="14sp"
         android:visibility="gone" />
 
@@ -55,7 +55,7 @@
         android:background="@drawable/nav_button_primary"
         android:text="@string/nav_perm_allow"
         android:textAllCaps="false"
-        android:textColor="@color/scr_on_primary"
+        android:textColor="?attr/mpOnPrimary"
         android:textSize="16sp" />
 
     <TextView
@@ -69,6 +69,6 @@
         android:layout_marginTop="8dp"
         android:text="@string/nav_perm_folders"
         android:textAllCaps="false"
-        android:textColor="@color/scr_primary"
+        android:textColor="?attr/mpPrimary"
         android:textSize="16sp" />
 </LinearLayout>

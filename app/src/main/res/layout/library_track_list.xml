@@ -22,5 +22,5 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/nav_back"
         android:src="@drawable/nav_ic_back"
-        android:tint="@color/scr_on_surface" />
+        android:tint="?attr/mpOnSurface" />
 </FrameLayout>

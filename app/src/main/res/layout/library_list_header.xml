@@ -8,7 +8,7 @@
     android:paddingTop="56dp"
     android:paddingBottom="16dp">
 
-    <ImageView
+    <com.mhrsdev.musicplayer.ui.widget.ArtworkView
         android:id="@+id/art"
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -22,7 +22,7 @@
         android:accessibilityHeading="true"
         android:gravity="center"
         android:textDirection="anyRtl"
-        android:textColor="@color/scr_on_surface"
+        android:textColor="?attr/mpOnSurface"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -49,12 +49,12 @@
             android:background="@drawable/nav_button_primary"
             android:clickable="true"
             android:drawablePadding="8dp"
-            android:drawableTint="@color/scr_on_primary"
+            android:drawableTint="?attr/mpOnPrimary"
             android:focusable="true"
             android:gravity="center"
             android:paddingHorizontal="28dp"
             android:text="@string/library_play_all"
-            android:textColor="@color/scr_on_primary"
+            android:textColor="?attr/mpOnPrimary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -66,12 +66,12 @@
             android:background="@drawable/library_tonal_button"
             android:clickable="true"
             android:drawablePadding="8dp"
-            android:drawableTint="@color/scr_on_secondary_container"
+            android:drawableTint="?attr/mpOnSecondaryContainer"
             android:focusable="true"
             android:gravity="center"
             android:paddingHorizontal="24dp"
             android:text="@string/library_shuffle"
-            android:textColor="@color/scr_on_secondary_container"
+            android:textColor="?attr/mpOnSecondaryContainer"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
