@@ -152,6 +152,20 @@ public class LyricsResolverTest {
         assertEquals(9_000, resolve().lines().get(0).timeMs());
     }
 
+    @Test public void onlineSettingOffSkipsTheNetworkButStillUsesLocalAndCachedLyrics() {
+        LyricsResolver offline = new LyricsResolver(Arrays.asList(embedded, sidecar), remote, cache, () -> now, () -> false);
+        remote.text = SYNCED;
+        assertTrue(offline.resolve(track, new CancelToken()).isEmpty());
+        assertEquals(0, remote.calls);
+        assertNull(cache.get(track.id())); // nothing cached, so turning the setting on works at once
+        sidecar.text = PLAIN;
+        assertEquals("LRC file", offline.resolve(track, new CancelToken()).source());
+        sidecar.text = null;
+        cache.put(track.id(), new LyricsCacheStore.Entry(SYNCED, "LRCLIB", now + 1));
+        assertEquals("LRCLIB", offline.resolve(track, new CancelToken()).source());
+        assertEquals(0, remote.calls);
+    }
+
     @Test public void brokenLocalSourceDoesNotStopTheLookup() {
         embedded.error = new IOException("EOF");
         sidecar.text = null;

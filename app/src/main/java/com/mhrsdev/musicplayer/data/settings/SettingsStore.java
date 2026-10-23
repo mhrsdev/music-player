@@ -152,11 +152,11 @@ public final class SettingsStore {
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {
-        String stored = prefs.getString(key, null);
-        if (stored == null) return fallback;
         try {
+            String stored = prefs.getString(key, null);
+            if (stored == null) return fallback;
             return Enum.valueOf(fallback.getDeclaringClass(), stored);
-        } catch (IllegalArgumentException removedValue) {
+        } catch (IllegalArgumentException | ClassCastException removedValueOrOldType) {
             return fallback;
         }
     }

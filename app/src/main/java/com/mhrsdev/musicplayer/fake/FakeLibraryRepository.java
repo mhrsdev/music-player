@@ -7,10 +7,12 @@ import androidx.lifecycle.Transformations;
 import com.mhrsdev.musicplayer.domain.model.Album;
 import com.mhrsdev.musicplayer.domain.model.Artist;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
+import com.mhrsdev.musicplayer.domain.model.ScanResult;
 import com.mhrsdev.musicplayer.domain.model.SearchFilter;
 import com.mhrsdev.musicplayer.domain.model.SearchResult;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.domain.repository.Callback;
+import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +24,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /** In-memory {@link LibraryRepository} seeded from {@link SampleData}. Main thread only; callbacks run inline. */
-public final class FakeLibraryRepository implements LibraryRepository {
+public final class FakeLibraryRepository implements LibraryRepository, LibraryAdmin {
     private final List<Track> tracks = new ArrayList<>();
     private final Map<String, Playlist> playlists = new LinkedHashMap<>();
     private final Map<String, List<String>> playlistTrackIds = new LinkedHashMap<>();
@@ -189,6 +191,44 @@ public final class FakeLibraryRepository implements LibraryRepository {
         List<String> ids = playlistTrackIds.get(playlistId);
         if (ids == null || ids.contains(trackId)) return;
         ids.add(trackId);
+        changed();
+    }
+
+    // ---- LibraryAdmin: nothing to scan in the fake; playlist edits work on the in-memory lists ----
+
+    @Override public LiveData<Boolean> isScanning() {
+        return new MutableLiveData<>(false);
+    }
+
+    @Override public void rescan(@Nullable Callback<ScanResult> callback) {
+        if (callback != null) callback.onResult(new ScanResult(true, 0, 0, 0));
+    }
+
+    @Override public void scanIfStale() { }
+
+    @Override public void renamePlaylist(String playlistId, String name) {
+        Playlist p = playlists.get(playlistId);
+        if (p == null || name.trim().isEmpty()) return;
+        playlists.put(playlistId, new Playlist(p.id(), name.trim(), p.trackCount(), p.description(), p.artworkUris(),
+                p.placeholderSeed()));
+        changed();
+    }
+
+    @Override public void deletePlaylist(String playlistId) {
+        if (playlists.remove(playlistId) == null) return;
+        playlistTrackIds.remove(playlistId);
+        changed();
+    }
+
+    @Override public void removeFromPlaylist(String playlistId, String trackId) {
+        List<String> ids = playlistTrackIds.get(playlistId);
+        if (ids != null && ids.remove(trackId)) changed();
+    }
+
+    @Override public void moveInPlaylist(String playlistId, int from, int to) {
+        List<String> ids = playlistTrackIds.get(playlistId);
+        if (ids == null || from < 0 || from >= ids.size() || to < 0 || to >= ids.size() || from == to) return;
+        ids.add(to, ids.remove(from));
         changed();
     }
 }

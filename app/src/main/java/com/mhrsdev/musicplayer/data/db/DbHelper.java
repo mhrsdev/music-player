@@ -16,11 +16,12 @@ import com.mhrsdev.musicplayer.data.db.contract.WaveformsContract;
  * {@code contract} classes, queries in the {@code query} classes; this class only wires them to the lifecycle.
  * Bump {@link #VERSION} and add a migration step in {@link #onUpgrade} whenever a contract changes.
  *
- * <p>History: v1 = likes only (scaffold), v2 = library, playlists, play stats, waveform + lyrics caches.
+ * <p>History: v1 = likes only (scaffold), v2 = library, playlists, play stats, waveform + lyrics caches,
+ * v3 = lyrics cache keyed by expiry instead of fetch time.
  */
 public final class DbHelper extends SQLiteOpenHelper {
     public static final String NAME = "musicplayer.db";
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     public DbHelper(Context context) {
         super(context.getApplicationContext(), NAME, null, VERSION);
@@ -37,6 +38,10 @@ public final class DbHelper extends SQLiteOpenHelper {
 
     @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 2) createV2Tables(db);
+        if (oldVersion == 2) { // v1 databases just got the v3 shape from createV2Tables
+            db.execSQL(LyricsCacheContract.DROP);
+            for (String sql : LyricsCacheContract.SCHEMA) db.execSQL(sql);
+        }
     }
 
     /** Playlists must exist before playlist_tracks (foreign key). */
