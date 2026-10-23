@@ -1,0 +1,150 @@
+[
+  {
+    "query": "Redesign this settings screen without changing the brand.",
+    "should_trigger": true
+  },
+  {
+    "query": "Make the typography of our reading app more coherent.",
+    "should_trigger": true
+  },
+  {
+    "query": "Audit the mobile checkout journey and show recovery problems.",
+    "should_trigger": true
+  },
+  {
+    "query": "Create a distinctive web interface for a museum archive.",
+    "should_trigger": true
+  },
+  {
+    "query": "این داشبورد فارسی را از نظر چیدمان و خوانایی بهتر کن.",
+    "should_trigger": true
+  },
+  {
+    "query": "Specify a native desktop note editor with keyboard navigation.",
+    "should_trigger": true
+  },
+  {
+    "query": "Build an accessible appointment request form.",
+    "should_trigger": true
+  },
+  {
+    "query": "Turn this provided screenshot into a responsive interface.",
+    "should_trigger": true
+  },
+  {
+    "query": "Improve our design tokens and component state contracts.",
+    "should_trigger": true
+  },
+  {
+    "query": "This interface feels generic; review its art direction.",
+    "should_trigger": true
+  },
+  {
+    "query": "Design a Postgres schema for our booking database; no UI changes.",
+    "should_trigger": false
+  },
+  {
+    "query": "Explain why a query on the ui_events table is slow.",
+    "should_trigger": false
+  },
+  {
+    "query": "Design an API for the mobile app without touching its screens.",
+    "should_trigger": false
+  },
+  {
+    "query": "Translate this standalone Persian essay into English.",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate a standalone landscape painting.",
+    "should_trigger": false
+  },
+  {
+    "query": "Fix a backend 500 error in the checkout API only.",
+    "should_trigger": false
+  },
+  {
+    "query": "Write a paper on the history of graphic design.",
+    "should_trigger": false
+  },
+  {
+    "query": "Find a font license file in this archive, no design work.",
+    "should_trigger": false
+  },
+  {
+    "query": "Calculate contrast of these two supplied hex values only.",
+    "should_trigger": false
+  },
+  {
+    "query": "Plan the architecture of a distributed screenshot storage service.",
+    "should_trigger": false
+  },
+  {
+    "query": "ok so I need a chart for our quarterly board deck, five product lines over eight quarters, and a couple of the board members are colorblind. what colors should I use and how should I label it",
+    "should_trigger": true
+  },
+  {
+    "query": "can you draw an architecture diagram of how our checkout service talks to the queue and the ledger? SVG is fine, it's going in the repo readme",
+    "should_trigger": true
+  },
+  {
+    "query": "make me a single html file landing page for my woodworking classes, it will be hosted somewhere that sandboxes scripts so no external stuff",
+    "should_trigger": true
+  },
+  {
+    "query": "my dashboard looks fine in light mode but dark mode is a mess, there's white text on light grey cards in a few places",
+    "should_trigger": true
+  },
+  {
+    "query": "این نمودار فروش را برای حالت تاریک و روشن درست کن، رنگ‌ها در حالت تاریک خیلی کم‌رنگ شده‌اند",
+    "should_trigger": true
+  },
+  {
+    "query": "turn this flow into a diagram that shows what changes between option A (polling) and option B (webhooks) for the design review",
+    "should_trigger": true
+  },
+  {
+    "query": "write a pandas script that computes weekly signups by channel and prints a table, no plots",
+    "should_trigger": false
+  },
+  {
+    "query": "convert this mermaid sequence diagram text into a PNG using the CLI in our CI job",
+    "should_trigger": false
+  },
+  {
+    "query": "write the SQL for the revenue-by-region tile on our dashboard, I'll handle the front end",
+    "should_trigger": false
+  },
+  {
+    "query": "summarize the history of the pie chart for my statistics seminar",
+    "should_trigger": false
+  },
+  {
+    "query": "my express server returns a 500 on the /report endpoint that renders chart images with node-canvas",
+    "should_trigger": false
+  },
+  {
+    "query": "does this color #8a8a8a pass AA on white? just give me the ratio",
+    "should_trigger": false
+  },
+  {
+    "query": "this landing page was clearly made by chatgpt, purple gradient and three cards with icons. can you make it look like an actual designer made it",
+    "should_trigger": true
+  },
+  {
+    "query": "my site looks like every other AI generated saas page, how do I fix it without a full redesign",
+    "should_trigger": true
+  },
+  {
+    "query": "این صفحه خیلی شبیه خروجی هوش مصنوعی است و قالبی به نظر می‌رسد، درستش کن",
+    "should_trigger": true
+  },
+  {
+    "query": "write a classifier that detects whether an image was AI generated, pytorch is fine",
+    "should_trigger": false
+  },
+  {
+    "query": "how can teachers tell if a student essay was written by an AI? they use em dashes a lot",
+    "should_trigger": false
+  }
+]

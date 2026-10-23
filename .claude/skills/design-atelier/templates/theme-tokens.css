@@ -1,0 +1,57 @@
+/* Theme token starting point. Replace the values, keep the structure.
+   Layout idea: one line naming the arrangement this page is built around.
+   Every token is declared on :root first (light). The two dark blocks only redefine tokens.
+   Check the pairs you rely on with: python scripts/contrast.py --css this-file.css --pair fg:bg --pair muted:surface */
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --fg: #16202c;
+  --muted: #4a5666;
+  --border: #c5cdd8;
+  --accent: #1d4ed8;
+  --accent-fg: #ffffff;
+  --focus: #1d4ed8;
+  --good: #176b3f;
+  --warn: #8a5300;
+  --critical: #b3261e;
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e141b;
+    --surface: #16202a;
+    --fg: #e8edf3;
+    --muted: #a6b2c0;
+    --border: #36424f;
+    --accent: #8fb0ff;
+    --accent-fg: #0b1220;
+    --focus: #a9c1ff;
+    --good: #5fd08f;
+    --warn: #e8b24a;
+    --critical: #ff9189;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e141b;
+  --surface: #16202a;
+  --fg: #e8edf3;
+  --muted: #a6b2c0;
+  --border: #36424f;
+  --accent: #8fb0ff;
+  --accent-fg: #0b1220;
+  --focus: #a9c1ff;
+  --good: #5fd08f;
+  --warn: #e8b24a;
+  --critical: #ff9189;
+}
+/* The host may paint its own ground behind a transparent page, so the body states its background. */
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}

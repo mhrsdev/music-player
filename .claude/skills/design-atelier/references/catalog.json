@@ -1,0 +1,438 @@
+[
+  {
+    "id": "judgment",
+    "path": "references/judgment.md",
+    "terms": [
+      "taste",
+      "beautiful",
+      "human design",
+      "generic",
+      "ugly",
+      "polish",
+      "سلیقه",
+      "زیبا",
+      "قشنگ",
+      "انسانی",
+      "زشت"
+    ],
+    "requires": []
+  },
+  {
+    "id": "discovery",
+    "path": "references/discovery.md",
+    "terms": [
+      "brief",
+      "research",
+      "discovery",
+      "persona",
+      "پژوهش",
+      "بریف",
+      "نیازسنجی"
+    ],
+    "requires": []
+  },
+  {
+    "id": "art-direction",
+    "path": "references/art-direction.md",
+    "terms": [
+      "brand",
+      "art direction",
+      "visual direction",
+      "reference",
+      "moodboard",
+      "برند",
+      "هویت بصری",
+      "مرجع"
+    ],
+    "requires": [
+      "judgment"
+    ]
+  },
+  {
+    "id": "information-architecture",
+    "path": "references/information-architecture.md",
+    "terms": [
+      "navigation",
+      "sitemap",
+      "journey",
+      "onboarding",
+      "معماری اطلاعات",
+      "ناوبری",
+      "جریان کار"
+    ],
+    "requires": []
+  },
+  {
+    "id": "composition",
+    "path": "references/composition.md",
+    "terms": [
+      "layout",
+      "spacing",
+      "alignment",
+      "hierarchy",
+      "composition",
+      "چیدمان",
+      "فاصله",
+      "ترکیب بندی",
+      "سلسله مراتب"
+    ],
+    "requires": []
+  },
+  {
+    "id": "typography",
+    "path": "references/typography.md",
+    "terms": [
+      "typography",
+      "font",
+      "reading",
+      "glyph",
+      "type scale",
+      "فونت",
+      "تایپوگرافی",
+      "خوانایی"
+    ],
+    "requires": []
+  },
+  {
+    "id": "color",
+    "path": "references/color.md",
+    "terms": [
+      "palette",
+      "color",
+      "contrast",
+      "dark mode",
+      "رنگ",
+      "پالت",
+      "کنتراست",
+      "حالت تاریک"
+    ],
+    "requires": []
+  },
+  {
+    "id": "content-assets",
+    "path": "references/content-assets.md",
+    "terms": [
+      "copy",
+      "imagery",
+      "icon",
+      "image",
+      "testimonial",
+      "microcopy",
+      "محتوا",
+      "تصویر",
+      "آیکون",
+      "متن رابط"
+    ],
+    "requires": []
+  },
+  {
+    "id": "design-systems",
+    "path": "references/design-systems.md",
+    "terms": [
+      "design system",
+      "component library",
+      "tokens",
+      "component",
+      "دیزاین سیستم",
+      "توکن",
+      "کامپوننت"
+    ],
+    "requires": []
+  },
+  {
+    "id": "interaction",
+    "path": "references/interaction.md",
+    "terms": [
+      "form",
+      "validation",
+      "dialog",
+      "error",
+      "retry",
+      "checkout",
+      "booking",
+      "فرم",
+      "اعتبارسنجی",
+      "خطا",
+      "رزرو"
+    ],
+    "requires": []
+  },
+  {
+    "id": "accessibility",
+    "path": "references/accessibility.md",
+    "terms": [
+      "accessibility",
+      "keyboard",
+      "screen reader",
+      "wcag",
+      "دسترس پذیری",
+      "کیبورد",
+      "صفحه خوان"
+    ],
+    "requires": []
+  },
+  {
+    "id": "responsive",
+    "path": "references/responsive.md",
+    "terms": [
+      "responsive",
+      "mobile",
+      "reflow",
+      "touch",
+      "narrow screen",
+      "موبایل",
+      "واکنش گرا",
+      "ریسپانسیو"
+    ],
+    "requires": []
+  },
+  {
+    "id": "localization",
+    "path": "references/localization.md",
+    "terms": [
+      "persian",
+      "rtl",
+      "bidi",
+      "localization",
+      "farsi",
+      "فارسی",
+      "راست به چپ",
+      "بومی سازی"
+    ],
+    "requires": [
+      "typography",
+      "responsive"
+    ]
+  },
+  {
+    "id": "data-interfaces",
+    "path": "references/data-interfaces.md",
+    "terms": [
+      "dashboard",
+      "table",
+      "analytics",
+      "filters",
+      "داشبورد",
+      "جدول",
+      "فیلتر"
+    ],
+    "requires": [
+      "information-architecture"
+    ]
+  },
+  {
+    "id": "charts",
+    "path": "references/charts.md",
+    "terms": [
+      "chart",
+      "charts",
+      "bar chart",
+      "line chart",
+      "pie chart",
+      "line graph",
+      "bar graph",
+      "scatter plot",
+      "sparkline",
+      "heatmap",
+      "chart legend",
+      "data visualization",
+      "dataviz",
+      "نمودار",
+      "نمودارها",
+      "مصورسازی داده",
+      "هیت مپ"
+    ],
+    "requires": [
+      "color"
+    ]
+  },
+  {
+    "id": "diagrams",
+    "path": "references/diagrams.md",
+    "terms": [
+      "diagram",
+      "flowchart",
+      "architecture diagram",
+      "sequence diagram",
+      "state diagram",
+      "system diagram",
+      "mermaid",
+      "svg diagram",
+      "دیاگرام",
+      "فلوچارت",
+      "نمودار جریان",
+      "شماتیک",
+      "نقشه معماری"
+    ],
+    "requires": []
+  },
+  {
+    "id": "hosted-pages",
+    "path": "references/hosted-pages.md",
+    "terms": [
+      "single file",
+      "single page",
+      "standalone page",
+      "self contained page",
+      "html artifact",
+      "artifact",
+      "published page",
+      "sandbox",
+      "csp",
+      "صفحه تک فایلی",
+      "صفحه مستقل",
+      "آرتیفکت",
+      "صفحه منتشر شده"
+    ],
+    "requires": [
+      "color",
+      "responsive"
+    ]
+  },
+  {
+    "id": "product-patterns",
+    "path": "references/product-patterns.md",
+    "terms": [
+      "ecommerce",
+      "booking",
+      "editorial",
+      "saas",
+      "documentation",
+      "storefront",
+      "commerce",
+      "رزرو",
+      "فروشگاه",
+      "مستندات",
+      "landing page",
+      "marketing site",
+      "homepage",
+      "لندینگ",
+      "صفحه فرود"
+    ],
+    "requires": []
+  },
+  {
+    "id": "platforms",
+    "path": "references/platforms.md",
+    "terms": [
+      "native",
+      "swiftui",
+      "ios",
+      "android",
+      "desktop",
+      "flutter",
+      "electron",
+      "دسکتاپ",
+      "اندروید",
+      "اپلیکیشن بومی"
+    ],
+    "requires": []
+  },
+  {
+    "id": "motion-spatial",
+    "path": "references/motion-spatial.md",
+    "terms": [
+      "animation",
+      "motion",
+      "3d",
+      "webgl",
+      "scroll",
+      "gesture",
+      "انیمیشن",
+      "موشن",
+      "سه بعدی",
+      "اسکرول"
+    ],
+    "requires": [
+      "accessibility"
+    ]
+  },
+  {
+    "id": "delivery",
+    "path": "references/delivery.md",
+    "terms": [
+      "performance",
+      "implementation",
+      "handoff",
+      "asset pipeline",
+      "پیاده سازی",
+      "کارایی",
+      "تحویل"
+    ],
+    "requires": []
+  },
+  {
+    "id": "verification",
+    "path": "references/verification.md",
+    "terms": [
+      "review",
+      "audit",
+      "screenshot",
+      "verification",
+      "regression",
+      "critique",
+      "نقد",
+      "بررسی طراحی",
+      "اسکرین شات"
+    ],
+    "requires": []
+  },
+  {
+    "id": "self-critique",
+    "path": "references/self-critique.md",
+    "terms": [
+      "self critique",
+      "self criticism",
+      "self review",
+      "novice user",
+      "first time user",
+      "experienced user",
+      "usability walkthrough",
+      "three perspectives",
+      "خودنقدی",
+      "خود نقدی",
+      "خود نقد کنندگی",
+      "کاربر تازه کار",
+      "کاربر مبتدی",
+      "کاربر باتجربه",
+      "چند دیدگاه"
+    ],
+    "requires": [
+      "verification"
+    ]
+  },
+  {
+    "id": "authorship",
+    "path": "references/authorship.md",
+    "terms": [
+      "ai slop",
+      "ai generated look",
+      "ai generated design",
+      "ai generated website",
+      "ai generated page",
+      "ai generated ui",
+      "looks generated",
+      "looks like ai",
+      "looks machine made",
+      "template look",
+      "looks templated",
+      "cookie cutter",
+      "too generic",
+      "less generic",
+      "generic ai",
+      "اسلاپ",
+      "شبیه هوش مصنوعی",
+      "ساخته هوش مصنوعی",
+      "خروجی هوش مصنوعی",
+      "قالبی",
+      "کلیشه ای",
+      "ai tells",
+      "slop tells",
+      "design slop",
+      "vibe coded look"
+    ],
+    "requires": [
+      "judgment"
+    ]
+  }
+]

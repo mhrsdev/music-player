@@ -35,3 +35,16 @@ The owner writes in Persian. Each entry: original text verbatim, then an English
 | 06-artists | Artists grid, circular avatars with names |
 
 Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork backdrop on player, rounded shapes, wavy progress, shape-morphing buttons.
+
+---
+
+## D2 — 2026-10-23 — Design skill + visual target
+
+**Original (verbatim):**
+
+> (attached design-atelier.zip) برای دیزاین از این اسکیل استفاده کن
+> آره و اون حالا یو آی که بهت دادم عکسشو، اون نمونه یو آی که حالا میخوام اون چیزی که میسازی شباهت داشته باشه به این، ولی میخوام قشنگ تر باشه.
+
+**Summary:**
+1. Use the attached **design-atelier** skill for all design work → installed at `.claude/skills/design-atelier/`.
+2. The built UI must be **similar to the reference screenshots, but more beautiful** (same structure/language, higher polish — not a different design).

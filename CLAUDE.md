@@ -8,6 +8,10 @@ Read this file first, then `docs/STATUS.md`, then `docs/DIRECTIVES.md`. Those th
 - **UI sub-agent**: model **Opus 5.5** (`model: "opus"`). Owns everything under `app/src/main/java/.../ui/` and visual design (Compose, Material 3 Expressive, animation, theming).
 - **All other sub-agents**: model **Sonnet 5.5** (`model: "sonnet"`). Build system, data, playback service, lyrics, tests, CI, etc.
 
+## Design skill (set by the owner — mandatory for UI work)
+
+The owner supplied the **design-atelier** skill, installed at `.claude/skills/design-atelier/` (start with its `SKILL.md`; relevant references: `platforms.md`, `motion-spatial.md`, `color.md`, `typography.md`, `localization.md`, `accessibility.md`, `self-critique.md`). The UI sub-agent must read and follow it (design brief, three-perspective self-critique, authorship pass) and report what it actually verified. The UI must **closely resemble the reference screenshots but be more beautiful/polished**.
+
 ## Git rules (set by the owner — mandatory)
 
 - `main` is the main branch and the final deliverable. When work is done it must be **merged into `main`**.

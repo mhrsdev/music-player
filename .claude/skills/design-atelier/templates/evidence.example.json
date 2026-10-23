@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "scope": "Replace with the exact route, state and environment inspected",
+  "checks": [
+    {
+      "id": "keyboard-journey",
+      "status": "not_run",
+      "method": "Complete the critical journey using the keyboard",
+      "reason": "Illustrative template; no execution is represented",
+      "artifacts": []
+    }
+  ]
+}

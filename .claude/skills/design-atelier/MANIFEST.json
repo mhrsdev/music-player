@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "package": "design-atelier",
+  "version": "1.4.0",
+  "scope": "All package files except MANIFEST.json itself; integrity inventory, not a signature.",
+  "files": [
+    {
+      "path": "BUILD-REPORT.md",
+      "sha256": "69b24ebefcebfb40dfefb416999a1445ccc7baa5c52f33a99131ff1d48788f14",
+      "bytes": 22606
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "a3212320404f77a32828ce6d9cae4282bab25798b92e93be5551384de7febf7d",
+      "bytes": 6422
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "d2daf8f473adf5e8cce515d36d4a697e2974206559bef72968f84517778a90b6",
+      "bytes": 1084
+    },
+    {
+      "path": "README.md",
+      "sha256": "2e70a80444557f6cfa50939c882ab8550f4a9050f6d19054aed32964edc27dea",
+      "bytes": 5840
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "f6d1ae6ab8cf64e259f6161b228dd93832c6a5288535bde12530840d6001a47a",
+      "bytes": 12336
+    },
+    {
+      "path": "SOURCES.md",
+      "sha256": "18019143ddfd94e9717c13800a429f4bfa0df0e8ad6be0e9ecad3282936b7d78",
+      "bytes": 11095
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.txt",
+      "sha256": "a9f28948203fc9970e002c6e7f9a71b2d8757243b5e345cf85dd3ea274d65d37",
+      "bytes": 2298
+    },
+    {
+      "path": "VERSION",
+      "sha256": "78b591400c56b7b67b8cb3b2b8a8e65e9093897f02ce0878e6b5405c68620fa7",
+      "bytes": 6
+    },
+    {
+      "path": "evals/PROTOCOL.md",
+      "sha256": "c4fd4612dc8dfc2b171c0d5aff39cc5ab679af827e154b14a1c8db329cabe8fa",
+      "bytes": 4311
+    },
+    {
+      "path": "evals/evals.json",
+      "sha256": "2248068409390d936c4c453abc3ef24d5cfe4f08e56620abccfe4f03c61d6264",
+      "bytes": 20766
+    },
+    {
+      "path": "evals/trigger-cases.json",
+      "sha256": "64670e91bdbd3166e633f57fffc1321b1cef5bf4922c8e31703676f88d22635c",
+      "bytes": 5031
+    },
+    {
+      "path": "examples/booking-rtl.md",
+      "sha256": "cf4d7ad4f1674fd8f4f26fb9aa60266fb4168beb6819c02929792173f147f2bb",
+      "bytes": 2289
+    },
+    {
+      "path": "examples/editorial.md",
+      "sha256": "ec86b60f6d09acfc3ccbfc67c5430766d0f6e8d1f22ce11cc7838be739d9e181",
+      "bytes": 2301
+    },
+    {
+      "path": "examples/index.html",
+      "sha256": "31932bc16d015496e71baad6d0afd0ddf172c86610581044d4c7b02962896835",
+      "bytes": 1377
+    },
+    {
+      "path": "examples/operations.md",
+      "sha256": "15fb58489f3153597a69f4ca2efcdf2da9a8a0ee78b04fb9f49c417ae2dcf4c0",
+      "bytes": 1969
+    },
+    {
+      "path": "examples/self-critique.md",
+      "sha256": "d13bebdbff788486ea69b564deb21c7988c306fc5df449dc8c22075f5dd4bb19",
+      "bytes": 3113
+    },
+    {
+      "path": "examples/web/booking.html",
+      "sha256": "2fada4f6d3d82d985f5b7db292299c2ecfa90b9e9392e8378a4251e2b394e682",
+      "bytes": 8217
+    },
+    {
+      "path": "examples/web/editorial.html",
+      "sha256": "b22c90b3165e82d4862b543f5bf4f5b1ad4cf4e02283f08d68af89660dd15336",
+      "bytes": 6029
+    },
+    {
+      "path": "examples/web/operations.html",
+      "sha256": "7fe9aca5a73a4a6f608dd4e67d35b620e0e0248a60887d46c3dc90d344ffc3d2",
+      "bytes": 10330
+    },
+    {
+      "path": "licenses/Apache-2.0.txt",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174
+    },
+    {
+      "path": "references/accessibility.md",
+      "sha256": "a2523a54212d413e6df12b93a6f0e69e826b190ac40e3f6dbbdba1f1fabd7edf",
+      "bytes": 3033
+    },
+    {
+      "path": "references/art-direction.md",
+      "sha256": "c4c0079e191653b7fd87420dfca2d6c9e7e8e602d96780e8c7d27e15222d17df",
+      "bytes": 3128
+    },
+    {
+      "path": "references/authorship-catalog.md",
+      "sha256": "823c29ae68db98303ef34da6c5844e4dc251ec365e42c77183eb7cb04a2d8b0d",
+      "bytes": 9090
+    },
+    {
+      "path": "references/authorship.md",
+      "sha256": "e7aa49a3381155c8855e1e1e89e37e5aa98c638a19035cb0d0286988065ba334",
+      "bytes": 5671
+    },
+    {
+      "path": "references/catalog.json",
+      "sha256": "2ae6264bd1ecf52e332ae132edfb866dbbb9195ac2e08a4e1843f774760c583c",
+      "bytes": 8404
+    },
+    {
+      "path": "references/charts.md",
+      "sha256": "703ea589da862745db553fd942f6fcd3502f2160fea9a8bfa747a0924887337d",
+      "bytes": 4877
+    },
+    {
+      "path": "references/color.md",
+      "sha256": "46403119aa75ca10f5358a2084121e3c3e216b6c6c9d4cbfc34a35fc392d9f44",
+      "bytes": 3711
+    },
+    {
+      "path": "references/composition.md",
+      "sha256": "20cc575aff9a87372fefdda0708cb5fbeb1baab78f7fc72ddc8c9a86336f3f38",
+      "bytes": 2870
+    },
+    {
+      "path": "references/content-assets.md",
+      "sha256": "746aaea8c4865796cf3bff16917a5623a91246effeb15cf85c45f3287b940462",
+      "bytes": 2809
+    },
+    {
+      "path": "references/data-interfaces.md",
+      "sha256": "97d0f213f59d612e336b0367956cb274873e620da60109ca77dfe4f39c0323b5",
+      "bytes": 2999
+    },
+    {
+      "path": "references/delivery.md",
+      "sha256": "6dfe2f13f010b49eaf1a5b3380e172c2ceaf4e77fdf16071ed3faed8f8b3259c",
+      "bytes": 2913
+    },
+    {
+      "path": "references/design-systems.md",
+      "sha256": "c354139c184077c158707dfaf66529a9419f796e3cf022bacb96dabd67a852b8",
+      "bytes": 3118
+    },
+    {
+      "path": "references/diagrams.md",
+      "sha256": "66fba424bcfe6badacde11a87bb45bf651bbe31c5464e7a8bc36489b1e6dbb79",
+      "bytes": 3451
+    },
+    {
+      "path": "references/discovery.md",
+      "sha256": "59ac0378c7b7c33716fc718fa8a02a57709729d69dfd5043fac7fe43a5aab7af",
+      "bytes": 2836
+    },
+    {
+      "path": "references/hosted-pages.md",
+      "sha256": "d8c703a0f02c9ab4c9266211d5ed6e6ff803922438ae86f79c94c0cc7601b43f",
+      "bytes": 3989
+    },
+    {
+      "path": "references/information-architecture.md",
+      "sha256": "cfabf981d809a3c852cad63d019ce6ad04c08253c372a27b322e7f20d0934a3c",
+      "bytes": 2925
+    },
+    {
+      "path": "references/interaction.md",
+      "sha256": "e46115d3fcce335a15dc0f8da342f8e07e4309c3f02dd611b8a82ef8f1b1b458",
+      "bytes": 3057
+    },
+    {
+      "path": "references/judgment.md",
+      "sha256": "6cf21bc23485b4f2b61dae17bbc79f22ce208cd3674de95711d4bdb555fab9b1",
+      "bytes": 4082
+    },
+    {
+      "path": "references/localization.md",
+      "sha256": "4e1ea4e9e05acd0d659a30014e9eca173c6f40aac051decc99089da42db96a3d",
+      "bytes": 4103
+    },
+    {
+      "path": "references/motion-spatial.md",
+      "sha256": "55e95b2f461462b9328792e8dabf9247e425b81d896841babcf4fd43aba6168a",
+      "bytes": 3027
+    },
+    {
+      "path": "references/platforms.md",
+      "sha256": "380f8a5f6c8e702f1d023816b8ed0c030e110bdb84ca5ffc6b4eeac5d3e751b3",
+      "bytes": 2994
+    },
+    {
+      "path": "references/product-patterns.md",
+      "sha256": "2629b85de21bdc2b6987e3896d56cf2b31a18bb653c7b5840fde714b72f20bb4",
+      "bytes": 3093
+    },
+    {
+      "path": "references/responsive.md",
+      "sha256": "4e478ad30ae02edaf558f1308b4832013fe1f736de7b138b76f7da0f85fcc19b",
+      "bytes": 2874
+    },
+    {
+      "path": "references/self-critique.md",
+      "sha256": "c8fbe9d3526fea4cb9c435e76ff6c719f46752abd34302a54a727b71a30755ec",
+      "bytes": 8471
+    },
+    {
+      "path": "references/typography.md",
+      "sha256": "4b994781317049cf5e10565bb7a908cae27e29d9d33babf7b60f9abe7417a213",
+      "bytes": 2904
+    },
+    {
+      "path": "references/verification.md",
+      "sha256": "efde946a3dda78e3a4b7cb79b6c61e80eb72ce9ddef6a7beb86341e0efbd247d",
+      "bytes": 4374
+    },
+    {
+      "path": "rubrics/design-review.md",
+      "sha256": "db5301e0327c68af3f88a33ed974eb3952d108b1f5279f0a3462e7c78e2a5710",
+      "bytes": 4381
+    },
+    {
+      "path": "scripts/contrast.py",
+      "sha256": "f5efdb13681d6c537936c6c2e901bd3020a5c42b1b568804d92a66ebbf1bbcde",
+      "bytes": 4680
+    },
+    {
+      "path": "scripts/evidence.py",
+      "sha256": "f367e639c8725707e2307cab0f03ed169672d706fcd902cb26923837c3a633e5",
+      "bytes": 5418
+    },
+    {
+      "path": "scripts/inspect_page.py",
+      "sha256": "1b248c4b5dbc822933d0ea68ceacd2daeb301f91f54d2d41d1ab69307bae8e20",
+      "bytes": 30494
+    },
+    {
+      "path": "scripts/route.py",
+      "sha256": "8f2532ef1c4247a88848557e2eb97225ecf6d859d66c7f1d888fe5f19d34e94a",
+      "bytes": 3008
+    },
+    {
+      "path": "scripts/validate.py",
+      "sha256": "2095d1a93caba8fd5619f002d77a46a50968bbb8c6f2aa84d3154e33c6704625",
+      "bytes": 2592
+    },
+    {
+      "path": "templates/brief.md",
+      "sha256": "af381f94537df494deff83e09e5a9bf3c083daca4d8d3f6cd47a83c9faa3c6f8",
+      "bytes": 649
+    },
+    {
+      "path": "templates/decision.md",
+      "sha256": "76b08c0c81eb74dac0f38c241fd18e379da2d4014d4533a9730ed4bec45a6aff",
+      "bytes": 447
+    },
+    {
+      "path": "templates/evidence.example.json",
+      "sha256": "0f43b500874cd270f1ad051e41d80841b06d08d503d730bcbd99e5e42e4eb266",
+      "bytes": 352
+    },
+    {
+      "path": "templates/finding.md",
+      "sha256": "7eec1ad4c3abb562495f3a1e5b1a1183896ae581d66dc3d08998902a92b913bb",
+      "bytes": 685
+    },
+    {
+      "path": "templates/self-critique.md",
+      "sha256": "5f1541a0b043bbcba444d487ce3c073c7bc0b671a4829149bc6b97713995b911",
+      "bytes": 1286
+    },
+    {
+      "path": "templates/state-contract.md",
+      "sha256": "b3e52978c01f86061fada6befd3b2e65b524c40f77bb9f63eb52b341703d8fd4",
+      "bytes": 570
+    },
+    {
+      "path": "templates/theme-tokens.css",
+      "sha256": "ee03c5a267e4cb5c6dca0d172659f20893287396e08bbb0a12682341d887e521",
+      "bytes": 1772
+    },
+    {
+      "path": "tests/browser_smoke.py",
+      "sha256": "9cbe20bf8aa2aef6a7763592414022f14e9df0688d15df330317db87758b21df",
+      "bytes": 9949
+    },
+    {
+      "path": "tests/test_additions.py",
+      "sha256": "f2f4a38883f492888bdf8e9544f6d590ab6aab9648319f02bcda8c10de2112fb",
+      "bytes": 16934
+    },
+    {
+      "path": "tests/test_helpers.py",
+      "sha256": "037b881f16670badf81d6c5b58bb81c94cc810c5e534fc8b7d0c1580131a78ac",
+      "bytes": 5773
+    }
+  ]
+}

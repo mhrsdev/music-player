@@ -1,0 +1,384 @@
+{
+  "skill_name": "design-atelier",
+  "evals": [
+    {
+      "id": 1,
+      "name": "editorial",
+      "prompt": "Create a coastal architecture journal front page without supplied photos. Make its reading path work.",
+      "expected_output": "Subject-specific direction, honest fictional content, original or attributable assets and working reading navigation.",
+      "files": [],
+      "split": "development",
+      "execution_status": "author_example"
+    },
+    {
+      "id": 2,
+      "name": "operations",
+      "prompt": "Build a dense shipment exception desk with search, status filtering and details. Use fictional local records.",
+      "expected_output": "Records support a scan-and-act task; combined filters, no-result recovery and keyboard-operable details work.",
+      "files": [],
+      "split": "development",
+      "execution_status": "author_example"
+    },
+    {
+      "id": 3,
+      "name": "booking-rtl",
+      "prompt": "فرم درخواست نوبت فارسی بساز؛ زمان، نام و موبایل بگیرد، خطاها مشخص باشند و فقط پیش‌نمایش محلی بدهد.",
+      "expected_output": "RTL, script-safe typography, input preservation, appropriate numeral normalization and no claim of a real booking.",
+      "files": [],
+      "split": "development",
+      "execution_status": "author_example"
+    },
+    {
+      "id": 4,
+      "name": "brand-polish",
+      "prompt": "Polish our existing blue-and-white admin UI. Keep the current font, Radix components and all behavior; only improve hierarchy and spacing.",
+      "expected_output": "Preserves identity and components; focused correction and affected behavior check, no gratuitous stack replacement.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 5,
+      "name": "read-only",
+      "prompt": "Review this checkout UI without editing files. Identify important usability issues and preserve strengths.",
+      "expected_output": "Evidence-based prioritized findings, explicitly read-only, no edits or fabricated testing.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 6,
+      "name": "reference-unknown",
+      "prompt": "Implement the supplied desktop screenshot. No mobile design or interaction states are provided.",
+      "expected_output": "Separates observed geometry from inferred mobile/states; requests missing screenshot if not actually available; no invented source facts.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 7,
+      "name": "recovery",
+      "prompt": "Improve a multi-step loan application that loses entered information when the network fails.",
+      "expected_output": "Preserves input, explicit pending/failure/retry semantics and appropriate consequences; no invented compliance claim.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 8,
+      "name": "calendar",
+      "prompt": "Specify an international appointment flow for Persian and English users in different time zones. Do not code it.",
+      "expected_output": "Separates locale/calendar/timezone/instant and unavailability; clear specification, not claimed tested software.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 9,
+      "name": "chart",
+      "prompt": "Design a chart comparing regional sales. Some values are missing, and users need a table alternative.",
+      "expected_output": "Missing distinct from zero; fit-for-question encoding, units, non-color cues and usable text/table equivalent.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 10,
+      "name": "native-mobile",
+      "prompt": "Specify a native SwiftUI medication reminder screen with Dynamic Type, VoiceOver and notification permission states.",
+      "expected_output": "Native navigation and accessibility obligations; no browser screenshot passed off as a tested iOS app.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 11,
+      "name": "desktop",
+      "prompt": "Redesign a resizable desktop document editor with keyboard shortcuts and unsaved work. Preserve its menu model.",
+      "expected_output": "Desktop window behavior, shortcut conventions, focus and work preservation; no forced marketing-page layout.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 12,
+      "name": "motion-reduced",
+      "prompt": "Add a reversible scroll-driven product demonstration. Keep all product information usable with motion reduced or WebGL unavailable.",
+      "expected_output": "One property owner/progress source, cleanup, reverse equivalence and functional fallback; no universal FPS claim.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 13,
+      "name": "small-change",
+      "prompt": "The label and input are too far apart. Adjust that spacing only.",
+      "expected_output": "Inspects local grouping, makes a focused correction; no complete redesign or ceremonial multiple palettes.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 14,
+      "name": "open-brief",
+      "prompt": "Make this software feel premium and more human. Existing product context is available in the repository.",
+      "expected_output": "Inspects context, translates adjectives to observable decisions; no generic universal style or fabricated user research.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 15,
+      "name": "commerce-trust",
+      "prompt": "Create a product page for a small ceramics studio. We have no customer reviews or awards.",
+      "expected_output": "Clear product/price/variant decisions and honest content; no fabricated testimonials, ratings or customer logos.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 16,
+      "name": "accessibility-blocker",
+      "prompt": "Our form has beautiful low-contrast labels and a custom dropdown that cannot be used by keyboard. Improve it.",
+      "expected_output": "Repairs access/operation before cosmetic effects; verifies relevant contrast and keyboard path without claiming full certification.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 17,
+      "name": "localization-switch",
+      "prompt": "Design an English/Persian account screen whose language switch preserves unsaved settings.",
+      "expected_output": "State preservation, actual script coverage, directional icons selected meaningfully and mixed-value isolation.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 18,
+      "name": "system-extension",
+      "prompt": "Extend our existing design system with a pending button state and destructive dialog. Do not add dependencies.",
+      "expected_output": "Reuses existing primitives/tokens and defines focus, duplicate submission, cancellation and return behavior.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 19,
+      "name": "no-browser",
+      "prompt": "Review source for layout issues in this environment where no browser can run.",
+      "expected_output": "Source-based findings distinguished from rendered observations; no invented screenshots or browser passes.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 20,
+      "name": "requested-style",
+      "prompt": "Use the explicitly requested monochrome, symmetrical layout with a large serif title.",
+      "expected_output": "Respects user direction instead of banning legitimate visual choices as AI-looking; still checks task and access.",
+      "files": [],
+      "split": "held_out",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 21,
+      "name": "three-perspective-critique",
+      "prompt": "Build a small booking interface, then inspect your own output as a senior designer, a person with almost no computer experience and a frequent user of similar booking tools. Fix material findings before delivery.",
+      "expected_output": "Three distinct task/recovery walkthroughs; artifact observations separated from usability predictions; scoped fixes and affected rechecks; no fabricated users or independent consensus.",
+      "files": [],
+      "split": "development",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 22,
+      "name": "novice-expert-conflict",
+      "prompt": "After building the workbench, a beginner needs an obvious first action while an experienced user needs quick access to existing batch actions. Critique and improve both paths without forcing everyone through a wizard.",
+      "expected_output": "Explains the conflicting needs, preserves expert capability and work, makes the core path discoverable, resolves by task consequence and rechecks affected perspectives.",
+      "files": [],
+      "split": "development",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 23,
+      "name": "self-critique-review-only",
+      "prompt": "Review the completed interface from professional, beginner and experienced-user perspectives. Do not change any files.",
+      "expected_output": "All three initial assessments and evidence basis recorded, conflicts prioritized, proposed corrections labeled unimplemented, no unauthorized edits or invented runtime results.",
+      "files": [],
+      "split": "development",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 24,
+      "name": "self-critique-no-renderer",
+      "prompt": "The interface implementation is ready, but no browser or screenshots are available here. Run the three-perspective self-review and tell me its limits.",
+      "expected_output": "Source-based assessment from all three perspectives; missing rendered/behavioral coverage explicitly recorded; no fabricated screenshots, user tests or passing interactions.",
+      "files": [],
+      "split": "development",
+      "execution_status": "not_run"
+    },
+    {
+      "id": 25,
+      "name": "landing-page-pair",
+      "split": "development",
+      "execution_status": "single_pair_trial",
+      "prompt": "Build a landing page in English for Lanternfish, an offline-first field notebook app for ecologists and land surveyors. Facts you may use: it works with no signal and syncs when the device is back in range; notes can carry photos pinned to GPS points; it exports to CSV and GeoJSON; it is free for students and costs $9 per month per person for everyone else. There are no customer reviews, awards or press yet. Deliver a single self-contained file.",
+      "expected_output": "A subject-specific single-file page with honest content, working navigation anchors, readable text in light and dark, no sideways scroll at phone width, and a self-review that names real defects.",
+      "files": [],
+      "assertions": [
+        "The deliverable is one self-contained HTML file",
+        "No lorem ipsum, invented testimonials, ratings, customer logos, awards or press quotes appear",
+        "Price statements match the supplied facts ($9 per month per person, free for students)",
+        "scripts/inspect_page.py reports no sideways scroll at 390 px",
+        "scripts/inspect_page.py reports no text-contrast failures in the light or dark scheme",
+        "The page has a non-empty title and exactly one h1",
+        "The final summary names at least one defect found in the first render and says how it was fixed"
+      ]
+    },
+    {
+      "id": 26,
+      "name": "chart-dark-colorblind",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "Design a panel showing weekly signups by acquisition channel (six channels, twelve weeks) for our board deck. It must work in light and dark and for colleagues with color-vision deficiency.",
+      "expected_output": "Form chosen for the question, fixed entity-to-color mapping, legend plus direct labels where useful, one value axis, redundant encoding where hues are close, a table or text equivalent, and tested contrast in both themes.",
+      "files": [],
+      "assertions": [
+        "A legend is present for the multiple series",
+        "No second value axis is used",
+        "Chart text uses theme text tokens rather than series colors",
+        "A table or text equivalent of the data is provided",
+        "Removing one channel does not change the colors of the others",
+        "Text and meaningful marks pass contrast in both themes, or the unrun check is stated"
+      ]
+    },
+    {
+      "id": 27,
+      "name": "diagram-compare-options",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "We are choosing between a polling worker and a webhook for syncing orders from the shop to the warehouse system. Draw the difference for the design doc.",
+      "expected_output": "One figure that shows what each option adds or removes in the same system, labeled arrows, a claim in the caption, self-contained inline SVG that reads in both themes.",
+      "files": [],
+      "assertions": [
+        "Both options appear in the same system context rather than as unconnected boxes",
+        "Every arrow has a label",
+        "The svg has role=img and an aria-label stating the claim",
+        "The svg draws with currentColor and contains no script or external image",
+        "The figure has a figcaption"
+      ]
+    },
+    {
+      "id": 28,
+      "name": "published-page-sandbox",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "Make a shareable single-page HTML tool for splitting a restaurant bill between friends. People should be able to copy the result.",
+      "expected_output": "Opens with a labeled sample state, a copy control with a fallback when the clipboard is refused, no blocking dialogs, storage wrapped in try/catch, tokens declared on :root with both themes.",
+      "files": [],
+      "assertions": [
+        "The page never calls alert, confirm, prompt or window.print",
+        "The copy handler catches a rejected clipboard write and offers a fallback",
+        "Every storage access is inside try/catch",
+        "Every color token is declared on :root before any dark override",
+        "The body sets an explicit background from a token",
+        "The first view shows sample data labeled as an example"
+      ]
+    },
+    {
+      "id": 29,
+      "name": "persian-chart-themes",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "یک نمودار مقایسه‌ی فروش ماهانه‌ی چهار شعبه بساز که هم در حالت روشن و هم تاریک خوانا باشد و جدول جایگزین هم داشته باشد.",
+      "expected_output": "lang=fa and dir=rtl, a stated decision about axis direction and numerals, isolated mixed-script labels, verified Persian glyphs, contrast in both themes and a table equivalent.",
+      "files": [],
+      "assertions": [
+        "The document sets lang=fa and dir=rtl",
+        "The numeral and axis-direction decisions are stated",
+        "Embedded Latin text is isolated with bdi or an explicit dir",
+        "A table equivalent is provided",
+        "Contrast is calculated or the check is reported as not run"
+      ]
+    },
+    {
+      "id": 30,
+      "name": "self-diagnosis-first",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "Build the pricing section for a small note-taking app, then tell me what was wrong with your first render before you fixed it.",
+      "expected_output": "A rendered first pass, three concrete criticisms each tied to something visible, repairs made to those points first, and a re-render that shows them resolved.",
+      "files": [],
+      "assertions": [
+        "The report names at least three concrete defects from the first render",
+        "Each defect cites something observable such as a measurement, a screenshot region or an element",
+        "The repairs address the named defects before cosmetic changes",
+        "A second render or measurement is reported after the fixes"
+      ]
+    },
+    {
+      "id": 31,
+      "name": "authorship-self-repair",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "Here is a landing page you generated for an offline field-notebook app. Before delivering it, look at it the way an editor who has seen a thousand generated pages would, find what looks machine-made, and fix it without changing any fact on the page.",
+      "expected_output": "Findings with locations ranked by visibility, each replaced by a decision from the subject or cut, a check against second-wave defaults, facts and accessibility preserved, and a report of what was kept on purpose.",
+      "files": [],
+      "assertions": [
+        "Each finding names a location in the page rather than an impression",
+        "At least one finding is repaired by a subject-specific decision and not only deleted",
+        "The report says what replaced each tell and checks it is not another common default",
+        "Prices, feature facts and the absence of reviews are unchanged",
+        "scripts/inspect_page.py reports no new measurable problems after the repairs",
+        "At least one habitual element is kept on purpose with a stated reason"
+      ]
+    },
+    {
+      "id": 32,
+      "name": "requested-look-is-not-slop",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "Our brand is warm cream paper, a serif display face and a terracotta accent. Build the pricing section and then review it for anything that looks AI-generated.",
+      "expected_output": "Delivers the requested brand look without calling it a defect, finds other habitual choices if present, and keeps the brand direction intact.",
+      "files": [],
+      "assertions": [
+        "The cream, serif and terracotta direction is delivered as asked",
+        "The review does not list the requested palette or type as a defect",
+        "Any findings concern choices the brand did not specify"
+      ]
+    },
+    {
+      "id": 33,
+      "name": "authorship-rtl-translated-layout",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "این صفحه‌ی فرود فارسی را که قبلاً ساخته‌ای بازبینی کن. به نظر می‌رسد فقط ترجمه‌ی یک صفحه‌ی انگلیسی است. هر جا ماشینی یا قالبی است پیدا و درست کن.",
+      "expected_output": "Finds layout habits specific to right-to-left pages with locations, repairs by logical properties and mirrored directional cues, checks Persian glyph shaping, and asks for or notes the need for a native-speaker copy review instead of inventing a list of Persian clichés.",
+      "files": [],
+      "assertions": [
+        "Physical left or right values on the page are located and replaced by logical ones",
+        "Directional icons or progress cues are checked for mirroring",
+        "The document sets lang=fa and dir=rtl",
+        "Letter-spacing on Persian text is removed or its absence is confirmed",
+        "The report does not claim a verified list of Persian AI copy clichés",
+        "scripts/inspect_page.py shows no rtlPhysical signal after the repairs"
+      ]
+    },
+    {
+      "id": 34,
+      "name": "authorship-links-and-claims",
+      "split": "development",
+      "execution_status": "not_run",
+      "prompt": "Review the landing page you just built for anything that looks generated or unfinished, then fix it. No sign-up URL or customer data exists yet.",
+      "expected_output": "Dead links and placeholder destinations are located and either wired or declared as missing, invented proof is absent, and structural habits are repaired by subject decisions rather than deleted.",
+      "files": [],
+      "assertions": [
+        "Every link that goes nowhere is listed with its location",
+        "Links are either given a real destination from supplied facts or reported as missing, not hidden",
+        "No invented statistics, testimonials, logos or awards are present",
+        "The report separates what was repaired from what was kept on purpose",
+        "The first-screen signals are addressed before below-the-fold ones"
+      ]
+    }
+  ]
+}

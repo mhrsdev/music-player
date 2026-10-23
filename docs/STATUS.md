@@ -1,6 +1,6 @@
 # Project Status (live — supervisor updates after every event)
 
-_Last updated: 2026-10-23 — kickoff_
+_Last updated: 2026-10-23 — D2 (design skill) received_
 
 ## Snapshot
 - Goal: Android music player, Material 3 Expressive UI that beats the reference screenshots in `docs/design-reference/`.
@@ -14,6 +14,7 @@ _Last updated: 2026-10-23 — kickoff_
 |---|---|---|
 | K1 | Native Android, Kotlin + Compose + Media3 | standard; matches reference look |
 | K2 | Phase 1 = local-library player; sources behind `MusicSource` interface | Reference looks like an online YouTube-Music-style client; unofficial scraping of such services violates their ToS, so it is **not** built by default. **Open question for owner** (see below). |
+| K4 | UI = reference look, more polished; UI agent must use `.claude/skills/design-atelier` (owner directive D2) | decided |
 | K3 | Lyrics via embedded/sidecar LRC + LRCLIB | open, legal API |
 
 ## Open questions for the owner
@@ -41,5 +42,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D2 archived: design-atelier skill installed in `.claude/skills/`; T2–T4 briefs must cite it and the "similar to reference, but prettier" target.
 - 2026-10-23: T0 bootstrap committed to `main` + working branch; directive D1 archived.
 - 2026-10-23: T1 delegated to Sonnet sub-agent. T2–T4 (UI, Opus) start after T1 lands contracts; T5–T7 (Sonnet) can run in parallel with UI once contracts exist.
