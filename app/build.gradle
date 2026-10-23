@@ -1,0 +1,60 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.mhrsdev.musicplayer'
+    compileSdkVersion 'android-37.0'
+
+    defaultConfig {
+        applicationId 'com.mhrsdev.musicplayer'
+        minSdk 26
+        targetSdk 37
+        versionCode 1
+        versionName '0.1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    lint {
+        abortOnError true
+        checkDependencies true
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.core
+    implementation libs.androidx.activity
+    implementation libs.androidx.fragment
+    implementation libs.androidx.lifecycle.viewmodel
+    implementation libs.androidx.lifecycle.livedata
+    implementation libs.androidx.recyclerview
+    implementation libs.androidx.constraintlayout
+    implementation libs.material
+
+    implementation libs.media3.exoplayer
+    implementation libs.media3.session
+
+    testImplementation libs.junit
+    testImplementation libs.androidx.arch.core.testing
+}
