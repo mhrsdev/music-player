@@ -62,7 +62,11 @@ public class EmbeddedLyricsSourceTest {
 
     @Test public void syltWordsMergeIntoLinesWhenNewlinesPresent() throws IOException {
         byte[] f = id3(4, "SYLT", syltBody("Hel", 1000, "lo ", 1200, "there\n", 1500, "\nNext", 3000));
-        assertEquals("[00:01.00]Hello there\n[00:03.00]Next\n", text(f));
+        String lrc = text(f); // word entries keep their timing as enhanced LRC
+        assertEquals("[00:01.00]<00:01.00>Hel<00:01.20>lo <00:01.50>there\n[00:03.00]Next\n", lrc);
+        Lyrics l = LrcParser.toLyrics("t", lrc, "Embedded");
+        assertEquals("Hello there", l.lines().get(0).text());
+        assertEquals(3, l.lines().get(0).words().size());
     }
 
     @Test public void id3v22Ult() throws IOException {

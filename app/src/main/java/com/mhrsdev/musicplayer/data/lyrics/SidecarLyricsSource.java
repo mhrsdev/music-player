@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-/** A {@code .lrc} (then {@code .txt}) file next to the audio file with the same base name. */
+/**
+ * A lyrics file next to the audio file with the same base name. Word-synced formats first ({@code .ttml}, {@code .elrc}
+ * = enhanced LRC or JSON), then {@code .lrc}, a {@code .xml} that is TTML, then {@code .txt}.
+ */
 public final class SidecarLyricsSource implements LyricsSource {
-    private static final String[] EXTENSIONS = {".lrc", ".LRC", ".txt"};
+    private static final String[] EXTENSIONS = {".ttml", ".elrc", ".lrc", ".LRC", ".xml", ".txt"};
     private static final int MAX_BYTES = 512 * 1024;
     private final AudioFileLocator locator;
 
@@ -29,7 +32,9 @@ public final class SidecarLyricsSource implements LyricsSource {
             try (RandomAccessFile f = new RandomAccessFile(candidate, "r")) {
                 byte[] buf = new byte[(int) Math.min(f.length(), MAX_BYTES)];
                 f.readFully(buf);
-                return new Found(LyricsTextDecoder.decode(buf), "LRC file");
+                String text = LyricsTextDecoder.decode(buf);
+                if (ext.equals(".xml") && !TtmlLyricsParser.looksLikeTtml(text)) continue; // some other XML
+                return new Found(text, ext.equals(".ttml") || ext.equals(".xml") ? "TTML file" : "LRC file");
             }
         }
         return null;

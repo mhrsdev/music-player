@@ -218,6 +218,13 @@ public class ArtworkLoader {
         cache.evictAll();
     }
 
+    /** UI hidden (Application.onTrimMemory): bitmaps and miss memory go; the next visit reloads what it shows. */
+    public static void trimAll() {
+        if (instance == null) return;
+        instance.trim();
+        instance.forgetMisses();
+    }
+
     /** Forget "no artwork" results, e.g. after a library rescan. */
     public void forgetMisses() {
         misses.evictAll();
