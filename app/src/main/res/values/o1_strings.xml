@@ -1,0 +1,50 @@
+<resources>
+    <string name="settings_feature_headset">Headset &amp; outputs</string>
+    <string name="settings_feature_headset_sub">Button gestures, connected devices, sound per device</string>
+
+    <string name="headset_title">Headset &amp; outputs</string>
+    <string name="headset_buttons_label">Headset buttons</string>
+    <string name="headset_gesture_single">Single press</string>
+    <string name="headset_gesture_double">Double press</string>
+    <string name="headset_gesture_triple">Triple press</string>
+    <string name="headset_gesture_long">Long press</string>
+    <string name="headset_buttons_hint">Applies to the one play/pause button on earbuds and wired headsets. A single press waits a moment to see whether a second one follows. Dedicated next, previous, play and pause buttons always do what they say. A long press usually belongs to your phone\'s assistant; set it here only if your earbuds send it to apps.</string>
+    <string name="headset_action_play_pause">Play / pause</string>
+    <string name="headset_action_next">Next song</string>
+    <string name="headset_action_previous">Previous song</string>
+    <string name="headset_action_seek_forward">Forward 10 seconds</string>
+    <string name="headset_action_seek_back">Back 10 seconds</string>
+    <string name="headset_action_shuffle">Shuffle on / off</string>
+    <string name="headset_action_like">Like / unlike song</string>
+    <string name="headset_action_none">Do nothing</string>
+
+    <string name="headset_connection_label">Connecting and disconnecting</string>
+    <string name="headset_resume_connect">Resume when a headset connects</string>
+    <string name="headset_resume_connect_sub">Continue the music if you plug in or reconnect headphones within 10 minutes of taking them off.</string>
+    <string name="headset_pause_disconnect">Pause when a headset disconnects</string>
+    <string name="headset_pause_disconnect_sub">Stops the music when headphones are unplugged or lose connection, so it never jumps to the speaker.</string>
+    <string name="headset_resume_call">Resume after calls</string>
+    <string name="headset_resume_call_sub">Carry on by itself when a call or another app that interrupted the music is finished.</string>
+
+    <string name="headset_outputs_title">Output devices</string>
+    <string name="headset_outputs_none">No audio output found.</string>
+    <string name="headset_playing_now">Playing now</string>
+    <string name="headset_connected">Connected</string>
+    <string name="headset_sound_saved_tag">Saved sound is applied when this device plays</string>
+    <string name="headset_kind_bluetooth">Bluetooth device</string>
+    <string name="headset_kind_hdmi">Display (HDMI)</string>
+    <string name="headset_kind_other">Audio output</string>
+    <string name="headset_volume">Volume</string>
+    <string name="headset_volume_note">Android remembers one volume per device. This slider changes the device playing now.</string>
+    <string name="headset_switch">Switch output</string>
+    <string name="headset_switch_failed">Couldn\'t open the output switcher. Use your phone\'s volume panel instead.</string>
+    <string name="headset_save_sound">Save current sound for this device</string>
+    <string name="headset_update_sound">Update saved sound</string>
+    <string name="headset_remove_sound">Remove saved sound</string>
+    <string name="headset_sound_saved_toast">Sound saved for %1$s</string>
+    <string name="headset_bt_names">Show Bluetooth device names</string>
+
+    <string name="headset_dual_title">Two Bluetooth devices at once</string>
+    <string name="headset_dual_body">Android doesn\'t let apps play to two Bluetooth devices at the same time. If your phone supports Dual Audio or Audio Sharing, turn it on in the phone\'s own settings and Mowj will play through both.</string>
+    <string name="headset_dual_open">Open audio sharing settings</string>
+</resources>

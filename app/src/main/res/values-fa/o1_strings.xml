@@ -1,0 +1,50 @@
+<resources>
+    <string name="settings_feature_headset">هدفون و خروجی‌ها</string>
+    <string name="settings_feature_headset_sub">حرکت دکمه‌ها، دستگاه‌های متصل، صدای جدا برای هر دستگاه</string>
+
+    <string name="headset_title">هدفون و خروجی‌ها</string>
+    <string name="headset_buttons_label">دکمه‌های هدست</string>
+    <string name="headset_gesture_single">یک‌بار فشردن</string>
+    <string name="headset_gesture_double">دوبار فشردن</string>
+    <string name="headset_gesture_triple">سه‌بار فشردن</string>
+    <string name="headset_gesture_long">نگه داشتن</string>
+    <string name="headset_buttons_hint">برای دکمه‌ی پخش/توقفِ ایرباد و هدست‌های سیمی است. فشردنِ تکی کمی صبر می‌کند ببیند فشار دوم می‌آید یا نه. دکمه‌های جداگانه‌ی بعدی، قبلی، پخش و توقف همیشه همان کار خودشان را می‌کنند. نگه داشتن معمولاً دست دستیار گوشی است؛ فقط اگر ایرباد شما آن را به برنامه‌ها می‌فرستد اینجا تنظیمش کنید.</string>
+    <string name="headset_action_play_pause">پخش / توقف</string>
+    <string name="headset_action_next">آهنگ بعدی</string>
+    <string name="headset_action_previous">آهنگ قبلی</string>
+    <string name="headset_action_seek_forward">۱۰ ثانیه جلو</string>
+    <string name="headset_action_seek_back">۱۰ ثانیه عقب</string>
+    <string name="headset_action_shuffle">پخش تصادفی روشن / خاموش</string>
+    <string name="headset_action_like">پسندیدن / برداشتن پسند</string>
+    <string name="headset_action_none">هیچ کاری نکن</string>
+
+    <string name="headset_connection_label">اتصال و قطع اتصال</string>
+    <string name="headset_resume_connect">با اتصال هدست ادامه بده</string>
+    <string name="headset_resume_connect_sub">اگر هدفون را تا ۱۰ دقیقه پس از درآوردن دوباره وصل کنید، موسیقی ادامه پیدا می‌کند.</string>
+    <string name="headset_pause_disconnect">با قطع هدست متوقف کن</string>
+    <string name="headset_pause_disconnect_sub">وقتی هدفون از برق می‌افتد یا اتصالش قطع می‌شود، موسیقی متوقف می‌شود تا ناگهان از بلندگو پخش نشود.</string>
+    <string name="headset_resume_call">بعد از تماس ادامه بده</string>
+    <string name="headset_resume_call_sub">وقتی تماس یا برنامه‌ی دیگری که موسیقی را قطع کرده تمام شد، خودکار ادامه می‌دهد.</string>
+
+    <string name="headset_outputs_title">دستگاه‌های خروجی</string>
+    <string name="headset_outputs_none">خروجی صدایی پیدا نشد.</string>
+    <string name="headset_playing_now">در حال پخش</string>
+    <string name="headset_connected">متصل</string>
+    <string name="headset_sound_saved_tag">صدای ذخیره‌شده هنگام پخش روی این دستگاه اعمال می‌شود</string>
+    <string name="headset_kind_bluetooth">دستگاه بلوتوث</string>
+    <string name="headset_kind_hdmi">نمایشگر (HDMI)</string>
+    <string name="headset_kind_other">خروجی صدا</string>
+    <string name="headset_volume">بلندی صدا</string>
+    <string name="headset_volume_note">اندروید برای هر دستگاه یک بلندی صدا به خاطر می‌سپارد. این نوار، بلندی دستگاهِ در حال پخش را تغییر می‌دهد.</string>
+    <string name="headset_switch">تغییر خروجی</string>
+    <string name="headset_switch_failed">پنجره‌ی تغییر خروجی باز نشد. از پنل صدای گوشی استفاده کنید.</string>
+    <string name="headset_save_sound">ذخیره‌ی صدای فعلی برای این دستگاه</string>
+    <string name="headset_update_sound">به‌روزرسانی صدای ذخیره‌شده</string>
+    <string name="headset_remove_sound">حذف صدای ذخیره‌شده</string>
+    <string name="headset_sound_saved_toast">صدا برای %1$s ذخیره شد</string>
+    <string name="headset_bt_names">نمایش نام دستگاه‌های بلوتوث</string>
+
+    <string name="headset_dual_title">دو دستگاه بلوتوث هم‌زمان</string>
+    <string name="headset_dual_body">اندروید به برنامه‌ها اجازه نمی‌دهد هم‌زمان روی دو دستگاه بلوتوث پخش کنند. اگر گوشی شما Dual Audio یا Audio Sharing دارد، آن را در تنظیمات خود گوشی روشن کنید؛ موج روی هر دو پخش می‌کند.</string>
+    <string name="headset_dual_open">باز کردن تنظیمات اشتراک صدا</string>
+</resources>
