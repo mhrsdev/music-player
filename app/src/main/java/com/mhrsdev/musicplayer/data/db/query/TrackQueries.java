@@ -24,6 +24,7 @@ import com.mhrsdev.musicplayer.data.db.contract.LikesContract;
 import com.mhrsdev.musicplayer.data.db.contract.PlayStatsContract;
 import com.mhrsdev.musicplayer.data.db.contract.PlaylistTracksContract;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.domain.model.YearCount;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -94,6 +95,40 @@ public final class TrackQueries {
         return run(" JOIN " + PlaylistTracksContract.TABLE + " pt ON pt." + PlaylistTracksContract.COL_TRACK_ID
                 + " = t." + COL_ID + " WHERE pt." + PlaylistTracksContract.COL_PLAYLIST_ID + " = ? ORDER BY pt."
                 + PlaylistTracksContract.COL_POSITION, playlistId);
+    }
+
+    /** Played tracks, most plays first, ties broken by the most recent play. */
+    public List<Track> mostPlayed(int limit) {
+        return run(" JOIN " + PlayStatsContract.TABLE + " ps ON ps." + PlayStatsContract.COL_TRACK_ID + " = t." + COL_ID
+                + " WHERE ps." + PlayStatsContract.COL_PLAY_COUNT + " > 0 ORDER BY ps." + PlayStatsContract.COL_PLAY_COUNT
+                + " DESC, ps." + PlayStatsContract.COL_LAST_PLAYED_AT + " DESC LIMIT " + limit);
+    }
+
+    /** Tracks without a recorded play, newest added first. */
+    public List<Track> neverPlayed(int limit) {
+        return run(JOIN_STATS + " WHERE ps." + PlayStatsContract.COL_TRACK_ID + " IS NULL OR ps."
+                + PlayStatsContract.COL_PLAY_COUNT + " = 0 ORDER BY t." + COL_ADDED_AT_MS + " DESC LIMIT " + limit);
+    }
+
+    public List<Track> byYear(int year) {
+        return run(" WHERE t." + COL_YEAR + " = ? ORDER BY t." + COL_ALBUM_TITLE + " COLLATE LOCALIZED, t."
+                + COL_TRACK_NUMBER, String.valueOf(year));
+    }
+
+    /** Known release years with their track counts, newest first. */
+    public List<YearCount> years() {
+        List<YearCount> out = new ArrayList<>();
+        try (Cursor c = db.rawQuery("SELECT " + COL_YEAR + ", COUNT(*) FROM " + TABLE + " WHERE " + COL_YEAR
+                + " > 0 GROUP BY " + COL_YEAR + " ORDER BY " + COL_YEAR + " DESC", null)) {
+            while (c.moveToNext()) out.add(new YearCount(c.getInt(0), c.getInt(1)));
+        }
+        return out;
+    }
+
+    /** One track by id, or null. */
+    public Track byId(String id) {
+        List<Track> found = run(" WHERE t." + COL_ID + " = ?", id);
+        return found.isEmpty() ? null : found.get(0);
     }
 
     /** @param pattern from {@link LikePattern#contains} */

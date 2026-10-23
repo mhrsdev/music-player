@@ -1,0 +1,9 @@
+<resources>
+    <!-- Defaults of the widget layouts = what the picker preview shows (lapis, dark). Runtime tints override them. -->
+    <color name="widget_default_bg">#1E4878</color>
+    <color name="widget_default_text">#D4E3FF</color>
+    <color name="widget_default_primary">#A6C8FF</color>
+    <color name="widget_default_on_primary">#00315F</color>
+    <color name="widget_default_cover">#385E8B</color>
+    <color name="widget_default_note">#9DB4D6</color>
+</resources>

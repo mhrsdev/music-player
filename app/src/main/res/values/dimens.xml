@@ -19,6 +19,19 @@
     <dimen name="mp_mini_player_height">76dp</dimen>
     <dimen name="mp_mini_player_radius">24dp</dimen>
     <dimen name="mp_mini_player_side">12dp</dimen>
+    <!-- Mini-player internals (real-device spacing fix) -->
+    <dimen name="mp_mini_pad_start">16dp</dimen>
+    <!-- end: 8dp + the next button's own 12dp icon inset reads as ~20dp -->
+    <dimen name="mp_mini_pad_end">8dp</dimen>
+    <dimen name="mp_mini_pad_v">10dp</dimen>
+    <dimen name="mp_mini_art">52dp</dimen>
+    <dimen name="mp_mini_gap">12dp</dimen>
+    <dimen name="mp_mini_text_end">8dp</dimen>
+    <dimen name="mp_mini_play">56dp</dimen>
+    <dimen name="mp_mini_play_pad">4dp</dimen>
+    <dimen name="mp_mini_touch">48dp</dimen>
+    <dimen name="mp_mini_progress_inset">20dp</dimen>
+    <dimen name="mp_mini_progress_bottom">8dp</dimen>
     <dimen name="mp_seek_height">48dp</dimen>
     <dimen name="mp_play_button_large">88dp</dimen>
     <dimen name="mp_play_button_small">48dp</dimen>

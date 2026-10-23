@@ -32,6 +32,8 @@ public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder
         void onStartDrag(RecyclerView.ViewHolder h);
         void onMoveA11y(int fromUpNext, int toUpNext);
         void onRemove(int upNextPos);
+        /** Tap on the "Now playing" row: back to the player. */
+        void onCurrent();
     }
 
     @Nullable private Track current;
@@ -76,12 +78,16 @@ public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder
         h.duration.setText(PlayerFormat.time(t.durationMs(), loc));
         h.art.bind(t);
         h.row.setActivated(isCurrent);
-        h.title.setTextColor(isCurrent ? 0xFFD4E3FF : 0xFFE2E2E9);
+        h.title.setTextColor(com.mhrsdev.musicplayer.ui.theme.Tokens.color(h.itemView.getContext(),
+                isCurrent ? R.attr.mpOnPrimaryContainer : R.attr.mpOnSurface));
+        h.artist.setTextColor(com.mhrsdev.musicplayer.ui.theme.Tokens.color(h.itemView.getContext(),
+                isCurrent ? R.attr.mpOnPrimaryContainer : R.attr.mpOnSurfaceVariant));
         h.drag.setVisibility(isCurrent ? View.INVISIBLE : View.VISIBLE);
         h.drag.setContentDescription(h.itemView.getContext().getString(R.string.queue_reorder, t.title()));
         h.row.setTranslationX(0f);
         h.removeBg.setVisibility(View.INVISIBLE);
-        h.row.setOnClickListener(isCurrent ? null : v -> {
+        h.row.setContentDescription(isCurrent ? h.itemView.getContext().getString(R.string.queue_now_playing_cd, t.title()) : null);
+        h.row.setOnClickListener(isCurrent ? v -> actions.onCurrent() : v -> {
             int p = h.getBindingAdapterPosition();
             if (p != RecyclerView.NO_POSITION) actions.onPlay(toUpNext(p));
         });

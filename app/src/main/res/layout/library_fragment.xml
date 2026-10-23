@@ -343,73 +343,40 @@
 
         </LinearLayout>
 
-        <!-- H1: Genres / Folders (data from the Home feed: tracks.genre / tracks.path, DB v4). -->
-        <LinearLayout
+        <!-- Browse: the whole library and the smart lists, one tap away. -->
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp">
+            android:layout_marginTop="16dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:scrollbars="none">
 
-        <FrameLayout
-            android:id="@+id/hub_genres"
-            android:layout_width="0dp"
-            android:layout_height="88dp"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="4dp"
-            android:background="@drawable/library_tile_bg"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical|start"
-                android:layout_marginStart="20dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_mp_note"
-                app:tint="?attr/mpPrimary" />
-
-            <TextView
-                style="@style/Library.TileTitle"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:paddingStart="56dp"
-                android:paddingEnd="16dp"
-                android:text="@string/library_genres" />
-        </FrameLayout>
+                android:orientation="horizontal">
 
-        <FrameLayout
-            android:id="@+id/hub_folders"
-            android:layout_width="0dp"
-            android:layout_height="88dp"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="4dp"
-            android:background="@drawable/library_tile_bg"
-            android:clickable="true"
-            android:focusable="true">
+                <TextView
+                    android:id="@+id/hub_new_playlist"
+                    style="@style/U2.ActionPill"
+                    android:background="@drawable/nav_button_primary"
+                    android:drawableStart="@drawable/u2_ic_add"
+                    android:drawableTint="?attr/mpOnPrimary"
+                    android:text="@string/library_new_playlist"
+                    android:textColor="?attr/mpOnPrimary"
+                    android:textStyle="bold" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical|start"
-                android:layout_marginStart="20dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_mp_folder"
-                app:tint="?attr/mpPrimary" />
-
-            <TextView
-                style="@style/Library.TileTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:paddingStart="56dp"
-                android:paddingEnd="16dp"
-                android:text="@string/library_folders" />
-        </FrameLayout>
-
-        </LinearLayout>
+                <TextView android:id="@+id/hub_songs" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_note" android:text="@string/u2_songs" />
+                <TextView android:id="@+id/hub_most_played" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_trending" android:text="@string/u2_most_played" />
+                <TextView android:id="@+id/hub_recent_added" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_sparkle" android:text="@string/u2_recently_added" />
+                <TextView android:id="@+id/hub_never_played" style="@style/U2.ActionPill" android:drawableStart="@drawable/nav_ic_history" android:text="@string/u2_never_played" />
+                <TextView android:id="@+id/hub_years" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_calendar" android:text="@string/u2_years" />
+                <!-- H1: Genres / Folders (tracks.genre / tracks.path, DB v4), pages built from the Home feed. -->
+                <TextView android:id="@+id/hub_genres" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_note" android:text="@string/library_genres" />
+                <TextView android:id="@+id/hub_folders" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_folder" android:text="@string/library_folders" />
+            </LinearLayout>
+        </HorizontalScrollView>
 
         <TextView
             style="@style/Scr.SectionTitle"

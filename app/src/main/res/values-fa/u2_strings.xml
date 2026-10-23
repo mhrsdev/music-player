@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="u2_songs">آهنگ‌ها</string>
+    <string name="u2_most_played">پرپخش‌ترین‌ها</string>
+    <string name="u2_never_played">هرگز پخش‌نشده</string>
+    <string name="u2_never_played_empty">همهٔ آهنگ‌ها را گوش داده‌اید. عالی!</string>
+    <string name="u2_recently_added">تازه اضافه‌شده</string>
+    <string name="u2_years">سال‌ها</string>
+    <string name="u2_add_songs">افزودن آهنگ</string>
+    <string name="u2_find_songs">پیدا کردن آهنگ</string>
+    <string name="u2_playlist_empty_body">روی هر آهنگ «افزودن به پلی‌لیست» را بزنید یا جست‌وجو کنید.</string>
+    <string name="u2_no_playlists">هنوز پلی‌لیستی ندارید</string>
+    <string name="u2_no_playlists_body">آهنگ‌ها را برای یک حال‌وهوا، سفر یا ورزش جمع کنید.</string>
+    <string name="u2_playlist_options">گزینه‌های پلی‌لیست</string>
+    <string name="u2_rename_playlist">تغییر نام پلی‌لیست</string>
+    <string name="u2_rename">تغییر نام</string>
+    <string name="u2_delete_playlist">حذف پلی‌لیست</string>
+    <string name="u2_delete_playlist_message">«%1$s» حذف شود؟ آهنگ‌ها در کتابخانه می‌مانند.</string>
+    <string name="u2_playlist_deleted">«%1$s» حذف شد</string>
+    <string name="u2_removed_from_playlist">«%1$s» برداشته شد</string>
+    <string name="u2_remove_from_playlist">برداشتن از این پلی‌لیست</string>
+    <string name="u2_already_in_playlist">از قبل در %1$s هست</string>
+    <string name="u2_reorder">برای جابه‌جایی بکشید</string>
+    <string name="u2_playing_next">«%1$s» بعدی پخش می‌شود</string>
+    <string name="u2_added_to_queue">«%1$s» به صف اضافه شد</string>
+    <string name="u2_go_album">رفتن به آلبوم</string>
+    <string name="u2_go_artist">رفتن به هنرمند</string>
+    <string name="u2_details">جزئیات آهنگ</string>
+    <string name="u2_share">اشتراک‌گذاری</string>
+    <string name="u2_share_failed">برنامه‌ای برای دریافت این فایل نیست</string>
+    <string name="u2_delete">حذف</string>
+    <string name="u2_delete_device">حذف از دستگاه</string>
+    <string name="u2_delete_confirm_one">«%1$s» برای همیشه از دستگاه حذف شود؟</string>
+    <plurals name="u2_delete_confirm_many">
+        <item quantity="one">%d آهنگ برای همیشه از دستگاه حذف شود؟</item>
+        <item quantity="other">%d آهنگ برای همیشه از دستگاه حذف شود؟</item>
+    </plurals>
+    <plurals name="u2_deleted">
+        <item quantity="one">%d آهنگ حذف شد</item>
+        <item quantity="other">%d آهنگ حذف شد</item>
+    </plurals>
+    <string name="u2_delete_failed">این فایل را نمی‌توان حذف کرد</string>
+    <string name="u2_select">انتخاب</string>
+    <string name="u2_select_all">انتخاب همه</string>
+    <string name="u2_selection_done">پایان انتخاب</string>
+    <plurals name="u2_selected">
+        <item quantity="one">%d انتخاب‌شده</item>
+        <item quantity="other">%d انتخاب‌شده</item>
+    </plurals>
+    <string name="u2_sort_by">مرتب‌سازی بر اساس</string>
+    <string name="u2_sort_default">ترتیب پیش‌فرض</string>
+    <string name="u2_sort_title">عنوان</string>
+    <string name="u2_sort_artist">هنرمند</string>
+    <string name="u2_sort_album">آلبوم</string>
+    <string name="u2_sort_date_added">تاریخ افزودن</string>
+    <string name="u2_sort_duration">مدت</string>
+    <string name="u2_sort_most_played">پرپخش‌ترین</string>
+    <string name="u2_sort_reverse">ترتیب معکوس</string>
+    <string name="u2_detail_title">عنوان</string>
+    <string name="u2_detail_artist">هنرمند</string>
+    <string name="u2_detail_album">آلبوم</string>
+    <string name="u2_detail_year">سال</string>
+    <string name="u2_detail_track_no">شمارهٔ قطعه</string>
+    <string name="u2_detail_duration">مدت</string>
+    <string name="u2_detail_bitrate">نرخ بیت</string>
+    <string name="u2_detail_format">قالب</string>
+    <string name="u2_detail_size">حجم</string>
+    <string name="u2_detail_path">مکان</string>
+    <string name="u2_detail_added">افزوده‌شده در</string>
+    <string name="u2_detail_plays">دفعات پخش</string>
+    <string name="u2_kbps">%1$d کیلوبیت بر ثانیه</string>
+    <string name="u2_empty_liked">هنوز آهنگی نپسندیده‌اید</string>
+    <string name="u2_empty_history">هنوز چیزی پخش نشده</string>
+    <string name="u2_empty_songs_body">آهنگ‌های این دستگاه پس از اسکن اینجا می‌آیند.</string>
+</resources>

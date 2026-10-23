@@ -61,6 +61,7 @@ public class MiniPlayerView extends LinearLayout {
     private long position;
     private long duration;
     private boolean playing;
+    private int progressInset, progressBottom;
     @Nullable private Listener listener;
 
     public MiniPlayerView(Context context) {
@@ -74,9 +75,13 @@ public class MiniPlayerView extends LinearLayout {
         setWillNotDraw(false);
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
-        setMinimumHeight((int) (76 * d));
-        int p = (int) (12 * d);
-        setPadding(p, (int) (10 * d), (int) (6 * d), (int) (12 * d));
+        android.content.res.Resources res = getResources();
+        setMinimumHeight(res.getDimensionPixelSize(R.dimen.mp_mini_player_height));
+        int pv = res.getDimensionPixelSize(R.dimen.mp_mini_pad_v);
+        setPaddingRelative(res.getDimensionPixelSize(R.dimen.mp_mini_pad_start), pv,
+                res.getDimensionPixelSize(R.dimen.mp_mini_pad_end), pv);
+        progressInset = res.getDimensionPixelSize(R.dimen.mp_mini_progress_inset);
+        progressBottom = res.getDimensionPixelSize(R.dimen.mp_mini_progress_bottom);
         setElevation(8 * d);
         setClickable(true);
         setFocusable(true);
@@ -84,7 +89,8 @@ public class MiniPlayerView extends LinearLayout {
 
         art = new ArtworkView(context);
         art.setCornerRadiusDp(16f);
-        addView(art, new LayoutParams((int) (52 * d), (int) (52 * d)));
+        int artPx = res.getDimensionPixelSize(R.dimen.mp_mini_art);
+        addView(art, new LayoutParams(artPx, artPx));
 
         LinearLayout texts = new LinearLayout(context);
         texts.setOrientation(VERTICAL);
@@ -93,20 +99,24 @@ public class MiniPlayerView extends LinearLayout {
         texts.addView(title);
         texts.addView(subtitle);
         LayoutParams tlp = new LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        tlp.setMarginStart((int) (14 * d));
-        tlp.setMarginEnd((int) (8 * d));
+        tlp.setMarginStart(res.getDimensionPixelSize(R.dimen.mp_mini_gap));
+        tlp.setMarginEnd(res.getDimensionPixelSize(R.dimen.mp_mini_text_end));
         addView(texts, tlp);
 
         playPause = new MorphPlayPauseView(context);
         playPause.setOnClickListener(v -> { if (listener != null) listener.onPlayPause(); });
-        addView(playPause, new LayoutParams((int) (48 * d), (int) (48 * d)));
+        // 56 dp touch target, disc drawn inside 4 dp padding (48 dp, < 86% of the view): never touches the pill.
+        int playPx = res.getDimensionPixelSize(R.dimen.mp_mini_play), playPad = res.getDimensionPixelSize(R.dimen.mp_mini_play_pad);
+        playPause.setPadding(playPad, playPad, playPad, playPad);
+        addView(playPause, new LayoutParams(playPx, playPx));
 
         next = new ImageButton(context, null, 0, R.style.Widget_MusicPlayer_IconButton);
         next.setImageResource(R.drawable.ic_mp_skip_next);
         next.setContentDescription(context.getString(R.string.mp_cd_next));
         next.setOnClickListener(v -> { if (listener != null) listener.onNext(); });
-        LayoutParams nlp = new LayoutParams((int) (48 * d), (int) (48 * d));
-        nlp.setMarginStart((int) (4 * d));
+        int touch = res.getDimensionPixelSize(R.dimen.mp_mini_touch);
+        LayoutParams nlp = new LayoutParams(touch, touch);
+        nlp.setMarginStart(res.getDimensionPixelSize(R.dimen.mp_mini_play_pad));
         addView(next, nlp);
 
         progressPaint.setStyle(Paint.Style.STROKE);
@@ -182,7 +192,7 @@ public class MiniPlayerView extends LinearLayout {
         long old = position;
         position = positionMs;
         duration = durationMs;
-        float w = getWidth() - 2 * radius;
+        float w = getWidth() - 2f * progressInset;
         if (w <= 0 || durationMs <= 0 || Math.abs(positionMs - old) * w / durationMs >= 1f) invalidate();
     }
 
@@ -200,8 +210,12 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void updateBackground() {
-        if (getWidth() == 0 || accent == null) return;
-        int c = accent.container();
+        if (accent == null) {
+            bgPaint.setColor(Tokens.color(getContext(), R.attr.mpPrimaryContainer) | 0xFF000000);
+            return;
+        }
+        if (getWidth() == 0) return;
+        int c = accent.container() | 0xFF000000; // opaque over scrolling content
         bgPaint.setShader(new LinearGradient(0, 0, getWidth(), 0,
                 c, com.mhrsdev.musicplayer.ui.theme.ColorMath.lerp(c, 0xFF000000, 0.25f), Shader.TileMode.CLAMP));
     }
@@ -222,7 +236,8 @@ public class MiniPlayerView extends LinearLayout {
 
     @Override protected void onDraw(Canvas canvas) {
         canvas.drawRoundRect(bounds, radius, radius, bgPaint);
-        float left = radius, right = getWidth() - radius, y = getHeight() - 5 * d;
+        // Inset from the rounded ends and lifted off the bottom edge so the line never meets the curve.
+        float left = progressInset, right = getWidth() - progressInset, y = getHeight() - progressBottom;
         float x = SeekMath.xFor(position, duration, left, right);
         canvas.drawLine(Math.min(right, x + 4 * d), y, right, y, trackPaint);
         if (x > left) {
