@@ -2,7 +2,9 @@ package com.mhrsdev.musicplayer.domain.repository;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import com.mhrsdev.musicplayer.domain.model.PlaybackOptions;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
+import com.mhrsdev.musicplayer.domain.model.ReplayGainMode;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import java.util.List;
 
@@ -62,4 +64,19 @@ public interface PlayerController {
     void setSleepTimerEndOfTrack();
 
     void cancelSleepTimer();
+
+    // --- playback options (persisted by the implementation) ----------------------------------
+
+    /** Speed, pitch, skip-silence and ReplayGain; changes only on a setter call. */
+    LiveData<PlaybackOptions> getOptions();
+
+    /** 0.5..2.0 in 0.05 steps (snapped); the pitch is not changed. */
+    void setPlaybackSpeed(float speed);
+
+    /** 0.5..2.0 (snapped), independent of the speed. */
+    void setPlaybackPitch(float pitch);
+
+    void setSkipSilence(boolean enabled);
+
+    void setReplayGainMode(ReplayGainMode mode);
 }
