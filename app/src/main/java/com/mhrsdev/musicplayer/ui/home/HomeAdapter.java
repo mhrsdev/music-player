@@ -212,7 +212,7 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         } else if (b instanceof LibraryRowTrackBinding t) {
             Track track = row.track();
             ScriptFont.setText(t.title, track.title());
-            ScriptFont.setText(t.subtitle, track.artistName());
+            ScriptFont.setText(t.subtitle, SectionText.artist(c, track.artistName()));
             t.duration.setText(Format.duration(track.durationMs(), locale(c)));
             t.explicit.setVisibility(track.explicit() ? View.VISIBLE : View.GONE);
             t.more.setContentDescription(c.getString(R.string.library_more, track.title()));
@@ -247,7 +247,7 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
     private void bindContinue(HomeContinueBinding k, HomeSection s) {
         Track track = s.items().get(0).track();
         ScriptFont.setText(k.title, track.title());
-        ScriptFont.setText(k.subtitle, track.artistName());
+        ScriptFont.setText(k.subtitle, SectionText.artist(k.getRoot().getContext(), track.artistName()));
         Art.bind(k.art, track.artworkUri(), track.placeholderSeed(), 14, false);
         boolean current = track.id().equals(nowTrackId) && nowProgress >= 0;
         k.progressTrack.setVisibility(current ? View.VISIBLE : View.INVISIBLE);
@@ -275,7 +275,7 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         st.topArtist.setVisibility(s.topArtistMonth() == null ? View.GONE : View.VISIBLE);
         if (s.topArtistMonth() != null) {
             ScriptFont.setText(st.topArtist, c.getString(R.string.home_stat_top_artist,
-                    android.text.BidiFormatter.getInstance().unicodeWrap(s.topArtistMonth())));
+                    SectionText.isolate(SectionText.artist(c, s.topArtistMonth()))));
         }
         st.listened.setVisibility(s.listenedMsMonth() > 0 ? View.VISIBLE : View.GONE);
         st.listened.setText(c.getString(R.string.home_stat_listened_month, Format.duration(s.listenedMsMonth(), locale(c))));

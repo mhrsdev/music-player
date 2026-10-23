@@ -1,11 +1,11 @@
 package com.mhrsdev.musicplayer.ui.home;
 
 import android.content.Context;
-import android.text.BidiFormatter;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.HomeMix;
 import com.mhrsdev.musicplayer.domain.model.HomeSection;
+import com.mhrsdev.musicplayer.domain.model.Track;
 
 /** Localized copy for Home: the feed returns section ids + parameters, this maps them to resource strings. */
 class SectionText {
@@ -65,13 +65,27 @@ class SectionText {
         if (m.kind() == HomeMix.Kind.DECADE || m.kind() == HomeMix.Kind.GENRE || m.kind() == HomeMix.Kind.FOLDER) {
             return c.getResources().getQuantityString(R.plurals.library_songs, m.tracks().size(), m.tracks().size());
         }
-        BidiFormatter bidi = BidiFormatter.getInstance();
         StringBuilder names = new StringBuilder();
         for (String n : m.artistNames()) {
             if (names.length() > 0) names.append(c.getString(R.string.home_list_separator));
-            names.append(bidi.unicodeWrap(n));
+            names.append(isolate(artist(c, n)));
         }
         return c.getString(R.string.home_mix_with, names);
+    }
+
+    /** Localized label for the scanner's "Unknown artist" placeholder. */
+    static String artist(Context c, String name) {
+        return Track.UNKNOWN_ARTIST.equals(name) ? c.getString(R.string.home_unknown_artist) : name;
+    }
+
+    static String album(Context c, String title) {
+        return Track.UNKNOWN_ALBUM.equals(title) ? c.getString(R.string.home_unknown_album) : title;
+    }
+
+    /** First-strong isolate: a Latin name inside a Persian line (or the reverse) keeps its own order and the line's
+     * ellipsis lands at the visual end of the line's (locale) direction. */
+    static String isolate(String s) {
+        return "\u2068" + s + "\u2069";
     }
 
     /** Digits in the UI locale (Persian digits in fa) for numeric args like a year or a mix number. */

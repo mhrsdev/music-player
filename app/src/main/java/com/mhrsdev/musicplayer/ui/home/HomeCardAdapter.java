@@ -51,6 +51,7 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
         };
     }
 
+    @androidx.annotation.Nullable private RecyclerView host;
     private final int mode;
     private final boolean grid;
     private final Listener listener;
@@ -91,7 +92,7 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
             default: {
                 HomeCardBinding b = HomeCardBinding.inflate(inf, parent, false);
                 if (type == HERO) {
-                    int w = HeroCarousel.cardWidth(parent.getWidth(), d);
+                    int w = HeroCarousel.cardWidth(rowWidth(parent), d);
                     b.getRoot().getLayoutParams().width = w;
                     b.artFrame.getLayoutParams().height = w - Math.round(8 * d);
                 } else if (grid) {
@@ -100,6 +101,25 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
                 return new Holder(b);
             }
         }
+    }
+
+    @Override public void onAttachedToRecyclerView(@NonNull RecyclerView rv) {
+        host = rv;
+    }
+
+    @Override public void onDetachedFromRecyclerView(@NonNull RecyclerView rv) {
+        host = null;
+    }
+
+    /**
+     * The row's width. During the first auto-measure pass a RecyclerView is still 0 wide, which used to size hero cards
+     * with the 272 dp fallback (too wide: only one card and a sliver visible); Home rows are full-width, so the window
+     * width is the right fallback.
+     */
+    private static int rowWidth(@androidx.annotation.Nullable View row) {
+        if (row != null && row.getWidth() > 0) return row.getWidth();
+        if (row != null && row.getMeasuredWidth() > 0) return row.getMeasuredWidth();
+        return (row != null ? row.getResources() : Resources.getSystem()).getDisplayMetrics().widthPixels;
     }
 
     /** Square cover in a grid cell: cell width from the span count minus margins and padding. */
@@ -119,7 +139,7 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
         String title;
         String subtitle;
         if (h.b instanceof HomeAvatarBinding a) {
-            title = item.artist().name();
+            title = SectionText.artist(c, item.artist().name());
             subtitle = r.getQuantityString(R.plurals.library_songs, item.artist().trackCount(), item.artist().trackCount());
             Art.artist(a.art, item.artist().imageUri(), title, item.artist().placeholderSeed());
             ScriptFont.setText(a.title, title);
@@ -145,13 +165,13 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
             switch (item.kind()) {
                 case TRACK -> {
                     title = item.track().title();
-                    subtitle = item.track().artistName();
+                    subtitle = SectionText.artist(c, item.track().artistName());
                     seed = item.track().placeholderSeed();
                     art = item.track().artworkUri();
                 }
                 case ALBUM -> {
-                    title = item.album().title();
-                    subtitle = android.text.BidiFormatter.getInstance().unicodeWrap(item.album().artistName()) + " · "
+                    title = SectionText.album(c, item.album().title());
+                    subtitle = SectionText.isolate(SectionText.artist(c, item.album().artistName())) + " · "
                             + r.getQuantityString(R.plurals.library_songs, item.album().trackCount(),
                             item.album().trackCount());
                     seed = item.album().placeholderSeed();
@@ -180,6 +200,17 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
             ScriptFont.setText(b.title, title);
             ScriptFont.setText(b.subtitle, subtitle);
             boolean hero = mode == HERO;
+            if (hero) { // width from the real row width; a lone hero card spans the row (no blank space after it)
+                int parentWidth = rowWidth(host);
+                float d = r.getDisplayMetrics().density;
+                int w = getItemCount() == 1
+                        ? parentWidth - Math.round(2 * (HeroCarousel.START_DP + 4) * d) : HeroCarousel.cardWidth(parentWidth, d);
+                if (b.getRoot().getLayoutParams().width != w) {
+                    b.getRoot().getLayoutParams().width = w;
+                    b.artFrame.getLayoutParams().height = Math.min(w, HeroCarousel.cardWidth(parentWidth, d)) - Math.round(8 * d);
+                    b.getRoot().requestLayout();
+                }
+            }
             Art.bind(b.art, art, seed, hero ? 28 : 24, false);
             b.play.setVisibility(hero ? View.VISIBLE : View.GONE);
             b.play.setOnClickListener(v -> listener.onItemClick(item));

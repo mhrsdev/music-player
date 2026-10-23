@@ -37,6 +37,8 @@
     <string name="home_surprise">Surprise me</string>
     <string name="home_refreshed">New picks</string>
     <string name="home_resume">Resume</string>
+    <string name="home_unknown_artist">Unknown artist</string>
+    <string name="home_unknown_album">Unknown album</string>
     <string name="home_play_now">Play</string>
     <string name="home_list_separator">", "</string>
 

@@ -33,6 +33,6 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:textDirection="anyRtl"
+        android:textDirection="locale"
         android:textAppearance="@style/TextAppearance.MusicPlayer.Supporting" />
 </LinearLayout>

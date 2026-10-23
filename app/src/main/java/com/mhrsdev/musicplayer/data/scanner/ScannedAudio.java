@@ -48,7 +48,7 @@ public record ScannedAudio(
     public Track toTrack() {
         String albumKey = String.valueOf(albumId);
         return new Track(String.valueOf(id), titleOrFileName(), String.valueOf(artistId),
-                known(artist, "Unknown artist"), albumKey, known(album, "Unknown album"), durationMs,
+                known(artist, Track.UNKNOWN_ARTIST), albumKey, known(album, Track.UNKNOWN_ALBUM), durationMs,
                 albumId > 0 ? ALBUM_ART_URI + albumId : null, Seeds.of(albumKey), AUDIO_URI + id,
                 false, false, year, trackNumber, addedAtMs);
     }

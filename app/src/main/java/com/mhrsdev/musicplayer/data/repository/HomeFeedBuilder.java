@@ -55,7 +55,9 @@ public class HomeFeedBuilder {
         if (tracks.isEmpty()) return List.of();
         Map<String, FeedTrack> byId = new HashMap<>();
         for (FeedTrack t : tracks) byId.put(t.track().id(), t);
+        Set<String> pseudo = pseudoAlbumIds(tracks);
         List<AlbumStat> albums = albumStats(tracks);
+        albums.removeIf(a -> pseudo.contains(a.album().id())); // untagged folders are never shown as album cards
         Map<String, Album> albumById = new HashMap<>();
         for (AlbumStat a : albums) albumById.put(a.album().id(), a.album());
         List<TrackStat> stats = new ArrayList<>();
@@ -70,7 +72,7 @@ public class HomeFeedBuilder {
         recent.sort(Comparator.comparingLong(FeedTrack::lastPlayedMs).reversed());
 
         List<HomeSection> head = new ArrayList<>();
-        add(head, base.get("new-releases"));
+        add(head, recentlyAdded(albums, tracks, pseudo));
         if (!recent.isEmpty()) {
             head.add(section("continue", HomeSectionStyle.CONTINUE, List.of(HomeItem.of(recent.get(0).track())), null));
         }
@@ -117,12 +119,50 @@ public class HomeFeedBuilder {
 
     // ---- sections ----
 
+    /**
+     * Untagged files: artist unknown and the "album" is just the folder name MediaStore made up (or "Unknown album").
+     * Those albums are shown as their songs, never as an album card.
+     */
+    static Set<String> pseudoAlbumIds(List<FeedTrack> tracks) {
+        Set<String> out = new HashSet<>();
+        for (FeedTrack t : tracks) if (isPseudoAlbum(t)) out.add(t.track().albumId());
+        return out;
+    }
+
+    static boolean isPseudoAlbum(FeedTrack t) {
+        Track tr = t.track();
+        if (!Track.UNKNOWN_ARTIST.equals(tr.artistName())) return false;
+        if (Track.UNKNOWN_ALBUM.equals(tr.albumTitle())) return true;
+        String folder = MixRanking.parent(t.path());
+        return folder != null && folder.substring(folder.lastIndexOf('/') + 1).equalsIgnoreCase(tr.albumTitle().trim());
+    }
+
+    /** Hero "Recently added": newest real albums interleaved by date with songs from untagged folders. */
+    static HomeSection recentlyAdded(List<AlbumStat> albums, List<FeedTrack> tracks, Set<String> pseudo) {
+        record Entry(long at, HomeItem item) { }
+        List<Entry> entries = new ArrayList<>();
+        for (AlbumStat a : albums) entries.add(new Entry(a.newestAddedMs(), HomeItem.of(a.album())));
+        if (!pseudo.isEmpty()) {
+            for (FeedTrack t : tracks) {
+                if (pseudo.contains(t.track().albumId())) entries.add(new Entry(t.track().addedAtMs(), HomeItem.of(t.track())));
+            }
+        }
+        entries.sort(Comparator.comparingLong(Entry::at).reversed());
+        List<HomeItem> items = new ArrayList<>();
+        for (Entry e : entries) {
+            if (items.size() == HomeRanking.HERO_COUNT) break;
+            items.add(e.item());
+        }
+        return section("new-releases", HomeSectionStyle.HERO_CAROUSEL, items, null);
+    }
+
     static List<HomeItem> jumpBackIn(List<FeedTrack> recent, Map<String, Album> albums) {
         Set<String> seen = new HashSet<>();
         List<HomeItem> out = new ArrayList<>();
         for (FeedTrack t : recent) {
             if (out.size() == 12) break;
-            if (seen.add(t.track().albumId())) out.add(HomeItem.of(albums.get(t.track().albumId())));
+            Album album = albums.get(t.track().albumId());
+            if (album != null && seen.add(album.id())) out.add(HomeItem.of(album));
         }
         return out;
     }
@@ -199,6 +239,7 @@ public class HomeFeedBuilder {
         Map<String, Track> sample = new HashMap<>();
         Map<String, Set<String>> albums = new HashMap<>();
         for (FeedTrack t : tracks) {
+            if (Track.UNKNOWN_ARTIST.equals(t.track().artistName())) continue; // not an artist you "love"
             String id = t.track().artistId();
             int[] s = score.computeIfAbsent(id, k -> new int[2]);
             s[0] += MixRanking.weight(t);
@@ -239,7 +280,7 @@ public class HomeFeedBuilder {
         List<HomeItem> out = new ArrayList<>();
         for (String id : ids) {
             if (out.size() == ROW_MAX) break;
-            out.add(HomeItem.of(albums.get(id)));
+            if (albums.containsKey(id)) out.add(HomeItem.of(albums.get(id)));
         }
         return out;
     }

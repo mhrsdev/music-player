@@ -48,6 +48,6 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:textAlignment="viewStart"
-        android:textDirection="anyRtl"
+        android:textDirection="locale"
         android:textAppearance="@style/TextAppearance.MusicPlayer.Supporting" />
 </LinearLayout>

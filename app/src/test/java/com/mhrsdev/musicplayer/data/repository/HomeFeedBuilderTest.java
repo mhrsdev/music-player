@@ -174,6 +174,27 @@ public class HomeFeedBuilderTest {
         assertNotNull(find(s, "stats").stats());
     }
 
+    @Test public void untaggedFolderIsNeverAnAlbumCard() {
+        List<FeedTrack> tracks = new ArrayList<>(FeedFixtures.library(30, 4).tracks());
+        for (int i = 0; i < 12; i++) { // MediaStore groups untagged files into an album named after the folder
+            Track t = new Track("u" + i, "Voice " + i, "ar-unknown", Track.UNKNOWN_ARTIST, "al-audio", "Audio", 120_000,
+                    null, 5, null, false, false, 0, 0, FeedFixtures.NOW + i);
+            tracks.add(new FeedTrack(t, 3, FeedFixtures.NOW - 1000 - i, null, "/storage/emulated/0/Audio/" + i + ".m4a"));
+        }
+        List<HomeSection> s = HomeFeedBuilder.build(new HomeFeedBuilder.Input(tracks, List.of(), List.of(),
+                FeedFixtures.NOW, FeedFixtures.ZONE, 1, 1));
+        for (HomeSection sec : s) {
+            for (HomeItem i : sec.items()) {
+                if (i.kind() == HomeItem.Kind.ALBUM) assertNotEquals(sec.id(), "al-audio", i.album().id());
+                if (i.kind() == HomeItem.Kind.ARTIST) assertNotEquals(sec.id(), Track.UNKNOWN_ARTIST, i.artist().name());
+            }
+        }
+        HomeSection hero = find(s, "new-releases");
+        assertEquals("newest untagged songs show as song cards", HomeItem.Kind.TRACK, hero.items().get(0).kind());
+        assertTrue(HomeFeedBuilder.isPseudoAlbum(tracks.get(tracks.size() - 1)));
+        assertFalse(HomeFeedBuilder.isPseudoAlbum(tracks.get(0)));
+    }
+
     private static FeedTrack feed(String id, boolean liked, int plays, long last) {
         Track t = new Track(id, "Song " + id, "ar-" + id, "Artist " + id, "al-" + id, "Album " + id, 200_000, null, 1,
                 null, false, liked, 2001, 1, 0);

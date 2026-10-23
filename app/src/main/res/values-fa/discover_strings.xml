@@ -36,6 +36,8 @@
     <string name="home_surprise">غافلگیرم کن</string>
     <string name="home_refreshed">انتخاب‌های تازه</string>
     <string name="home_resume">ادامه</string>
+    <string name="home_unknown_artist">هنرمند ناشناس</string>
+    <string name="home_unknown_album">آلبوم ناشناس</string>
     <string name="home_play_now">پخش</string>
     <string name="home_list_separator">"، "</string>
 

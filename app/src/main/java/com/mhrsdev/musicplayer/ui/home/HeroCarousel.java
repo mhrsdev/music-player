@@ -50,16 +50,8 @@ final class HeroCarousel {
                 apply(r);
             }
         });
-        rv.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
-            int w = r - l;
-            int full = cardWidth(w, d);
-            // Let the last card reach the focused keyline.
-            int end = Math.max(start, w - start - full);
-            if (rv.getPaddingEnd() != end) {
-                rv.setPaddingRelative(start, rv.getPaddingTop(), end, rv.getPaddingBottom());
-            }
-            rv.post(() -> apply(rv));
-        });
+        // Symmetric padding: the last card ends at the same margin the first starts at (no blank page at the end).
+        rv.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> rv.post(() -> apply(rv)));
     }
 
     /**
@@ -70,7 +62,11 @@ final class HeroCarousel {
         float d = rv.getResources().getDisplayMetrics().density;
         boolean rtl = rv.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
         float gap = GAP_DP * d;
-        int keyline = rtl ? rv.getWidth() - rv.getPaddingStart() : rv.getPaddingStart();
+        float keyline = rtl ? rv.getWidth() - rv.getPaddingStart() : rv.getPaddingStart();
+        // Near the end the focus keyline slides toward the end edge, so the last card (which cannot reach the start
+        // keyline) is shown focused, full size, ending at the end margin, with its neighbour peeking before it.
+        float shift = endShift(rv, rtl);
+        keyline += rtl ? -shift : shift;
         for (int i = 0; i < rv.getChildCount(); i++) {
             View c = rv.getChildAt(i);
             float full = c.getWidth();
@@ -93,6 +89,20 @@ final class HeroCarousel {
             c.setImportantForAccessibility(textAlpha > 0.5f || Math.abs(o) < 1.5f
                     ? View.IMPORTANT_FOR_ACCESSIBILITY_AUTO : View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
         }
+    }
+
+    /** 0 until the last card is closer than one "peek area" to its final position, then up to that area. */
+    static float endShift(RecyclerView rv, boolean rtl) {
+        RecyclerView.Adapter<?> a = rv.getAdapter();
+        if (a == null || a.getItemCount() < 2) return 0;
+        int w = rv.getWidth();
+        int full = cardWidth(w, rv.getResources().getDisplayMetrics().density);
+        float max = Math.max(0, w - rv.getPaddingStart() - rv.getPaddingEnd() - full);
+        RecyclerView.ViewHolder last = rv.findViewHolderForAdapterPosition(a.getItemCount() - 1);
+        if (last == null || max == 0) return 0;
+        View v = last.itemView;
+        float overshoot = rtl ? rv.getPaddingEnd() - v.getLeft() : v.getRight() - (w - rv.getPaddingEnd());
+        return max - Math.max(0f, Math.min(max, overshoot));
     }
 
     /** Snaps the nearest card's start edge to the start padding (LTR and RTL). */
