@@ -430,3 +430,14 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > جواب سوالش؟  (screenshot: friends' group asking "لیریک رو از کجا میاره؟")
 
 **Summary:** (1) Tags containing only a site watermark/advert must not count as lyrics -> L2 (junk filter + query normaliser + empty states with Retry / Add file / Search manually). (2) Owner needed an answer for his friends: lyrics resolve in order sidecar `.lrc`/`.elrc`/`.json` next to the audio -> embedded tags (ID3 USLT/SYLT, FLAC Vorbis, M4A ©lyr) -> LRCLIB (lrclib.net, free, no key), cached in the app DB. Answered in chat.
+
+---
+
+## D26 — 2026-10-24 — Settings: a Performance section to reduce animations
+
+**Original (verbatim):**
+
+> و توی ستینگ یه بخش پرفورمنس بزار بشه توش انیمیشنارو کم کرد تا کمتر لگ شه
+> در اپدیت بعدی
+
+**Summary:** For the next release (v0.3.0): Settings gets a **Performance** section where the user can dial animations/effects down for laggy phones. Defaults keep full effects (D24: optimise, don't cut); the section is an opt-in escape hatch. Task Q1 (Opus, `task/q1-performance-settings`).

@@ -47,6 +47,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - 🔄 **B2** [Opus] 5-6 new seek-bar styles + live-preview picker in Settings (D24). `task/b2-seekbars`.
 - ✅ **E2** [Sonnet] Perf regression (shared PeriodicTick/FrameDriver, bucketed artwork decode) — merged into ccr.
 - ✅ **L2** [Opus] Lyrics junk filter, query normaliser, empty states/tools (D25) — merged into ccr (d57328b); also fixed 3 lint errors (Motion API33, ArtworkLoader thread, home_mix_card RTL) and M1ThemeRenderTest index.
+- 🔄 **P2** [Opus] Settings > Performance section (D26): presets + per-effect toggles, live effect. `task/q1-performance-settings`.
 - 🔄 **O1** [Sonnet] Headset buttons fix + settings + output devices. `task/o1-headset`.
 - 🔄 **G1** [Opus] Generated covers for tracks without art (deterministic generative art, UI + notification + widget). `task/g1-covers`.
 - 🔄 **U1b** [Opus] Full edge-to-edge/cutout/immersive + friend's-phone dock inset bug. `task/u1b-fullscreen`.
