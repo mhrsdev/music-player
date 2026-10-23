@@ -59,12 +59,23 @@ final class PlayerHolder {
         return player;
     }
 
-    /** Tests only: a player shared between tests keeps stale loader state and its callbacks race the looper reset. */
+    /**
+     * Tests only: a player shared between tests keeps stale loader state and its callbacks race the looper reset;
+     * one left by an earlier test class (MainActivity builds one) never leaves BUFFERING under the next test's looper.
+     * Robolectric can kill the playback thread while it unregisters the audio-becoming-noisy receiver ("Receiver not
+     * registered"); release() then waits for a reply that never comes (its timeout rides the frozen fake clock), so it
+     * runs on a helper thread and is abandoned after 2 s instead of hanging the whole test task.
+     */
     @VisibleForTesting
-    static synchronized void resetForTest() {
-        if (player != null) player.release();
+    static synchronized void resetForTest() throws InterruptedException {
+        ExoPlayer old = player;
         player = null;
         store = null;
+        if (old == null) return;
+        Thread release = new Thread(old::release, "release-test-player");
+        release.setDaemon(true);
+        release.start();
+        release.join(2_000);
     }
 
     static synchronized PlaybackStore store(Context context) {
