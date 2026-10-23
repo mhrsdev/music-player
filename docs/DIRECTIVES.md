@@ -440,4 +440,4 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > و توی ستینگ یه بخش پرفورمنس بزار بشه توش انیمیشنارو کم کرد تا کمتر لگ شه
 > در اپدیت بعدی
 
-**Summary:** For the next release (v0.3.0): Settings gets a **Performance** section where the user can dial animations/effects down for laggy phones. Defaults keep full effects (D24: optimise, don't cut); the section is an opt-in escape hatch. Task P2 (Opus, `task/p2-performance-settings`).
+**Summary:** For the next release (v0.3.0): Settings gets a **Performance** section where the user can dial animations/effects down for laggy phones. Defaults keep full effects (D24: optimise, don't cut); the section is an opt-in escape hatch. Task Q1 (Opus, `task/q1-performance-settings`).
