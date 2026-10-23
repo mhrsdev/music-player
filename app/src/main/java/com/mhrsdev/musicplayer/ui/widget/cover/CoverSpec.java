@@ -103,6 +103,12 @@ public record CoverSpec(Kind kind, String identity, long seed, String title, @Nu
         return (int) Long.remainderUnsigned(CoverRandom.mix(seed ^ 0xBA1E77EL), CoverPalettes.ALL.size());
     }
 
+    /** The same cover without title/artist lines (rows, mini-player: text would be too small to read). */
+    public CoverSpec textless() {
+        return kind == Kind.ARTIST || title.isEmpty() && subtitle == null ? this
+                : new CoverSpec(kind, identity, seed, "", null);
+    }
+
     /** Cache key: identity plus the text actually drawn (a renamed album gets a fresh cover). */
     public String cacheKey() {
         return "gen:" + identity + '|' + title + '|' + (subtitle == null ? "" : subtitle);

@@ -91,7 +91,8 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
         }
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, title);
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, subtitle);
-        Art.bind(h.b.art, art, seed, hero ? 28 : 24, false, cover);
+        // hero: the play button sits on the cover's text corner and the caption repeats it -> scene only
+        Art.bind(h.b.art, art, seed, hero ? 28 : 24, false, hero ? cover.textless() : cover);
         boolean showPlay = hero;
         h.b.play.setVisibility(showPlay ? View.VISIBLE : View.GONE);
         h.b.play.setOnClickListener(v -> listener.onItemClick(item));

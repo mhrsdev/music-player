@@ -123,8 +123,13 @@ public class ArtworkView extends View {
         return generated && bitmap != null;
     }
 
+    /** Below this width (dp) a generated cover drops its text: it would be under ~9 sp and only add noise. */
+    private static final float TEXT_MIN_DP = 96f;
+
     private CoverSpec coverSpec() {
-        return spec != null ? spec : CoverSpec.fromSeed(seed);
+        CoverSpec s = spec != null ? spec : CoverSpec.fromSeed(seed);
+        float dp = Math.max(getWidth(), getHeight()) / getResources().getDisplayMetrics().density;
+        return dp < TEXT_MIN_DP ? s.textless() : s;
     }
 
     private void cancelInFlight() {
