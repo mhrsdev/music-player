@@ -69,7 +69,7 @@ public class PlaybackNotificationTest {
         app = RuntimeEnvironment.getApplication();
         File wav = new File(app.getCacheDir(), "tone.wav");
         writeSilentWav(wav);
-        Track track = new Track("1", "Song Title", "ar", "Artist Name", "al", "Album", 300_000L, artworkUri, 0,
+        Track track = new Track("1", "Song Title", "ar", "Artist Name", "al", "Album", 600_000L, artworkUri, 0,
                 android.net.Uri.fromFile(wav).toString(), false, false, 0, 0, 0L);
         controller = new ExoPlayerController(app, null, null);
         controller.play(Collections.singletonList(track), 0, null);
@@ -87,19 +87,22 @@ public class PlaybackNotificationTest {
             if (posted == null) Thread.sleep(25);
         }
         assertNotNull("no media notification posted", posted);
-        // Give a loaded machine time to reach READY, but BUFFERING is also "ongoing"; IDLE / ENDED would not be.
-        for (int i = 0; i < 200 && PlayerHolder.get(app).getPlaybackState() != Player.STATE_READY; i++) {
+        // Media3's onTaskRemoved keeps the service only if player.isPlaying() (READY + playWhenReady) and it is already
+        // foreground. Poll (bounded, returns as soon as true) so a slow CI runner cannot race the first buffering.
+        Player player = PlayerHolder.get(app);
+        player.setRepeatMode(Player.REPEAT_MODE_ONE); // can never reach ENDED, whatever the runner's speed
+        for (int i = 0; i < 2400 && !(player.isPlaying() && shadow().isLastForegroundNotificationAttached()); i++) {
             ShadowLooper.idleMainLooper();
             Thread.sleep(25);
         }
-        int state = PlayerHolder.get(app).getPlaybackState();
-        assertTrue("player state " + state, state == Player.STATE_READY || state == Player.STATE_BUFFERING);
+        assertTrue("player never started playing, state " + player.getPlaybackState(), player.isPlaying());
         return posted;
     }
 
     @After public void tearDown() {
         if (controller != null) controller.pause();
         if (service != null) service.destroy(); // releases the session: its id must be unique per test
+        PlayerHolder.resetForTest(); // fresh ExoPlayer per test: no state or pending callbacks leak across tests
     }
 
     private ShadowService shadow() {
@@ -190,9 +193,9 @@ public class PlaybackNotificationTest {
         assertTrue("service kept running while paused", shadow().isStoppedBySelf());
     }
 
-    /** 5 minutes of 8 kHz 8-bit mono: long enough that the track never ends while a slow CI machine runs the test. */
+    /** 10 minutes of 8 kHz 8-bit mono: long enough that the track never ends while a slow CI machine runs the test. */
     private static void writeSilentWav(File file) throws Exception {
-        int rate = 8000, samples = rate * 300;
+        int rate = 8000, samples = rate * 600;
         ByteBuffer b = ByteBuffer.allocate(44 + samples).order(ByteOrder.LITTLE_ENDIAN);
         b.put("RIFF".getBytes()).putInt(36 + samples).put("WAVEfmt ".getBytes()).putInt(16)
                 .putShort((short) 1).putShort((short) 1).putInt(rate).putInt(rate).putShort((short) 1)
