@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="queue_a11y_up" type="id"/>
+    <item name="queue_a11y_down" type="id"/>
+    <item name="queue_a11y_remove" type="id"/>
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/library_row_bg"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <com.mhrsdev.musicplayer.ui.library.SquareArtworkView
+        android:id="@+id/art"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textDirection="anyRtl"
+        android:textColor="?attr/mpOnSurface"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textDirection="anyRtl"
+        android:textColor="?attr/mpOnSurfaceVariant"
+        android:textSize="14sp" />
+</LinearLayout>

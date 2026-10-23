@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared empty / loading state (DESIGN.md 13-states). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/state_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingHorizontal="40dp"
+    android:paddingBottom="@dimen/scr_bottom_chrome"
+    android:visibility="gone">
+
+    <ProgressBar
+        android:id="@+id/state_progress"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:indeterminateTint="?attr/mpPrimary" />
+
+    <ImageView
+        android:id="@+id/state_icon"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/nav_perm_art" />
+
+    <TextView
+        android:id="@+id/state_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textColor="?attr/mpOnSurface"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/state_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="?attr/mpOnSurfaceVariant"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/state_action"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingHorizontal="20dp"
+        android:textColor="?attr/mpPrimary"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+</LinearLayout>
