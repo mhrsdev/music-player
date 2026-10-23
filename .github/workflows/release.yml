@@ -102,21 +102,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          FLAGS=""
+          # Pre-release only when the version has a suffix (v1.0.0-rc.1); every other release is stable and "latest".
           case "$TAG" in
-            *-* | v0.*) FLAGS="--prerelease" ;;
+            *-*) PRE=true; LATEST="" ;;
+            *) PRE=false; LATEST="--latest" ;;
           esac
-          # Manual run: the tag may not exist yet, so let GitHub create it at this commit. Tag push: it must already exist.
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            FLAGS="$FLAGS --target $GITHUB_SHA"
-          else
-            FLAGS="$FLAGS --verify-tag"
-          fi
           if gh release view "$TAG" > /dev/null 2>&1; then
+            # Re-run: upload the assets again and correct the flags.
             gh release upload "$TAG" --clobber \
               "release-out/MusicPlayer-${TAG}.apk" "release-out/MusicPlayer-${TAG}.apk.sha256"
+            gh release edit "$TAG" --prerelease="$PRE" $LATEST
           else
-            gh release create "$TAG" $FLAGS \
+            # Manual run: the tag may not exist yet, so let GitHub create it at this commit. Tag push: it must already exist.
+            if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+              TAGFLAG="--target $GITHUB_SHA"
+            else
+              TAGFLAG="--verify-tag"
+            fi
+            gh release create "$TAG" $TAGFLAG --prerelease="$PRE" $LATEST \
               --title "Music Player ${TAG}" \
               --notes-file release-out/notes.md \
               "release-out/MusicPlayer-${TAG}.apk" "release-out/MusicPlayer-${TAG}.apk.sha256"
