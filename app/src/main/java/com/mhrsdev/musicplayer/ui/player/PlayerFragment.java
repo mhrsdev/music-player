@@ -94,9 +94,11 @@ public final class PlayerFragment extends Fragment {
         vm = new ViewModelProvider(this, PlayerViewModel.factory(c.player, c.library, c.lyrics, c.waveform))
                 .get(PlayerViewModel.class);
 
+        int basePadLeft = b.playerContent.getPaddingLeft(), basePadRight = b.playerContent.getPaddingRight();
         ViewCompat.setOnApplyWindowInsetsListener(b.playerContent, (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), bars.bottom + dp(12));
+            // Controls clear the bars and a side/top cutout (landscape punch hole); the backdrop stays full-bleed.
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            v.setPadding(basePadLeft + bars.left, bars.top, basePadRight + bars.right, bars.bottom + dp(12));
             return insets;
         });
 
@@ -603,6 +605,9 @@ public final class PlayerFragment extends Fragment {
 
     private void renderLiked(Boolean liked) {
         boolean on = Boolean.TRUE.equals(liked);
+        boolean wasOn = Boolean.TRUE.equals(b.playerLike.getTag(R.id.mp_motion_state));
+        b.playerLike.setTag(R.id.mp_motion_state, on);
+        if (on && !wasOn && b.playerLike.isLaidOut()) com.mhrsdev.musicplayer.ui.motion.Motion.pop(b.playerLike);
         b.playerLike.setImageResource(on ? R.drawable.player_ic_favorite : R.drawable.player_ic_favorite_border);
         b.playerLike.setContentDescription(getString(on ? R.string.player_unlike : R.string.player_like));
     }

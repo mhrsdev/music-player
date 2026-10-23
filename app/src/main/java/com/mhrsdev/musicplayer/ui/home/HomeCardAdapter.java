@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.home;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,7 @@ import com.mhrsdev.musicplayer.databinding.HomeCardBinding;
 import com.mhrsdev.musicplayer.domain.model.HomeItem;
 import com.mhrsdev.musicplayer.ui.library.Art;
 
-/** Cards inside a Home carousel. The hero variant is the focused-card width of {@link HeroCarousel} with the cookie play on the cover. */
+/** Cards inside a Home carousel. The hero variant is the focused-card width of {@link HeroCarousel} with the play button on the cover. */
 final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
 
     interface Listener {
@@ -61,12 +63,14 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
         String subtitle;
         int seed;
         String art;
+        CoverSpec cover;
         switch (item.kind()) {
             case TRACK -> {
                 title = item.track().title();
                 subtitle = item.track().artistName();
                 seed = item.track().placeholderSeed();
                 art = item.track().artworkUri();
+                cover = CoverSpec.forTrack(item.track());
             }
             case ALBUM -> {
                 title = item.album().title();
@@ -74,6 +78,7 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
                         + r.getQuantityString(R.plurals.library_songs, item.album().trackCount(), item.album().trackCount());
                 seed = item.album().placeholderSeed();
                 art = item.album().artworkUri();
+                cover = CoverSpec.forAlbum(item.album());
             }
             default -> {
                 title = item.playlist().name();
@@ -81,11 +86,13 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
                         item.playlist().trackCount());
                 seed = item.playlist().placeholderSeed();
                 art = item.playlist().artworkUris().isEmpty() ? null : item.playlist().artworkUris().get(0);
+                cover = CoverSpec.forPlaylist(item.playlist().id(), item.playlist().name());
             }
         }
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, title);
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, subtitle);
-        Art.bind(h.b.art, art, seed, hero ? 28 : 24, false);
+        // hero: the play button sits on the cover's text corner and the caption repeats it -> scene only
+        Art.bind(h.b.art, art, seed, hero ? 28 : 24, false, hero ? cover.textless() : cover);
         boolean showPlay = hero;
         h.b.play.setVisibility(showPlay ? View.VISIBLE : View.GONE);
         h.b.play.setOnClickListener(v -> listener.onItemClick(item));

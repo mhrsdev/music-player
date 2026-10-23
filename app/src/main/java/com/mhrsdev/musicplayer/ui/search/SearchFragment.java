@@ -30,7 +30,7 @@ import com.mhrsdev.musicplayer.ui.nav.Screens;
 import java.util.List;
 
 /** Search (DESIGN.md 02): pill field, filter chips, results with match highlight, no-results state. */
-public final class SearchFragment extends Fragment implements SearchResultAdapter.Listener {
+public class SearchFragment extends Fragment implements SearchResultAdapter.Listener {
     private SearchFragmentBinding b;
     private SearchViewModel vm;
 

@@ -50,6 +50,7 @@ public class PlaybackService extends MediaLibraryService {
     @Nullable private MediaLibrarySession session;
     private ListeningExecutorService browseExecutor;
     private HeadsetControls headset;
+    private MediaLibrarySession.Callback callback;
     private AudioManager audioManager;
 
     /** Event-driven and only registered while this service lives: a headset showing up can resume paused playback. */
@@ -79,8 +80,8 @@ public class PlaybackService extends MediaLibraryService {
         ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         pool.allowCoreThreadTimeOut(true);
         browseExecutor = MoreExecutors.listeningDecorator(pool);
-        MediaLibrarySession.Builder builder = new MediaLibrarySession.Builder(this, player,
-                new BrowseCallback(new BrowseTree(getResources(), BrowseHolder.get()), store))
+        callback = new BrowseCallback(new BrowseTree(getResources(), BrowseHolder.get()), store);
+        MediaLibrarySession.Builder builder = new MediaLibrarySession.Builder(this, player, callback)
                 .setBitmapLoader(new ArtworkLoader(this));
         Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (launch != null) {
@@ -105,6 +106,11 @@ public class PlaybackService extends MediaLibraryService {
     /** For tests: the session the system sees. */
     @Nullable MediaLibrarySession session() {
         return session;
+    }
+
+    /** For tests: the session callback (browse, playback resumption, media buttons). */
+    MediaLibrarySession.Callback callback() {
+        return callback;
     }
 
     /** For tests: the button / interruption logic behind the session callback. */

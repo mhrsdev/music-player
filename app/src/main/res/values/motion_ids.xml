@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ui/motion: view tags holding a cached SpringAnimator (one per view, reused for every press/jiggle). -->
+    <item name="mp_motion_scale" type="id" />
+    <item name="mp_motion_state" type="id" />
+</resources>

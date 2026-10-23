@@ -46,7 +46,7 @@ public class BottomChrome {
     }
 
     /** Opaque background behind the dock that fades out {@code fadePx} above it, so content never shows through. */
-    public static final class Scrim extends Drawable {
+    public static class Scrim extends Drawable {
         private final Paint paint = new Paint();
         private final int color;
         private final int fadePx;

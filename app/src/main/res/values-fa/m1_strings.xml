@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mp_setting_dynamic_color">رنگ‌های والپیپر</string>
+    <string name="mp_setting_dynamic_color_summary">به‌جای لاجوردی موج، از رنگ‌های والپیپر استفاده شود (اندروید ۱۲ به بالا)</string>
+    <string name="mp_setting_dynamic_color_unsupported">به اندروید ۱۲ یا بالاتر نیاز دارد</string>
+</resources>

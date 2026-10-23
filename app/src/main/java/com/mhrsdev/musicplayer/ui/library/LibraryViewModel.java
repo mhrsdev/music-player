@@ -18,7 +18,7 @@ import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 import java.util.List;
 
 /** Library hub: Liked songs card, Albums / Playlists / Artists / History tiles, Recently saved. */
-public final class LibraryViewModel extends ViewModel {
+public class LibraryViewModel extends ViewModel {
     private final LibraryRepository library;
     private final PlayerController player;
     @Nullable private final LibraryBrowser browser;

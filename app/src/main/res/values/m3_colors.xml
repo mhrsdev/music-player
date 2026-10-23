@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- M1: the remaining Material 3 roles of the lapis/turquoise scheme (DESIGN.md 2.1, light), so stock Material
+     components (dialogs, switches, snackbars, menus) pick up Mowj colours. mp_* roles live in colors.xml. -->
+<resources>
+    <color name="mp_secondary">#535F70</color>
+    <color name="mp_on_secondary">#FFFFFF</color>
+    <color name="mp_on_tertiary">#FFFFFF</color>
+    <color name="mp_tertiary_container">#9EF2E7</color>
+    <color name="mp_on_tertiary_container">#00201D</color>
+    <color name="mp_on_error">#FFFFFF</color>
+    <color name="mp_error_container">#FFDAD6</color>
+    <color name="mp_on_error_container">#410002</color>
+    <color name="mp_inverse_surface">#2D3137</color>
+    <color name="mp_inverse_on_surface">#EFF0F7</color>
+    <color name="mp_inverse_primary">#A6C8FF</color>
+    <!-- Floating chrome (nav dock, mini-player, snackbar, sheets): always opaque. -->
+    <color name="mp_surface_floating">#FFFFFF</color>
+    <color name="mp_on_surface_floating">#181C21</color>
+    <color name="mp_black_surface_floating">#1A1E23</color>
+    <!-- Ripple / pressed state layer: primary at ~12% (light) / 16% (dark). -->
+    <color name="mp_state_layer">#1F2F5F95</color>
+</resources>

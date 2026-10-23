@@ -20,6 +20,7 @@ import java.util.Set;
  */
 public class SettingsStore {
     public static final int DEFAULT_SLEEP_TIMER_MINUTES = 30;
+    public static final int DEFAULT_MIN_TRACK_SECONDS = 30;
 
     private static final String PREFS = "settings";
     private static final String K_THEME = "theme";
@@ -32,19 +33,20 @@ public class SettingsStore {
     private static final String K_BATTERY_SAVER = "battery_saver";
     private static final String K_INCLUDE = "folders_include";
     private static final String K_EXCLUDE = "folders_exclude";
+    private static final String K_NON_MUSIC = "include_non_music";
+    private static final String K_DYNAMIC_COLOR = "dynamic_color";
     private static final String K_MIN_TRACK_SECONDS = "min_track_seconds";
     private static final String K_REDUCE_MOTION = "reduce_motion";
     private static final String K_HS_SINGLE = "headset_single", K_HS_DOUBLE = "headset_double",
             K_HS_TRIPLE = "headset_triple", K_HS_LONG = "headset_long", K_HS_CONNECT = "headset_resume_on_connect",
             K_HS_DISCONNECT = "headset_pause_on_disconnect", K_HS_CALL = "headset_resume_after_call";
-    /** Files shorter than this are skipped by the scanner (ringtones, notification sounds, voice notes). */
-    public static final int DEFAULT_MIN_TRACK_SECONDS = 30;
+    private static final String K_IMMERSIVE_PLAYER = "immersive_player";
 
     private static final int MAX_BACKUP_STRING = 32;
     private static final Map<String, Class<?>> BACKUP_TYPES = Map.of(
             K_THEME, String.class, K_ARTWORK_COLORS, Boolean.class, K_SEEK_BAR, String.class, K_LANGUAGE, String.class,
             K_LYRICS_ONLINE, Boolean.class, K_LYRICS_SIZE, String.class, K_SLEEP_MINUTES, Integer.class,
-            K_BATTERY_SAVER, String.class);
+            K_BATTERY_SAVER, String.class, K_DYNAMIC_COLOR, Boolean.class);
 
     private final SharedPreferences prefs;
     private final MutableLiveData<ThemeMode> theme;
@@ -57,9 +59,11 @@ public class SettingsStore {
     private final MutableLiveData<BatterySaverMode> batterySaver;
     private final MutableLiveData<Set<String>> includedFolders;
     private final MutableLiveData<Set<String>> excludedFolders;
+    private final MutableLiveData<Boolean> includeNonMusic;
     private final MutableLiveData<Integer> minTrackSeconds;
     private final MutableLiveData<Boolean> reduceMotion;
     private final MutableLiveData<HeadsetConfig> headset;
+    private final MutableLiveData<Boolean> immersivePlayer;
 
     public SettingsStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -73,9 +77,11 @@ public class SettingsStore {
         batterySaver = new MutableLiveData<>(readEnum(K_BATTERY_SAVER, BatterySaverMode.AUTO));
         includedFolders = new MutableLiveData<>(readSet(K_INCLUDE));
         excludedFolders = new MutableLiveData<>(readSet(K_EXCLUDE));
+        includeNonMusic = new MutableLiveData<>(prefs.getBoolean(K_NON_MUSIC, false));
         minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_TRACK_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
         reduceMotion = new MutableLiveData<>(prefs.getBoolean(K_REDUCE_MOTION, false));
         headset = new MutableLiveData<>(readHeadset(prefs));
+        immersivePlayer = new MutableLiveData<>(prefs.getBoolean(K_IMMERSIVE_PLAYER, false));
     }
 
     /** Headset / Bluetooth button behaviour and connect / disconnect / call handling. */
@@ -209,6 +215,16 @@ public class SettingsStore {
         publish(excludedFolders, Collections.unmodifiableSet(new HashSet<>(folders)));
     }
 
+    /** Also scan ringtones, notifications, alarms and podcasts. Changing it needs a rescan. */
+    public LiveData<Boolean> includeNonMusic() {
+        return includeNonMusic;
+    }
+
+    public void setIncludeNonMusic(boolean value) {
+        prefs.edit().putBoolean(K_NON_MUSIC, value).apply();
+        publish(includeNonMusic, value);
+    }
+
     /** The settings a backup carries (folder lists are device paths, so they stay out), by key. */
     public Map<String, Object> exportBackup() {
         Map<String, Object> all = new HashMap<>(prefs.getAll());
@@ -258,6 +274,25 @@ public class SettingsStore {
     public void setReduceMotion(boolean value) {
         prefs.edit().putBoolean(K_REDUCE_MOTION, value).apply();
         publish(reduceMotion, value);
+    }
+
+    /** Hide the status bar while the full player is open (swipe from the top shows it briefly). */
+    public LiveData<Boolean> immersivePlayer() {
+        return immersivePlayer;
+    }
+
+    public void setImmersivePlayer(boolean value) {
+        prefs.edit().putBoolean(K_IMMERSIVE_PLAYER, value).apply();
+        publish(immersivePlayer, value);
+    }
+
+    /** Material You wallpaper colours (API 31+) instead of the lapis identity; default off. Read at activity start. */
+    public boolean isDynamicColor() {
+        return prefs.getBoolean(K_DYNAMIC_COLOR, false);
+    }
+
+    public void setDynamicColor(boolean value) {
+        prefs.edit().putBoolean(K_DYNAMIC_COLOR, value).apply();
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {

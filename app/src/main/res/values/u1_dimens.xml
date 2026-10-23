@@ -10,4 +10,6 @@
     <dimen name="mp_dock_content_clearance">16dp</dimen>
     <!-- How far the background fade reaches above the dock. -->
     <dimen name="mp_dock_scrim_fade">40dp</dimen>
+    <!-- Floor for the bottom inset when a phone reports 0 (dock stays >= 16 + 12 = 28dp above the edge). -->
+    <dimen name="mp_dock_min_bottom_inset">16dp</dimen>
 </resources>

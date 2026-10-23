@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Page transitions (ui/motion/PageTransitions): shared-axis slide distance, mirrored in animator-ldrtl. -->
+    <dimen name="mp_page_slide">28dp</dimen>
+    <dimen name="mp_page_slide_neg">-28dp</dimen>
+    <integer name="mp_page_ms">320</integer>
+    <integer name="mp_page_out_ms">140</integer>
+</resources>

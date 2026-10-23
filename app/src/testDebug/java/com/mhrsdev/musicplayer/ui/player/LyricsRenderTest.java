@@ -34,7 +34,7 @@ import java.io.FileOutputStream;
 
 /**
  * L1 lyrics renders (docs/screens/l1-*.png): word sweep at several points of a line with real word timing (track-1),
- * emulated timing (track-2), Persian RTL with real timing (track-34), light theme, blur off (software canvas) and
+ * emulated timing (track-2), Persian RTL with real timing (track-25), light theme, blur off (software canvas) and
  * blur on (hardware renderer through PixelCopy, the RenderEffect path), plus the top row with/without the lyrics
  * button (track-4 has no lyrics).
  */
@@ -79,7 +79,7 @@ public class LyricsRenderTest {
 
     @Test @Config(sdk = 35, qualifiers = "fa-ldrtl-" + DARK)
     public void persianRtl() throws Exception {
-        FragmentActivity a = host(33); // track-34: Persian enhanced LRC
+        FragmentActivity a = host(24); // track-25: Persian enhanced LRC
         openLyrics(a);
         at(a, 19_900); snap(a, "l1-fa-word2-dark");
         at(a, 23_000); snap(a, "l1-fa-lineend-dark");

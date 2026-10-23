@@ -43,7 +43,7 @@ import java.util.Objects;
  * Settings (DESIGN.md 09). Applying theme/language is done here (View layer); the ViewModels only store.
  * Library folders are picked with the system folder picker (Storage Access Framework) and stored as paths.
  */
-public final class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment {
     public static final String REPO_URL = "https://github.com/mhrsdev/music-player-mowj";
     private static final String STATE_PICK_EXCLUDE = "pick_exclude";
 
@@ -104,6 +104,10 @@ public final class SettingsFragment extends Fragment {
 
     private void bindMotionAndColor() {
         b.reduceMotion.setOnCheckedChangeListener((v, on) -> device.setReduceMotion(on));
+        b.immersivePlayer.setOnCheckedChangeListener((v, on) -> device.setImmersivePlayer(on));
+        device.getImmersivePlayer().observe(getViewLifecycleOwner(), on -> {
+            if (b.immersivePlayer.isChecked() != Boolean.TRUE.equals(on)) b.immersivePlayer.setChecked(Boolean.TRUE.equals(on));
+        });
         device.getReduceMotion().observe(getViewLifecycleOwner(), on -> {
             if (b.reduceMotion.isChecked() != Boolean.TRUE.equals(on)) b.reduceMotion.setChecked(Boolean.TRUE.equals(on));
         });

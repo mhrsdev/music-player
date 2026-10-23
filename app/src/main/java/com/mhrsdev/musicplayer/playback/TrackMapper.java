@@ -12,10 +12,12 @@ import com.mhrsdev.musicplayer.domain.model.Track;
  * the metadata extras, so the player itself is the single source of truth for the queue (no side maps, and a
  * queue restored after process death or seen by a headless service decodes the same way).
  */
-final class TrackMapper {
+class TrackMapper {
     private static final String ID = "id", TITLE = "title", ARTIST_ID = "artistId", ARTIST = "artist",
             ALBUM_ID = "albumId", ALBUM = "album", DURATION = "duration", ARTWORK = "artwork", SEED = "seed",
             URI = "uri", EXPLICIT = "explicit", LIKED = "liked", YEAR = "year", NUMBER = "number", ADDED = "added";
+
+    private static final String MEDIASTORE_AUDIO = "content://media/";
 
     private TrackMapper() {}
 
@@ -50,7 +52,10 @@ final class TrackMapper {
                 .setExtras(extras);
         if (t.durationMs() > 0) meta.setDurationMs(t.durationMs());
         if (t.trackNumber() > 0) meta.setTrackNumber(t.trackNumber());
-        if (t.artworkUri() != null) meta.setArtworkUri(Uri.parse(t.artworkUri()));
+        // Notification / lock-screen cover: the track's own MediaStore URI (thumbnail -> embedded picture -> folder art,
+        // see ArtworkResolver); the legacy albumart URI does not open on Android 10+. Other sources keep their URI.
+        String cover = t.mediaUri() != null && t.mediaUri().startsWith(MEDIASTORE_AUDIO) ? t.mediaUri() : t.artworkUri();
+        if (cover != null) meta.setArtworkUri(Uri.parse(cover));
         return new MediaItem.Builder()
                 .setMediaId(t.id())
                 .setUri(t.mediaUri())
@@ -61,7 +66,13 @@ final class TrackMapper {
     /** Inverse of {@link #toMediaItem}; null for an item that was not created by it. */
     @Nullable
     static Track fromMediaItem(@Nullable MediaItem item) {
-        Bundle e = item == null ? null : item.mediaMetadata.extras;
+        return item == null ? null : fromMetadata(item.mediaMetadata);
+    }
+
+    /** The track carried in metadata extras by {@link #toMediaItem}; null for foreign metadata. */
+    @Nullable
+    static Track fromMetadata(MediaMetadata metadata) {
+        Bundle e = metadata.extras;
         if (e == null || e.getString(ID) == null) return null;
         return new Track(e.getString(ID), nz(e.getString(TITLE)), nz(e.getString(ARTIST_ID)),
                 nz(e.getString(ARTIST)), nz(e.getString(ALBUM_ID)), nz(e.getString(ALBUM)), e.getLong(DURATION),

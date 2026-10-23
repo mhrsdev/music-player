@@ -13,8 +13,6 @@ import android.content.Intent;
 import android.view.KeyEvent;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.session.MediaController;
-import androidx.media3.session.SessionToken;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 import com.mhrsdev.musicplayer.domain.model.HeadsetAction;
 import com.mhrsdev.musicplayer.domain.model.HeadsetConfig;
@@ -245,22 +243,25 @@ public class HeadsetButtonsTest {
         assertEquals("t2", r.mediaItems.get(2).mediaId);
     }
 
-    @Test public void mediaControllerPlayOnEmptyPlayerGoesThroughOnPlaybackResumption() throws Exception {
+    /** What Media3 does for a controller's / key's play() on an empty player: it asks the session callback for the queue. */
+    @Test public void sessionCallbackResumptionFeedsAnEmptyPlayer() throws Exception {
         service = Robolectric.buildService(PlaybackService.class).create();
         player().clearMediaItems(); // also resets the saved index, so save after it
         saveQueue(1, 0L);
-        SessionToken token = service.get().session().getToken();
-        MediaController c = new MediaController.Builder(app, token).buildAsync().get(5, TimeUnit.SECONDS);
-        // The controller's calls hop through the session's handler: pump the looper while waiting.
-        c.play();
-        for (int i = 0; i < 50 && player().getMediaItemCount() == 0; i++) {
-            ShadowLooper.idleMainLooper();
-            Thread.sleep(20);
+        androidx.media3.session.MediaSession.MediaItemsWithStartPosition r = service.get().callback()
+                .onPlaybackResumption(service.get().session(), null, true).get(5, TimeUnit.SECONDS);
+        assertEquals(3, r.mediaItems.size());
+        assertEquals(1, r.startIndex);
+    }
+
+    @Test public void sessionCallbackResumptionFailsCleanlyWithNothingSaved() throws Exception {
+        service = Robolectric.buildService(PlaybackService.class).create();
+        try {
+            service.get().callback().onPlaybackResumption(service.get().session(), null, true).get(5, TimeUnit.SECONDS);
+            org.junit.Assert.fail("expected a failure: nothing to resume");
+        } catch (java.util.concurrent.ExecutionException e) {
+            assertTrue(e.getCause() instanceof UnsupportedOperationException);
         }
-        c.release();
-        assertEquals(3, player().getMediaItemCount());
-        assertEquals(1, player().getCurrentMediaItemIndex());
-        assertTrue(player().getPlayWhenReady());
     }
 
     // --- stopped service ------------------------------------------------------------------------

@@ -16,7 +16,7 @@ import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.databinding.NavPermissionBinding;
 
 /** First run: explains why audio access is needed (DESIGN.md 13-states). "Denied for good" offers system settings. */
-public final class PermissionFragment extends Fragment {
+public class PermissionFragment extends Fragment {
 
     /** Implemented by the host; called when the user granted access or chose to continue without it. */
     public interface Host {
