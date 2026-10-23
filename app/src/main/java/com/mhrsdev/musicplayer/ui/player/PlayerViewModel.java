@@ -39,7 +39,8 @@ public final class PlayerViewModel extends ViewModel {
     private final MediatorLiveData<Boolean> liked = new MediatorLiveData<>();
     private final MediatorLiveData<Integer> activeLyricLine = new MediatorLiveData<>();
     private final MutableLiveData<Boolean> showLyrics = new MutableLiveData<>(false);
-    /** The track whose lyrics are wanted (null while the lyrics view is hidden); re-emitted by {@link #retryLyrics()}. */
+    private final MediatorLiveData<LyricsAvailability> lyricsAvailability = new MediatorLiveData<>();
+    /** The current track whose lyrics are wanted; re-emitted by {@link #retryLyrics()}. */
     private final MediatorLiveData<Track> lyricsRequest = new MediatorLiveData<>();
     private Set<String> likedIds = new HashSet<>();
     private boolean likedLoaded;
@@ -54,9 +55,11 @@ public final class PlayerViewModel extends ViewModel {
             Track old = currentTrack.getValue();
             if (!sameId(old, t)) currentTrack.setValue(t);
         });
-        // Lyrics (disk + possibly network) are only requested while the lyrics view is showing: no fetch per track change.
+        // Lyrics are requested for the CURRENT track only, and only while the player observes (its view lifecycle =
+        // full player visible): the answer decides whether the lyrics button is shown (owner, D21 request). Local
+        // tag/sidecar first; online only via the cache or one LRCLIB request with the setting on (LyricsResolver).
+        // Tracks in the queue are never looked up, and nothing runs while the player is hidden.
         lyricsRequest.addSource(currentTrack, t -> updateLyricsRequest());
-        lyricsRequest.addSource(showLyrics, shown -> updateLyricsRequest());
         lyrics = Transformations.switchMap(lyricsRequest,
                 t -> t == null ? new MutableLiveData<Lyrics>(null) : lyricsRepo.lyricsFor(t)); // null clears stale lyrics
         waveform = Transformations.switchMap(currentTrack,
@@ -72,12 +75,14 @@ public final class PlayerViewModel extends ViewModel {
         });
         liked.addSource(currentTrack, t -> updateLiked());
 
+        lyricsAvailability.addSource(lyrics, l -> updateAvailability());
+        lyricsAvailability.addSource(currentTrack, t -> updateAvailability());
         activeLyricLine.addSource(lyrics, l -> updateActiveLine());
         activeLyricLine.addSource(state, s -> updateActiveLine());
     }
 
     private void updateLyricsRequest() {
-        Track wanted = Boolean.TRUE.equals(showLyrics.getValue()) ? currentTrack.getValue() : null;
+        Track wanted = currentTrack.getValue();
         if (!sameId(lyricsRequest.getValue(), wanted)) lyricsRequest.setValue(wanted);
     }
 
@@ -90,6 +95,14 @@ public final class PlayerViewModel extends ViewModel {
         Track t = currentTrack.getValue();
         boolean v = t != null && (likedLoaded ? likedIds.contains(t.id()) : t.liked());
         if (!Objects.equals(liked.getValue(), v)) liked.setValue(v);
+    }
+
+    private void updateAvailability() {
+        LyricsAvailability a = LyricsAvailability.of(lyrics.getValue(), currentTrack.getValue());
+        if (a == lyricsAvailability.getValue()) return;
+        lyricsAvailability.setValue(a);
+        // A track without lyrics while the lyrics view is open: back to the cover.
+        if (a == LyricsAvailability.NONE && Boolean.TRUE.equals(showLyrics.getValue())) showLyrics.setValue(false);
     }
 
     private void updateActiveLine() {
@@ -114,6 +127,8 @@ public final class PlayerViewModel extends ViewModel {
     /** Distinct-until-changed index of the active lyric line. */
     public LiveData<Integer> getActiveLyricLine() { return activeLyricLine; }
     public LiveData<Boolean> getShowLyrics() { return showLyrics; }
+    /** Drives the lyrics button: shown only for {@link LyricsAvailability#AVAILABLE}. */
+    public LiveData<LyricsAvailability> getLyricsAvailability() { return lyricsAvailability; }
 
     public void togglePlayPause() { player.togglePlayPause(); }
     /** "Stop": pause and rewind the current song (PlayerController has no stop). */
@@ -147,7 +162,12 @@ public final class PlayerViewModel extends ViewModel {
 
     public void toggleShuffle() { player.toggleShuffle(); }
     public void cycleRepeat() { player.cycleRepeat(); }
-    public void toggleLyrics() { showLyrics.setValue(!Boolean.TRUE.equals(showLyrics.getValue())); }
+    /** Opens lyrics only when the track has some (cover tap, menu, button); closing always works. */
+    public void toggleLyrics() {
+        boolean open = Boolean.TRUE.equals(showLyrics.getValue());
+        if (!open && lyricsAvailability.getValue() != LyricsAvailability.AVAILABLE) return;
+        showLyrics.setValue(!open);
+    }
     public void toggleLike() {
         Track t = currentTrack.getValue();
         if (t == null) return;

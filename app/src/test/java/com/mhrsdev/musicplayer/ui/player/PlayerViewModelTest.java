@@ -28,6 +28,7 @@ public class PlayerViewModelTest {
         PlayerViewModel vm = new PlayerViewModel(c, new FakeLibraryRepository(), new FakeLyricsRepository(),
                 new FakeWaveformRepository());
         vm.getActiveLyricLine().observeForever(x -> {});
+        vm.getLyricsAvailability().observeForever(x -> {});
         vm.getLiked().observeForever(x -> {});
         vm.getCurrentTrack().observeForever(x -> {});
         return vm;
@@ -70,8 +71,22 @@ public class PlayerViewModelTest {
         assertEquals(!before, vm.getLiked().getValue());
     }
 
-    /** F1(c): lyrics (disk + network) are asked for only while the lyrics view is shown, once per track. */
-    @Test public void lyricsAreRequestedOnlyWhileTheLyricsViewIsShown() {
+    @Test public void lyricsButtonFollowsAvailability() {
+        // track-4 has no lyrics (index 3), track-1 has synced lyrics
+        FakePlayerController c = new FakePlayerController(SampleData.TRACKS.subList(0, 5), 0);
+        PlayerViewModel vm = vm(c);
+        assertEquals(LyricsAvailability.AVAILABLE, vm.getLyricsAvailability().getValue());
+        vm.toggleLyrics();
+        assertTrue(vm.getShowLyrics().getValue());
+        c.next(); c.next(); c.next(); // -> track-4
+        assertEquals(LyricsAvailability.NONE, vm.getLyricsAvailability().getValue());
+        assertFalse("lyrics view closes on a track without lyrics", vm.getShowLyrics().getValue());
+        vm.toggleLyrics();
+        assertFalse("cannot open lyrics that do not exist", vm.getShowLyrics().getValue());
+    }
+
+    /** Lyrics are asked for the current track only (never the queue), once per track, while the player observes. */
+    @Test public void lyricsAreRequestedForTheCurrentTrackOnly() {
         FakePlayerController c = new FakePlayerController(SampleData.TRACKS.subList(0, 4), 0);
         java.util.List<String> asked = new java.util.ArrayList<>();
         FakeLyricsRepository fake = new FakeLyricsRepository();
@@ -80,18 +95,15 @@ public class PlayerViewModelTest {
             return fake.lyricsFor(t);
         };
         PlayerViewModel vm = new PlayerViewModel(c, new FakeLibraryRepository(), repo, new FakeWaveformRepository());
+        assertTrue("nobody observing: no request", asked.isEmpty());
         vm.getCurrentTrack().observeForever(x -> {});
         vm.getLyrics().observeForever(x -> {});
-        c.next();
-        c.next();
-        assertTrue("hidden lyrics view: no request", asked.isEmpty());
+        assertEquals(java.util.List.of("track-1"), asked);
         vm.toggleLyrics();
-        assertEquals(1, asked.size());
-        c.next();
-        assertEquals(2, asked.size());
         vm.toggleLyrics();
+        assertEquals("toggling does not ask again", 1, asked.size());
         c.next();
-        assertEquals("hidden again: no request", 2, asked.size());
+        assertEquals(java.util.List.of("track-1", "track-2"), asked);
     }
 
     @Test public void seekClampsAndSteps() {
