@@ -49,6 +49,9 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         void onShuffleLibrary();
 
         void onSurprise();
+
+        /** The hero carousel settled on {@code item} after a user swipe (never fires per scroll frame). */
+        void onHeroFocused(HomeItem item);
     }
 
     /** One row of the Home list. */
@@ -167,6 +170,13 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
                 };
                 if (type == Row.HERO) {
                     HeroCarousel.attach(b.carousel);
+                    b.carousel.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                        @Override public void onScrollStateChanged(@NonNull RecyclerView rv, int state) {
+                            if (state != RecyclerView.SCROLL_STATE_IDLE) return;
+                            HomeItem focused = focusedHero(rv);
+                            if (focused != null) listener.onHeroFocused(focused);
+                        }
+                    });
                 } else {
                     LinearLayoutManager lm = new LinearLayoutManager(parent.getContext(), RecyclerView.HORIZONTAL, false);
                     lm.setInitialPrefetchItemCount(4);
@@ -219,6 +229,19 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
             ((HomeCardAdapter) car.carousel.getAdapter()).submitList(
                     items.size() > cap ? new ArrayList<>(items.subList(0, cap)) : items);
         }
+    }
+
+    /** The hero card HeroCarousel scaled to full size (the focused keyline). */
+    @Nullable static HomeItem focusedHero(RecyclerView rv) {
+        View best = null;
+        for (int i = 0; i < rv.getChildCount(); i++) {
+            View v = rv.getChildAt(i);
+            if (best == null || v.getScaleX() > best.getScaleX()) best = v;
+        }
+        if (best == null) return null;
+        int pos = rv.getChildAdapterPosition(best);
+        HomeCardAdapter a = (HomeCardAdapter) rv.getAdapter();
+        return a == null || pos == RecyclerView.NO_POSITION || pos >= a.getItemCount() ? null : a.getCurrentList().get(pos);
     }
 
     private void bindContinue(HomeContinueBinding k, HomeSection s) {

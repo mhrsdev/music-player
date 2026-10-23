@@ -27,6 +27,8 @@ import java.util.List;
 public final class HomeFragment extends Fragment implements HomeAdapter.Listener {
     private HomeFragmentBinding b;
     private HomeViewModel vm;
+    private HomeBackdrop backdrop;
+    @Nullable private String backdropTrackId;
     private boolean scanning;
     @Nullable private List<HomeSection> sections;
     private final ActivityResultLauncher<String> requestAudio = registerForActivityResult(
@@ -50,6 +52,7 @@ public final class HomeFragment extends Fragment implements HomeAdapter.Listener
         vm.getSections().observe(getViewLifecycleOwner(), s -> {
             sections = s;
             render(adapter);
+            if (backdropTrackId == null && backdrop != null) tintFromHeroStart();
         });
         // The first scan finishes after Home's first (empty) load: show "scanning", not "library is empty", meanwhile.
         c.libraryAdmin().isScanning().observe(getViewLifecycleOwner(), s -> {
@@ -57,10 +60,17 @@ public final class HomeFragment extends Fragment implements HomeAdapter.Listener
             render(adapter);
         });
         // Continue card progress: only the one row rebinds, quantized to 2 % steps (no per-tick layout).
+        backdrop = new HomeBackdrop(requireActivity(), c.ioExecutor);
         c.player.getState().observe(getViewLifecycleOwner(), st -> {
             if (st == null || st.currentTrack() == null) {
                 adapter.setNowPlaying(null, -1f);
+                if (backdropTrackId == null) tintFromHeroStart();
             } else {
+                Track now = st.currentTrack();
+                if (!now.id().equals(backdropTrackId)) { // track changed: the playing cover wins again
+                    backdropTrackId = now.id();
+                    backdrop.show(now.artworkUri(), now.placeholderSeed());
+                }
                 long dur = st.durationMs() > 0 ? st.durationMs() : st.currentTrack().durationMs();
                 adapter.setNowPlaying(st.currentTrack().id(), dur > 0 ? Math.min(1f, st.positionMs() / (float) dur) : 0f);
             }
@@ -147,6 +157,28 @@ public final class HomeFragment extends Fragment implements HomeAdapter.Listener
 
     @Override public void onShuffle(HomeSection section) {
         vm.shuffleSection(section, SectionText.title(requireContext(), section));
+    }
+
+    @Override public void onHeroFocused(HomeItem item) {
+        if (backdrop == null) return;
+        switch (item.kind()) {
+            case ALBUM -> backdrop.show(item.album().artworkUri(), item.album().placeholderSeed());
+            case TRACK -> backdrop.show(item.track().artworkUri(), item.track().placeholderSeed());
+            case PLAYLIST -> backdrop.show(item.playlist().artworkUris().isEmpty() ? null
+                    : item.playlist().artworkUris().get(0), item.playlist().placeholderSeed());
+            default -> { }
+        }
+    }
+
+    /** Nothing playing: the first hero card (when there is one) tints the glow. */
+    private void tintFromHeroStart() {
+        if (sections == null) return;
+        for (HomeSection s : sections) {
+            if (s.style() == com.mhrsdev.musicplayer.domain.model.HomeSectionStyle.HERO_CAROUSEL && !s.items().isEmpty()) {
+                onHeroFocused(s.items().get(0));
+                return;
+            }
+        }
     }
 
     @Override public void onContinue(Track track) {

@@ -73,6 +73,11 @@ public final class ThemeController {
         if (!enabled) animateTo(AccentScheme.base(Tokens.isDark(app)));
     }
 
+    /** Settings "Colors from artwork" as last applied (Home glow follows it too). */
+    public boolean isArtworkColorsEnabled() {
+        return artworkColors;
+    }
+
     /** Extracts the seed from {@code artwork} (any size; downscaled to 32x32). {@code key} dedupes repeats. */
     @MainThread
     public void setFromArtwork(@Nullable Bitmap artwork, @Nullable String key) {
