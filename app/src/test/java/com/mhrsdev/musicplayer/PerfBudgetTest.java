@@ -65,14 +65,29 @@ public class PerfBudgetTest {
         while (m.find()) permissions.add(m.group(1).replace("android.permission.", ""));
         Set<String> expected = new TreeSet<>(Arrays.asList("FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
                 "POST_NOTIFICATIONS", "WAKE_LOCK", "ACCESS_NETWORK_STATE", "READ_MEDIA_AUDIO", "READ_EXTERNAL_STORAGE",
-                "INTERNET"));
+                "INTERNET", "REQUEST_INSTALL_PACKAGES")); // install: user-started self-update only
         // BLUETOOTH_CONNECT is optional (output chip name); allowed if the UI team adds it.
         permissions.remove("BLUETOOTH_CONNECT");
         assertEquals("new permission: review battery impact and update docs/PERF_BUDGET.md", expected, permissions);
         assertTrue("largeHeap must stay off", !manifest.contains("largeHeap=\"true\""));
         assertEquals("only PlaybackService may run as a service", 1, count(manifest, "<service"));
-        assertEquals("only the media-button receiver may be registered (no boot / connectivity receivers)", 1,
-                count(manifest, "<receiver"));
+        Set<String> receivers = new TreeSet<>();
+        Matcher r = Pattern.compile("<receiver\\s+android:name=\"([^\"]+)\"").matcher(manifest);
+        while (r.find()) receivers.add(r.group(1));
+        assertEquals("new receiver: it must not wake the app on boot/connectivity/timers; update PERF_BUDGET.md",
+                new TreeSet<>(Arrays.asList(".data.update.InstallResultReceiver", "androidx.media3.session.MediaButtonReceiver",
+                        ".appwidget.CompactWidgetProvider", ".appwidget.SquareWidgetProvider", ".appwidget.WideWidgetProvider",
+                        ".appwidget.WidgetActionReceiver")), receivers);
+        for (String wake : new String[] {"BOOT_COMPLETED", "CONNECTIVITY_CHANGE", "SCHEDULE_EXACT_ALARM", "USE_EXACT_ALARM",
+                "RECEIVE_BOOT"}) {
+            assertTrue("manifest must not use " + wake, !manifest.contains(wake));
+        }
+        try (Stream<Path> xml = Files.walk(MAIN.resolve("res/xml"))) {
+            for (Path p : xml.filter(x -> x.getFileName().toString().startsWith("widget_info")).collect(Collectors.toList())) {
+                assertTrue(name(p) + ": widgets redraw on playback events only, updatePeriodMillis must be 0",
+                        read(p).contains("updatePeriodMillis=\"0\""));
+            }
+        }
         assertTrue("service type", manifest.contains("foregroundServiceType=\"mediaPlayback\""));
     }
 
@@ -89,6 +104,8 @@ public class PerfBudgetTest {
                 "java/com/mhrsdev/musicplayer/playback/PlaybackService.java",     // idle stop after 60 s
                 "java/com/mhrsdev/musicplayer/playback/PlaybackStore.java",       // 1 s queue-save debounce
                 "java/com/mhrsdev/musicplayer/ui/widget/SkeletonView.java",       // only while attached + visible + motion on
+                "java/com/mhrsdev/musicplayer/playback/NowPlayingBridge.java",     // one coalesced widget push per playback event
+                "java/com/mhrsdev/musicplayer/ui/library/FastScrollerView.java",  // one-shot hide after a touch
                 "java/com/mhrsdev/musicplayer/ui/player/PlayerFragment.java"));   // lyrics auto-scroll resume, view-scoped
         Set<String> found = filesMatching("postDelayed\\(|scheduleAtFixedRate|scheduleWithFixedDelay|new Timer\\(");
         found.removeAll(allowed);
