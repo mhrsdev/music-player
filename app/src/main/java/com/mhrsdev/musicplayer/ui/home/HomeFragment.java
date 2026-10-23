@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,6 +18,7 @@ import com.mhrsdev.musicplayer.domain.model.HomeItem;
 import com.mhrsdev.musicplayer.domain.model.HomeSection;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.library.StateView;
+import com.mhrsdev.musicplayer.ui.nav.AudioPermission;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
 import com.mhrsdev.musicplayer.ui.nav.Screens;
 import java.util.List;
@@ -24,6 +27,12 @@ import java.util.List;
 public final class HomeFragment extends Fragment implements HomeAdapter.Listener {
     private HomeFragmentBinding b;
     private HomeViewModel vm;
+    private boolean scanning;
+    @Nullable private List<HomeSection> sections;
+    private final ActivityResultLauncher<String> requestAudio = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) Screens.container(this).onAudioPermissionGranted();
+            });
 
     @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle state) {
@@ -38,17 +47,26 @@ public final class HomeFragment extends Fragment implements HomeAdapter.Listener
         b.list.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.list.setAdapter(adapter);
         StateView.loading(b.state, R.string.home_loading);
-        vm.getSections().observe(getViewLifecycleOwner(), sections -> render(adapter, sections));
+        vm.getSections().observe(getViewLifecycleOwner(), s -> {
+            sections = s;
+            render(adapter);
+        });
+        // The first scan finishes after Home's first (empty) load: show "scanning", not "library is empty", meanwhile.
+        c.libraryAdmin().isScanning().observe(getViewLifecycleOwner(), s -> {
+            scanning = Boolean.TRUE.equals(s);
+            render(adapter);
+        });
     }
 
-    private void render(HomeAdapter adapter, @Nullable List<HomeSection> sections) {
-        if (sections == null) {
+    private void render(HomeAdapter adapter) {
+        if (sections == null || (sections.isEmpty() && scanning)) {
             StateView.loading(b.state, R.string.home_loading);
         } else if (sections.isEmpty()) {
+            boolean granted = AudioPermission.granted(requireContext());
             StateView.empty(b.state, getString(R.string.home_empty_title), getString(R.string.home_empty_body),
-                    getString(R.string.nav_settings), v -> {
-                        ScreenNavigator nav = ScreenNavigator.from(requireContext());
-                        if (nav != null) nav.openTab(ScreenNavigator.Tab.SETTINGS);
+                    getString(granted ? R.string.home_empty_rescan : R.string.nav_perm_allow), v -> {
+                        if (granted) Screens.container(this).libraryAdmin().rescan(null);
+                        else requestAudio.launch(AudioPermission.name());
                     });
         } else {
             StateView.hide(b.state);

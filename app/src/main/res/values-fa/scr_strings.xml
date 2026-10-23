@@ -13,7 +13,8 @@
     <string name="home_see_all">همه</string>
     <string name="home_shuffle">پخش تصادفی</string>
     <string name="home_empty_title">کتابخانه خالی است</string>
-    <string name="home_empty_body">موسیقی به گوشی اضافه کنید یا پوشه‌ها را در تنظیمات انتخاب کنید.</string>
+    <string name="home_empty_body">موسیقی به گوشی اضافه کنید و دوباره اسکن کنید.</string>
+    <string name="home_empty_rescan">اسکن دوباره</string>
     <string name="home_loading">در حال اسکن کتابخانه…</string>
 
     <string name="search_hint">آهنگ، آلبوم، خواننده</string>
@@ -82,6 +83,8 @@
     <string name="settings_version">نسخه‌ی %1$s</string>
     <string name="library_menu_play_next">پخش بعدی</string>
     <string name="library_menu_add_queue">افزودن به صف</string>
+    <string name="library_menu_add_playlist">افزودن به فهرست پخش</string>
+    <string name="library_new_playlist">فهرست پخش جدید</string>
     <string name="library_menu_like">پسندیدن</string>
     <string name="library_menu_unlike">حذف از پسندیده‌ها</string>
     <string name="settings_sleep_end">پایان آهنگ</string>
