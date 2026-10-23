@@ -12,7 +12,7 @@ import com.mhrsdev.musicplayer.domain.model.Track;
  * the metadata extras, so the player itself is the single source of truth for the queue (no side maps, and a
  * queue restored after process death or seen by a headless service decodes the same way).
  */
-final class TrackMapper {
+class TrackMapper {
     private static final String ID = "id", TITLE = "title", ARTIST_ID = "artistId", ARTIST = "artist",
             ALBUM_ID = "albumId", ALBUM = "album", DURATION = "duration", ARTWORK = "artwork", SEED = "seed",
             URI = "uri", EXPLICIT = "explicit", LIKED = "liked", YEAR = "year", NUMBER = "number", ADDED = "added";
@@ -66,7 +66,13 @@ final class TrackMapper {
     /** Inverse of {@link #toMediaItem}; null for an item that was not created by it. */
     @Nullable
     static Track fromMediaItem(@Nullable MediaItem item) {
-        Bundle e = item == null ? null : item.mediaMetadata.extras;
+        return item == null ? null : fromMetadata(item.mediaMetadata);
+    }
+
+    /** The track carried in metadata extras by {@link #toMediaItem}; null for foreign metadata. */
+    @Nullable
+    static Track fromMetadata(MediaMetadata metadata) {
+        Bundle e = metadata.extras;
         if (e == null || e.getString(ID) == null) return null;
         return new Track(e.getString(ID), nz(e.getString(TITLE)), nz(e.getString(ARTIST_ID)),
                 nz(e.getString(ARTIST)), nz(e.getString(ALBUM_ID)), nz(e.getString(ALBUM)), e.getLong(DURATION),

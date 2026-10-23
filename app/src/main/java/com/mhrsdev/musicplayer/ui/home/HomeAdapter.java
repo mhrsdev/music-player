@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.home;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,7 +124,7 @@ final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHo
                     holder.itemView.getResources().getConfiguration().getLocales().get(0)));
             t.explicit.setVisibility(track.explicit() ? View.VISIBLE : View.GONE);
             t.more.setContentDescription(holder.itemView.getContext().getString(R.string.library_more, track.title()));
-            Art.bind(t.art, track.artworkUri(), track.placeholderSeed(), 12, false);
+            Art.bind(t.art, track.artworkUri(), track.placeholderSeed(), 12, false, CoverSpec.forTrack(track));
             t.getRoot().setOnClickListener(v -> listener.onTrackClick(row.section(), track));
             t.more.setOnClickListener(v -> TrackMenu.show(v, track));
         } else if (b instanceof HomeCarouselBinding c) {

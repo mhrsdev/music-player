@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.search;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,6 +72,7 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
         String sub;
         int seed;
         String art = null;
+        CoverSpec cover = null;
         boolean track = r.kind() == SearchResult.Kind.TRACK;
         switch (r.kind()) {
             case TRACK -> {
@@ -77,6 +80,7 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
                 sub = r.track().artistName();
                 seed = r.track().placeholderSeed();
                 art = r.track().artworkUri();
+                cover = CoverSpec.forTrack(r.track());
                 h.b.duration.setText(Format.duration(r.track().durationMs(),
                         c.getResources().getConfiguration().getLocales().get(0)));
             }
@@ -85,6 +89,7 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
                 sub = c.getString(R.string.search_kind_album) + " · " + r.album().artistName();
                 seed = r.album().placeholderSeed();
                 art = r.album().artworkUri();
+                cover = CoverSpec.forAlbum(r.album());
             }
             case ARTIST -> {
                 title = r.artist().name();
@@ -96,6 +101,7 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
                 title = r.playlist().name();
                 sub = c.getString(R.string.search_kind_playlist);
                 seed = r.playlist().placeholderSeed();
+                cover = CoverSpec.forPlaylist(r.playlist().id(), r.playlist().name());
             }
         }
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, Highlight.apply(title, query));
@@ -108,7 +114,7 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
         if (r.kind() == SearchResult.Kind.ARTIST) {
             Art.artist(h.b.art, art, title, seed);
         } else {
-            Art.bind(h.b.art, art, seed, 12, false);
+            Art.bind(h.b.art, art, seed, 12, false, cover);
         }
         h.itemView.setOnClickListener(v -> listener.onResultClick(r));
         if (track) {

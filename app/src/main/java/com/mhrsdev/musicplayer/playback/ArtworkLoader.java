@@ -5,15 +5,20 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.LruCache;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.annotation.OptIn;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.util.BitmapLoader;
 import androidx.media3.common.util.UnstableApi;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.widget.ArtworkResolver;
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+import com.mhrsdev.musicplayer.ui.widget.cover.GeneratedCover;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,7 +27,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Notification / lock-screen artwork loader that decodes straight down to at most {@link #MAX_PX} px in RGB_565
  * (the stock loader decodes full size). Local sources only (content, file, resource); anything else fails the
- * future, which Media3 treats as "no artwork". One worker thread that exits after 10 s idle.
+ * future. A track without artwork (no URI, or one that resolves to nothing) gets Mowj's generated cover instead
+ * ({@link GeneratedCover}, 512 px RGB_565, the same spec as in the app, so notification, lock screen, the platform
+ * session's METADATA_KEY_ART and the app agree), kept in the same bounded cache. One worker thread that exits after
+ * 10 s idle.
  */
 @OptIn(markerClass = UnstableApi.class)
 class ArtworkLoader implements BitmapLoader {
@@ -31,6 +39,7 @@ class ArtworkLoader implements BitmapLoader {
     /** Test seam: replaces the platform access of loaders created afterwards. */
     @VisibleForTesting static ArtworkResolver.Backend backendOverride;
 
+    private final Context context;
     private final ArtworkResolver resolver;
     private final ListeningExecutorService executor;
     /** A few covers (<= 4 MB, RGB_565 512 px = 0.5 MB each) so a track change or re-post does not decode again. */
@@ -42,6 +51,7 @@ class ArtworkLoader implements BitmapLoader {
     private final LruCache<String, Boolean> misses = new LruCache<>(64);
 
     ArtworkLoader(Context context) {
+        this.context = context.getApplicationContext();
         resolver = new ArtworkResolver(backendOverride != null ? backendOverride
                 : new com.mhrsdev.musicplayer.ui.widget.ArtworkLoader.PlatformBackend(context.getApplicationContext()));
         ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
@@ -68,6 +78,38 @@ class ArtworkLoader implements BitmapLoader {
             Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, decodeOptions(bounds));
             if (bitmap == null) throw new IOException("Undecodable artwork");
             return bitmap;
+        });
+    }
+
+    /** Real artwork when there is some, otherwise (or when it fails) the generated cover of the track. */
+    @Override public ListenableFuture<Bitmap> loadBitmapFromMetadata(MediaMetadata metadata) {
+        @Nullable ListenableFuture<Bitmap> real = BitmapLoader.super.loadBitmapFromMetadata(metadata);
+        @Nullable CoverSpec spec = coverSpec(metadata);
+        if (spec == null) return real;
+        if (real == null) return generate(spec);
+        return Futures.catchingAsync(real, Throwable.class, t -> generate(spec), MoreExecutors.directExecutor());
+    }
+
+    /** The app's spec for a queue item (track extras from {@link TrackMapper}), else from the plain metadata. */
+    @Nullable
+    static CoverSpec coverSpec(MediaMetadata m) {
+        Track t = TrackMapper.fromMetadata(m);
+        if (t != null) return CoverSpec.forTrack(t);
+        if (m.title == null) return null;
+        String artist = m.artist == null ? null : m.artist.toString();
+        return m.albumTitle != null && CoverSpec.isRealAlbum(m.albumTitle.toString())
+                ? CoverSpec.forAlbum(null, m.albumTitle.toString(), artist)
+                : CoverSpec.single(m.title.toString(), artist);
+    }
+
+    private ListenableFuture<Bitmap> generate(CoverSpec spec) {
+        String key = spec.cacheKey();
+        Bitmap hit = cache.get(key);
+        if (hit != null) return Futures.immediateFuture(hit);
+        return executor.submit(() -> {
+            Bitmap b = GeneratedCover.get(context).render(spec, MAX_PX);
+            cache.put(key, b);
+            return b;
         });
     }
 
