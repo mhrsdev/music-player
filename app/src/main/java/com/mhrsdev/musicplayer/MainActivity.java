@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity
 
     /** T4's screens, resolved by name so the shell compiles before (and independently of) them. */
     private static final String PLAYER_FRAGMENT = "com.mhrsdev.musicplayer.ui.player.PlayerFragment";
-    private static final String QUEUE_FRAGMENT = "com.mhrsdev.musicplayer.ui.queue.QueueSheetFragment";
+    private static final String QUEUE_FRAGMENT = "com.mhrsdev.musicplayer.ui.queue.QueueFragment";
     private static final String PLAYER_TAG = "player";
     private static final String QUEUE_TAG = "queue";
     private static final String STATE_PERMISSION = "permission_flow";
