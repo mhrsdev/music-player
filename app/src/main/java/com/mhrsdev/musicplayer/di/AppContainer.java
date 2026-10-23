@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.PowerManager;
 import androidx.core.content.ContextCompat;
 import com.mhrsdev.musicplayer.BuildConfig;
 import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
@@ -84,7 +85,7 @@ public final class AppContainer {
             library = data.library;
             libraryAdmin = data.library;
             homeFeed = data.homeFeed;
-            WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore);
+            WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
             lyrics = LyricsModule.create(appContext, BuildConfig.VERSION_NAME,
@@ -114,6 +115,12 @@ public final class AppContainer {
         if (!useFakes && hasAudioPermission() && foregroundScanDone.compareAndSet(false, true)) {
             libraryAdmin.scanIfStale();
         }
+    }
+
+    /** The user's battery-saver setting combined with the system's; read on any thread. */
+    private boolean batterySaverActive() {
+        PowerManager power = (PowerManager) appContext.getSystemService(Context.POWER_SERVICE);
+        return settings.batterySaver().getValue().active(power != null && power.isPowerSaveMode());
     }
 
     private boolean hasAudioPermission() {

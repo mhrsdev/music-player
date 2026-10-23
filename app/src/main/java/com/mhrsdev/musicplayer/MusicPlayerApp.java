@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.os.Trace;
+import com.mhrsdev.musicplayer.data.settings.BatterySaverMode;
 import com.mhrsdev.musicplayer.di.AppContainer;
+import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
 
 public class MusicPlayerApp extends Application {
     private AppContainer container;
@@ -14,6 +16,9 @@ public class MusicPlayerApp extends Application {
         Trace.beginSection("MusicPlayerApp.onCreate"); // visible in Perfetto; the container is lazy except the player
         container = new AppContainer(this);
         Trace.endSection();
+        // Cheap: one static write per change of the setting, no polling.
+        container.settings().batterySaver().observeForever(mode -> MotionPolicy.setBatterySaverOverride(
+                mode == BatterySaverMode.AUTO ? null : mode == BatterySaverMode.ON));
         registerActivityLifecycleCallbacks(new FirstActivityStart());
     }
 
