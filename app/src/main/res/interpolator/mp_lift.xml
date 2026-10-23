@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mowj "lift" (ui/motion/Motion.LIFT): slow start, quick exit. -->
+<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:controlX1="0.4" android:controlY1="0" android:controlX2="0.85" android:controlY2="0.25" />

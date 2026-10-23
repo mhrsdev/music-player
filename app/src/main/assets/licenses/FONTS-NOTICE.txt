@@ -1,5 +1,5 @@
 Bundled fonts (res/font, res/font-fa), SIL Open Font License 1.1:
-- google_sans_flex.ttf: Google Sans Flex (c) 2015 Google LLC. Instanced (wdth 100, opsz 18, slnt 0, ROND 30; wght 400-800 kept variable) and subset to Latin with fontTools. Source: github.com/google/fonts ofl/googlesansflex.
+- google_sans_flex.ttf: Google Sans Flex (c) 2025 The Google Sans Flex Project Authors. Variable font reduced with fontTools (tools/fonts/build_sans_subset.py): wght 400-800 and ROND 0-100 kept variable; wdth 100, opsz 18, slnt 0 pinned; subset to Latin + Latin-1 + common punctuation; unhinted. Source: github.com/google/fonts ofl/googlesansflex.
 - vazirmatn.ttf: Vazirmatn-NL v33.003 (c) Saber Rastikerdar, variable wght, non-Latin build. Source: github.com/rastikerdar/vazirmatn releases.
 
 ===== OFL: Google Sans Flex =====

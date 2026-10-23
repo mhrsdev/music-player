@@ -538,6 +538,9 @@ public final class PlayerFragment extends Fragment {
 
     private void renderLiked(Boolean liked) {
         boolean on = Boolean.TRUE.equals(liked);
+        boolean wasOn = Boolean.TRUE.equals(b.playerLike.getTag(R.id.mp_motion_state));
+        b.playerLike.setTag(R.id.mp_motion_state, on);
+        if (on && !wasOn && b.playerLike.isLaidOut()) com.mhrsdev.musicplayer.ui.motion.Motion.pop(b.playerLike);
         b.playerLike.setImageResource(on ? R.drawable.player_ic_favorite : R.drawable.player_ic_favorite_border);
         b.playerLike.setContentDescription(getString(on ? R.string.player_unlike : R.string.player_like));
     }

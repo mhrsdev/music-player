@@ -18,11 +18,14 @@ import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
 
 import com.mhrsdev.musicplayer.R;
+import com.mhrsdev.musicplayer.ui.motion.Motion;
+import com.mhrsdev.musicplayer.ui.motion.Spring;
+import com.mhrsdev.musicplayer.ui.motion.SpringInterpolator;
 import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
 
 /**
- * Floating pill navigation (DESIGN.md 01/16): a 68 dp pill on surfaceContainerHigh; the selected item widens into a
+ * Floating pill navigation (DESIGN.md 01/16): a 68 dp opaque pill on ?attr/mpSurfaceFloating; the selected item widens into a
  * secondaryContainer pill and shows its label (bounds transition, only on selection). Others are icon-only with a
  * tooltip + content description. Mirrors in RTL automatically. Use {@link #addDefaultItems()} for the 4 app tabs.
  */
@@ -33,6 +36,8 @@ public class FloatingNavView extends LinearLayout {
         /** Tapped the already-selected tab (scroll to top). */
         default void onItemReselected(@IdRes int id) {}
     }
+
+    private static final SpringInterpolator PILL_SPRING = new SpringInterpolator(Spring.Preset.BOUNCY);
 
     private final int selectedBg;
     private final int onSelected;
@@ -53,8 +58,8 @@ public class FloatingNavView extends LinearLayout {
         setMinimumHeight((int) Tokens.dp(context, 68f));
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(Tokens.dp(context, 34f));
-        int high = Tokens.color(context, R.attr.mpSurfaceContainerHigh);
-        bg.setColor(high | 0xFF000000); // opaque: list content must never show through (owner, real device)
+        int floating = Tokens.color(context, R.attr.mpSurfaceFloating);
+        bg.setColor(floating | 0xFF000000); // opaque: list content must never show through (owner, real device)
         setBackground(bg);
         setElevation(Tokens.dp(context, 6f));
         selectedBg = Tokens.color(context, R.attr.mpSecondaryContainer);
@@ -111,6 +116,7 @@ public class FloatingNavView extends LinearLayout {
         tlp.setMarginStart((int) Tokens.dp(c, 8f));
         item.addView(tv, tlp);
 
+        Motion.attachPress(item, Motion.PRESS_SCALE);
         item.setOnClickListener(v -> {
             if (id == selectedId) {
                 if (listener != null) listener.onItemReselected(id);
@@ -132,9 +138,13 @@ public class FloatingNavView extends LinearLayout {
     /** Selects without notifying the listener (e.g. restoring state or following back navigation). */
     public void setSelectedItem(@IdRes int id, boolean animate) {
         if (animate && MotionPolicy.decorativeMotionEnabled(getContext()) && isLaidOut()) {
+            // The selected pill widens on a bouncy spring; its icon does the one Mowj jiggle.
             ChangeBounds t = new ChangeBounds();
-            t.setDuration(Tokens.MOTION_FAST + 100);
+            t.setInterpolator(PILL_SPRING);
+            t.setDuration(PILL_SPRING.durationMs());
             TransitionManager.beginDelayedTransition(this, t);
+            View item = findViewById(id);
+            if (item instanceof ViewGroup) Motion.jiggle(((ViewGroup) item).getChildAt(0));
         }
         selectedId = id;
         for (int i = 0; i < getChildCount(); i++) {

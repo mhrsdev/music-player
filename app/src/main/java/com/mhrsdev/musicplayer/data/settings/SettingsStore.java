@@ -28,6 +28,7 @@ public final class SettingsStore {
     private static final String K_BATTERY_SAVER = "battery_saver";
     private static final String K_INCLUDE = "folders_include";
     private static final String K_EXCLUDE = "folders_exclude";
+    private static final String K_DYNAMIC_COLOR = "dynamic_color";
 
     private final SharedPreferences prefs;
     private final MutableLiveData<ThemeMode> theme;
@@ -149,6 +150,15 @@ public final class SettingsStore {
     public void setExcludedFolders(Set<String> folders) {
         prefs.edit().putStringSet(K_EXCLUDE, new HashSet<>(folders)).apply();
         publish(excludedFolders, Collections.unmodifiableSet(new HashSet<>(folders)));
+    }
+
+    /** Material You wallpaper colours (API 31+) instead of the lapis identity; default off. Read at activity start. */
+    public boolean isDynamicColor() {
+        return prefs.getBoolean(K_DYNAMIC_COLOR, false);
+    }
+
+    public void setDynamicColor(boolean value) {
+        prefs.edit().putBoolean(K_DYNAMIC_COLOR, value).apply();
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {

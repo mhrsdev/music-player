@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Below API 31 there are no wallpaper palettes: the overlays are empty (see values-v31 / values-night-v31). -->
+<resources>
+    <style name="ThemeOverlay.Mowj.Dynamic" parent="" />
+    <style name="ThemeOverlay.Mowj.DynamicAccents" parent="" />
+</resources>
