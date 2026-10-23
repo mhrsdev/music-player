@@ -1,114 +1,95 @@
 <!doctype html>
-<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>States</title><link rel="stylesheet" href="base.css">
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>States</title><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="sheet.css"><link rel="stylesheet" href="player.css">
 <style>
-  body { width: 1920px; background: #07090C; }
-  .sheet { padding: 56px 64px 64px; width: 1920px; }
-  h1 { font-size: 40px; font-weight: 560; letter-spacing: -.4px; font-variation-settings: 'ROND' 40; }
-  .lede { font-size: 17px; line-height: 26px; color: #AEB6C2; max-width: 1100px; margin-top: 10px; }
-  .cols { display: grid; grid-template-columns: repeat(4, 412px); gap: 44px; margin-top: 36px; }
-  .cap { font-size: 18px; font-weight: 620; margin-bottom: 4px; } .sub { font-size: 14px; color: #8D96A3; margin-bottom: 14px; }
-  .screen { border-radius: 30px; }
-  .center { position: absolute; left: 32px; right: 32px; text-align: center; }
-  .h2 { text-wrap: balance; font-size: 28px; line-height: 34px; font-weight: 600; font-variation-settings: 'ROND' 50; }
-  .p { font-size: 15.5px; line-height: 23px; color: var(--on-surface-var); margin-top: 10px; }
-  .ill { position: absolute; left: 50%; transform: translateX(-50%); }
-  .float { position: absolute; border-radius: 16px; box-shadow: 0 10px 24px rgba(0,0,0,.4); }
-  .sk { background: linear-gradient(90deg, var(--sc) 0%, var(--sc-high) 45%, var(--sc) 70%); border-radius: 12px; }
-  .li { display: flex; align-items: center; gap: 14px; height: 72px; padding: 0 12px; }
-  .scanbar { position: absolute; left: 16px; right: 16px; top: 56px; height: 76px; border-radius: 24px; background: var(--sc-high); display: flex; align-items: center; gap: 14px; padding: 0 18px; }
-  .ld { width: 48px; height: 48px; position: relative; }
-  .field { margin: 12px 16px 0; height: 56px; border-radius: 28px; background: var(--sc-high); display: flex; align-items: center; gap: 14px; padding: 0 8px 0 18px; font-size: 17px; }
+  .sk { background: var(--ink1); border-radius: 10px; position: absolute; }
+  .sk.sh { background: linear-gradient(100deg, var(--ink1) 30%, var(--ink2) 50%, var(--ink1) 70%); }
+  .loader { display: flex; gap: 4px; align-items: center; height: 28px; }
+  .loader i { width: 4px; border-radius: 3px; background: var(--accent); display: block; }
+  .field { margin: 14px 16px 0; height: 52px; border-radius: 999px; background: var(--ink2); display: flex; align-items: center; gap: 12px; padding: 0 4px 0 18px; box-shadow: inset 0 0 0 1px var(--line); font-size: 16px; }
+  .float { position: absolute; box-shadow: 0 14px 28px -8px rgba(0,0,0,.6); }
 </style></head>
 <body><div class="sheet">
   <h1>Empty, loading and error states</h1>
-  <p class="lede">Each state says what happened, what the person can do next, and what was kept. They use the same type, shapes and artwork-derived color as the main screens.</p>
+  <p class="lede">Each state says what happened, what the person can do next and what was kept. They reuse the arch, the discs and the loudness bars, so even a waiting screen looks like this app and nobody else's.</p>
   <div class="cols">
 
-    <div><div class="cap">First run · permission</div><div class="sub">Nothing scanned yet; asks at the moment it matters</div>
+    <div><div class="cap">First run · permission</div><div class="sub">Asked when it matters, with the reason in plain words</div>
       <div class="screen theme-dark">
         <div class="statusbar"></div>
-        <div class="ill" style="top:120px;width:300px;height:280px">
-          <div class="float art" data-art="koucheh-bagh" style="left:12px;top:30px;width:84px;height:84px;transform:rotate(-12deg);opacity:.85"></div>
-          <div class="float art" data-art="without-you" style="right:6px;top:10px;width:96px;height:96px;transform:rotate(9deg);opacity:.85"></div>
-          <div class="float art" data-art="anar" style="left:30px;bottom:6px;width:74px;height:74px;transform:rotate(7deg);opacity:.85"></div>
-          <div class="float art" data-art="electric-dusk" style="right:26px;bottom:20px;width:70px;height:70px;transform:rotate(-8deg);opacity:.85"></div>
-          <div class="cookie" data-size="132" data-n="9" data-k=".08" data-c="var(--primary-container)" style="position:absolute;left:84px;top:74px"><i class="ic f" style="font-size:56px;color:var(--on-primary-container)">library_music</i></div>
+        <div class="ill" style="top:104px;width:260px;height:320px">
+          <div style="position:absolute;left:-60px;top:40px;width:380px;height:300px;background:radial-gradient(closest-side,rgba(99,213,199,.18),transparent)"></div>
+          <div class="archline" data-w="220" data-h="300" data-r="18" data-c="rgba(99,213,199,.55)" style="position:absolute;left:20px;top:0"></div>
+          <div class="art arch" data-r="12" data-art="koucheh-bagh" data-zoom="1.45" data-origin="50% 0%" style="position:absolute;left:36px;top:16px;width:188px;height:268px;opacity:.9"></div>
+          <div class="float art sl10" data-art="without-you" style="left:-6px;top:150px;width:92px;height:92px;transform:rotate(-8deg)"></div>
+          <div class="float art sl10" data-art="anar" style="right:-10px;top:96px;width:84px;height:84px;transform:rotate(7deg)"></div>
+          <div class="float art sl10" data-art="electric-dusk" style="right:14px;top:222px;width:70px;height:70px;transform:rotate(-4deg)"></div>
         </div>
-        <div class="center" style="top:440px"><div class="h2">Find the music on this phone</div><div class="p">Allow access to audio files and we'll build your library: albums, artists and lyrics. Nothing is uploaded.</div></div>
-        <div class="center" style="top:640px"><div class="btn btn-filled" style="width:100%;height:56px;font-size:16px">Allow access to music</div><div class="btn btn-text" style="margin-top:8px">Choose folders instead</div></div>
-        <div class="center t-support" style="top:812px;font-size:13px">You can change this later in Settings → Library.</div>
+        <div class="center" style="top:454px"><div class="h2s">Find the music on this phone</div><div class="ps">Allow access to audio files and your library builds itself: albums, artists, lyrics. Nothing leaves the phone.</div></div>
+        <div class="center" style="top:640px"><div class="btn solid" style="width:100%">Allow access to music</div><div class="btn text" style="margin-top:8px">Choose folders instead</div></div>
+        <div class="center t-meta" style="top:812px">You can change this later in Settings → Library.</div>
         <div class="gesture"></div>
       </div>
     </div>
 
-    <div><div class="cap">Scanning · loading</div><div class="sub">Expressive loading indicator + skeletons, real progress</div>
+    <div><div class="cap">Scanning · loading</div><div class="sub">Real progress; skeletons share the real shapes</div>
       <div class="screen theme-dark">
         <div class="statusbar"></div>
-        <div class="scanbar">
-          <div class="ld cookie" data-size="48" data-n="7" data-k=".16" data-c="var(--primary)" data-rot="18"></div>
-          <div style="flex:1"><div class="t-title">Building your library</div><div class="t-support num">1,204 of 2,184 songs</div>
-            <div class="seek" style="margin-top:6px;color:var(--primary)" data-w="226" data-h="10" data-p=".55" data-c="#A6C8FF" data-t="rgba(166,200,255,.22)" data-sw="3" data-amp="2" data-wl="14" data-nothumb="1"></div></div>
+        <div style="position:absolute;top:56px;left:20px;right:20px;display:flex;align-items:center;gap:14px">
+          <div class="loader"><i style="height:10px"></i><i style="height:22px"></i><i style="height:14px;opacity:.7"></i><i style="height:26px"></i><i style="height:12px;opacity:.6"></i></div>
+          <div style="flex:1"><div class="t-title">Building your library</div><div class="t-meta num">1,204 of 2,184 songs · about a minute</div></div>
         </div>
-        <div style="position:absolute;top:156px;left:20px;width:200px;height:26px" class="sk"></div>
-        <div style="position:absolute;top:200px;left:16px;width:272px;height:272px;border-radius:28px" class="sk"></div>
-        <div style="position:absolute;top:200px;left:296px;width:68px;height:272px;border-radius:24px" class="sk"></div>
-        <div style="position:absolute;top:200px;left:372px;width:40px;height:272px;border-radius:20px 0 0 20px" class="sk"></div>
-        <div style="position:absolute;top:488px;left:20px;width:160px;height:16px" class="sk"></div>
-        <div style="position:absolute;top:512px;left:20px;width:110px;height:14px;opacity:.7" class="sk"></div>
-        <div style="position:absolute;top:556px;left:20px;width:150px;height:26px" class="sk"></div>
-        <div style="position:absolute;top:600px;left:16px;right:16px">
-          <div class="li"><div class="sk" style="width:52px;height:52px"></div><div style="flex:1"><div class="sk" style="width:60%;height:14px"></div><div class="sk" style="width:35%;height:12px;margin-top:8px;opacity:.7"></div></div></div>
-          <div class="li"><div class="sk" style="width:52px;height:52px"></div><div style="flex:1"><div class="sk" style="width:48%;height:14px"></div><div class="sk" style="width:30%;height:12px;margin-top:8px;opacity:.7"></div></div></div>
-        </div>
-        <div class="navwrap"></div>
-        <div class="nav"><div class="it on"><i class="ic">home</i><span class="l">Home</span></div><div class="it"><i class="ic">search</i></div><div class="it"><i class="ic">library_music</i></div><div class="it"><i class="ic">settings</i></div></div>
+        <div style="position:absolute;top:116px;left:20px"><div class="seek" data-w="372" data-h="18" data-p=".55" data-style="bars" data-c="#63D5C7" data-t="rgba(238,234,225,.14)" data-seed="3" data-bw="2.6" data-gap="2.4" data-min="3"></div></div>
+        <div class="sk" style="top:168px;left:20px;width:180px;height:22px"></div>
+        <div class="sk sh" style="top:206px;left:20px;width:264px;height:264px;border-radius:16px"></div>
+        <div class="sk" style="top:206px;left:292px;width:84px;height:264px;border-radius:14px"></div>
+        <div class="sk" style="top:206px;left:384px;width:40px;height:264px;border-radius:12px"></div>
+        <div class="sk" style="top:488px;left:20px;width:150px;height:14px"></div>
+        <div class="sk" style="top:512px;left:20px;width:100px;height:12px;opacity:.7"></div>
+        <div class="sk" style="top:556px;left:20px;width:140px;height:22px"></div>
+        <div class="sk" style="top:600px;left:20px;width:136px;height:136px"></div>
+        <div class="sk" style="top:600px;left:166px;width:136px;height:136px"></div>
+        <div class="sk" style="top:600px;left:312px;width:136px;height:136px"></div>
+        <div class="deckwrap"></div><div class="deck" data-on="home"></div>
         <div class="gesture"></div>
       </div>
     </div>
 
-    <div><div class="cap">Search · no results</div><div class="sub">Keeps the query; offers the next useful move</div>
+    <div><div class="cap">Search · no results</div><div class="sub">Keeps the query, offers the next useful move</div>
       <div class="screen theme-dark">
         <div class="statusbar"></div>
         <div style="position:absolute;top:40px;left:0;right:0">
-          <div class="field"><i class="ic" style="color:var(--on-surface-var)">search</i><div style="flex:1">neffexx grateful</div><div class="iconbtn" style="color:var(--on-surface-var)"><i class="ic">close</i></div></div>
-          <div style="display:flex;gap:8px;padding:14px 16px 6px"><div class="chip on"><i class="ic s18">check</i>Songs</div><div class="chip">Albums</div><div class="chip">Artists</div><div class="chip">Playlists</div></div>
+          <div class="field"><i class="g" data-g="search" style="color:var(--text2)"></i><div style="flex:1">neffexx grateful</div><div class="ib" style="color:var(--text2)"><i class="g s20" data-g="close"></i></div></div>
+          <div class="tabs" style="margin-top:10px"><div class="tb on"><span>Songs<span class="c">0</span></span><span class="tick"></span></div><div class="tb"><span>Albums<span class="c">0</span></span></div><div class="tb"><span>Artists<span class="c">0</span></span></div><div class="tb"><span>Playlists</span></div></div>
         </div>
-        <div class="cookie ill" data-size="104" data-shape="square" data-c="var(--sc-high)" style="top:250px;position:absolute"><i class="ic" style="font-size:48px;color:var(--on-surface-var)">search_off</i></div>
-        <div class="center" style="top:384px"><div class="h2" style="font-size:24px">No songs match<br>“neffexx grateful”</div><div class="p">Check the spelling, or look in all categories instead of only Songs.</div></div>
-        <div class="center" style="top:540px"><div class="btn btn-tonal">Search all categories</div></div>
-        <div class="center" style="top:620px;text-align:left;left:16px;right:16px">
-          <div class="t-support" style="padding:0 4px 8px">Did you mean</div>
-          <div class="group"><div class="row" style="min-height:64px"><div class="art r10" data-art="grateful" style="width:48px;height:48px"></div><div class="txt"><div class="t-title">Grateful</div><div class="t-support">NEFFEX</div></div><div class="trail"><i class="ic">more_vert</i></div></div></div>
+        <div class="ill" style="top:232px;width:104px;height:128px"><div class="archline" data-w="104" data-h="128" data-r="14" data-c="var(--line2)" data-f="var(--ink1)" style="position:absolute;inset:0"></div><i class="g s36" data-g="searchoff" style="position:absolute;left:34px;top:52px;color:var(--text2)"></i></div>
+        <div class="center" style="top:384px"><div class="h2s" style="font-size:22px;line-height:28px">No songs match<br>“neffexx grateful”</div><div class="ps">Check the spelling, or look in every category instead of only Songs.</div></div>
+        <div class="center" style="top:530px"><div class="btn glass">Search all categories</div></div>
+        <div style="position:absolute;top:620px;left:0;right:0">
+          <div class="t-label" style="padding:0 20px 2px">Did you mean</div>
+          <div class="row"><div class="art sl8 edge" data-art="grateful" style="width:48px;height:48px"></div><div class="txt"><div class="t-title">Grateful</div><div class="t-meta">NEFFEX · song</div></div><div class="ib more"><i class="g" data-g="more"></i></div></div>
         </div>
-        <div class="navwrap"></div>
-        <div class="nav"><div class="it"><i class="ic">home</i></div><div class="it on"><i class="ic">search</i><span class="l">Search</span></div><div class="it"><i class="ic">library_music</i></div><div class="it"><i class="ic">settings</i></div></div>
+        <div class="deckwrap"></div><div class="deck" data-on="search"></div>
         <div class="gesture"></div>
       </div>
     </div>
 
-    <div><div class="cap">Lyrics · offline error</div><div class="sub">Music keeps playing; one clear way to retry</div>
-      <div class="screen theme-dark" style="--dyn-primary:#86D5C9;--dyn-on-primary:#003731;color:#fff;--sb:#fff;--gh:#fff">
+    <div><div class="cap">Lyrics · offline</div><div class="sub">Music keeps playing; one clear way to retry</div>
+      <div class="screen theme-dark pl" style="--dyn:#86D5C9;--on-dyn:#003731;--dyn-shadow:rgba(10,90,80,.8);--tintc:#1f6b62">
         <div class="backdrop"><div class="art" data-art="baran"></div></div>
-        <div class="backdrop-scrim" style="background:linear-gradient(180deg,rgba(4,20,18,.5),rgba(4,20,18,.6) 60%,rgba(4,20,18,.86))"></div>
-        <div class="grain"></div>
+        <div class="tint"></div><div class="backdrop-scrim" style="background:linear-gradient(180deg,rgba(3,22,20,.55),rgba(3,22,20,.62) 55%,rgba(3,22,20,.88))"></div><div class="grain"></div>
         <div class="layer">
           <div class="statusbar"></div>
-          <div style="position:absolute;top:58px;left:12px;right:12px;display:flex;align-items:center;justify-content:space-between">
-            <div class="iconbtn" style="background:var(--dyn-primary);color:var(--dyn-on-primary)"><i class="ic f">lyrics</i></div>
-            <div class="togglegroup"><div class="tg"><i class="ic">shuffle</i></div><div class="tg"><i class="ic">repeat</i></div><div class="tg"><i class="ic">queue_music</i></div></div>
-            <div class="iconbtn"><i class="ic">favorite</i></div>
-          </div>
-          <div class="cookie ill" data-size="96" data-n="8" data-k=".1" data-c="rgba(255,255,255,.12)" style="top:200px;position:absolute"><i class="ic" style="font-size:44px">cloud_off</i></div>
-          <div class="center" style="top:320px"><div class="h2" style="font-size:24px;color:#fff">Lyrics need a connection</div><div class="p" style="color:rgba(255,255,255,.78)">This song has no lyrics on the phone, and lrclib.net can't be reached right now. The music keeps playing.</div></div>
-          <div class="center" style="top:476px"><div class="btn" style="background:var(--dyn-primary);color:var(--dyn-on-primary)"><i class="ic s20">refresh</i>Try again</div></div>
-          <div style="position:absolute;top:612px;left:24px;right:16px;display:flex;align-items:center;gap:14px">
-            <div class="art r12" data-art="baran" style="width:56px;height:56px"></div>
-            <div style="flex:1;min-width:0" class="fa" dir="rtl"><div style="font-family:Vazirmatn;font-size:22px;font-weight:800;text-align:left">باران که می‌آید</div><div style="font-family:Vazirmatn;font-size:14.5px;opacity:.75;text-align:left">نیلوفر</div></div>
-          </div>
-          <div style="position:absolute;top:692px;left:24px;width:364px"><div class="seek" data-w="364" data-h="32" data-p=".2" data-c="#86D5C9" data-t="rgba(255,255,255,.26)" data-thumb="28"></div><div class="times"><span>1:02</span><span>−3:59</span></div></div>
-          <div class="transport" style="position:absolute;top:768px;left:0;right:0"><div class="side" style="width:72px;height:60px"><i class="ic f s28">skip_previous</i></div><div class="cookie" data-size="88" data-n="10" data-k=".075" data-c="#86D5C9"><i class="ic f s32" style="color:#003731">pause</i></div><div class="side" style="width:72px;height:60px"><i class="ic f s28">skip_next</i></div></div>
+          <div class="top"><div class="ib"><i class="g" data-g="chevd"></i></div><div class="from"><div class="a">Playing from</div><div class="b">Liked songs</div></div><div class="ib"><i class="g" data-g="more"></i></div></div>
+          <div class="ill" style="top:120px;width:96px;height:118px"><div class="archline" data-w="96" data-h="118" data-r="14" data-c="rgba(255,255,255,.28)" data-f="rgba(255,255,255,.06)" style="position:absolute;inset:0"></div><i class="g s36" data-g="cloudoff" style="position:absolute;left:30px;top:48px"></i></div>
+          <div class="center" style="top:256px"><div class="h2s" style="font-size:22px;color:#fff">Lyrics need a connection</div><div class="ps" style="color:rgba(255,255,255,.78)">This song has no lyrics on the phone, and lrclib.net can't be reached. The music keeps playing.</div></div>
+          <div class="center" style="top:384px"><div class="btn" style="background:var(--dyn);color:var(--on-dyn)"><i class="g s20" data-g="refresh"></i>Try again</div></div>
+          <div class="minimeta"><div class="art sl10 edge" data-art="baran" style="width:56px;height:56px"></div><div style="flex:1;min-width:0"><div class="tt fa" dir="rtl" style="text-align:left;font-family:Vazirmatn;font-weight:800">باران که می‌آید</div><div class="ar fa" dir="rtl" style="text-align:left;font-family:Vazirmatn">نیلوفر</div></div><div class="ib"><i class="g s28" data-g="heart"></i></div></div>
+          <div class="seekwrap"><div style="height:54px;display:flex;align-items:flex-end;padding-bottom:5px"><div class="seek" data-w="364" data-h="28" data-p=".2" data-c="#86D5C9" data-t="rgba(255,255,255,.24)"></div></div><div class="times"><span>1:02</span><span>−3:59</span></div></div>
+          <div class="transport"><div class="ib"><i class="g" data-g="shuffle"></i></div><div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="prev"></i></div><div class="disc play" style="width:88px;height:88px"><span class="glyph" data-t="1" data-s="34" data-c="#003731"></span></div><div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="next"></i></div><div class="ib"><i class="g" data-g="repeat"></i></div></div>
+          <div class="actions"><div class="capsule"><i class="g s20" data-g="speaker"></i>This phone</div><div style="display:flex;gap:4px"><div class="ib"><i class="g" data-g="moon"></i></div><div class="ib lit" style="--lit:var(--dyn)"><i class="g" data-g="lyrics"></i></div></div></div>
+          <div class="upnext"><div class="art sl8" data-art="cold" style="width:36px;height:36px"></div><div class="tx"><div class="a">Up next</div><div class="b ell">Cold · NEFFEX</div></div><i class="g s20" data-g="chevu" style="opacity:.7"></i></div>
         </div>
-        <div class="gesture"></div>
+        <div class="gesture" style="--gh:#fff"></div>
       </div>
     </div>
   </div>
