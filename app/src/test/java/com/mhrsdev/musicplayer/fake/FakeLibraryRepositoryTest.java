@@ -44,8 +44,8 @@ public class FakeLibraryRepositoryTest {
 
     @Test public void recordPlayMovesTrackToTopOfHistory() {
         FakeLibraryRepository repo = new FakeLibraryRepository();
-        repo.recordPlay("track-30");
-        assertEquals("track-30", value(repo.getHistory()).get(0).id());
+        repo.recordPlay("track-20");
+        assertEquals("track-20", value(repo.getHistory()).get(0).id());
         repo.recordPlay("track-5");
         List<Track> history = value(repo.getHistory());
         assertEquals("track-5", history.get(0).id());
@@ -65,10 +65,10 @@ public class FakeLibraryRepositoryTest {
     @Test public void searchFiltersByKindAndIgnoresBlankQuery() {
         FakeLibraryRepository repo = new FakeLibraryRepository();
         assertTrue(value(repo.search("  ", SearchFilter.ALL)).isEmpty());
-        List<SearchResult> artists = value(repo.search("neffex", SearchFilter.ARTISTS));
+        List<SearchResult> artists = value(repo.search("woodward", SearchFilter.ARTISTS));
         assertEquals(1, artists.size());
         assertEquals(SearchResult.Kind.ARTIST, artists.get(0).kind());
-        assertFalse(value(repo.search("neffex", SearchFilter.SONGS)).isEmpty());
+        assertFalse(value(repo.search("woodward", SearchFilter.SONGS)).isEmpty());
     }
 
     @Test public void homeFeedHasHeroSectionFirst() {

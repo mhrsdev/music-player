@@ -6,7 +6,7 @@ import com.mhrsdev.musicplayer.MusicPlayerApp;
 import com.mhrsdev.musicplayer.di.AppContainer;
 
 /** Small helpers shared by the screen fragments. */
-public final class Screens {
+public class Screens {
     private Screens() { }
 
     public static AppContainer container(Fragment fragment) {

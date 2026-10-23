@@ -57,7 +57,11 @@ public class ChipView extends AppCompatTextView implements Checkable {
         onColor = Tokens.color(context, R.attr.mpOnSecondaryContainer);
         offColor = Tokens.onSurfaceVariant(context);
         setTextColor(offColor);
-        setOnClickListener(v -> { if (checkable) toggle(); });
+        setOnClickListener(v -> {
+            if (!checkable) return;
+            toggle();
+            com.mhrsdev.musicplayer.ui.motion.Motion.jiggle(this);
+        });
     }
 
     public void setCheckable(boolean checkable) {

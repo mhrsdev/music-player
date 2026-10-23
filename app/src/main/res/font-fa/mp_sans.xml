@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Variable font, one entry per weight used by the v1 type ramp (DESIGN.md section 3). -->
+<!-- Persian: Vazirmatn (variable wght; it has no roundness axis) for the mp_sans role. -->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android">
     <font android:font="@font/vazirmatn" android:fontStyle="normal" android:fontWeight="400" android:fontVariationSettings="'wght' 400" />
     <font android:font="@font/vazirmatn" android:fontStyle="normal" android:fontWeight="500" android:fontVariationSettings="'wght' 500" />

@@ -18,4 +18,7 @@
     <attr name="mpOnSecondaryContainer" format="color" />
     <attr name="mpTertiary" format="color" />
     <attr name="mpError" format="color" />
+    <!-- M1: floating chrome (nav dock, mini-player, snackbar, sheets). Always opaque: nothing floating is see-through. -->
+    <attr name="mpSurfaceFloating" format="color" />
+    <attr name="mpOnSurfaceFloating" format="color" />
 </resources>

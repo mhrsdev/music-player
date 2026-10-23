@@ -14,7 +14,7 @@ import com.mhrsdev.musicplayer.R;
  * Home's ambient top glow: a vertical gradient that starts at full strength at y=0 (under the status bar) and eases
  * out to fully transparent over many stops, so it never shows a band or a hard edge. Static drawable, no animation.
  */
-public final class HomeGlow {
+public class HomeGlow {
     static final int TINT = 0x705AA8;
     static final int PEAK_ALPHA = 0x40;
 

@@ -34,7 +34,7 @@ import java.util.List;
  * "Add to playlist" sheet: lists the user's playlists (LibraryRepository), creates a new one inline, adds the track.
  * Callable from any screen via {@link #show(FragmentManager, Track)}.
  */
-public final class AddToPlaylistSheet extends BottomSheetDialogFragment {
+public class AddToPlaylistSheet extends BottomSheetDialogFragment {
     public static final String TAG = "add_to_playlist";
     private static final String ARG_TRACKS = "track_ids", ARG_TITLE = "track_title";
 

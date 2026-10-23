@@ -18,8 +18,8 @@ import com.mhrsdev.musicplayer.data.db.contract.WaveformsContract;
  * Bump {@link #VERSION} and add a migration step in {@link #onUpgrade} whenever a contract changes.
  *
  * <p>History: v1 = likes only (scaffold), v2 = library, playlists, play stats, waveform + lyrics caches,
- * v3 = lyrics cache keyed by expiry instead of fetch time, v4 = tracks.genre / tracks.path + play_events (timestamped
- * history for the Home mixes).
+ * v3 = lyrics cache keyed by expiry instead of fetch time, v4 = tracks keep file size + path (change detection,
+ * folder browser) + genre, and play_events (timestamped history for the Home mixes). v0.2.0 shipped v3.
  */
 public final class DbHelper extends SQLiteOpenHelper {
     public static final String NAME = "musicplayer.db";
@@ -47,7 +47,7 @@ public final class DbHelper extends SQLiteOpenHelper {
             db.execSQL(LyricsCacheContract.DROP);
             for (String sql : LyricsCacheContract.SCHEMA) db.execSQL(sql);
         }
-        // v1 got the v4 tracks shape from createV2Tables; only v2/v3 tables need the new columns.
+        // One v3 -> v4 step (v1 databases got the v4 tracks table from createV2Tables above).
         if (oldVersion >= 2 && oldVersion < 4) {
             for (String sql : TracksContract.UPGRADE_V4) db.execSQL(sql);
         }

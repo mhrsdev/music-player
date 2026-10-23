@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /** Canned summaries for the UI development gallery and tests; writes nothing. */
-public final class FakeBackupService implements BackupService {
+public class FakeBackupService implements BackupService {
     private static final BackupSummary SAMPLE = new BackupSummary(12, 340, 1280, 8, 5, BackupSummary.Error.NONE);
     private final Handler main = new Handler(Looper.getMainLooper());
 

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Mowj brand tokens (docs/brand/BRAND.md). Used by the launcher icon; UI colours stay in colors.xml. -->
 <resources>
-    <color name="brand_lapis">#24548C</color>
+    <color name="brand_lapis">#1D4A80</color>
+    <color name="brand_lapis_teal">#1B6787</color>
     <color name="brand_turquoise">#0E8C84</color>
-    <color name="brand_foam">#F2FAFF</color>
+    <color name="brand_glow">#619EF2E7</color>
+    <color name="brand_glow_clear">#009EF2E7</color>
+    <color name="brand_foam">#FFFFFF</color>
+    <color name="brand_foam_deep">#CDEFEA</color>
+    <color name="brand_shadow">#4705182C</color>
 </resources>

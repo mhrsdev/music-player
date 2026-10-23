@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -29,14 +28,17 @@ import com.mhrsdev.musicplayer.ui.home.HomeFragment;
 import com.mhrsdev.musicplayer.ui.library.CollectionFragment;
 import com.mhrsdev.musicplayer.ui.library.LibraryFragment;
 import com.mhrsdev.musicplayer.ui.library.TrackListFragment;
+import com.mhrsdev.musicplayer.ui.motion.PageTransitions;
 import com.mhrsdev.musicplayer.ui.nav.AudioPermission;
 import com.mhrsdev.musicplayer.ui.nav.BottomChrome;
+import com.mhrsdev.musicplayer.ui.nav.SystemBars;
 import com.mhrsdev.musicplayer.ui.nav.HomeGlow;
 import com.mhrsdev.musicplayer.ui.nav.PermissionFragment;
 import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
 import com.mhrsdev.musicplayer.ui.nav.ScrollToTop;
 import com.mhrsdev.musicplayer.ui.nav.ShellViewModel;
+import com.mhrsdev.musicplayer.ui.nav.ShortcutIntents;
 import com.mhrsdev.musicplayer.ui.search.SearchFragment;
 import com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore;
 import com.mhrsdev.musicplayer.ui.settings.SettingsFragment;
@@ -70,7 +72,8 @@ public class MainActivity extends AppCompatActivity
         SettingsStore.Theme theme = new PrefsSettingsStore(this).getTheme();
         ThemeApplier.applyNightMode(theme);
         setTheme(ThemeApplier.themeRes(theme));
-        EdgeToEdge.enable(this);
+        ThemeController.applyDynamicColor(this, theme == SettingsStore.Theme.BLACK);
+        SystemBars.install(this); // edge-to-edge, transparent bars, no scrim, cutout area (all API levels)
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -92,10 +95,14 @@ public class MainActivity extends AppCompatActivity
         };
         getOnBackPressedDispatcher().addCallback(this, backToHome);
         getSupportFragmentManager().addOnBackStackChangedListener(this::updateBackToHome);
+        getSupportFragmentManager().addOnBackStackChangedListener(this::updateImmersive);
+        ((MusicPlayerApp) getApplication()).getContainer().settings().immersivePlayer()
+                .observe(this, on -> updateImmersive());
 
         if (savedInstanceState == null) {
             if (AudioPermission.granted(this) || PermissionPrefs.skipped(this)) {
                 showTab(Tab.HOME);
+                runShortcut(getIntent());
             } else {
                 permissionFlow = true;
                 getSupportFragmentManager().beginTransaction()
@@ -110,6 +117,17 @@ public class MainActivity extends AppCompatActivity
         binding.bottomScrim.setVisibility(permissionFlow ? View.GONE : View.VISIBLE);
     }
 
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (!permissionFlow) runShortcut(intent);
+    }
+
+    /** Launcher shortcuts (Shuffle all / Liked songs / Search). */
+    private void runShortcut(Intent intent) {
+        ShortcutIntents.handle(this, intent, ((MusicPlayerApp) getApplication()).getContainer(), this);
+    }
+
     @Override protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
         out.putBoolean(STATE_PERMISSION, permissionFlow);
@@ -121,13 +139,7 @@ public class MainActivity extends AppCompatActivity
      * from the system one), so they stay readable on light and dark backgrounds.
      */
     private void applySystemBarAppearance() {
-        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        boolean night = (getResources().getConfiguration().uiMode
-                & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-        androidx.core.view.WindowInsetsControllerCompat c =
-                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        c.setAppearanceLightStatusBars(!night);
-        c.setAppearanceLightNavigationBars(!night);
+        SystemBars.applyAppearance(getWindow(), this);
     }
 
     private int insetBottom;
@@ -135,12 +147,15 @@ public class MainActivity extends AppCompatActivity
 
     private void applyInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root, (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            // Controls and text get the bar/cutout insets; backgrounds (root, glow, scrim) stay full-bleed.
+            Insets bars = SystemBars.controlInsets(insets);
             binding.screenContainer.setPadding(bars.left, bars.top, bars.right, 0);
-            insetBottom = bars.bottom;
+            // Never trust a 0 bottom inset: some phones report 0 with a gesture handle or bar drawn over the window.
+            insetBottom = SystemBars.dockBottomInset(insets, getResources(),
+                    getResources().getDimensionPixelSize(R.dimen.mp_dock_min_bottom_inset));
             sizeGlow(bars.top);
             int gap = getResources().getDimensionPixelSize(R.dimen.mp_dock_margin_b);
-            binding.chrome.setPadding(bars.left, 0, bars.right, bars.bottom + gap);
+            binding.chrome.setPadding(bars.left, 0, bars.right, insetBottom + gap);
             updateDock();
             return insets;
         });
@@ -155,7 +170,32 @@ public class MainActivity extends AppCompatActivity
             @Override public void onFragmentViewCreated(FragmentManager fm, Fragment f, View view, Bundle state) {
                 if (dockPx >= 0) BottomChrome.apply(view, dockPx);
             }
+
+            @Override public void onFragmentStarted(FragmentManager fm, Fragment f) {
+                // Sheets and dialogs (queue, add to playlist, track menu, sleep timer...) are edge-to-edge too.
+                if (f instanceof DialogFragment df) SystemBars.applyTo(df.getDialog(), MainActivity.this);
+            }
         }, true);
+    }
+
+    /** Settings → "Immersive player": hide the status bar while the full player is open; swipe shows it briefly. */
+    private void updateImmersive() {
+        boolean playerOpen = getSupportFragmentManager().findFragmentByTag(PLAYER_TAG) != null;
+        boolean on = playerOpen && Boolean.TRUE.equals(
+                ((MusicPlayerApp) getApplication()).getContainer().settings().immersivePlayer().getValue());
+        androidx.core.view.WindowInsetsControllerCompat c =
+                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        if (on) {
+            c.setSystemBarsBehavior(androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            c.hide(WindowInsetsCompat.Type.statusBars());
+        } else {
+            c.show(WindowInsetsCompat.Type.statusBars());
+        }
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        updateImmersive(); // re-hide after coming back from another app
     }
 
     /** Glow height: status-bar inset + ~45% of the window; its gradient is fully transparent at the end. */
@@ -318,9 +358,8 @@ public class MainActivity extends AppCompatActivity
             case LIBRARY -> new LibraryFragment();
             case SETTINGS -> new SettingsFragment();
         };
-        getSupportFragmentManager().beginTransaction()
+        PageTransitions.tab(getSupportFragmentManager().beginTransaction(), this)
                 .setReorderingAllowed(true)
-                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                 .replace(R.id.screen_container, f)
                 .commit();
         shell.selectTab(tab);
@@ -346,10 +385,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void push(Fragment f, @Nullable String tag) {
-        getSupportFragmentManager().beginTransaction()
+        PageTransitions.push(getSupportFragmentManager().beginTransaction(), this)
                 .setReorderingAllowed(true)
-                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out,
-                        android.R.animator.fade_in, android.R.animator.fade_out)
                 .replace(R.id.screen_container, f, tag)
                 .addToBackStack(tag)
                 .commit();
@@ -416,7 +453,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /** Remembers that the first-run screen was passed, so it is not shown on every launch. */
-    private static final class PermissionPrefs {
+    private static class PermissionPrefs {
         static boolean skipped(android.content.Context c) {
             return c.getSharedPreferences("nav", MODE_PRIVATE).getBoolean("perm_done", false);
         }

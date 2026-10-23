@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 /** Settings screen state. Each setter persists to the store and publishes a new immutable snapshot. */
-public final class SettingsViewModel extends ViewModel {
+public class SettingsViewModel extends ViewModel {
 
     public record State(SettingsStore.Theme theme, boolean artworkColors, SettingsStore.SeekStyle seekStyle,
             String language, boolean onlineLyrics, int sleepDefaultMinutes, boolean batterySaver) { }

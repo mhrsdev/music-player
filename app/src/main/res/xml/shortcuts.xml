@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="shuffle_all"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_ic_shuffle"
+        android:shortcutShortLabel="@string/shortcut_shuffle_all"
+        android:shortcutLongLabel="@string/shortcut_shuffle_all_long">
+        <intent
+            android:action="com.mhrsdev.musicplayer.action.SHUFFLE_ALL"
+            android:targetClass="com.mhrsdev.musicplayer.MainActivity"
+            android:targetPackage="com.mhrsdev.musicplayer" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="liked_songs"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_ic_liked"
+        android:shortcutShortLabel="@string/shortcut_liked"
+        android:shortcutLongLabel="@string/shortcut_liked_long">
+        <intent
+            android:action="com.mhrsdev.musicplayer.action.LIKED"
+            android:targetClass="com.mhrsdev.musicplayer.MainActivity"
+            android:targetPackage="com.mhrsdev.musicplayer" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="search"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_ic_search"
+        android:shortcutShortLabel="@string/shortcut_search"
+        android:shortcutLongLabel="@string/shortcut_search_long">
+        <intent
+            android:action="com.mhrsdev.musicplayer.action.SEARCH"
+            android:targetClass="com.mhrsdev.musicplayer.MainActivity"
+            android:targetPackage="com.mhrsdev.musicplayer" />
+    </shortcut>
+</shortcuts>

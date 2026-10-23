@@ -9,13 +9,15 @@ import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.MusicPlayerApp;
 import com.mhrsdev.musicplayer.domain.model.NowPlaying;
 import com.mhrsdev.musicplayer.playback.NowPlayingBridge;
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+import com.mhrsdev.musicplayer.ui.widget.cover.GeneratedCover;
 import java.util.concurrent.Executor;
 
 /**
  * Pushes the current {@link NowPlaying} to every placed widget. Called by the playback bridge on changes and by the
  * providers when the system asks; with no widget on the home screen it costs one cheap id lookup per kind.
  */
-public final class WidgetUpdater {
+public class WidgetUpdater {
     private static final int ART_PX = 420;
 
     private WidgetUpdater() { }
@@ -35,8 +37,19 @@ public final class WidgetUpdater {
         if (any) io.execute(() -> render(app, manager, np));
     }
 
+    /** The generated cover the app shows for this track (io thread; one 420 px RGB_565 render per update). */
+    static Bitmap generated(Context app, NowPlaying np) {
+        CoverSpec spec = CoverSpec.forTrack(np.albumId(), np.albumTitle(), np.title(), np.artist());
+        return GeneratedCover.get(app).render(spec, ART_PX);
+    }
+
     private static void render(Context app, AppWidgetManager manager, @Nullable NowPlaying np) {
         Bitmap art = np == null ? null : WidgetArt.decode(app, np.artworkUri(), ART_PX);
+        if (art == null && np != null && np.artworkUri() != null) { // Android 10+: albumart URIs often do not open
+            art = new com.mhrsdev.musicplayer.ui.widget.ArtworkResolver(
+                    new com.mhrsdev.musicplayer.ui.widget.ArtworkLoader.PlatformBackend(app)).resolve(np.artworkUri(), ART_PX);
+        }
+        if (art == null && np != null) art = generated(app, np); // no cover: the app's generated one
         boolean dark = (app.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
                 == Configuration.UI_MODE_NIGHT_YES;
         for (WidgetKind kind : WidgetKind.values()) {

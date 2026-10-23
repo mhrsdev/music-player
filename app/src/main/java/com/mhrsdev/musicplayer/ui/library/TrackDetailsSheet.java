@@ -23,15 +23,14 @@ import java.util.Collections;
 import java.util.Locale;
 
 /** Read-only "Track details": tags, file facts (from MediaStore, loaded on demand) and play count. */
-public final class TrackDetailsSheet extends BottomSheetDialogFragment {
+public class TrackDetailsSheet extends BottomSheetDialogFragment {
     private static final String TAG = "track_details";
-    @Nullable private Track track;
     @Nullable private U2SheetBinding b;
 
     public static void show(FragmentActivity a, Track track) {
         if (a.getSupportFragmentManager().findFragmentByTag(TAG) != null) return;
         TrackDetailsSheet s = new TrackDetailsSheet();
-        s.track = track;
+        s.setArguments(TrackArgs.put(new Bundle(), track));
         s.show(a.getSupportFragmentManager(), TAG);
     }
 
@@ -42,11 +41,11 @@ public final class TrackDetailsSheet extends BottomSheetDialogFragment {
     }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
-        if (track == null) {
+        Track t = TrackArgs.get(getArguments());
+        if (t == null) {
             dismissAllowingStateLoss();
             return;
         }
-        Track t = track;
         b.sheetArt.setCornerRadiusDp(12);
         b.sheetArt.setCovers(t.artworkUri() == null ? Collections.emptyList() : Collections.singletonList(t.artworkUri()),
                 t.placeholderSeed());

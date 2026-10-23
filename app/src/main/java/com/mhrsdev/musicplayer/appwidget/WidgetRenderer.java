@@ -12,7 +12,7 @@ import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.NowPlaying;
 
 /** Builds the RemoteViews of one widget instance: a pure function of its arguments (also used by the render test). */
-final class WidgetRenderer {
+class WidgetRenderer {
     private static final int PROGRESS_W = 480;
     private static final int PROGRESS_H = 12;
     /** RemoteViews bitmaps count against a binder-size budget: keep every cover under this edge. */

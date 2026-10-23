@@ -17,6 +17,9 @@ import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+import com.mhrsdev.musicplayer.ui.widget.cover.GeneratedCover;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,8 +37,12 @@ import java.util.concurrent.TimeUnit;
  * max 16 MB), a bounded negative cache (failed URIs are not retried on every bind), request de-duplication by key
  * and cancellation: when every caller of a key has cancelled (recycled row), a not-yet-started decode is dropped.
  * Two low-priority worker threads that exit after 10 s idle. Callbacks run on the main thread.
+ *
+ * <p>Generated covers ({@link GeneratedCover}, for tracks without art) go through the same executor, request
+ * de-duplication and memory cache, keyed by {@link CoverSpec#cacheKey()} plus a size bucket ({@link #bucket}), so
+ * they obey the same RAM cap and a row recycled mid-render drops its job.
  */
-public final class ArtworkLoader {
+public class ArtworkLoader {
     /** Result callback; {@code bitmap} is null when no artwork was found. */
     public interface Callback {
         void onLoaded(String key, @Nullable Bitmap bitmap);
@@ -44,7 +51,13 @@ public final class ArtworkLoader {
     private static final int MISS_CAPACITY = 512;
     private static ArtworkLoader instance;
 
+    /** Generated-cover size buckets (px): a cover renders once per bucket, not once per view size. */
+    static final int[] BUCKETS = {64, 96, 128, 192, 256, 384, 512, 768, 1024};
+    /** At or below this bucket a generated cover is rendered on the calling thread (well under a millisecond). */
+    public static final int SYNC_MAX_PX = 96;
+
     private final ArtworkResolver resolver;
+    @Nullable private final GeneratedCover generator;
     private final LruCache<String, Bitmap> cache;
     /** URIs (any size) that have no artwork. Bounded; {@link #forgetMisses()} clears it. */
     private final LruCache<String, Boolean> misses = new LruCache<>(MISS_CAPACITY);
@@ -58,12 +71,18 @@ public final class ArtworkLoader {
     }
 
     private ArtworkLoader(Context context) {
-        this(new ArtworkResolver(new PlatformBackend(context.getApplicationContext())));
+        this(new ArtworkResolver(new PlatformBackend(context.getApplicationContext())), GeneratedCover.get(context));
     }
 
     @VisibleForTesting
     ArtworkLoader(ArtworkResolver resolver) {
+        this(resolver, null);
+    }
+
+    @VisibleForTesting
+    ArtworkLoader(ArtworkResolver resolver, @Nullable GeneratedCover generator) {
         this.resolver = resolver;
+        this.generator = generator;
         int max = (int) Math.min(16L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 16);
         cache = new LruCache<String, Bitmap>(max) {
             @Override protected int sizeOf(String key, Bitmap value) {
@@ -121,8 +140,65 @@ public final class ArtworkLoader {
         });
     }
 
-    private void deliver(String uri, String key, @Nullable Bitmap bmp) {
-        if (bmp != null) cache.put(key, bmp); else misses.put(uri, Boolean.TRUE);
+    /** Smallest bucket at or above {@code px} (capped at the largest). */
+    public static int bucket(int px) {
+        for (int b : BUCKETS) if (px <= b) return b;
+        return BUCKETS[BUCKETS.length - 1];
+    }
+
+    public static String generatedKey(CoverSpec spec, int sizePx) {
+        return spec.cacheKey() + '#' + bucket(sizePx);
+    }
+
+    @Nullable
+    public Bitmap cachedGenerated(CoverSpec spec, int sizePx) {
+        return cache.get(generatedKey(spec, sizePx));
+    }
+
+    /** Renders a small generated cover now (only for buckets up to {@link #SYNC_MAX_PX}); cached. */
+    @MainThread @Nullable
+    public Bitmap generatedNow(CoverSpec spec, int sizePx) {
+        String key = generatedKey(spec, sizePx);
+        Bitmap hit = cache.get(key);
+        if (hit != null || generator == null || bucket(sizePx) > SYNC_MAX_PX) return hit;
+        Bitmap b = generator.render(spec, bucket(sizePx));
+        cache.put(key, b);
+        return b;
+    }
+
+    /** The generated cover for {@code spec} at the bucket of {@code sizePx}, rendered on a worker thread. */
+    @MainThread
+    public void loadGenerated(CoverSpec spec, int sizePx, Callback callback) {
+        String key = generatedKey(spec, sizePx);
+        Bitmap hit = cache.get(key);
+        if (hit != null || generator == null) {
+            callback.onLoaded(key, hit);
+            return;
+        }
+        Pending p = pending.get(key);
+        if (p != null) {
+            p.callbacks.add(callback);
+            return;
+        }
+        Pending np = new Pending();
+        np.callbacks.add(callback);
+        pending.put(key, np);
+        int px = bucket(sizePx);
+        GeneratedCover g = generator;
+        np.future = executor.submit(() -> {
+            Bitmap bmp;
+            try {
+                bmp = g.render(spec, px);
+            } catch (RuntimeException | OutOfMemoryError e) {
+                bmp = null;
+            }
+            Bitmap result = bmp;
+            main.post(() -> deliver(null, key, result));
+        });
+    }
+
+    private void deliver(@Nullable String uri, String key, @Nullable Bitmap bmp) {
+        if (bmp != null) cache.put(key, bmp); else if (uri != null) misses.put(uri, Boolean.TRUE);
         Pending p = pending.remove(key);
         if (p == null) return;
         for (Callback c : p.callbacks) c.onLoaded(key, bmp);
@@ -142,6 +218,13 @@ public final class ArtworkLoader {
         cache.evictAll();
     }
 
+    /** UI hidden (Application.onTrimMemory): bitmaps and miss memory go; the next visit reloads what it shows. */
+    public static void trimAll() {
+        if (instance == null) return;
+        instance.trim();
+        instance.forgetMisses();
+    }
+
     /** Forget "no artwork" results, e.g. after a library rescan. */
     public void forgetMisses() {
         misses.evictAll();
@@ -157,12 +240,12 @@ public final class ArtworkLoader {
     }
 
     /** Real platform access: MediaStore thumbnails/queries, MediaMetadataRetriever, files. Worker thread only. */
-    static final class PlatformBackend implements ArtworkResolver.Backend {
+    public static final class PlatformBackend implements ArtworkResolver.Backend {
         private static final String AUDIO_URI = "content://media/external/audio/media/";
         private final Context context;
         private final ContentResolver cr;
 
-        PlatformBackend(Context context) {
+        public PlatformBackend(Context context) {
             this.context = context;
             this.cr = context.getContentResolver();
         }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ui/motion/PageTransitions: translation/alpha/scale only (GPU-cheap). -->
+<set xmlns:android="http://schemas.android.com/apk/res/android" android:ordering="together">
+    <objectAnimator android:propertyName="translationX" android:valueType="floatType" android:valueFrom="@dimen/mp_page_slide_neg" android:valueTo="0" android:duration="@integer/mp_page_ms" android:interpolator="@interpolator/mp_glide" />
+    <objectAnimator android:propertyName="alpha" android:valueType="floatType" android:valueFrom="0" android:valueTo="1" android:duration="@integer/mp_page_ms" android:interpolator="@interpolator/mp_glide" />
+</set>

@@ -2,6 +2,7 @@ package com.mhrsdev.musicplayer.playback;
 
 import android.content.Context;
 import androidx.annotation.OptIn;
+import androidx.annotation.VisibleForTesting;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.util.UnstableApi;
@@ -56,6 +57,14 @@ final class PlayerHolder {
             player = p;
         }
         return player;
+    }
+
+    /** Tests only: a player shared between tests keeps stale loader state and its callbacks race the looper reset. */
+    @VisibleForTesting
+    static synchronized void resetForTest() {
+        if (player != null) player.release();
+        player = null;
+        store = null;
     }
 
     static synchronized PlaybackStore store(Context context) {

@@ -12,5 +12,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Debug-only sample cover art for fake/SampleData (screenshots, galleries). -->
+        <provider
+            android:name=".fake.SampleCoverProvider"
+            android:authorities="com.mhrsdev.musicplayer.samplecovers"
+            android:exported="false" />
     </application>
 </manifest>

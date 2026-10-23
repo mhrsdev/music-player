@@ -21,9 +21,11 @@ public final class TracksContract {
     public static final String COL_ADDED_AT_MS = "added_at_ms";
     /** File modification time (ms); the scanner re-reads a row only when this changes, waveform cache keys on it. */
     public static final String COL_MODIFIED_MS = "modified_ms";
-    /** MediaStore genre (API 30+), null when unknown. Added in DB v4. */
+    /** File size and absolute path as of the last scan: with {@link #COL_MODIFIED_MS} they tell the scanner a file changed. */
+    public static final String COL_SIZE_BYTES = "size_bytes";
+    /** MediaStore genre (API 30+), null when unknown. */
     public static final String COL_GENRE = "genre";
-    /** Absolute file path (folder browser), null when MediaStore has none. Added in DB v4. */
+    /** Absolute file path (change detection + folder browser), null when MediaStore has none. */
     public static final String COL_PATH = "path";
 
     public static final String CREATE = "CREATE TABLE " + TABLE + " ("
@@ -40,8 +42,9 @@ public final class TracksContract {
             + COL_TRACK_NUMBER + " INTEGER NOT NULL DEFAULT 0, "
             + COL_ADDED_AT_MS + " INTEGER NOT NULL, "
             + COL_MODIFIED_MS + " INTEGER NOT NULL, "
-            + COL_GENRE + " TEXT, "
-            + COL_PATH + " TEXT)";
+            + COL_SIZE_BYTES + " INTEGER NOT NULL DEFAULT 0, "
+            + COL_PATH + " TEXT, "
+            + COL_GENRE + " TEXT)";
 
     /** Table plus the indices the album / artist / recently-added queries use. */
     public static final String[] SCHEMA = {
@@ -52,12 +55,14 @@ public final class TracksContract {
     };
 
     /**
-     * v3 -> v4: genre + path columns. {@code modified_ms = -1} marks every row stale so the next scan re-reads it and
-     * fills the new columns (see {@code TrackQueries.needsRescan}).
+     * The single v3 -> v4 step: size + path (incremental-scan signature, folder browser) and genre.
+     * {@code modified_ms = -1} marks every row stale so the next scan re-reads it and fills the new columns
+     * ({@code TrackQueries.needsRescan} makes {@code MediaStoreScanner.isStale} true until then).
      */
     public static final String[] UPGRADE_V4 = {
-        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_GENRE + " TEXT",
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_SIZE_BYTES + " INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_PATH + " TEXT",
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_GENRE + " TEXT",
         "UPDATE " + TABLE + " SET " + COL_MODIFIED_MS + " = -1"
     };
 

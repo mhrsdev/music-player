@@ -17,6 +17,7 @@ import com.mhrsdev.musicplayer.di.AppContainer;
 import com.mhrsdev.musicplayer.domain.model.HomeItem;
 import com.mhrsdev.musicplayer.domain.model.HomeSection;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.ui.library.ScanFeedback;
 import com.mhrsdev.musicplayer.ui.library.StateView;
 import com.mhrsdev.musicplayer.ui.nav.AudioPermission;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
@@ -57,6 +58,7 @@ public final class HomeFragment extends Fragment implements HomeAdapter.Listener
         // The first scan finishes after Home's first (empty) load: show "scanning", not "library is empty", meanwhile.
         c.libraryAdmin().isScanning().observe(getViewLifecycleOwner(), s -> {
             scanning = Boolean.TRUE.equals(s);
+            b.scanProgress.setVisibility(scanning ? View.VISIBLE : View.GONE);
             render(adapter);
         });
         // Continue card progress: only the one row rebinds, quantized to 2 % steps (no per-tick layout).
@@ -115,7 +117,7 @@ public final class HomeFragment extends Fragment implements HomeAdapter.Listener
             boolean granted = AudioPermission.granted(requireContext());
             StateView.empty(b.state, getString(R.string.home_empty_title), getString(R.string.home_empty_body),
                     getString(granted ? R.string.home_empty_rescan : R.string.nav_perm_allow), v -> {
-                        if (granted) Screens.container(this).libraryAdmin().rescan(null);
+                        if (granted) Screens.container(this).libraryAdmin().rescan(r -> ScanFeedback.show(v.getContext(), r));
                         else requestAudio.launch(AudioPermission.name());
                     });
         } else {

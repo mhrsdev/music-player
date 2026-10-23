@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mp_secondary">#BBC7DB</color>
+    <color name="mp_on_secondary">#253141</color>
+    <color name="mp_on_tertiary">#003732</color>
+    <color name="mp_tertiary_container">#00504A</color>
+    <color name="mp_on_tertiary_container">#9EF2E7</color>
+    <color name="mp_on_error">#690005</color>
+    <color name="mp_error_container">#93000A</color>
+    <color name="mp_on_error_container">#FFDAD6</color>
+    <color name="mp_inverse_surface">#E2E2E9</color>
+    <color name="mp_inverse_on_surface">#2E3036</color>
+    <color name="mp_inverse_primary">#2F5F95</color>
+    <color name="mp_surface_floating">#252A30</color>
+    <color name="mp_on_surface_floating">#E2E2E9</color>
+    <color name="mp_black_surface_floating">#1A1E23</color>
+    <!-- Ripple / pressed state layer: primary at ~12% (light) / 16% (dark). -->
+    <color name="mp_state_layer">#29A6C8FF</color>
+</resources>

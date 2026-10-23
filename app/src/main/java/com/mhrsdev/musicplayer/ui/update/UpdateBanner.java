@@ -18,7 +18,7 @@ import com.mhrsdev.musicplayer.domain.model.ReleaseInfo;
  * Dismissible "Update available" strip for Home. Hidden until {@link #bind} delivers a release; tapping it calls
  * {@code onOpen} (open the update screen), the close button calls {@code onDismiss} (skip that version).
  */
-public final class UpdateBanner extends LinearLayout {
+public class UpdateBanner extends LinearLayout {
     private final TextView label;
     private final ImageView close;
 

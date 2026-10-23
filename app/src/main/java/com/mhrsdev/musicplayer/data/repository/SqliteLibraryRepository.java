@@ -3,6 +3,7 @@ package com.mhrsdev.musicplayer.data.repository;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -50,6 +51,7 @@ public final class SqliteLibraryRepository implements LibraryRepository, Library
     private final MediaStoreScanner scanner;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final AtomicBoolean scanRunning = new AtomicBoolean();
+    private volatile long lastFinishedMs = Long.MIN_VALUE / 2;
     private final MutableLiveData<Boolean> scanning = new MutableLiveData<>(false);
 
     private final LiveData<List<Track>> allTracks;
@@ -227,25 +229,32 @@ public final class SqliteLibraryRepository implements LibraryRepository, Library
         return scanning;
     }
 
-    /** App-start hook: scans only if MediaStore changed since the last scan (or never scanned). Needs the permission. */
+    /** Scans only if MediaStore changed since the last scan (or never scanned). Needs the permission. */
     @Override public void scanIfStale() {
+        scanIfStale(0);
+    }
+
+    /** As {@link #scanIfStale()}, but skipped when a scan finished less than {@code minIntervalMs} ago. */
+    @Override public void scanIfStale(long minIntervalMs) {
         scanIo.execute(() -> {
-            if (scanner.isStale()) scanNow(null);
+            if (SystemClock.elapsedRealtime() - lastFinishedMs < minIntervalMs) return;
+            if (scanner.isStale()) scanNow(null, false);
         });
     }
 
-    /** Manual rescan. {@code callback} (may be null) gets the result on the main thread; FAILED if one is already running. */
+    /** Manual refresh: re-reads every MediaStore row, ignoring the staleness check. Callback on the main thread. */
     @Override public void rescan(@Nullable Callback<ScanResult> callback) {
-        scanIo.execute(() -> scanNow(callback));
+        scanIo.execute(() -> scanNow(callback, true));
     }
 
-    private void scanNow(@Nullable Callback<ScanResult> callback) {
+    private void scanNow(@Nullable Callback<ScanResult> callback, boolean force) {
         ScanResult result = ScanResult.FAILED;
         if (scanRunning.compareAndSet(false, true)) {
             scanning.postValue(true);
             try {
-                result = scanner.scan();
-                if (result.changed()) notifier.notifyChanged(ChangeNotifier.TRACKS);
+                result = scanner.scan(force);
+                if (result.ok()) lastFinishedMs = SystemClock.elapsedRealtime();
+                if (result.changed() || (force && result.ok())) notifier.notifyChanged(ChangeNotifier.TRACKS);
             } finally {
                 scanRunning.set(false);
                 scanning.postValue(false);

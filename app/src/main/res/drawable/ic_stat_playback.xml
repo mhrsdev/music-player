@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Status-bar icon: the Mowj mark, white on transparent (system tints it). Same geometry as ic_launcher_foreground, fitted to 22dp wide. -->
+<!-- Status-bar icon: the Mowj mark (M ~ م), white on transparent; fitted to 22dp wide. Geometry = ic_launcher_monochrome. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <group
-        android:translateX="1.64"
-        android:translateY="5.94"
-        android:scaleX="0.3188"
-        android:scaleY="0.3188">
+        android:translateX="-7.93"
+        android:translateY="-8.47"
+        android:scaleX="0.3722"
+        android:scaleY="0.3722">
         <path
-            android:pathData="M2,35 C9,35 10,27 17,27 C24,27 24,35 31,35 C42,35 37,3 51,3 A12,12 0 0,1 63,15 A12,12 0 0,1 51,27 A6,6 0 0,1 45,21"
-            android:strokeColor="#FFFFFFFF"
-            android:strokeWidth="8"
+            android:pathData="M27.5,58 L27.5,35 L37.5,49 L47.5,35 L47.5,58 C52.5,58 54,63.5 59,63.5 C63,63.5 64,58.6 71.4,58.6"
+            android:strokeWidth="7"
             android:strokeLineCap="round"
-            android:strokeLineJoin="round" />
+            android:strokeLineJoin="round"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M64.4,51 A7.6,7.6 0 1,1 79.6,51 A7.6,7.6 0 1,1 64.4,51 Z"
+            android:strokeWidth="7"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M66.53,56.32 C64.4,63 63.6,69 64,75"
+            android:strokeWidth="7"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:strokeColor="#FFFFFFFF" />
     </group>
 </vector>

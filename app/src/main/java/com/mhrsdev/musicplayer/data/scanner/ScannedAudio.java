@@ -22,14 +22,23 @@ public record ScannedAudio(
         long addedAtMs,
         long modifiedMs,
         @Nullable String path,
+        long sizeBytes,
+        /** MediaStore IS_MUSIC. */
+        boolean music,
+        /** Ringtone, notification, alarm or podcast. */
+        boolean special,
+        /** Android 10+: the file is still being written (a running download). */
+        boolean pending,
+        /** MediaStore GENRE (API 30+), cleaned; null when unknown. */
         @Nullable String genre) {
 
-    /** Older call sites / tests without a genre. */
+    /** Rows / tests without a genre. */
     public ScannedAudio(long id, @Nullable String title, @Nullable String displayName, @Nullable String artist,
                         long artistId, @Nullable String album, long albumId, long durationMs, int trackNumber, int year,
-                        long addedAtMs, long modifiedMs, @Nullable String path) {
+                        long addedAtMs, long modifiedMs, @Nullable String path, long sizeBytes, boolean music,
+                        boolean special, boolean pending) {
         this(id, title, displayName, artist, artistId, album, albumId, durationMs, trackNumber, year, addedAtMs,
-                modifiedMs, path, null);
+                modifiedMs, path, sizeBytes, music, special, pending, null);
     }
 
     /** Trims; blank, "<unknown>" and ID3v1 numeric codes like "(17)" become null. */

@@ -1,6 +1,8 @@
 package com.mhrsdev.musicplayer.ui.home;
 
 import android.content.Context;
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -157,17 +159,20 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
             subtitle = SectionText.mixSubtitle(c, m);
             ScriptFont.setText(mc.label, title);
             ScriptFont.setText(mc.subtitle, subtitle);
-            Art.bind(mc.art, m.artworkUri(), m.placeholderSeed(), 24, false);
+            // the mix label sits on the cover: generated covers stay text-less
+            Art.bind(mc.art, m.artworkUri(), m.placeholderSeed(), 24, false, CoverSpec.fromSeed(m.placeholderSeed()));
         } else {
             HomeCardBinding b = (HomeCardBinding) h.b;
             String art;
             int seed;
+            CoverSpec cover;
             switch (item.kind()) {
                 case TRACK -> {
                     title = item.track().title();
                     subtitle = SectionText.artist(c, item.track().artistName());
                     seed = item.track().placeholderSeed();
                     art = item.track().artworkUri();
+                    cover = CoverSpec.forTrack(item.track());
                 }
                 case ALBUM -> {
                     title = SectionText.album(c, item.album().title());
@@ -176,18 +181,21 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
                             item.album().trackCount());
                     seed = item.album().placeholderSeed();
                     art = item.album().artworkUri();
+                    cover = CoverSpec.forAlbum(item.album());
                 }
                 case ARTIST -> {
                     title = item.artist().name();
                     subtitle = "";
                     seed = item.artist().placeholderSeed();
                     art = item.artist().imageUri();
+                    cover = CoverSpec.forArtist(item.artist());
                 }
                 case MIX -> {
                     title = SectionText.mixTitle(c, item.mix());
                     subtitle = SectionText.mixSubtitle(c, item.mix());
                     seed = item.mix().placeholderSeed();
                     art = item.mix().artworkUri();
+                    cover = CoverSpec.fromSeed(seed);
                 }
                 default -> {
                     title = item.playlist().name();
@@ -195,6 +203,7 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
                             item.playlist().trackCount());
                     seed = item.playlist().placeholderSeed();
                     art = item.playlist().artworkUris().isEmpty() ? null : item.playlist().artworkUris().get(0);
+                    cover = CoverSpec.forPlaylist(item.playlist().id(), item.playlist().name());
                 }
             }
             ScriptFont.setText(b.title, title);
@@ -211,7 +220,8 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
                     b.getRoot().requestLayout();
                 }
             }
-            Art.bind(b.art, art, seed, hero ? 28 : 24, false);
+            // hero: the play button sits on the cover's text corner and the caption repeats it -> scene only
+            Art.bind(b.art, art, seed, hero ? 28 : 24, false, hero ? cover.textless() : cover);
             b.play.setVisibility(hero ? View.VISIBLE : View.GONE);
             b.play.setOnClickListener(v -> listener.onItemClick(item));
         }

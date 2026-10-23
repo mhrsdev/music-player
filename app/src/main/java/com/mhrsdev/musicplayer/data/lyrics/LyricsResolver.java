@@ -69,13 +69,13 @@ public final class LyricsResolver {
         long now = clock.getAsLong();
         LyricsCacheStore.Entry cached = cache.get(track.id());
         if (cached != null && cached.expiresAtMs() > now) {
-            return cached.text() == null ? null : LrcParser.toLyrics(track.id(), cached.text(), cached.source());
+            return cached.text() == null ? null : LyricsParser.toLyrics(track.id(), cached.text(), cached.source());
         }
         if (!remoteEnabled.getAsBoolean()) return null;
         try {
             LyricsSource.Found found = remote.load(track, cancel);
             if (cancel.isCancelled()) return null;
-            Lyrics lyrics = found == null ? null : LrcParser.toLyrics(track.id(), found.text(), found.source());
+            Lyrics lyrics = found == null ? null : LyricsParser.toLyrics(track.id(), found.text(), found.source());
             cache.put(track.id(), lyrics == null
                     ? new LyricsCacheStore.Entry(null, null, now + NOT_FOUND_TTL_MS)
                     : new LyricsCacheStore.Entry(found.text(), found.source(), now + FOUND_TTL_MS));
@@ -98,6 +98,6 @@ public final class LyricsResolver {
 
     @Nullable
     private static Lyrics parse(Track track, @Nullable LyricsSource.Found found) {
-        return found == null ? null : LrcParser.toLyrics(track.id(), found.text(), found.source());
+        return found == null ? null : LyricsParser.toLyrics(track.id(), found.text(), found.source());
     }
 }
