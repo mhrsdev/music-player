@@ -76,6 +76,18 @@ public class SeekMathTest {
         assertEquals(8, ArtworkLoader.sampleSize(3000, 3000, 300));
     }
 
+    @Test public void backdropBlurKeepsFlatColorAndSmoothsEdges() {
+        int[] px = new int[64];
+        java.util.Arrays.fill(px, 0xFF336699);
+        BackdropBlur.blur(px, 8, 8, 2);
+        for (int c : px) assertEquals(0xFF336699, c);
+        int[] edge = new int[64];
+        for (int i = 0; i < edge.length; i++) edge[i] = (i % 8) < 4 ? 0xFF000000 : 0xFFFFFFFF;
+        BackdropBlur.blur(edge, 8, 8, 1);
+        int mid = edge[3] & 0xFF;
+        assertTrue(mid > 0 && mid < 255);
+    }
+
     @Test public void placeholderIsDeterministic() {
         int[] a = PlaceholderArt.colors(42), b = PlaceholderArt.colors(42);
         assertEquals(a[0], b[0]);
