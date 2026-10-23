@@ -6,6 +6,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import com.mhrsdev.musicplayer.data.lyrics.LyricsRepositoryImpl;
 import com.mhrsdev.musicplayer.data.repository.SqliteLibraryRepository;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
 import com.mhrsdev.musicplayer.fake.FakeLibraryRepository;
@@ -36,7 +37,7 @@ public class AppContainerTest {
         AppContainer c = new AppContainer(context, false);
         assertTrue(c.library instanceof SqliteLibraryRepository);
         assertSame(c.library, c.libraryAdmin());
-        assertSame(c.library, c.libraryAdmin());
+        assertTrue(c.lyrics instanceof LyricsRepositoryImpl);
         assertTrue(c.waveform instanceof WaveformRepositoryImpl);
         assertFalse(c.player instanceof FakePlayerController);
         assertFalse(context.getDatabasePath("musicplayer.db").exists());

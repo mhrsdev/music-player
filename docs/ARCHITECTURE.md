@@ -128,6 +128,9 @@ Model notes:
   activity of a process triggers `onAppForeground()` which runs `scanIfStale()` once, only if the permission is held.
 - Playback: `PlaybackModule.createController(ctx, library::recordPlay, waveform::prefetch)`. The next-track callback is
   event-driven inside `ExoPlayerController` (only while playing, only when the next queued track changes); no observer or timer.
+- Lyrics: `LyricsModule.create(ctx, BuildConfig.VERSION_NAME, SqliteLyricsCacheStore, onlineAllowed)`; order embedded -> sidecar ->
+  (valid cache entry, else LRCLIB). `onlineAllowed` is `SettingsStore.lyricsOnline()`: off = no request and nothing cached, local files and
+  already-cached lyrics still show. `lyrics_cache` (DB v3) stores `content/source/expires_at`; each put prunes expired rows.
 - Waveform: `SqliteWaveformStore` implements `WaveformStore` directly over `WaveformQueries` (256-bucket master envelope, same
   byte codec as `WaveformMath`; validity = the track's `modified_ms`; empty blob = negative cache), passed to `WaveformModule`.
 

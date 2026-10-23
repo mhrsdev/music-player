@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
+import com.mhrsdev.musicplayer.BuildConfig;
+import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
 import com.mhrsdev.musicplayer.domain.repository.HomeFeedSource;
@@ -85,7 +87,9 @@ public final class AppContainer {
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
-            lyrics = new FakeLyricsRepository(); // replaced by LyricsModule once the lyrics task is merged
+            lyrics = LyricsModule.create(appContext, BuildConfig.VERSION_NAME,
+                    new SqliteLyricsCacheStore(data.dbHelper, System::currentTimeMillis),
+                    () -> !Boolean.FALSE.equals(settings.lyricsOnline().getValue()));
         }
     }
 

@@ -2,7 +2,6 @@ package com.mhrsdev.musicplayer.di;
 
 import android.content.Context;
 import com.mhrsdev.musicplayer.data.db.DbHelper;
-import com.mhrsdev.musicplayer.data.db.query.LyricsCacheQueries;
 import com.mhrsdev.musicplayer.data.repository.ChangeNotifier;
 import com.mhrsdev.musicplayer.data.repository.LocalHomeFeedSource;
 import com.mhrsdev.musicplayer.data.repository.SqliteLibraryRepository;
@@ -39,10 +38,5 @@ public final class DataModule {
     /** @param settings shared with the rest of the app (the scanner reads the folder filters from it) */
     public static DataModule create(Context context, Executor io, SettingsStore settings) {
         return new DataModule(context, io, settings);
-    }
-
-    /** Lyrics cache for the lyrics task. Opens the database: call from a background thread. */
-    public LyricsCacheQueries lyricsCache() {
-        return new LyricsCacheQueries(dbHelper.getWritableDatabase());
     }
 }

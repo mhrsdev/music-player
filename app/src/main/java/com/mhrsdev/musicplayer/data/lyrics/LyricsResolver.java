@@ -5,6 +5,7 @@ import com.mhrsdev.musicplayer.domain.model.Lyrics;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import java.io.IOException;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.LongSupplier;
 
 /**
@@ -14,7 +15,10 @@ import java.util.function.LongSupplier;
  *   <li>the lookup cache, then the remote source (LRCLIB); every remote outcome is cached, including "not found"
  *       (days) and failures (minutes) so a track never causes repeated requests.</li>
  * </ol>
- * Synced beats plain: a local plain-text result is kept as fallback and only replaced by a synced remote result.
+ * When {@code remoteEnabled} is false (the user's "lyrics online" setting) a valid cache entry is still used but no request
+ * is made and nothing is cached, so switching it back on works at once.
+ *
+ * <p>Synced beats plain: a local plain-text result is kept as fallback and only replaced by a synced remote result.
  * The first synced result wins immediately. Returns null when cancelled.
  */
 public final class LyricsResolver {
@@ -26,8 +30,16 @@ public final class LyricsResolver {
     private final LyricsSource remote;
     private final LyricsCacheStore cache;
     private final LongSupplier clock;
+    private final BooleanSupplier remoteEnabled;
 
     public LyricsResolver(List<LyricsSource> local, LyricsSource remote, LyricsCacheStore cache, LongSupplier clock) {
+        this(local, remote, cache, clock, () -> true);
+    }
+
+    /** @param remoteEnabled read on the resolving thread for every lookup */
+    public LyricsResolver(List<LyricsSource> local, LyricsSource remote, LyricsCacheStore cache, LongSupplier clock,
+            BooleanSupplier remoteEnabled) {
+        this.remoteEnabled = remoteEnabled;
         this.local = local;
         this.remote = remote;
         this.cache = cache;
@@ -59,6 +71,7 @@ public final class LyricsResolver {
         if (cached != null && cached.expiresAtMs() > now) {
             return cached.text() == null ? null : LrcParser.toLyrics(track.id(), cached.text(), cached.source());
         }
+        if (!remoteEnabled.getAsBoolean()) return null;
         try {
             LyricsSource.Found found = remote.load(track, cancel);
             if (cancel.isCancelled()) return null;
