@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Player light</title><link rel="stylesheet" href="base.css">
+<style>
+  .theme-light .togglegroup { background: rgba(43,99,134,.10); } .theme-light .togglegroup .tg { color: #0E1D28; } .theme-light .togglegroup .tg.on { color: #FFFFFF; } .theme-light .transport .side { background: rgba(43,99,134,.12); color: #0E1D28; }
+  .cover { box-shadow: 0 30px 60px rgba(20,60,90,.35) !important; }
+  .screen { --dyn-primary: #2B6386; --dyn-on-primary: #FFFFFF; --dyn-container: #CDE8FF; --dyn-on-container: #001E2E; --dyn-glow: 120,180,220; color: #0E1D28; --sb: #0E1D28; --gh: #0E1D28; }
+  .scrim { background: linear-gradient(180deg, rgba(240,247,253,.62) 0%, rgba(240,247,253,.55) 38%, rgba(240,247,253,.84) 64%, rgba(240,247,253,.94) 100%); }
+  .tint { position: absolute; inset: 0; z-index: 1; background: rgb(var(--dyn-glow)); mix-blend-mode: soft-light; opacity: .25; }
+  .handle { position: absolute; top: 44px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 4px; background: rgba(14,29,40,.3); }
+  .top { position: absolute; top: 58px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .cover { position: absolute; top: 136px; left: 24px; width: 364px; height: 364px; box-shadow: 0 30px 70px rgba(0,8,20,.55), 0 0 0 1px rgba(255,255,255,.06); }
+  .meta { position: absolute; top: 528px; left: 24px; right: 16px; display: flex; align-items: flex-end; justify-content: space-between; }
+  .meta .t-display { color: #0E1D28; }
+  .meta .artist { font-size: 18px; font-weight: 500; color: #3C4F5E; margin-top: 2px; }
+  .seekwrap { position: absolute; top: 612px; left: 24px; width: 364px; color: var(--dyn-primary); }
+  .seekwrap .times { margin-top: 6px; color: #23323E; opacity: 1; }
+  .transport { position: absolute; top: 704px; left: 0; right: 0; }
+  .device { position: absolute; top: 826px; left: 50%; transform: translateX(-50%); height: 40px; padding: 0 16px 0 12px; border-radius: 99px; display: flex; gap: 8px; align-items: center;
+    background: rgba(43,99,134,.10); font-size: 14px; font-weight: 560; color: var(--dyn-on-container); white-space: nowrap; }
+</style></head>
+<body><div class="screen theme-light">
+  <div class="backdrop"><div class="art" data-art="without-you"></div></div>
+  <div class="tint"></div>
+  <div class="backdrop-scrim scrim"></div>
+  <div class="grain"></div>
+  <div class="layer">
+    <div class="statusbar"></div>
+    <div class="handle"></div>
+    <div class="top">
+      <div class="iconbtn" style="color:#0E1D28"><i class="ic">lyrics</i></div>
+      <div class="togglegroup">
+        <div class="tg on"><i class="ic">shuffle</i></div>
+        <div class="tg on"><i class="ic">repeat_one</i></div>
+        <div class="tg"><i class="ic">queue_music</i></div>
+      </div>
+      <div class="iconbtn" style="color:var(--dyn-primary)"><i class="ic f">favorite</i></div>
+    </div>
+    <div class="cover art r32" data-art="without-you"></div>
+    <div class="meta">
+      <div style="min-width:0"><div class="t-display ell">Without You</div><div class="artist">NEFFEX</div></div>
+      <div class="iconbtn" style="color:#3C4F5E;margin-bottom:-4px"><i class="ic">more_vert</i></div>
+    </div>
+    <div class="seekwrap">
+      <div class="seek" data-w="364" data-h="56" data-p=".29" data-style="waveform" data-c="#2B6386" data-t="rgba(14,29,40,.16)" data-thumb="44" data-seed="8"></div>
+      <div class="times"><span>0:52</span><span>−2:09</span></div>
+    </div>
+    <div class="transport">
+      <div class="side"><i class="ic f s32">skip_previous</i></div>
+      <div class="cookie" data-size="100" data-n="10" data-k=".075" data-c="#2B6386" data-rot="6"><i class="ic f s36" style="color:#FFFFFF">pause</i></div>
+      <div class="side"><i class="ic f s32">skip_next</i></div>
+    </div>
+    <div class="device"><i class="ic s20">speaker</i>JBL Charge 6</div>
+  </div>
+  <div class="gesture"></div>
+</div>
+<script src="lib.js"></script><script>buildMock()</script></body></html>

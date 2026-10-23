@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Overview</title><link rel="stylesheet" href="base.css">
+<style>
+  body { width: 1920px; background: #07090C; color: #E2E2E9; }
+  .wrap { padding: 60px 48px 56px; }
+  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 60px; padding: 0 12px; }
+  h1 { font-size: 56px; line-height: 60px; font-weight: 560; letter-spacing: -.8px; font-variation-settings: 'ROND' 50, 'opsz' 60; }
+  h1 .fa { font-family: Vazirmatn; font-weight: 800; letter-spacing: 0; font-size: 46px; color: #C9B6FF; }
+  .thesis { max-width: 760px; font-size: 18px; line-height: 28px; color: #AEB6C2; }
+  .thesis b { color: #E8EBF0; font-weight: 600; }
+  .prow { display: grid; align-items: start; grid-template-columns: repeat(7, 240px); gap: 24px; margin-top: 40px; justify-content: center; }
+  .ph { width: 240px; }
+  .ph .img { width: 240px; height: 533px; border-radius: 26px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 20px 50px rgba(0,0,0,.5); background: #111; }
+  .ph img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .ph .n { margin-top: 14px; font-size: 15px; font-weight: 620; }
+  .ph .d { font-size: 13px; color: #8D96A3; margin-top: 2px; line-height: 18px; }
+  .num { color: #5d6672; font-weight: 600; margin-right: 6px; }
+  .sheets { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 44px; padding: 0 12px; }
+  .sheets .img { height: 300px; border-radius: 20px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,.07); }
+  .sheets img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+</style></head>
+<body><div class="wrap">
+  <div class="top">
+    <h1>Music Player<br><span class="fa">طراحی رابط کاربری</span> · design v1</h1>
+    <p class="thesis"><b>The artwork is the light source.</b> Each screen takes its color, glow and depth from the cover that's playing, while the controls stay quiet, rounded and tactile: M3 Expressive shapes that morph with playback. Persian and English get equal typographic care: Google Sans Flex with Vazirmatn, true right-to-left, Persian numerals.</p>
+  </div>
+  <div class="prow">
+    <div class="ph"><div class="img"><img src="../png/01-home.png"></div><div class="n"><span class="num">01</span>Home</div><div class="d">Hero carousel, glow from the focused cover</div></div>
+    <div class="ph"><div class="img"><img src="../png/02-search.png"></div><div class="n"><span class="num">02</span>Search</div><div class="d">Top result, match highlight, explicit badge</div></div>
+    <div class="ph"><div class="img"><img src="../png/03-library.png"></div><div class="n"><span class="num">03</span>Library</div><div class="d">Liked songs, tiles with content peeks</div></div>
+    <div class="ph"><div class="img"><img src="../png/04-artists.png"></div><div class="n"><span class="num">04</span>Artists</div><div class="d">Circular crops of each artist's artwork</div></div>
+    <div class="ph"><div class="img"><img src="../png/05-player-cover.png"></div><div class="n"><span class="num">05</span>Player · cover</div><div class="d">Waveform seek style, cookie play button</div></div>
+    <div class="ph"><div class="img"><img src="../png/06-player-lyrics.png"></div><div class="n"><span class="num">06</span>Player · lyrics</div><div class="d">Synced lines, word sweep, wavy seek</div></div>
+    <div class="ph"><div class="img"><img src="../png/07-queue.png"></div><div class="n"><span class="num">07</span>Queue</div><div class="d">Drag, swipe to remove, sleep timer, Undo</div></div>
+  </div>
+  <div class="prow">
+    <div class="ph"><div class="img"><img src="../png/08-miniplayer.png"></div><div class="n"><span class="num">08</span>Mini-player</div><div class="d">Artwork-tinted, above the floating nav</div></div>
+    <div class="ph"><div class="img"><img src="../png/09-settings.png"></div><div class="n"><span class="num">09</span>Settings</div><div class="d">Full scroll in 09-settings.png</div></div>
+    <div class="ph"><div class="img"><img src="../png/10-rtl-home.png"></div><div class="n"><span class="num">10</span>Home · فارسی</div><div class="d">Mirrored layout, Persian numerals</div></div>
+    <div class="ph"><div class="img"><img src="../png/11-rtl-player.png"></div><div class="n"><span class="num">11</span>Player · فارسی</div><div class="d">Persian lyrics; playback stays in tape order</div></div>
+    <div class="ph"><div class="img"><img src="../png/14-light-home.png"></div><div class="n"><span class="num">14</span>Home · light</div><div class="d">Designed separately, not inverted</div></div>
+    <div class="ph"><div class="img"><img src="../png/15-light-player.png"></div><div class="n"><span class="num">15</span>Player · light</div><div class="d">Light scrim over the blurred cover</div></div>
+    <div class="ph"><div class="img" style="background:#0F1216;display:grid;place-items:center;padding:24px"><div style="text-align:center;color:#8D96A3;font-size:14px;line-height:21px">Also see<br><b style="color:#E2E2E9">12</b> notification · lock · widget<br><b style="color:#E2E2E9">13</b> empty · loading · error<br><b style="color:#E2E2E9">16</b> components · type · color</div></div><div class="n">&nbsp;</div></div>
+  </div>
+  <div class="sheets">
+    <div><div class="img"><img src="../png/12-notification-sheet.png"></div><div class="ph" style="width:auto"><div class="n"><span class="num">12</span>Notification, lock screen, widget</div></div></div>
+    <div><div class="img"><img src="../png/13-states-sheet.png"></div><div class="ph" style="width:auto"><div class="n"><span class="num">13</span>Empty, loading, error</div></div></div>
+    <div><div class="img"><img src="../png/16-components-sheet.png"></div><div class="ph" style="width:auto"><div class="n"><span class="num">16</span>Components and tokens</div></div></div>
+  </div>
+</div>
+<script>Promise.all([...document.images].map(i => i.decode().catch(()=>{}))).then(() => document.fonts.ready).then(() => document.body.dataset.ready = '1');</script>
+</body></html>

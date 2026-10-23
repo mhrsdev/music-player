@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Components</title><link rel="stylesheet" href="base.css">
+<style>
+  body { width: 1920px; background: #07090C; }
+  .sheet { padding: 56px 64px 72px; width: 1920px; color: #E2E2E9; }
+  h1 { font-size: 40px; font-weight: 560; letter-spacing: -.4px; font-variation-settings: 'ROND' 40; }
+  h2 { font-size: 22px; font-weight: 600; margin: 44px 0 6px; font-variation-settings: 'ROND' 30; }
+  .lede { font-size: 16px; line-height: 24px; color: #9BA4B1; max-width: 1200px; }
+  .panel { background: #0F1216; border-radius: 28px; padding: 28px; margin-top: 14px; }
+  .flex { display: flex; gap: 28px; align-items: flex-end; flex-wrap: wrap; }
+  .fr { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .lab { font-size: 13.5px; color: #9BA4B1; text-align: center; line-height: 19px; }
+  .lab b { color: #E2E2E9; font-weight: 600; display: block; }
+  .arrow { color: #5d6672; font-size: 22px; align-self: center; margin-bottom: 30px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .sk { width: 420px; }
+  .bubble { position: absolute; top: -44px; height: 32px; padding: 0 12px; border-radius: 10px; background: #A9D4F5; color: #00344D; font-weight: 650; font-size: 14px; display: grid; place-items: center; transform: translateX(-50%); }
+  .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .sw { display: flex; gap: 4px; flex-wrap: wrap; }
+  .chipc { width: 132px; height: 64px; border-radius: 14px; padding: 8px 10px; font-size: 11.5px; line-height: 15px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .dynrow { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; }
+  .dynrow .art { width: 56px; height: 56px; border-radius: 14px; }
+  .dynrow .c { width: 112px; height: 56px; border-radius: 14px; font-size: 11.5px; padding: 6px 9px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .spec { display: grid; grid-template-columns: 220px 1fr; gap: 12px 24px; align-items: baseline; }
+  .spec .k { font-size: 13px; color: #9BA4B1; }
+  .rowc { width: 400px; }
+  .mono { width: 100%; height: 100%; display: grid; place-items: center; font-size: 56px; font-weight: 600; font-variation-settings: 'ROND' 100; }
+</style></head>
+<body><div class="sheet theme-dark" style="background:#07090C">
+  <h1>Components and states</h1>
+  <p class="lede">Building blocks with their states, for the implementation agent. Sizes are in dp. Colors come from the artwork-derived roles in DESIGN.md.</p>
+
+  <h2>Play / pause: shape morph</h2>
+  <div class="panel"><div class="flex">
+    <div class="fr"><div class="cookie" data-size="96" data-shape="square" data-c="#A9D4F5"><i class="ic f s36" style="color:#00344D">play_arrow</i></div><div class="lab"><b>Paused</b>Squircle, 30% corners</div></div>
+    <div class="arrow">→</div>
+    <div class="fr"><div class="cookie" data-size="88" data-shape="circle" data-c="#A9D4F5" style="margin:4px"><i class="ic f s36" style="color:#00344D">play_arrow</i></div><div class="lab"><b>Pressed</b>Squishes to circle, scale .92</div></div>
+    <div class="arrow">→</div>
+    <div class="fr"><div class="cookie" data-size="96" data-n="10" data-k=".03" data-c="#A9D4F5"><i class="ic f s36" style="color:#00344D">pause</i></div><div class="lab"><b>Morphing</b>Spring, 350 ms feel</div></div>
+    <div class="arrow">→</div>
+    <div class="fr"><div class="cookie" data-size="96" data-n="10" data-k=".075" data-c="#A9D4F5" data-rot="10"><i class="ic f s36" style="color:#00344D">pause</i></div><div class="lab"><b>Playing</b>Cookie (10 lobes), slow spin<br>1 turn / 24 s, off with reduced motion</div></div>
+    <div style="width:40px"></div>
+    <div class="fr"><div class="cookie" data-size="96" data-n="10" data-k=".075" data-c="#A9D4F5"><span class="cookie" data-size="36" data-n="7" data-k=".18" data-c="#00344D" style="position:relative"></span></div><div class="lab"><b>Buffering</b>Icon swaps to a small<br>LoadingIndicator</div></div>
+    <div class="fr"><div class="cookie" data-size="96" data-shape="square" data-c="rgba(226,226,233,.12)"><i class="ic f s36" style="color:rgba(226,226,233,.38)">play_arrow</i></div><div class="lab"><b>Disabled</b>Nothing queued</div></div>
+  </div></div>
+
+  <div class="grid2">
+  <div>
+  <h2>Seek bar</h2>
+  <div class="panel" style="color:#fff">
+    <div style="display:grid;grid-template-columns:420px 1fr;gap:26px 30px;align-items:center">
+      <div class="seek" data-w="420" data-h="32" data-p=".38" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-thumb="28"></div><div class="lab" style="text-align:left"><b>Wavy · playing</b>amplitude 3 dp, wavelength 26 dp, the wave travels</div>
+      <div class="seek" data-w="420" data-h="32" data-p=".38" data-style="flat" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-thumb="28"></div><div class="lab" style="text-align:left"><b>Wavy · paused</b>amplitude animates to 0 (flat) in 300 ms</div>
+      <div style="position:relative;margin-top:30px"><div class="seek" data-w="420" data-h="40" data-p=".52" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-thumb="40"></div><div class="bubble" style="left:218px">1:41</div></div><div class="lab" style="text-align:left"><b>Dragging</b>thumb grows to 40 dp, time bubble, haptic tick per 10 s</div>
+      <div class="seek" data-w="420" data-h="52" data-p=".38" data-style="waveform" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-thumb="44" data-seed="8"></div><div class="lab" style="text-align:left"><b>Waveform (setting)</b>real loudness envelope, 3 layers</div>
+    </div>
+  </div>
+  </div>
+  <div>
+  <h2>Navigation + mini-player</h2>
+  <div class="panel" style="position:relative;height:420px;overflow:hidden">
+    <div class="nav" style="position:absolute;left:28px;top:28px;bottom:auto;transform:none"><div class="it on"><i class="ic">home</i><span class="l">Home</span></div><div class="it"><i class="ic">search</i></div><div class="it"><i class="ic">library_music</i></div><div class="it"><i class="ic">settings</i></div></div>
+    <div class="nav" style="position:absolute;left:28px;top:112px;bottom:auto;transform:none"><div class="it"><i class="ic">home</i></div><div class="it"><i class="ic">search</i></div><div class="it on"><i class="ic">library_music</i><span class="l">Library</span></div><div class="it"><i class="ic">settings</i></div></div>
+    <div class="lab" style="position:absolute;left:400px;top:46px;text-align:left;width:360px"><b>Floating pill nav</b>68 dp tall, 24 dp above the gesture bar. The selected item widens and shows its label (spring, medium-low stiffness). The bar hides on scroll down and returns on scroll up.</div>
+    <div style="position:absolute;left:28px;top:212px;width:388px;height:76px;border-radius:24px;overflow:hidden;background:#173a52;color:#fff">
+      <div style="position:absolute;inset:0 0 8px 0;display:flex;align-items:center;gap:12px;padding:0 8px 0 10px"><div class="art r16" data-art="without-you" style="width:48px;height:48px"></div><div style="flex:1"><div style="font-weight:600">Without You</div><div style="font-size:13.5px;opacity:.72">NEFFEX</div></div><div class="cookie" data-size="48" data-n="9" data-k=".09" data-c="#A9D4F5"><i class="ic f" style="color:#00344D">pause</i></div><div class="iconbtn"><i class="ic f s28">skip_next</i></div></div>
+      <div style="position:absolute;left:18px;right:18px;bottom:4px"><div class="seek" data-w="352" data-h="8" data-p=".31" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-sw="2.5" data-amp="1.6" data-wl="14" data-nothumb="1"></div></div>
+    </div>
+    <div style="position:absolute;left:28px;top:304px;width:388px;height:76px;border-radius:24px;overflow:hidden;background:#173a52;color:#fff;opacity:.95">
+      <div style="position:absolute;inset:0 0 8px 0;display:flex;align-items:center;gap:12px;padding:0 8px 0 10px"><div class="art r16" data-art="without-you" style="width:48px;height:48px"></div><div style="flex:1"><div style="font-weight:600">Without You</div><div style="font-size:13.5px;opacity:.72">NEFFEX</div></div><div class="cookie" data-size="48" data-shape="square" data-c="#A9D4F5"><i class="ic f" style="color:#00344D">play_arrow</i></div><div class="iconbtn"><i class="ic f s28">skip_next</i></div></div>
+      <div style="position:absolute;left:18px;right:18px;bottom:4px"><div class="seek" data-w="352" data-h="8" data-p=".31" data-style="flat" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-sw="2.5" data-nothumb="1"></div></div>
+    </div>
+    <div class="lab" style="position:absolute;left:440px;top:226px;text-align:left;width:330px"><b>Mini-player · playing / paused</b>Colored by the artwork. Tap opens the player with a shared-element transition from the cover. Swipe up opens it; swipe sideways skips; swipe down dismisses and stops. Progress runs along the bottom edge.</div>
+  </div>
+  </div>
+  </div>
+
+  <div class="grid2">
+  <div>
+  <h2>Track row</h2>
+  <div class="panel"><div class="group rowc">
+    <div class="row"><div class="art r12" data-art="cold" style="width:52px;height:52px"></div><div class="txt"><div class="t-title">Cold</div><div class="t-support"><span class="badge-e">E</span>NEFFEX</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+    <div class="row" style="background:color-mix(in srgb,#1A4B66 70%,var(--sc))"><div class="art r12" data-art="without-you" style="width:52px;height:52px"></div><div class="txt"><div class="t-title" style="color:#CDE8FF">Without You</div><div class="t-support">Now playing</div></div><div class="trail"><i class="ic f" style="color:#A9D4F5">graphic_eq</i></div></div>
+    <div class="row" style="background:var(--sc-highest)"><div class="art r12" data-art="grateful" style="width:52px;height:52px"></div><div class="txt"><div class="t-title">Grateful</div><div class="t-support">Pressed · 10% state layer</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+    <div class="row" style="opacity:.42"><div class="art r12" style="width:52px;height:52px;background:var(--sc-highest);display:grid;place-items:center"><i class="ic" style="color:var(--on-surface-var)">music_note</i></div><div class="txt"><div class="t-title">Paper Planes (Live)</div><div class="t-support">File missing · tap to remove</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+  </div>
+  <div class="lab" style="text-align:left;margin-top:12px;width:400px">Row 72 dp, art 52 dp with 12 dp corners. A group's outer corners are 22 dp and its inner corners 6 dp, with 3 dp gaps (M3 Expressive segmented list).</div>
+  </div>
+  </div>
+  <div>
+  <h2>Artwork fallbacks · loading indicator</h2>
+  <div class="panel">
+    <div class="flex" style="align-items:flex-start">
+      <div class="fr"><div class="r24" style="width:120px;height:120px;overflow:hidden;background:linear-gradient(135deg,#2a4a7a,#6a3a8a);display:grid;place-items:center;position:relative"><div class="grain" style="opacity:.25"></div><i class="ic f" style="font-size:44px;color:rgba(255,255,255,.85)">music_note</i></div><div class="lab"><b>No cover</b>gradient seeded<br>from album name</div></div>
+      <div class="fr"><div class="rf" style="width:120px;height:120px;overflow:hidden;background:#364659;color:#D6E3F7"><div class="mono">O</div></div><div class="lab"><b>Artist, no art</b>monogram on<br>secondary container</div></div>
+      <div class="fr"><div class="rf" style="width:120px;height:120px;overflow:hidden;background:#3B2A55;color:#F3DAFF"><div class="mono" style="font-family:Vazirmatn;font-size:52px;font-weight:800">آ</div></div><div class="lab"><b>Persian monogram</b>first letter,<br>Vazirmatn</div></div>
+    </div>
+    <div class="flex" style="margin-top:26px;gap:18px;align-items:center">
+      <div class="cookie" data-size="44" data-n="7" data-k=".18" data-c="#A6C8FF"></div><span class="arrow" style="margin:0">→</span>
+      <div class="cookie" data-size="44" data-n="9" data-k=".08" data-c="#A6C8FF"></div><span class="arrow" style="margin:0">→</span>
+      <div class="cookie" data-size="44" data-n="5" data-k=".12" data-c="#A6C8FF"></div><span class="arrow" style="margin:0">→</span>
+      <div class="cookie" data-size="44" data-n="2" data-k=".22" data-c="#A6C8FF" data-rot="90"></div><span class="arrow" style="margin:0">→</span>
+      <div class="cookie" data-size="44" data-n="12" data-k=".06" data-c="#A6C8FF"></div><span class="arrow" style="margin:0">→</span>
+      <div class="cookie" data-size="44" data-n="4" data-k=".2" data-c="#A6C8FF"></div>
+      <div class="lab" style="text-align:left;margin-left:10px"><b>LoadingIndicator</b>M3 Expressive, shapes morph<br>in a loop (indeterminate)</div>
+    </div>
+  </div>
+  </div>
+  </div>
+
+  <h2>Type</h2>
+  <div class="panel">
+    <div class="spec">
+      <div class="k">Display · GSF 34/40 · 560 · ROND 40</div><div style="font-size:34px;line-height:40px;font-weight:560;font-variation-settings:'ROND' 40">Without You</div>
+      <div class="k">Headline · GSF 26/32 · 520</div><div style="font-size:26px;font-weight:520;font-variation-settings:'ROND' 40">Recently added</div>
+      <div class="k">Lyrics · GSF 26/35 · 560 → 760 active</div><div style="font-size:26px;font-weight:560;color:rgba(255,255,255,.45)">I count the windows, <span style="color:#fff;font-weight:760">you said the night would wait</span></div>
+      <div class="k">Title · GSF 17/22 · 560 &nbsp;|&nbsp; Body 15/20 · 420</div><div><span style="font-size:17px;font-weight:560">Cold Light</span> &nbsp; <span style="font-size:15px;color:#BFC6D2">Mira Vale · 3:47 · tabular figures 0123456789</span></div>
+      <div class="k">Persian headline · Vazirmatn 24/38 · 800</div><div class="fa" dir="rtl" style="text-align:left;font-family:Vazirmatn;font-size:24px;line-height:38px;font-weight:800">تازه‌های کتابخانه · خاطره‌بازی</div>
+      <div class="k">Persian lyrics · Vazirmatn 25/44 · 500 → 800</div><div class="fa" dir="rtl" style="text-align:left;font-family:Vazirmatn;font-size:25px;line-height:44px;font-weight:500;color:rgba(255,255,255,.45)">چراغ‌های شهر هنوز بیدارند · <span style="color:#fff;font-weight:800">تو گفتی شب منتظر ما می‌ماند</span></div>
+      <div class="k">Persian body · Vazirmatn 13.5/22 · numerals</div><div class="fa" dir="rtl" style="text-align:left;font-family:Vazirmatn;font-size:14px;line-height:22px;color:#BFC6D2">۵۸ آهنگ · ۱ ساعت و ۱۸ دقیقه · ۰۱۲۳۴۵۶۷۸۹ · پ چ ژ گ ک ی</div>
+    </div>
+  </div>
+
+  <h2>Color: base themes and artwork-derived roles</h2>
+  <div class="panel">
+    <div class="swatches" id="sw"></div>
+    <div style="margin-top:28px" id="dyn"></div>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+  const themes = {
+    Dark: [['bg','#0F1216','#E2E2E9'],['sc','#1B1F24','#E2E2E9'],['sc-high','#252A30','#E2E2E9'],['primary','#A6C8FF','#00315F'],['primary-container','#1E4878','#D4E3FF'],['secondary-container','#364659','#D6E3F7'],['tertiary','#7FD6CB','#00201D'],['error','#FFB4AB','#690005']],
+    Light: [['bg','#F7F9FF','#181C21'],['sc','#EAEEF5','#181C21'],['sc-high','#E4E8EF','#181C21'],['primary','#2F5F95','#FFFFFF'],['primary-container','#D4E3FF','#001C3A'],['secondary-container','#D6E3F7','#0F1D2C'],['tertiary','#006A62','#FFFFFF'],['error','#BA1A1A','#FFFFFF']],
+    'Black (AMOLED)': [['bg','#000000','#E2E2E9'],['sc','#111418','#E2E2E9'],['sc-high','#1A1E23','#E2E2E9'],['primary','#A6C8FF','#00315F'],['primary-container','#1E4878','#D4E3FF'],['secondary-container','#2B394A','#D6E3F7'],['tertiary','#7FD6CB','#00201D'],['error','#FFB4AB','#690005']],
+  };
+  document.getElementById('sw').innerHTML = Object.entries(themes).map(([n, l]) => `<div><div style="font-weight:600;margin-bottom:10px">${n}</div><div class="sw">${l.map(([k, bg, fg]) => `<div class="chipc" style="background:${bg};color:${fg};border:1px solid rgba(255,255,255,.08)"><b>${k}</b>${bg}</div>`).join('')}</div></div>`).join('');
+  const roles = ['primary', 'on-primary', 'container', 'on-container'];
+  document.getElementById('dyn').innerHTML = '<div style="font-weight:600;margin-bottom:12px">Artwork-derived (dark): MaterialKolor / SchemeContent from the cover\'s seed color</div>' +
+    ['without-you', 'electric-dusk', 'tehran-nights', 'anar', 'baran', 'topography'].map((k) => { const d = MP.ART[k].dyn; return `<div class="dynrow"><div class="art" data-art="${k}"></div>${roles.map((r, i) => `<div class="c" style="background:${d[i]};color:${d[[1, 0, 3, 2][i]]}"><b>${r}</b>${d[i]}</div>`).join('')}<div class="lab" style="text-align:left">${MP.ART[k].t} · ${MP.ART[k].a}</div></div>`; }).join('');
+  buildMock();
+</script></body></html>

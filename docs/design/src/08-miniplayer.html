@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Mini player</title><link rel="stylesheet" href="base.css">
+<style>
+  .content { position: absolute; inset: 40px 0 0 0; }
+  .sec { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 6px 20px; height: 56px; }
+  .row .d { font-size: 13.5px; color: var(--on-surface-var); font-feature-settings: 'tnum' 1; }
+  .mini { position: absolute; left: 12px; right: 12px; bottom: 102px; height: 76px; border-radius: 24px; overflow: hidden; z-index: 46;
+    box-shadow: 0 10px 28px rgba(0,0,0,.45); --dyn-primary: #A9D4F5; }
+  .mini .bgart { position: absolute; inset: -40px; filter: blur(30px) saturate(1.3); }
+  .mini .bgart .art { width: 100%; height: 100%; }
+  .mini .wash { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(14,44,64,.78), rgba(14,44,64,.9)); }
+  .mini .in { position: absolute; inset: 0 0 8px 0; display: flex; align-items: center; gap: 12px; padding: 0 8px 0 10px; color: #fff; }
+  .mini .tx { flex: 1; min-width: 0; }
+  .mini .tx .a { font-size: 16px; font-weight: 600; }
+  .mini .tx .b { font-size: 13.5px; color: rgba(255,255,255,.72); font-weight: 500; }
+  .mini .pg { position: absolute; left: 18px; right: 18px; bottom: 4px; }
+</style></head>
+<body><div class="screen theme-dark">
+  <div class="statusbar"></div>
+  <div class="content">
+    <div class="sec"><div class="t-headline">Quick picks</div><div class="iconbtn" style="color:var(--on-surface-var)"><i class="ic">shuffle</i></div></div>
+    <div class="group" style="padding:0 16px">
+      <div class="row"><div class="art r12" data-art="without-you" style="width:52px;height:52px"><div class="eq-mini"></div></div><div class="txt"><div class="t-title ell" style="color:var(--primary)">Without You</div><div class="t-support ell">NEFFEX</div></div><div class="d">3:10</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="anar" style="width:52px;height:52px"></div><div class="txt fa" dir="rtl" style="text-align:left"><div class="t-title ell">انار</div><div class="t-support ell">سامان آرین</div></div><div class="d">4:21</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="topography" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Cold Light</div><div class="t-support ell">Mira Vale</div></div><div class="d">3:47</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="baran" style="width:52px;height:52px"></div><div class="txt fa" dir="rtl" style="text-align:left"><div class="t-title ell">باران که می‌آید</div><div class="t-support ell">نیلوفر</div></div><div class="d">5:02</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="salt-static" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Salt &amp; Static</div><div class="t-support ell">The Low Tides</div></div><div class="d">3:33</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="desert-bloom" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Desert Bloom</div><div class="t-support ell">Kaveh Rostami</div></div><div class="d">4:48</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="koucheh-bagh" style="width:52px;height:52px"></div><div class="txt fa" dir="rtl" style="text-align:left"><div class="t-title ell">کوچه‌باغ</div><div class="t-support ell">گروه دریاچه</div></div><div class="d">3:56</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="paper-planes" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Paper Planes</div><div class="t-support ell">Juniper Lane</div></div><div class="d">2:49</div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="mercury" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Mercury</div><div class="t-support ell">Oslo Haze</div></div><div class="d">3:20</div><div class="trail"><i class="ic">more_vert</i></div></div>
+    </div>
+  </div>
+  <div class="navwrap" style="height:230px"></div>
+  <div class="mini">
+    <div class="bgart"><div class="art" data-art="without-you"></div></div><div class="wash"></div>
+    <div class="in">
+      <div class="art r16" data-art="without-you" style="width:48px;height:48px"></div>
+      <div class="tx"><div class="a ell">Without You</div><div class="b ell">NEFFEX</div></div>
+      <div class="cookie" data-size="48" data-n="9" data-k=".09" data-c="#A9D4F5" data-rot="20"><i class="ic f" style="color:#00344D">pause</i></div>
+      <div class="iconbtn"><i class="ic f s28">skip_next</i></div>
+    </div>
+    <div class="pg"><div class="seek" data-w="352" data-h="8" data-p=".31" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-sw="2.5" data-amp="1.6" data-wl="14" data-nothumb="1"></div></div>
+  </div>
+  <div class="nav">
+    <div class="it on"><i class="ic">home</i><span class="l">Home</span></div>
+    <div class="it"><i class="ic">search</i></div>
+    <div class="it"><i class="ic">library_music</i></div>
+    <div class="it"><i class="ic">settings</i></div>
+  </div>
+  <div class="gesture"></div>
+</div>
+<script src="lib.js"></script><script>buildMock()</script></body></html>

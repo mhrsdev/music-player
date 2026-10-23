@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Artists</title><link rel="stylesheet" href="base.css">
+<style>
+  .bar { position: absolute; top: 40px; left: 0; right: 0; height: 64px; display: flex; align-items: center; gap: 4px; padding: 0 8px; z-index: 10; background: var(--bg); }
+  .bar .t { flex: 1; font-size: 24px; font-weight: 560; font-variation-settings: 'ROND' 40; }
+  .grid { position: absolute; top: 104px; left: 0; right: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 16px; padding: 8px 20px; }
+  .a { display: flex; flex-direction: column; align-items: center; }
+  .a .art { width: 168px; height: 168px; }
+  .a .n { margin-top: 10px; font-size: 16.5px; font-weight: 580; }
+  .a .n.fa { font-size: 16px; font-weight: 650; }
+  .a .c { font-size: 13.5px; color: var(--on-surface-var); margin-top: 1px; }
+  .sortchip { display: inline-flex; height: 32px; align-items: center; gap: 4px; padding: 0 10px 0 12px; border-radius: 10px; background: var(--sc-high); font-size: 13.5px; font-weight: 560; color: var(--on-surface-var); }
+</style></head>
+<body><div class="screen theme-dark">
+  <div class="statusbar"></div>
+  <div class="bar"><div class="iconbtn"><i class="ic">arrow_back</i></div><div class="t">Artists</div><div class="sortchip">A–Z<i class="ic s20">expand_more</i></div><div class="iconbtn"><i class="ic">search</i></div></div>
+  <div class="grid">
+    <div class="a"><div class="art rf" data-art="tehran-nights" data-zoom="2.0" data-origin="66% 50%"></div><div class="n fa" dir="rtl">آوا نیک‌زاد</div><div class="c">10 songs</div></div>
+    <div class="a"><div class="art rf" data-art="koucheh-bagh" data-zoom="1.7" data-origin="50% 30%"></div><div class="n fa" dir="rtl">گروه دریاچه</div><div class="c">8 songs</div></div>
+    <div class="a"><div class="art rf" data-art="electric-dusk" data-zoom="1.9" data-origin="50% 40%"></div><div class="n">Halcyon Drift</div><div class="c">14 songs</div></div>
+    <div class="a"><div class="art rf" data-art="desert-bloom" data-zoom="1.8" data-origin="62% 58%"></div><div class="n">Kaveh Rostami</div><div class="c">6 songs</div></div>
+    <div class="a"><div class="art rf" data-art="topography" data-zoom="1.8" data-origin="36% 42%"></div><div class="n">Mira Vale</div><div class="c">11 songs</div></div>
+    <div class="a"><div class="art rf" data-art="without-you" data-zoom="1.9" data-origin="62% 40%"></div><div class="n">NEFFEX</div><div class="c">38 songs</div></div>
+  </div>
+  <div class="navwrap"></div>
+  <div class="nav">
+    <div class="it"><i class="ic">home</i></div>
+    <div class="it"><i class="ic">search</i></div>
+    <div class="it on"><i class="ic">library_music</i><span class="l">Library</span></div>
+    <div class="it"><i class="ic">settings</i></div>
+  </div>
+  <div class="gesture"></div>
+</div>
+<script src="lib.js"></script><script>buildMock()</script></body></html>

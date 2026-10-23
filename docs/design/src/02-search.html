@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Search</title><link rel="stylesheet" href="base.css">
+<style>
+  .content { position: absolute; inset: 40px 0 0 0; }
+  .field { margin: 12px 16px 0; height: 56px; border-radius: 28px; background: var(--sc-high); display: flex; align-items: center; gap: 14px; padding: 0 8px 0 18px; }
+  .field .q { flex: 1; font-size: 17px; font-weight: 450; }
+  .field .caret { display: inline-block; width: 2px; height: 22px; background: var(--primary); vertical-align: -4px; margin-left: 1px; }
+  .chips { display: flex; gap: 8px; padding: 14px 16px 6px; overflow: hidden; }
+  .top { margin: 12px 16px 0; padding: 14px; border-radius: 28px; background: var(--sc); display: flex; gap: 16px; align-items: center; position: relative; overflow: hidden; }
+  .top .bg { position: absolute; inset: 0; background: radial-gradient(120% 140% at 0% 0%, rgba(75,109,147,.45), transparent 60%); }
+  .top .kind { font-size: 12.5px; font-weight: 600; color: var(--on-surface-var); }
+  .lbl { font-size: 15px; font-weight: 600; color: var(--on-surface-var); padding: 18px 20px 8px; }
+  mark { background: none; color: var(--on-surface); font-weight: 760; }
+  .row .t-title { font-weight: 480; }
+</style></head>
+<body><div class="screen theme-dark">
+  <div class="statusbar"></div>
+  <div class="content">
+    <div class="field"><i class="ic" style="color:var(--on-surface-var)">search</i><div class="q">cold<span class="caret"></span></div><div class="iconbtn" style="color:var(--on-surface-var)"><i class="ic">close</i></div></div>
+    <div class="chips">
+      <div class="chip on"><i class="ic s18">check</i>Songs</div><div class="chip">Albums</div><div class="chip">Artists</div><div class="chip">Playlists</div><div class="chip">Folders</div>
+    </div>
+    <div class="top">
+      <div class="bg"></div>
+      <div class="art r16" data-art="cold" style="width:88px;height:88px;position:relative"></div>
+      <div style="flex:1;min-width:0;position:relative">
+        <div class="kind">Top result · Song</div>
+        <div style="font-size:24px;font-weight:620;margin-top:2px;font-variation-settings:'ROND' 40">Cold</div>
+        <div class="t-support"><span class="badge-e">E</span>NEFFEX · 2:58</div>
+      </div>
+      <div class="cookie" data-size="52" data-shape="circle" data-c="var(--primary)" style="position:relative"><i class="ic f" style="color:var(--on-primary)">play_arrow</i></div>
+    </div>
+    <div class="lbl">Songs · 14</div>
+    <div class="group" style="padding:0 16px">
+      <div class="row"><div class="art r10" data-art="salt-static" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell"><mark>Cold</mark> Water Static</div><div class="t-support ell">The Low Tides</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r10" data-art="topography" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell"><mark>Cold</mark> Light</div><div class="t-support ell"><span class="badge-e">E</span>Mira Vale</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r10" data-art="electric-dusk" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell"><mark>Cold</mark>er Nights (Extended Mix)</div><div class="t-support ell">Halcyon Drift</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r10" data-art="paper-planes" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell"><mark>Cold</mark> Coffee &amp; Rain</div><div class="t-support ell">Juniper Lane</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r10" data-art="mercury" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">So <mark>Cold</mark></div><div class="t-support ell"><span class="badge-e">E</span>Oslo Haze</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r10" data-art="fight-back" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Out in the <mark>Cold</mark></div><div class="t-support ell"><span class="badge-e">E</span>NEFFEX</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+    </div>
+  </div>
+  <div class="navwrap"></div>
+  <div class="nav">
+    <div class="it"><i class="ic">home</i></div>
+    <div class="it on"><i class="ic">search</i><span class="l">Search</span></div>
+    <div class="it"><i class="ic">library_music</i></div>
+    <div class="it"><i class="ic">settings</i></div>
+  </div>
+  <div class="gesture"></div>
+</div>
+<script src="lib.js"></script><script>buildMock()</script></body></html>

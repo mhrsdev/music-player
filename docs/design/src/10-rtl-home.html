@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>Home RTL</title><link rel="stylesheet" href="base.css">
+<style>
+  body { font-family: 'Vazirmatn', 'GSF', sans-serif; }
+  .glow { position: absolute; right: -120px; top: -160px; width: 680px; height: 640px; z-index: 0; pointer-events: none;
+    background: radial-gradient(closest-side at 62% 46%, rgba(178,40,62,.42), rgba(178,40,62,.12) 55%, rgba(178,40,62,0) 100%); }
+  .content { position: absolute; inset: 40px 0 0 0; z-index: 2; }
+  .sec { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 0 12px; height: 52px; }
+  .sec .more { width: 40px; height: 40px; display: grid; place-items: center; color: var(--on-surface-var); }
+  .car { position: relative; height: 272px; margin-top: 6px; }
+  .car .art { position: absolute; top: 0; height: 272px; }
+  .car .cap { position: absolute; right: 20px; top: 280px; width: 264px; }
+  .playfab { position: absolute; left: 14px; bottom: 14px; }
+  .chipdate { position: absolute; right: 14px; top: 14px; height: 28px; padding: 0 10px; border-radius: 99px; background: rgba(30,4,10,.55); color: #fff; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .tb { display: flex; gap: 12px; padding: 0 16px; margin-top: 8px; }
+  .tb .card { width: 152px; flex: none; }
+  .tb .card .t-title { margin-top: 8px; }
+</style></head>
+<body><div class="screen theme-dark">
+  <div class="glow"></div>
+  <div class="statusbar"></div>
+  <div class="content">
+    <div class="sec" style="margin-top:8px"><div class="t-headline">تازه‌های کتابخانه</div><div class="more"><i class="ic mir">chevron_right</i></div></div>
+    <div class="car">
+      <div class="art r28" data-art="anar" style="right:16px;width:272px">
+                <div class="playfab cookie lift" data-size="56" data-c="#FFB3B1" data-rot="8"><i class="ic f s28" style="color:#5F1416">play_arrow</i></div>
+      </div>
+      <div class="art r24" data-art="baran" style="right:296px;width:68px"></div>
+      <div class="art r20" data-art="salt-static" style="right:372px;width:40px;border-top-left-radius:0;border-bottom-left-radius:0"></div>
+      <div class="cap"><div class="t-title ell">انار</div><div class="t-support ell">سامان آرین · آلبوم · امروز اضافه شد</div></div>
+    </div>
+
+    <div class="sec" style="margin-top:66px"><div class="t-headline">خاطره‌بازی</div><div class="more"><i class="ic mir">chevron_right</i></div></div>
+    <div class="tb">
+      <div class="card"><div class="art r24" data-art="mix-fa" style="width:152px;height:152px"></div><div class="t-title ell">دهه‌ی هشتاد</div><div class="t-support ell">۵۸ آهنگ · ۱۳۸۰ تا ۱۳۸۹</div></div>
+      <div class="card"><div class="art r24" data-art="mix-2016" style="width:152px;height:152px"></div><div class="t-title ell">پرتکرارهای ۲۰۱۶</div><div class="t-support ell">۴۲ آهنگ</div></div>
+      <div class="card"><div class="art r24" data-art="mix-summer" style="width:152px;height:152px"></div><div class="t-title ell">تابستان ۹۸</div><div class="t-support ell">۳۱ آهنگ</div></div>
+    </div>
+
+    <div class="sec" style="margin-top:12px"><div class="t-headline">انتخاب‌های سریع</div><div class="more"><i class="ic mir">chevron_right</i></div></div>
+    <div class="group" style="padding:4px 16px 0">
+      <div class="row"><div class="art r12" data-art="tehran-nights" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">شب‌های تهران</div><div class="t-support ell">آوا نیک‌زاد</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="without-you" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell ltr" dir="ltr" style="text-align:right">Without You</div><div class="t-support ell ltr" dir="ltr" style="text-align:right">NEFFEX</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+    </div>
+  </div>
+  <div class="navwrap"></div>
+  <div class="nav">
+    <div class="it on"><i class="ic">home</i><span class="l">خانه</span></div>
+    <div class="it"><i class="ic">search</i></div>
+    <div class="it"><i class="ic">library_music</i></div>
+    <div class="it"><i class="ic">settings</i></div>
+  </div>
+  <div class="gesture"></div>
+</div>
+<script src="lib.js"></script><script>buildMock()</script></body></html>
