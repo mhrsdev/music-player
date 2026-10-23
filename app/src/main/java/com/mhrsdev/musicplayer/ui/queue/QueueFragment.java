@@ -118,12 +118,17 @@ public final class QueueFragment extends BottomSheetDialogFragment {
         for (int i = 0; i < presets.length; i++) items[i] = getString(R.string.queue_sleep_preset, nf.format(presets[i]));
         items[presets.length] = getString(R.string.queue_sleep_end_of_track);
         items[presets.length + 1] = getString(R.string.queue_sleep_off);
+        // The Settings "default" is pre-marked; a tap still applies immediately.
+        int preselected = presets.length; // 0 minutes = end of track
+        int defaultMinutes = ((MusicPlayerApp) requireActivity().getApplication()).getContainer().settings().sleepTimerMinutes().getValue();
+        for (int i = 0; i < presets.length; i++) if (presets[i] == defaultMinutes) preselected = i;
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.player_sleep_timer)
-                .setItems(items, (d, which) -> {
+                .setSingleChoiceItems(items, preselected, (d, which) -> {
                     if (which < presets.length) vm.setSleepTimer(presets[which]);
                     else if (which == presets.length) vm.setSleepTimerEndOfTrack();
                     else vm.cancelSleepTimer();
+                    d.dismiss();
                 })
                 .show();
     }

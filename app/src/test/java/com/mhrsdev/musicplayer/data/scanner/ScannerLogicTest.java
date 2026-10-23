@@ -9,6 +9,7 @@ import com.mhrsdev.musicplayer.data.db.query.Seeds;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import java.util.Map;
 import java.util.Set;
+import com.mhrsdev.musicplayer.domain.model.ScanResult;
 import org.junit.Test;
 
 public class ScannerLogicTest {

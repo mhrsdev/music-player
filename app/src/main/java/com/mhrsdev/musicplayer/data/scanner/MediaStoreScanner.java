@@ -11,6 +11,7 @@ import com.mhrsdev.musicplayer.data.db.DbHelper;
 import com.mhrsdev.musicplayer.data.db.query.TrackQueries;
 import com.mhrsdev.musicplayer.data.db.query.WaveformQueries;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
+import com.mhrsdev.musicplayer.domain.model.ScanResult;
 import java.util.Collections;
 import java.util.Set;
 

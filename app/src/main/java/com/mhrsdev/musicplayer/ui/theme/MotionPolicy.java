@@ -11,6 +11,8 @@ import android.provider.Settings;
  */
 public final class MotionPolicy {
     private static volatile boolean appReduceMotion;
+    /** The user's battery-saver choice: TRUE = always on, FALSE = always off, null = follow the system. */
+    private static volatile Boolean saverOverride;
 
     private MotionPolicy() {}
 
@@ -19,17 +21,23 @@ public final class MotionPolicy {
         appReduceMotion = reduce;
     }
 
+    /** Settings screen's battery-saver choice (see {@code MusicPlayerApp}); null follows the system. */
+    public static void setBatterySaverOverride(Boolean forced) {
+        saverOverride = forced;
+    }
+
     public static boolean decorativeMotionEnabled(Context context) {
         if (appReduceMotion) return false;
         Context app = context.getApplicationContext();
         float scale = Settings.Global.getFloat(app.getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
         if (scale == 0f) return false;
-        PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
-        return pm == null || !pm.isPowerSaveMode();
+        return !batterySaver(app);
     }
 
     /** Battery saver only (skip grain, glow and other purely decorative layers). */
     public static boolean batterySaver(Context context) {
+        Boolean forced = saverOverride;
+        if (forced != null) return forced;
         PowerManager pm = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
         return pm != null && pm.isPowerSaveMode();
     }
