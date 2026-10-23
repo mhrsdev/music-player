@@ -1,60 +1,69 @@
 <!doctype html>
-<html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>Player RTL</title><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="player.css">
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>Player RTL</title><link rel="stylesheet" href="base.css">
 <style>
-  body { font-family: 'Vazirmatn', 'Readex', sans-serif; }
-  .screen { --dyn: #E3B6FF; --on-dyn: #4A1A6B; --dyn-shadow: rgba(90,30,140,.8); --tintc: #7c3a9c; }
-  .scrim { background: linear-gradient(180deg, rgba(14,6,26,.56) 0%, rgba(14,6,26,.56) 46%, rgba(14,6,26,.74) 66%, rgba(14,6,26,.9) 100%); }
-  .pl .ln { font-family: Vazirmatn; font-size: 23px; line-height: 42px; font-weight: 500; letter-spacing: 0; margin-bottom: 12px; }
-  .pl .ln.act { font-size: 24px; line-height: 44px; font-weight: 800; }
-  .pl .from .a, .pl .upnext .a { font-size: 12px; }
-  .pl .minimeta .tt { font-family: Vazirmatn; font-size: 21px; line-height: 32px; font-weight: 800; }
-  .ltrz { direction: ltr; }
-  .times { font-family: Vazirmatn; font-size: 13.5px; }
+  body { font-family: 'Vazirmatn', 'GSF', sans-serif; }
+  .screen { --dyn-primary: #E3B6FF; --dyn-on-primary: #4A1A6B; --dyn-container: #5A2F78; --dyn-on-container: #F3DAFF; color: #fff; --sb: #fff; --gh: #fff; }
+  .scrim { background: linear-gradient(180deg, rgba(14,6,26,.5) 0%, rgba(14,6,26,.5) 50%, rgba(14,6,26,.74) 74%, rgba(14,6,26,.88) 100%); }
+  .tint { position: absolute; inset: 0; z-index: 1; background: #7c3a9c; mix-blend-mode: soft-light; opacity: .5; }
+  .handle { position: absolute; top: 44px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 4px; background: rgba(255,255,255,.4); }
+  .top { position: absolute; top: 58px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .lyr { position: absolute; top: 112px; left: 0; right: 0; height: 486px; overflow: hidden; padding: 0 26px; text-align: center;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 70%, transparent 100%); }
+  .ln { text-wrap: balance; font-size: 25px; line-height: 44px; font-weight: 500; color: rgba(255,255,255,.6); margin: 0 0 18px; }
+  .ln.past { color: rgba(255,255,255,.5); }
+  .ln.act { font-weight: 800; color: rgba(255,255,255,.66); }
+  .ln.act .done { color: #fff; }
+  .ln.act .cur { background: linear-gradient(270deg, #fff 0 46%, rgba(255,255,255,.66) 64%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .meta { position: absolute; top: 612px; left: 16px; right: 24px; display: flex; align-items: center; gap: 14px; }
+  .meta .title { font-size: 25px; line-height: 36px; font-weight: 800; }
+  .meta .artist { font-size: 15.5px; color: rgba(255,255,255,.75); font-weight: 500; }
+  .seekwrap { position: absolute; top: 692px; left: 24px; width: 364px; direction: ltr; }
+  .seekwrap .times { margin-top: 4px; font-family: 'Vazirmatn'; font-size: 14px; }
+  .transport { position: absolute; top: 768px; left: 0; right: 0; direction: ltr; }
+  .transport .side { width: 72px; height: 60px; }
 </style></head>
-<body><div class="screen theme-dark pl">
+<body><div class="screen theme-dark">
   <div class="backdrop"><div class="art" data-art="tehran-nights"></div></div>
-  <div class="tint"></div><div class="backdrop-scrim scrim"></div><div class="grain"></div>
+  <div class="tint"></div>
+  <div class="backdrop-scrim scrim"></div>
+  <div class="grain"></div>
   <div class="layer">
     <div class="statusbar"></div>
+    <div class="handle"></div>
     <div class="top">
-      <div class="ib"><i class="g" data-g="chevd"></i></div>
-      <div class="from"><div class="a">در حال پخش از آلبوم</div><div class="b">شب‌های تهران</div></div>
-      <div class="ib"><i class="g" data-g="more"></i></div>
+      <div class="iconbtn" style="color:var(--dyn-on-primary);background:var(--dyn-primary)"><i class="ic f">lyrics</i></div>
+      <div class="togglegroup">
+        <div class="tg on"><i class="ic">shuffle</i></div>
+        <div class="tg"><i class="ic">repeat</i></div>
+        <div class="tg"><i class="ic mir">queue_music</i></div>
+      </div>
+      <div class="iconbtn" style="color:var(--dyn-primary)"><i class="ic f">favorite</i></div>
     </div>
-    <div class="lyr" style="top:100px;height:368px">
-      <p class="ln past" style="margin-top:6px">چراغ‌های شهر هنوز بیدارند</p>
+    <div class="lyr">
+      <p class="ln past" style="margin-top:-30px">باد از دامنه‌ی البرز می‌آمد</p>
+      <p class="ln past">چراغ‌های شهر هنوز بیدارند</p>
       <p class="ln past">و من کوچه به کوچه دنبال صدایت</p>
       <p class="ln act"><span class="done">تو گفتی شب </span><span class="cur">منتظر</span> ما می‌ماند</p>
       <p class="ln">از پشت پنجره‌ها ماه را صدا زدم</p>
       <p class="ln">بمان، که ماه هنوز پشت ابر است</p>
       <p class="ln">بمان، تا صبح راهی نمانده</p>
+      <p class="ln">و شهر آرام در گوش ما می‌خواند</p>
     </div>
-    <div class="minimeta" style="left:14px;right:20px">
-      <div class="art sl10 edge" data-art="tehran-nights" style="width:56px;height:56px"></div>
-      <div style="flex:1;min-width:0"><div class="tt ell">شب‌های تهران</div><div class="ar ell">آوا نیک‌زاد</div></div>
-      <div class="ib" style="color:var(--dyn)"><i class="g s28" data-g="heart.f"></i></div>
+    <div class="meta">
+      <div class="art r12" data-art="tehran-nights" style="width:56px;height:56px"></div>
+      <div style="flex:1;min-width:0"><div class="title ell">شب‌های تهران</div><div class="artist ell">آوا نیک‌زاد · آلبوم شب‌های تهران</div></div>
+      <div class="iconbtn" style="color:rgba(255,255,255,.8)"><i class="ic">more_vert</i></div>
     </div>
-    <div class="seekwrap ltrz">
-      <div style="height:54px;display:flex;align-items:center"><div class="seek" data-w="364" data-h="40" data-p=".42" data-style="bars" data-c="#E3B6FF" data-t="rgba(255,255,255,.26)" data-seed="21"></div></div>
-      <div class="times"><span>۱:۴۳</span><span>−۲:۲۵</span></div>
+    <div class="seekwrap">
+      <div class="seek" data-w="364" data-h="32" data-p=".42" data-c="#E3B6FF" data-t="rgba(255,255,255,.26)" data-thumb="28" data-ph="2"></div>
+      <div class="times"><span>۱:۳۸</span><span>−۲:۱۵</span></div>
     </div>
-    <div class="transport ltrz">
-      <div class="ib lit" style="--lit:var(--dyn)"><i class="g" data-g="shuffle"></i></div>
-      <div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="prev"></i></div>
-      <div class="disc play" style="width:88px;height:88px"><span class="glyph" data-t="1" data-s="34" data-c="#4A1A6B"></span></div>
-      <div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="next"></i></div>
-      <div class="ib"><i class="g" data-g="repeat"></i></div>
-    </div>
-    <div class="actions" style="left:12px;right:20px">
-      <div class="capsule"><i class="g s20" data-g="speaker"></i>همین گوشی</div>
-      <div style="display:flex;gap:4px"><div class="ib"><i class="g" data-g="moon"></i></div><div class="ib lit" style="--lit:var(--dyn)"><i class="g mir" data-g="lyrics"></i></div></div>
-    </div>
-    <div class="upnext" style="padding:0 9px 0 18px">
-      <div class="art sl8" data-art="koucheh-bagh" style="width:36px;height:36px"></div>
-      <div class="tx"><div class="a">بعدی</div><div class="b ell">کوچه‌باغ · گروه دریاچه</div></div>
-      <i class="g s20" data-g="chevu" style="opacity:.7"></i>
+    <div class="transport">
+      <div class="side"><i class="ic f s28">skip_previous</i></div>
+      <div class="cookie" data-size="88" data-n="10" data-k=".075" data-c="#E3B6FF" data-rot="4"><i class="ic f s32" style="color:#4A1A6B">pause</i></div>
+      <div class="side"><i class="ic f s28">skip_next</i></div>
     </div>
   </div>
-  <div class="gesture" style="--gh:#fff"></div>
+  <div class="gesture"></div>
 </div>
 <script src="lib.js"></script><script>buildMock()</script></body></html>

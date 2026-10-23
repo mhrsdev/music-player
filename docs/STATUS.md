@@ -26,7 +26,7 @@ _Last updated: 2026-10-23 — D8: parallel agents + ponytail skill + UI/RAM/batt
 | K8 | No profile avatar in nav (local app) | default applied |
 | K10 | MVVM architecture (D6) | adopted |
 | K11 | Battery efficiency = hard requirement (D6), see ARCHITECTURE.md | adopted |
-| K12 | Less stock-Google component look (D6) → T2b design revision | adopted |
+| K12 | ~~Less stock-Google look (D6) → v2~~ **Superseded by D13: use design v1** (`docs/design/`), built as Java Views | owner decision |
 | K13 | **Language: Java only, NO Kotlin** (D7, answers Q-J). Groovy `.gradle` build files | decided by owner |
 | K14 | UI = XML + custom Views (no Compose) → Wavy/Waveform/Bars seek bars are custom `View`s (D7) | consequence of K13 |
 | K15 | **No Room**: framework `SQLiteOpenHelper`/`SQLiteDatabase`, tidy query/DAO classes (D7) | decided by owner |
@@ -37,7 +37,7 @@ _Last updated: 2026-10-23 — D8: parallel agents + ponytail skill + UI/RAM/batt
 
 ## Open questions for the owner
 0. ~~Q-J~~ **ANSWERED (D7): Java only, no Kotlin.** Residual assumption for owner: "کوعری ها رو مرتب بزن" was read as "keep DB queries tidy".
-D-A. Persian: keep transport + seek bar LTR (default yes). D-B. Default seek bar (rec. Wavy). D-C. App name/icon (placeholder 'Music Player', arch + 3 bars). D-E. Lyrics centered (default) or start-aligned? D-F. Liked = saffron everywhere or cover color in player?
+(v2 questions D-A..D-F void after D13; v1 defaults K5-K9 stand.)
 1. Online catalog (Home "New releases", search of songs not on device): keep Phase 1 local-only, or the owner picks a legal provider/API (e.g. own backend, Jamendo, Audius)? Default until answered: local-only + pluggable interface.
 
 ## Task board
@@ -71,7 +71,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 ### Done
 - ✅ **T6** [Sonnet+ponytail] Playback merged: `playback/` (PlayerHolder single ExoPlayer, ExoPlayerController, PlaybackService MediaSessionService stops 60 s after pause, PlaybackStore, SleepTimerLogic w/ fade, PlayCountListener), `di/PlaybackModule`, 18 JVM tests, build green (agent-reported). T8: create controller in `MusicPlayerApp.onCreate` via `PlaybackModule.createController(ctx, library::recordPlay)`. Not verified on device: notification, Bluetooth, FGS start on Android 14+; audio offload not enabled; fakes without mediaUri are unplayable.
-- ✅ **T2b** [Opus] Design v2 merged: `docs/design/DESIGN.md` v2 + 18 PNGs (new `17-player-bars.png`). Own identity (Readex Pro + Vazirmatn, 42 custom icons, Persian arch/tile language, 'Deck' = mini-player+nav, lamp controls, 3 real-loudness seek bars, 'Still' low-power mode, 64px pre-blurred backdrop, ≤30 fps wave only while playing+visible). Screenshots sent to owner in chat. Not verified: any Android run; not mocked: tablet/landscape, overflow menus, sleep-timer sheet, permission-denied states. **Open owner questions D-A..D-F** (see below).
+- ❌ **T2b** [Opus] Design v2 — REJECTED by owner (D13), v1 is the target again; v2 lives only on branch `task/t2b-design-revision`. (Old entry:) `docs/design/DESIGN.md` v2 + 18 PNGs (new `17-player-bars.png`). Own identity (Readex Pro + Vazirmatn, 42 custom icons, Persian arch/tile language, 'Deck' = mini-player+nav, lamp controls, 3 real-loudness seek bars, 'Still' low-power mode, 64px pre-blurred backdrop, ≤30 fps wave only while playing+visible). Screenshots sent to owner in chat. Not verified: any Android run; not mocked: tablet/landscape, overflow menus, sleep-timer sheet, permission-denied states. **Open owner questions D-A..D-F** (see below).
 - ✅ **T-W** [Sonnet+ponytail] Waveform extractor merged: `data/waveform` (WaveformMath, SamplingPlan sparse windows ~25% decode, EnvelopeBuilder, WaveformExtractor MediaCodec glue, WaveformStore + in-memory/file impls, WaveformRepositoryImpl with lazy/observer-driven work + battery-saver skip, `di/WaveformModule`), 45 JVM tests, build green (agent-reported). NOT verified: MediaCodec decode on a real device. T8 should bind `WaveformStore` to SQLite and call `prefetch(next track)`.
 - ✅ **T1b** [Sonnet+ponytail] Java scaffold merged into the working branch. Gradle 9.0.0 + **AGP 8.13.2** (AGP 9.x needs Gradle ≥ 9.1; tried 9.0.1 → refused), compileSdk/targetSdk 37 (suppressUnsupportedCompileSdk), minSdk 26, Java records for models, LiveData contracts + `Callback<T>`, fakes (37 tracks / 7 artists / 8 albums), `AppContainer`, `DbHelper` skeleton, 24 JVM tests, R8 release builds. **Supervisor re-ran `:app:assembleDebug test lint` → green; 0 `.kt/.kts` files.** Not verified: device run, GitHub Actions.
 - ✅ **T2a** [Opus] Design phase: 17 PNG mockups in `docs/design/png/` + spec `docs/design/DESIGN.md` (sources in `docs/design/src/`). Sent to owner in chat. **Approved by owner (D4).** Not verified: nothing runs on Android (browser mockups); notification/lock-screen is approximate; Persian copy needs native check; not mocked: tablet, overflow menus, sleep-timer sheet, permission-denied state.
@@ -79,6 +79,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D13: owner rejects v2, wants v1. docs/design restored to v1; T2/T3/T4 retargeted.
 - 2026-10-23: T2b done + merged; PNGs sent to owner in chat; owner feedback to be applied as follow-up to T2/T3/T4.
 - 2026-10-23: D12 archived: 1-hour budget, up to 8 agents. Launched T2/T3/T4 (Opus) in parallel on WIP design v2; T2b asked to wrap up and report.
 - 2026-10-23: T1b merged into ccr-b49e5e2a-53r8m3 (reviewed: build green, no Kotlin). T-W launched → 5 agents running (T2b, T5, T6, T7, T-W).

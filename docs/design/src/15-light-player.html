@@ -1,56 +1,56 @@
 <!doctype html>
-<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Player light</title><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="player.css">
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Player light</title><link rel="stylesheet" href="base.css">
 <style>
-  .screen { --dyn: #1F4D86; --on-dyn: #FFFFFF; --dyn-shadow: rgba(31,77,134,.55); --tintc: #2a5db0; color: #121A2C; --sb: #121A2C; }
-  .pl { color: #121A2C; --sb: #121A2C; }
-  .scrim { background: linear-gradient(180deg, rgba(244,241,234,.72) 0%, rgba(244,241,234,.6) 36%, rgba(244,241,234,.86) 60%, rgba(244,241,234,.95) 100%); }
-  .pl .tint { opacity: .22; }
-  .pl .from .a, .pl .upnext .a { color: #4E566A; }
-  .pl .meta .t-display { color: #121A2C; }
-  .pl .meta .artist { color: #4E566A; }
-  .times { color: #4E566A; }
-  .disc.glass { background: rgba(21,27,44,.06); box-shadow: inset 0 0 0 1px rgba(21,27,44,.10); color: #121A2C; }
-  .capsule { background: rgba(21,27,44,.06); box-shadow: inset 0 0 0 1px rgba(21,27,44,.09); }
-  .pl .upnext { background: rgba(255,255,255,.55); box-shadow: inset 0 0 0 1px rgba(21,27,44,.08), 0 8px 20px -12px rgba(31,77,134,.4); }
-  .play { background: radial-gradient(120% 120% at 50% 12%, #3c6fb0 0%, #1F4D86 60%) !important; }
-  .pl .cover { box-shadow: 0 30px 50px -22px rgba(31,77,134,.7); }
+  .theme-light .togglegroup { background: rgba(43,99,134,.10); } .theme-light .togglegroup .tg { color: #0E1D28; } .theme-light .togglegroup .tg.on { color: #FFFFFF; } .theme-light .transport .side { background: rgba(43,99,134,.12); color: #0E1D28; }
+  .cover { box-shadow: 0 30px 60px rgba(20,60,90,.35) !important; }
+  .screen { --dyn-primary: #2B6386; --dyn-on-primary: #FFFFFF; --dyn-container: #CDE8FF; --dyn-on-container: #001E2E; --dyn-glow: 120,180,220; color: #0E1D28; --sb: #0E1D28; --gh: #0E1D28; }
+  .scrim { background: linear-gradient(180deg, rgba(240,247,253,.62) 0%, rgba(240,247,253,.55) 38%, rgba(240,247,253,.84) 64%, rgba(240,247,253,.94) 100%); }
+  .tint { position: absolute; inset: 0; z-index: 1; background: rgb(var(--dyn-glow)); mix-blend-mode: soft-light; opacity: .25; }
+  .handle { position: absolute; top: 44px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 4px; background: rgba(14,29,40,.3); }
+  .top { position: absolute; top: 58px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .cover { position: absolute; top: 136px; left: 24px; width: 364px; height: 364px; box-shadow: 0 30px 70px rgba(0,8,20,.55), 0 0 0 1px rgba(255,255,255,.06); }
+  .meta { position: absolute; top: 528px; left: 24px; right: 16px; display: flex; align-items: flex-end; justify-content: space-between; }
+  .meta .t-display { color: #0E1D28; }
+  .meta .artist { font-size: 18px; font-weight: 500; color: #3C4F5E; margin-top: 2px; }
+  .seekwrap { position: absolute; top: 612px; left: 24px; width: 364px; color: var(--dyn-primary); }
+  .seekwrap .times { margin-top: 6px; color: #23323E; opacity: 1; }
+  .transport { position: absolute; top: 704px; left: 0; right: 0; }
+  .device { position: absolute; top: 826px; left: 50%; transform: translateX(-50%); height: 40px; padding: 0 16px 0 12px; border-radius: 99px; display: flex; gap: 8px; align-items: center;
+    background: rgba(43,99,134,.10); font-size: 14px; font-weight: 560; color: var(--dyn-on-container); white-space: nowrap; }
 </style></head>
-<body><div class="screen theme-light pl">
-  <div class="backdrop"><div class="art" data-art="koucheh-bagh"></div></div>
-  <div class="tint"></div><div class="backdrop-scrim scrim"></div><div class="grain" style="opacity:.06"></div>
+<body><div class="screen theme-light">
+  <div class="backdrop"><div class="art" data-art="without-you"></div></div>
+  <div class="tint"></div>
+  <div class="backdrop-scrim scrim"></div>
+  <div class="grain"></div>
   <div class="layer">
     <div class="statusbar"></div>
+    <div class="handle"></div>
     <div class="top">
-      <div class="ib"><i class="g" data-g="chevd"></i></div>
-      <div class="from"><div class="a">Playing from playlist</div><div class="b">Rainy evenings</div></div>
-      <div class="ib"><i class="g" data-g="more"></i></div>
+      <div class="iconbtn" style="color:#0E1D28"><i class="ic">lyrics</i></div>
+      <div class="togglegroup">
+        <div class="tg on"><i class="ic">shuffle</i></div>
+        <div class="tg on"><i class="ic">repeat_one</i></div>
+        <div class="tg"><i class="ic">queue_music</i></div>
+      </div>
+      <div class="iconbtn" style="color:var(--dyn-primary)"><i class="ic f">favorite</i></div>
     </div>
-    <div class="cover art sl20 edge" data-art="koucheh-bagh"></div>
+    <div class="cover art r32" data-art="without-you"></div>
     <div class="meta">
-      <div style="min-width:0;flex:1"><div class="t-display fa ell" dir="rtl" style="text-align:left">کوچه‌باغ</div><div class="artist fa" dir="rtl" style="text-align:left;font-family:Vazirmatn">گروه دریاچه</div></div>
-      <div class="ib" style="color:#1F4D86"><i class="g s28" data-g="heart"></i></div>
+      <div style="min-width:0"><div class="t-display ell">Without You</div><div class="artist">NEFFEX</div></div>
+      <div class="iconbtn" style="color:#3C4F5E;margin-bottom:-4px"><i class="ic">more_vert</i></div>
     </div>
     <div class="seekwrap">
-      <div class="seek" data-w="364" data-h="54" data-p=".58" data-style="waveform" data-c="#1F4D86" data-t="rgba(21,27,44,.09)" data-hot="#ffffff" data-seed="5"></div>
-      <div class="times"><span>2:17</span><span>−1:39</span></div>
+      <div class="seek" data-w="364" data-h="56" data-p=".29" data-style="waveform" data-c="#2B6386" data-t="rgba(14,29,40,.16)" data-thumb="44" data-seed="8"></div>
+      <div class="times"><span>0:52</span><span>−2:09</span></div>
     </div>
     <div class="transport">
-      <div class="ib"><i class="g" data-g="shuffle"></i></div>
-      <div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="prev"></i></div>
-      <div class="disc play" style="width:88px;height:88px"><span class="glyph" data-t="0" data-s="34" data-c="#FFFFFF"></span></div>
-      <div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="next"></i></div>
-      <div class="ib"><i class="g" data-g="repeat"></i></div>
+      <div class="side"><i class="ic f s32">skip_previous</i></div>
+      <div class="cookie" data-size="100" data-n="10" data-k=".075" data-c="#2B6386" data-rot="6"><i class="ic f s36" style="color:#FFFFFF">pause</i></div>
+      <div class="side"><i class="ic f s32">skip_next</i></div>
     </div>
-    <div class="actions">
-      <div class="capsule"><i class="g s20" data-g="speaker"></i>This phone</div>
-      <div style="display:flex;gap:4px"><div class="ib"><i class="g" data-g="moon"></i></div><div class="ib"><i class="g" data-g="lyrics"></i></div></div>
-    </div>
-    <div class="upnext">
-      <div class="art sl8" data-art="baran" style="width:36px;height:36px"></div>
-      <div class="tx"><div class="a">Up next</div><div class="b ell"><span style="font-family:Vazirmatn">باران که می‌آید</span> · <span style="font-family:Vazirmatn">نیلوفر</span></div></div>
-      <i class="g s20" data-g="chevu" style="opacity:.6"></i>
-    </div>
+    <div class="device"><i class="ic s20">speaker</i>JBL Charge 6</div>
   </div>
-  <div class="gesture" style="--gh:#121A2C"></div>
+  <div class="gesture"></div>
 </div>
 <script src="lib.js"></script><script>buildMock()</script></body></html>
