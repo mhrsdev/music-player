@@ -47,7 +47,8 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - ✅ **B2** [Opus] 6 new seek-bar styles + live-preview picker (D24); owner keeps all 6 (D27). Merged into ccr (local, push pending CI).
 - ✅ **E2** [Sonnet] Perf regression (shared PeriodicTick/FrameDriver, bucketed artwork decode) — merged into ccr.
 - ✅ **L2** [Opus] Lyrics junk filter, query normaliser, empty states/tools (D25) — merged into ccr (d57328b); also fixed 3 lint errors (Motion API33, ArtworkLoader thread, home_mix_card RTL) and M1ThemeRenderTest index.
-- 🔄 **P2** [Opus] Settings > Performance section (D26): presets + per-effect toggles, live effect. `task/q1-performance-settings`.
+- 🔄 **CI1** [Sonnet] BLOCKER: CI hangs (40-min timeout) in unit tests on every run since ~21:20 UTC (after H1/F1/G1/M1 merges). Find hanging test, fix root cause, add test logging + per-task timeout. `task/ci1-test-hang`.
+- ✅ **Q1** [Opus] Settings > Performance (D26): presets Full/Balanced/Light + toggles + fps cap, live. Pushed 41b1ac5; merge pending (conflicts with B2/O1 in SettingsStore/PlayerFragment — Q1 agent to merge ccr after I push).
 - ✅ **O1** [Sonnet] Headset buttons fix + settings + output devices + per-device profiles. Merged into ccr (local, push pending CI). Device-unverified: see docs/HEADSET_CHECKLIST.md.
 - 🔄 **G1** [Opus] Generated covers for tracks without art (deterministic generative art, UI + notification + widget). `task/g1-covers`.
 - 🔄 **U1b** [Opus] Full edge-to-edge/cutout/immersive + friend's-phone dock inset bug. `task/u1b-fullscreen`.
