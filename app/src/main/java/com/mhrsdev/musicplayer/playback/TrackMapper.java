@@ -17,6 +17,8 @@ class TrackMapper {
             ALBUM_ID = "albumId", ALBUM = "album", DURATION = "duration", ARTWORK = "artwork", SEED = "seed",
             URI = "uri", EXPLICIT = "explicit", LIKED = "liked", YEAR = "year", NUMBER = "number", ADDED = "added";
 
+    private static final String MEDIASTORE_AUDIO = "content://media/";
+
     private TrackMapper() {}
 
     /** Only tracks with a playable URI can be queued (fakes have none). */
@@ -50,7 +52,10 @@ class TrackMapper {
                 .setExtras(extras);
         if (t.durationMs() > 0) meta.setDurationMs(t.durationMs());
         if (t.trackNumber() > 0) meta.setTrackNumber(t.trackNumber());
-        if (t.artworkUri() != null) meta.setArtworkUri(Uri.parse(t.artworkUri()));
+        // Notification / lock-screen cover: the track's own MediaStore URI (thumbnail -> embedded picture -> folder art,
+        // see ArtworkResolver); the legacy albumart URI does not open on Android 10+. Other sources keep their URI.
+        String cover = t.mediaUri() != null && t.mediaUri().startsWith(MEDIASTORE_AUDIO) ? t.mediaUri() : t.artworkUri();
+        if (cover != null) meta.setArtworkUri(Uri.parse(cover));
         return new MediaItem.Builder()
                 .setMediaId(t.id())
                 .setUri(t.mediaUri())

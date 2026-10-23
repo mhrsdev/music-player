@@ -233,12 +233,12 @@ public class ArtworkLoader {
     }
 
     /** Real platform access: MediaStore thumbnails/queries, MediaMetadataRetriever, files. Worker thread only. */
-    static final class PlatformBackend implements ArtworkResolver.Backend {
+    public static final class PlatformBackend implements ArtworkResolver.Backend {
         private static final String AUDIO_URI = "content://media/external/audio/media/";
         private final Context context;
         private final ContentResolver cr;
 
-        PlatformBackend(Context context) {
+        public PlatformBackend(Context context) {
             this.context = context;
             this.cr = context.getContentResolver();
         }

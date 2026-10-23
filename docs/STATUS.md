@@ -118,6 +118,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - **J1** (after all merges) mechanical refactor: remove `final class`, Java 17 idioms in touched code, drop redundant AppCompat-transitive deps from the version catalog; verify on GitHub CI (local builds OOM).
 
 ## Change log
+- 2026-10-23: **v0.2.0 published** (GitHub pre-release; supervisor verified the downloaded APK: signed with the owner's key — cert SHA-256 2E59CE52…18AACD, versionCode 2, label Mowj, sha256 matches the .sha256 asset; built from main 8d51b89). From v0.3.0 on releases are NOT pre-release (D23); release title becomes 'Mowj vX'.
 - 2026-10-23: **main = 8d51b89 (CI green), release v0.2.0 workflow dispatched** (signed with owner's key via secrets). D22: pause = option B, ambient backgrounds, generated covers (G1), fullscreen (U1b).
 - 2026-10-23: D21 archived (headphone/device features → O1 backlog; no `final` classes; Java 17; dependency tidy → J1). CLAUDE.md updated.
 - 2026-10-23: D19 archived. GitHub signing secrets set by owner. Launched H1/L1/M1. U2 finished (merged); N1 root cause = missing `addSession` (merged). Merged to ccr: N1, U3 (partial), U2, E, S1(partial, conflicts resolved). Tag push is blocked (403) → releases via workflow_dispatch.
