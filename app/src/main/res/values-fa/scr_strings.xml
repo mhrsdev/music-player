@@ -1,0 +1,93 @@
+<resources>
+    <string name="nav_home">خانه</string>
+    <string name="nav_search">جستجو</string>
+    <string name="nav_library">کتابخانه</string>
+    <string name="nav_settings">تنظیمات</string>
+    <string name="nav_back">بازگشت</string>
+    <string name="nav_play">پخش</string>
+    <string name="nav_pause">مکث</string>
+    <string name="nav_open_player">باز کردن پخش‌کننده</string>
+    <string name="nav_player_unavailable">صفحه‌ی پخش‌کننده هنوز آماده نیست</string>
+    <string name="nav_perm_title">موسیقی شما، روی همین گوشی</string>
+    <string name="nav_perm_body">برای پخش آهنگ‌های ذخیره‌شده روی دستگاه، برنامه به اجازه‌ی خواندن فایل‌های صوتی نیاز دارد. چیزی از گوشی شما خارج نمی‌شود.</string>
+    <string name="nav_perm_allow">اجازه دادن</string>
+    <string name="nav_perm_folders">انتخاب پوشه‌ها</string>
+    <string name="nav_perm_denied">دسترسی خاموش است. می‌توانید آن را در تنظیمات سیستم روشن کنید.</string>
+    <string name="nav_perm_open_settings">باز کردن تنظیمات</string>
+
+    <string name="home_see_all">همه</string>
+    <string name="home_shuffle">پخش تصادفی</string>
+    <string name="home_empty_title">کتابخانه خالی است</string>
+    <string name="home_empty_body">موسیقی به گوشی اضافه کنید یا پوشه‌ها را در تنظیمات انتخاب کنید.</string>
+    <string name="home_loading">در حال اسکن کتابخانه…</string>
+
+    <string name="search_hint">آهنگ، آلبوم، خواننده</string>
+    <string name="search_clear">پاک کردن جستجو</string>
+    <string name="search_filter_all">همه</string>
+    <string name="search_filter_songs">آهنگ‌ها</string>
+    <string name="search_filter_albums">آلبوم‌ها</string>
+    <string name="search_filter_artists">خواننده‌ها</string>
+    <string name="search_filter_playlists">فهرست‌ها</string>
+    <string name="search_prompt">هر چیزی را در کتابخانه پیدا کنید</string>
+    <string name="search_no_results">نتیجه‌ای برای «%1$s» پیدا نشد</string>
+    <string name="search_try_all">جستجو در همه‌ی دسته‌ها</string>
+    <string name="search_kind_album">آلبوم</string>
+    <string name="search_kind_artist">خواننده</string>
+    <string name="search_kind_playlist">فهرست پخش</string>
+    <string name="search_explicit">صریح</string>
+
+    <string name="library_title">کتابخانه</string>
+    <string name="library_liked">پسندیده‌ها</string>
+    <string name="library_albums">آلبوم‌ها</string>
+    <string name="library_playlists">فهرست‌های پخش</string>
+    <string name="library_artists">خواننده‌ها</string>
+    <string name="library_history">تاریخچه</string>
+    <string name="library_recently_saved">تازه ذخیره‌شده</string>
+    <string name="library_play_liked">پخش پسندیده‌ها</string>
+    <string name="library_liked_empty">روی ♥ هر آهنگی بزنید تا اینجا بماند</string>
+    <string name="library_history_empty">آهنگ‌هایی که پخش می‌کنید اینجا می‌آیند</string>
+    <string name="library_playlist_empty">این فهرست خالی است</string>
+    <string name="library_empty">هنوز چیزی نیست</string>
+    <string name="library_play_all">پخش</string>
+    <string name="library_shuffle">تصادفی</string>
+    <string name="library_more">گزینه‌های بیشتر برای %1$s</string>
+    <plurals name="library_songs"><item quantity="one">%d آهنگ</item><item quantity="other">%d آهنگ</item></plurals>
+    <plurals name="library_albums_count"><item quantity="one">%d آلبوم</item><item quantity="other">%d آلبوم</item></plurals>
+    <plurals name="library_artists_count"><item quantity="one">%d خواننده</item><item quantity="other">%d خواننده</item></plurals>
+    <plurals name="library_playlists_count"><item quantity="one">%d فهرست</item><item quantity="other">%d فهرست</item></plurals>
+
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_appearance">ظاهر</string>
+    <string name="settings_theme">پوسته</string>
+    <string name="settings_theme_system">سیستم</string>
+    <string name="settings_theme_light">روشن</string>
+    <string name="settings_theme_dark">تیره</string>
+    <string name="settings_theme_black">سیاه</string>
+    <string name="settings_artwork_colors">رنگ از کاور</string>
+    <string name="settings_artwork_colors_sub">پخش‌کننده رنگ کاور را می‌گیرد</string>
+    <string name="settings_seek_style">نوار پیشرفت</string>
+    <string name="settings_seek_wavy">موجی</string>
+    <string name="settings_seek_waveform">شکل موج</string>
+    <string name="settings_seek_bars">میله‌ای</string>
+    <string name="settings_language">زبان</string>
+    <string name="settings_lang_system">سیستم</string>
+    <string name="settings_lang_en">English</string>
+    <string name="settings_lang_fa">فارسی</string>
+    <string name="settings_library">کتابخانه</string>
+    <string name="settings_folders">پوشه‌های موسیقی</string>
+    <string name="settings_folders_all">همه‌ی پوشه‌های دستگاه</string>
+    <string name="settings_lyrics">متن ترانه</string>
+    <string name="settings_lyrics_online">یافتن متن به‌صورت آنلاین</string>
+    <string name="settings_lyrics_online_sub">وقتی فایل ‎.lrc پیدا نشد، متن همگام را جستجو کن</string>
+    <string name="settings_playback">پخش</string>
+    <string name="settings_sleep_default">زمان‌سنج خواب پیش‌فرض</string>
+    <string name="settings_sleep_minutes">%d دقیقه</string>
+    <string name="settings_battery_saver">صرفه‌جویی باتری</string>
+    <string name="settings_battery_saver_sub">حرکت، محوشدگی و دانه را خاموش کن</string>
+    <string name="settings_about">درباره</string>
+    <string name="settings_version">نسخه‌ی %1$s</string>
+    <string name="library_menu_play_next">پخش بعدی</string>
+    <string name="library_menu_add_queue">افزودن به صف</string>
+    <string name="library_menu_like">پسندیدن</string>
+    <string name="library_menu_unlike">حذف از پسندیده‌ها</string>
+</resources>
