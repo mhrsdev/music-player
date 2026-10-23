@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lyrics_text_larger">متن ترانه بزرگ‌تر</string>
+    <string name="lyrics_text_smaller">متن ترانه کوچک‌تر</string>
+    <string name="lyrics_offset_now">زمان‌بندی ترانه %1$s</string>
+</resources>

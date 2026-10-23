@@ -152,7 +152,12 @@ public final class PlayerViewModel extends ViewModel {
 
     public void toggleShuffle() { player.toggleShuffle(); }
     public void cycleRepeat() { player.cycleRepeat(); }
-    public void toggleLyrics() { showLyrics.setValue(!Boolean.TRUE.equals(showLyrics.getValue())); }
+    /** Opens lyrics only when the track has some (cover tap, menu, button); closing always works. */
+    public void toggleLyrics() {
+        boolean open = Boolean.TRUE.equals(showLyrics.getValue());
+        if (!open && lyricsAvailability.getValue() != LyricsAvailability.AVAILABLE) return;
+        showLyrics.setValue(!open);
+    }
     public void toggleLike() {
         Track t = currentTrack.getValue();
         if (t == null) return;

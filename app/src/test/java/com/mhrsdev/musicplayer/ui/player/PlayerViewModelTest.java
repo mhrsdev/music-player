@@ -28,6 +28,7 @@ public class PlayerViewModelTest {
         PlayerViewModel vm = new PlayerViewModel(c, new FakeLibraryRepository(), new FakeLyricsRepository(),
                 new FakeWaveformRepository());
         vm.getActiveLyricLine().observeForever(x -> {});
+        vm.getLyricsAvailability().observeForever(x -> {});
         vm.getLiked().observeForever(x -> {});
         vm.getCurrentTrack().observeForever(x -> {});
         return vm;
@@ -68,6 +69,20 @@ public class PlayerViewModelTest {
         boolean before = vm.getLiked().getValue();
         vm.toggleLike();
         assertEquals(!before, vm.getLiked().getValue());
+    }
+
+    @Test public void lyricsButtonFollowsAvailability() {
+        // track-4 has no lyrics (index 3), track-1 has synced lyrics
+        FakePlayerController c = new FakePlayerController(SampleData.TRACKS.subList(0, 5), 0);
+        PlayerViewModel vm = vm(c);
+        assertEquals(LyricsAvailability.AVAILABLE, vm.getLyricsAvailability().getValue());
+        vm.toggleLyrics();
+        assertTrue(vm.getShowLyrics().getValue());
+        c.next(); c.next(); c.next(); // -> track-4
+        assertEquals(LyricsAvailability.NONE, vm.getLyricsAvailability().getValue());
+        assertFalse("lyrics view closes on a track without lyrics", vm.getShowLyrics().getValue());
+        vm.toggleLyrics();
+        assertFalse("cannot open lyrics that do not exist", vm.getShowLyrics().getValue());
     }
 
     @Test public void seekClampsAndSteps() {
