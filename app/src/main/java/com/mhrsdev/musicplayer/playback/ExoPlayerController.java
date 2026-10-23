@@ -12,11 +12,15 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
+import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
 import androidx.media3.common.Timeline;
+import androidx.media3.common.Tracks;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
+import com.mhrsdev.musicplayer.domain.model.PlaybackOptions;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
+import com.mhrsdev.musicplayer.domain.model.ReplayGainMode;
 import com.mhrsdev.musicplayer.domain.model.RepeatMode;
 import com.mhrsdev.musicplayer.domain.model.SleepTimer;
 import com.mhrsdev.musicplayer.domain.model.Track;
@@ -44,6 +48,8 @@ public final class ExoPlayerController implements PlayerController {
     private final PlaybackStore store;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final StateData state = new StateData();
+    private final MutableLiveData<PlaybackOptions> options = new MutableLiveData<>();
+    private final SoundPrefs soundPrefs;
     private final QueueShuffler<Track> shuffler = new QueueShuffler<>();
     private final SleepTimerLogic sleep = new SleepTimerLogic();
     private final PlayCountTracker playCount = new PlayCountTracker();
@@ -57,6 +63,8 @@ public final class ExoPlayerController implements PlayerController {
 
     private List<Track> queue = Collections.emptyList();
     private int consecutiveErrors;
+    private ReplayGain replayGain = ReplayGain.NONE;
+    private float sleepVolume = 1f; // fade factor of the sleep timer; the player volume is this times the ReplayGain volume
 
     /**
      * @param playCountListener told once per real listen of a track (wire to {@code LibraryRepository.recordPlay})
@@ -72,6 +80,9 @@ public final class ExoPlayerController implements PlayerController {
         store = PlayerHolder.store(appContext);
         queue = readQueue();
         startPlayCount();
+        soundPrefs = new SoundPrefs(appContext);
+        options.setValue(soundPrefs.options());
+        applyOptions(options.getValue());
         player.addListener(new PlayerEvents());
         state.setValue(buildState());
     }
@@ -224,7 +235,7 @@ public final class ExoPlayerController implements PlayerController {
             return;
         }
         player.setPauseAtEndOfMediaItems(false);
-        player.setVolume(1f);
+        setSleepVolume(1f);
         sleep.startCountdown(minutes * 60_000L, player.isPlaying(), now());
         scheduleSleep();
         publish();
@@ -233,7 +244,7 @@ public final class ExoPlayerController implements PlayerController {
     @Override public void setSleepTimerEndOfTrack() {
         sleep.startEndOfTrack();
         handler.removeCallbacks(sleepTask);
-        player.setVolume(1f);
+        setSleepVolume(1f);
         player.setPauseAtEndOfMediaItems(true); // ExoPlayer pauses itself at the end of the item: no polling
         publish();
     }
@@ -242,7 +253,7 @@ public final class ExoPlayerController implements PlayerController {
         sleep.cancel();
         handler.removeCallbacks(sleepTask);
         player.setPauseAtEndOfMediaItems(false);
-        player.setVolume(1f);
+        setSleepVolume(1f);
         publish();
     }
 
@@ -257,12 +268,60 @@ public final class ExoPlayerController implements PlayerController {
         if (sleep.isExpired(now)) {
             sleep.cancel();
             player.pause();
-            player.setVolume(1f);
+            setSleepVolume(1f);
             publish();
             return;
         }
-        player.setVolume(sleep.volume(now)); // fade-out during the last seconds
+        setSleepVolume(sleep.volume(now)); // fade-out during the last seconds
         scheduleSleep();
+    }
+
+    // --- playback options ---------------------------------------------------------------------
+
+    @Override public LiveData<PlaybackOptions> getOptions() {
+        return options;
+    }
+
+    @Override public void setPlaybackSpeed(float speed) {
+        PlaybackOptions o = options.getValue();
+        setOptions(new PlaybackOptions(PlaybackOptions.snap(speed), o.pitch(), o.skipSilence(), o.replayGain()));
+    }
+
+    @Override public void setPlaybackPitch(float pitch) {
+        PlaybackOptions o = options.getValue();
+        setOptions(new PlaybackOptions(o.speed(), PlaybackOptions.snap(pitch), o.skipSilence(), o.replayGain()));
+    }
+
+    @Override public void setSkipSilence(boolean enabled) {
+        PlaybackOptions o = options.getValue();
+        setOptions(new PlaybackOptions(o.speed(), o.pitch(), enabled, o.replayGain()));
+    }
+
+    @Override public void setReplayGainMode(ReplayGainMode mode) {
+        PlaybackOptions o = options.getValue();
+        setOptions(new PlaybackOptions(o.speed(), o.pitch(), o.skipSilence(), mode));
+    }
+
+    private void setOptions(PlaybackOptions o) {
+        if (o.equals(options.getValue())) return;
+        soundPrefs.options(o);
+        applyOptions(o);
+        options.setValue(o);
+    }
+
+    private void applyOptions(PlaybackOptions o) {
+        player.setPlaybackParameters(new PlaybackParameters(o.speed(), o.pitch()));
+        player.setSkipSilenceEnabled(o.skipSilence());
+        applyVolume();
+    }
+
+    private void setSleepVolume(float factor) {
+        sleepVolume = factor;
+        applyVolume();
+    }
+
+    private void applyVolume() {
+        player.setVolume(sleepVolume * replayGain.volume(options.getValue().replayGain()));
     }
 
     // --- play count ---------------------------------------------------------------------------
@@ -419,6 +478,12 @@ public final class ExoPlayerController implements PlayerController {
 
         @Override public void onTimelineChanged(Timeline timeline, int reason) {
             queue = readQueue(); // before onMediaItemTransition, which looks up the current track
+        }
+
+        /** Tags are parsed by the extractor; the audio track's format carries them (ReplayGain). */
+        @Override public void onTracksChanged(Tracks tracks) {
+            replayGain = ReplayGain.from(tracks);
+            applyVolume();
         }
 
         @Override public void onEvents(Player p, Player.Events events) {
