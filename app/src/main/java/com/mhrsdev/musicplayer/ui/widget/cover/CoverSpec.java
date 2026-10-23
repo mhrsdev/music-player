@@ -34,8 +34,14 @@ public record CoverSpec(Kind kind, String identity, long seed, String title, @Nu
 
     /** Album-level spec when the track has a real album, otherwise a single of its own. */
     public static CoverSpec forTrack(Track t) {
-        if (isRealAlbum(t.albumTitle())) return forAlbum(t.albumId(), t.albumTitle(), t.artistName());
-        return single(t.title(), t.artistName());
+        return forTrack(t.albumId(), t.albumTitle(), t.title(), t.artistName());
+    }
+
+    /** {@link #forTrack(Track)} from its parts (for consumers that only carry these, e.g. the widget). */
+    public static CoverSpec forTrack(@Nullable String albumId, @Nullable String albumTitle, String title,
+                                     @Nullable String artist) {
+        if (isRealAlbum(albumTitle)) return forAlbum(albumId, albumTitle, artist);
+        return single(title, artist);
     }
 
     public static CoverSpec forAlbum(Album a) {

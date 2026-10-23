@@ -7,7 +7,7 @@ import java.util.List;
  * families). Built like the owner's reference cover (design 05, "Without You"): a three-stop sky, two hill tones that
  * get darker towards the viewer, an accent pair, a glow (moon, stars) with its halo, and the ink for text.
  * Rules, enforced by {@code CoverPalettesTest}: ink vs every surface text may sit on is at least 4.5:1, also for the
- * 85% subtitle ink and over the 70% text scrim on the bright accents.
+ * 90% subtitle ink and over the 70% text scrim on the bright accents.
  */
 public class CoverPalettes {
 
@@ -42,7 +42,7 @@ public class CoverPalettes {
             p("ocean-deep", 0x04121F, 0x0B3354, 0x145A7A, 0x08263D, 0x030B14, 0x2FA8D8, 0x7FE0E0, 0xE6F8FF, 0x9FDCF5),
             p("kashi-tile", 0x0E1F45, 0x15357A, 0x1E4F8F, 0x102A5E, 0x07122A, 0x3FC1C9, 0xE2B64A, 0xF2E6CC, 0x9EE8EC),
             // turquoise
-            p("turquoise-dusk", 0x061E22, 0x0F4A50, 0x1F7A76, 0x0C3438, 0x04161A, 0x3FB3A6, 0xE2B64A, 0xE6FFF9, 0x9BE3D5),
+            p("turquoise-dusk", 0x061E22, 0x0F4A50, 0x1C716D, 0x0C3438, 0x04161A, 0x3FB3A6, 0xE2B64A, 0xE6FFF9, 0x9BE3D5),
             p("teal-amber", 0x07201F, 0x154845, 0x2B6E5E, 0x113A36, 0x061614, 0xE0A547, 0x6FD1BE, 0xFFF1D6, 0xF7CF8E),
             p("sea-glass", 0x0A1E2A, 0x1A4A5C, 0x2F7280, 0x133746, 0x07151D, 0x7FD1C7, 0xB9E6F0, 0xEFFFFC, 0xB5F0E6),
             // saffron / amber
@@ -71,7 +71,7 @@ public class CoverPalettes {
     /** Alpha of the text scrim ({@link Palette#deep}) under a title that may overlap a bright element. */
     public static final float TEXT_SCRIM = 0.7f;
     /** Opacity of the subtitle ink. */
-    public static final float SUBTITLE_ALPHA = 0.86f;
+    public static final float SUBTITLE_ALPHA = 0.9f;
 
     private CoverPalettes() { }
 }

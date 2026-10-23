@@ -55,6 +55,6 @@ public class NowPlayingBridge {
         boolean playing = p.getPlayWhenReady() && (state == Player.STATE_READY || state == Player.STATE_BUFFERING);
         long duration = p.getDuration() > 0 ? p.getDuration() : t.durationMs();
         return new NowPlaying(t.title(), t.artistName(), t.artworkUri(), playing, Math.max(0L, p.getCurrentPosition()),
-                duration);
+                duration, t.albumId(), t.albumTitle());
     }
 }
