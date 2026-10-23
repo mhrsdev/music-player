@@ -59,6 +59,6 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.androidx.arch.core.testing
-    testImplementation libs.org.json // real org.json for PlaybackStore's JSON codec (android.jar's is a stub)
+    testImplementation libs.org.json // real org.json for JVM tests (android.jar's is a stub)
     testImplementation libs.robolectric
 }

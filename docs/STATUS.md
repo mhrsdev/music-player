@@ -46,7 +46,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 ### In progress
 
 
-- 🔄 **T7** [Sonnet + ponytail] Lyrics (LRC parser/sidecar/embedded + LRCLIB + cache). Branch `task/t7-lyrics-java`, worktree `../wt-t7`.
 
 
 - 🔄 **T2** [Opus] UI foundation: theme/tokens, custom widgets (Wavy/Waveform/Bars seek bars, morph play button, floating nav, mini-player), image loader. Branch `task/t2-ui-foundation-java`, worktree `../wt-t2`. Owns `ui/theme`, `ui/widget`, `res/values`, drawables.
@@ -70,6 +69,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T7** [Sonnet+ponytail] Lyrics merged: `data/lyrics` (LrcParser, embedded ID3/FLAC/MP4 readers, sidecar .lrc/.txt, LrclibClient /get→/search, LyricsResolver with TTL cache 30d/3d/5min, LyricsRepositoryImpl observer-driven), `di/LyricsModule`, 118 JVM tests, supervisor re-ran `:app:assembleDebug test` after merge → green (all test XMLs pass). Not verified: real tagged files, MediaStore file locator, real Persian LRCLIB hits; LRCLIB /get returned 503s during agent checks. T8 must add INTERNET permission + bind LyricsCacheStore.
 - ✅ **T5** [Sonnet+ponytail] Data merged: `data/db` (DbHelper v2, contract/ + query/ classes, all SQL there), `data/scanner` (incremental MediaStore scanner), `data/repository` (SqliteLibraryRepository, LocalHomeFeedSource, SqliteWaveformStore), `data/settings/SettingsStore`, `di/DataModule`; 55 JVM tests (Robolectric 4.16 test-only dep for real SQLite), build+lint green (agent-reported). Not verified on device: MediaStore query, album-art URI (UI needs placeholder/loadThumbnail fallback). Extra repo methods outside the interface: rescan/scanIfStale/isScanning/renamePlaylist/deletePlaylist/removeFromPlaylist/moveInPlaylist → T8 exposes.
 - ✅ **T6** [Sonnet+ponytail] Playback merged: `playback/` (PlayerHolder single ExoPlayer, ExoPlayerController, PlaybackService MediaSessionService stops 60 s after pause, PlaybackStore, SleepTimerLogic w/ fade, PlayCountListener), `di/PlaybackModule`, 18 JVM tests, build green (agent-reported). T8: create controller in `MusicPlayerApp.onCreate` via `PlaybackModule.createController(ctx, library::recordPlay)`. Not verified on device: notification, Bluetooth, FGS start on Android 14+; audio offload not enabled; fakes without mediaUri are unplayable.
 - ❌ **T2b** [Opus] Design v2 — REJECTED by owner (D13), v1 is the target again; v2 lives only on branch `task/t2b-design-revision`. (Old entry:) `docs/design/DESIGN.md` v2 + 18 PNGs (new `17-player-bars.png`). Own identity (Readex Pro + Vazirmatn, 42 custom icons, Persian arch/tile language, 'Deck' = mini-player+nav, lamp controls, 3 real-loudness seek bars, 'Still' low-power mode, 64px pre-blurred backdrop, ≤30 fps wave only while playing+visible). Screenshots sent to owner in chat. Not verified: any Android run; not mocked: tablet/landscape, overflow menus, sleep-timer sheet, permission-denied states. **Open owner questions D-A..D-F** (see below).
@@ -80,6 +80,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: Merged T5, T7 into ccr (supervisor fixed a conflict-marker slip from the T5 merge; one flaky T5 test `SqliteRepositoryTest.historyAndPlayCountsMoveToTheTop` (same-ms ties) passed on re-run; T8 told to make ordering deterministic).
 - 2026-10-23: D13: owner rejects v2, wants v1. docs/design restored to v1; T2/T3/T4 retargeted.
 - 2026-10-23: T2b done + merged; PNGs sent to owner in chat; owner feedback to be applied as follow-up to T2/T3/T4.
 - 2026-10-23: D12 archived: 1-hour budget, up to 8 agents. Launched T2/T3/T4 (Opus) in parallel on WIP design v2; T2b asked to wrap up and report.

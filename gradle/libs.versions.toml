@@ -12,7 +12,7 @@ media3 = "1.11.1"
 junit = "4.13.2"
 androidxTestCore = "1.7.0"
 archCoreTesting = "2.2.0"
-orgJson = "20250107"
+orgJson = "20250517"
 robolectric = "4.16"
 
 [libraries]
