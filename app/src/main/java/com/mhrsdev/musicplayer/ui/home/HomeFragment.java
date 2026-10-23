@@ -77,6 +77,10 @@ public final class HomeFragment extends Fragment implements HomeAdapter.Listener
         vm.playFromSection(section, track);
     }
 
+    @Override public void onSeeAll(HomeSection section) {
+        Screens.openTrackList(this, ScreenNavigator.TrackList.RECENT, null);
+    }
+
     @Override public void onShuffle(HomeSection section) {
         vm.shuffleSection(section);
     }

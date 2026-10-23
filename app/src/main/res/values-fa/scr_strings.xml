@@ -1,12 +1,7 @@
 <resources>
-    <string name="nav_home">خانه</string>
-    <string name="nav_search">جستجو</string>
-    <string name="nav_library">کتابخانه</string>
     <string name="nav_settings">تنظیمات</string>
     <string name="nav_back">بازگشت</string>
     <string name="nav_play">پخش</string>
-    <string name="nav_pause">مکث</string>
-    <string name="nav_open_player">باز کردن پخش‌کننده</string>
     <string name="nav_player_unavailable">صفحه‌ی پخش‌کننده هنوز آماده نیست</string>
     <string name="nav_perm_title">موسیقی شما، روی همین گوشی</string>
     <string name="nav_perm_body">برای پخش آهنگ‌های ذخیره‌شده روی دستگاه، برنامه به اجازه‌ی خواندن فایل‌های صوتی نیاز دارد. چیزی از گوشی شما خارج نمی‌شود.</string>
