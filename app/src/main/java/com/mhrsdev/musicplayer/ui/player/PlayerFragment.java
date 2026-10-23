@@ -298,7 +298,10 @@ public final class PlayerFragment extends Fragment {
         b.playerArtist.setText(t.artistName());
         boolean changed = paletteTrackId != null && !paletteTrackId.equals(t.id());
         paletteTrackId = t.id();
-        applyPalette(PlayerPalette.forSeed(t.placeholderSeed()), null, changed);
+        boolean artColors = new com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore(requireContext()).isArtworkColors();
+        // "Colors from artwork" off -> lapis base scheme (DESIGN §2.2 off switch)
+        applyPalette(artColors ? PlayerPalette.forSeed(t.placeholderSeed()) : PlayerPalette.fromColor(0xFF5F7FA6),
+                null, changed);
         b.playerArtwork.bind(t); // may call onArtwork() with the real cover, which refines the palette
         if (changed && PlayerPalette.motionAllowed(requireContext())) {
             View art = b.playerArtwork;
