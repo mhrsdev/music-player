@@ -15,7 +15,7 @@ import com.mhrsdev.musicplayer.data.db.query.PlayStatsQueries;
 import com.mhrsdev.musicplayer.data.db.query.PlaylistQueries;
 import com.mhrsdev.musicplayer.data.db.query.TrackQueries;
 import com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner;
-import com.mhrsdev.musicplayer.data.scanner.ScanResult;
+import com.mhrsdev.musicplayer.domain.model.ScanResult;
 import com.mhrsdev.musicplayer.domain.model.Album;
 import com.mhrsdev.musicplayer.domain.model.Artist;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
@@ -23,6 +23,7 @@ import com.mhrsdev.musicplayer.domain.model.SearchFilter;
 import com.mhrsdev.musicplayer.domain.model.SearchResult;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.domain.repository.Callback;
+import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,9 +35,9 @@ import java.util.function.Function;
 /**
  * {@link LibraryRepository} on framework SQLite. Reads run on the io executor and are delivered as LiveData that reload
  * only while observed ({@link DbLiveData}); writes run on the io executor and notify through {@link ChangeNotifier}.
- * Beyond the interface it offers library scanning and the remaining playlist edits (rename, delete, remove, reorder).
+ * Also the {@link LibraryAdmin}: library scanning and the remaining playlist edits (rename, delete, remove, reorder).
  */
-public final class SqliteLibraryRepository implements LibraryRepository {
+public final class SqliteLibraryRepository implements LibraryRepository, LibraryAdmin {
     private static final int HISTORY_LIMIT = 200;
     private static final int RECENT_LIMIT = 100;
     private static final int SEARCH_LIMIT = 50;
@@ -179,21 +180,21 @@ public final class SqliteLibraryRepository implements LibraryRepository {
         write(ChangeNotifier.PLAYLISTS, db -> new PlaylistQueries(db).addTrack(playlistId, trackId));
     }
 
-    public void renamePlaylist(String playlistId, String name) {
+    @Override public void renamePlaylist(String playlistId, String name) {
         if (name.trim().isEmpty()) return;
         write(ChangeNotifier.PLAYLISTS, db -> new PlaylistQueries(db).rename(playlistId, name.trim()));
     }
 
-    public void deletePlaylist(String playlistId) {
+    @Override public void deletePlaylist(String playlistId) {
         write(ChangeNotifier.PLAYLISTS, db -> new PlaylistQueries(db).delete(playlistId));
     }
 
-    public void removeFromPlaylist(String playlistId, String trackId) {
+    @Override public void removeFromPlaylist(String playlistId, String trackId) {
         write(ChangeNotifier.PLAYLISTS, db -> new PlaylistQueries(db).removeTrack(playlistId, trackId));
     }
 
     /** Moves the member at index {@code from} to index {@code to} (indices into the playlist's current order). */
-    public void moveInPlaylist(String playlistId, int from, int to) {
+    @Override public void moveInPlaylist(String playlistId, int from, int to) {
         write(ChangeNotifier.PLAYLISTS, db -> {
             PlaylistQueries queries = new PlaylistQueries(db);
             List<String> ids = queries.orderedTrackIds(playlistId);
@@ -219,19 +220,19 @@ public final class SqliteLibraryRepository implements LibraryRepository {
     // ---- scanning -----------------------------------------------------------------------------------------------
 
     /** True while a scan runs (for a progress indicator). */
-    public LiveData<Boolean> isScanning() {
+    @Override public LiveData<Boolean> isScanning() {
         return scanning;
     }
 
     /** App-start hook: scans only if MediaStore changed since the last scan (or never scanned). Needs the permission. */
-    public void scanIfStale() {
+    @Override public void scanIfStale() {
         io.execute(() -> {
             if (scanner.isStale()) scanNow(null);
         });
     }
 
     /** Manual rescan. {@code callback} (may be null) gets the result on the main thread; FAILED if one is already running. */
-    public void rescan(@Nullable Callback<ScanResult> callback) {
+    @Override public void rescan(@Nullable Callback<ScanResult> callback) {
         io.execute(() -> scanNow(callback));
     }
 

@@ -12,6 +12,7 @@ import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
 import com.mhrsdev.musicplayer.data.waveform.WaveformStore;
 import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.BooleanSupplier;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -27,10 +28,15 @@ public final class WaveformModule {
         return create(context, new FileWaveformStore(new File(context.getFilesDir(), "waveforms")));
     }
 
-    /** With a caller-provided store, e.g. the SQLite-backed one. */
+    /** With the system's battery saver deciding whether background prefetch is skipped. */
     public static WaveformRepositoryImpl create(Context context, WaveformStore store) {
+        PowerManager power = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        return create(context, store, power::isPowerSaveMode);
+    }
+
+    /** With a caller-provided store (e.g. the SQLite-backed one) and battery-saver state (called on the worker too). */
+    public static WaveformRepositoryImpl create(Context context, WaveformStore store, BooleanSupplier powerSave) {
         Context app = context.getApplicationContext();
-        PowerManager power = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
         ThreadPoolExecutor worker = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
                 runnable -> new Thread(() -> {
                     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
@@ -39,6 +45,6 @@ public final class WaveformModule {
         worker.allowCoreThreadTimeOut(true);
         Handler mainHandler = new Handler(Looper.getMainLooper());
         return new WaveformRepositoryImpl(store, new WaveformExtractor(app), new MediaFingerprint(app),
-                power::isPowerSaveMode, worker, mainHandler::post);
+                powerSave, worker, mainHandler::post);
     }
 }
