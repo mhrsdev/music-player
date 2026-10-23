@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- White on purpose: the widget tints it at runtime (cover colors or lapis) with ImageView.setColorFilter. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/widget_radius" />
+    <solid android:color="@android:color/white" />
+</shape>

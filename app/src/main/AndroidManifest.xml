@@ -15,9 +15,14 @@
     <!-- API 31+: only to show the connected Bluetooth device's NAME on the player's output chip (asked in context). -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
+    <!-- Self-update from GitHub Releases: the system installer session is started by the app (user confirms in the system dialog). -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <application
         android:name=".MusicPlayerApp"
         android:allowBackup="false"
+        android:largeHeap="false"
+        android:localeConfig="@xml/locales_config"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
@@ -44,6 +49,11 @@
             </intent-filter>
         </service>
 
+        <!-- Status of the self-update install session; only the system's PendingIntent reaches it. -->
+        <receiver
+            android:name=".data.update.InstallResultReceiver"
+            android:exported="false" />
+
         <!-- Headset / Bluetooth media buttons, also when the app process is not running. -->
         <receiver
             android:name="androidx.media3.session.MediaButtonReceiver"
@@ -52,6 +62,48 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+        <!-- Home-screen widgets (RemoteViews, redrawn on playback state changes only). -->
+        <receiver
+            android:name=".appwidget.CompactWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label_compact">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_compact" />
+        </receiver>
+
+        <receiver
+            android:name=".appwidget.SquareWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label_square">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_square" />
+        </receiver>
+
+        <receiver
+            android:name=".appwidget.WideWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label_wide">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_wide" />
+        </receiver>
+
+        <!-- Widget buttons. Not exported: only our own PendingIntents reach it. -->
+        <receiver
+            android:name=".appwidget.WidgetActionReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

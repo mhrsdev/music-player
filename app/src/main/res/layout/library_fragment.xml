@@ -343,6 +343,38 @@
 
         </LinearLayout>
 
+        <!-- Browse: the whole library and the smart lists, one tap away. -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/hub_new_playlist"
+                    style="@style/U2.ActionPill"
+                    android:background="@drawable/nav_button_primary"
+                    android:drawableStart="@drawable/u2_ic_add"
+                    android:drawableTint="?attr/mpOnPrimary"
+                    android:text="@string/library_new_playlist"
+                    android:textColor="?attr/mpOnPrimary"
+                    android:textStyle="bold" />
+
+                <TextView android:id="@+id/hub_songs" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_note" android:text="@string/u2_songs" />
+                <TextView android:id="@+id/hub_most_played" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_trending" android:text="@string/u2_most_played" />
+                <TextView android:id="@+id/hub_recent_added" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_sparkle" android:text="@string/u2_recently_added" />
+                <TextView android:id="@+id/hub_never_played" style="@style/U2.ActionPill" android:drawableStart="@drawable/nav_ic_history" android:text="@string/u2_never_played" />
+                <TextView android:id="@+id/hub_years" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_calendar" android:text="@string/u2_years" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
         <TextView
             style="@style/Scr.SectionTitle"
             android:layout_width="match_parent"

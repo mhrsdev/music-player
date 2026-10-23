@@ -297,3 +297,59 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 2. **Output chip shows only "بلوتوث"** — owner wants the **device name** next to the Bluetooth icon (needs BLUETOOTH_CONNECT runtime permission on API 31+). Routed to U3.
 3. **Full-player title is huge and clipped** (only "no et orchestre)" visible, collides with the 3-dot menu). Routed to U3.
 4. **Bottom of scrolling screens is buggy** ("when you scroll to the very end"): last items hidden behind/through the translucent dock (nav + mini-player), no bottom padding. Routed to U1 (already queued as fix #1 there).
+
+---
+
+## D19 — 2026-10-23 — Secrets OK; ugly play/stop button; shallow app; lyrics/blur/M3 expressive/Google Sans Flex brief; empty Settings
+
+**Original (verbatim, with screenshots: GitHub secrets page, full player with distorted play button, empty Liked-songs screen with overlapping layout, a lyrics reference screenshot):**
+
+> کلید های گیت هاب اوکی شدن
+> این دکمه استپ خیلی یجوریه و قشنگ نیست
+> و باگ جدید
+> و اینکه برنامه عملا خیلی کوچیکه و تو هیچی برای کشف کردن و اسکرول توش نداری
+> زود میرسی ته برنامه
+> Lyrics and dynamic background blur generated from the cover art
+> و
+> Material theming هم نداریم
+> ستینگ هم خیلی خالیه و هیچ چیز خاصی نداره
+> این پرامپت هم دوستم نوشته:
+> Use native material 3 expressive shapes and shape transitions
+> Native bounce and motion physics documented by Google
+> https://m3.material.io/blog/building-with-m3-expressive
+> Use Google sans flex in different weights and rounding values
+> Documented here
+> https://fonts.google.com/specimen/Google+Sans+Flex?preview.script=Latn
+>
+> Make sure nothing floating is low in opacity  like the nav bar
+> Work on page transitions
+> State transitions (play/pause) and adapt a coherent style of "jiggle"
+>
+> We need support for lyrics
+> Embedded or external files, with word for word sync
+> And a emulation of word for word sync for lyrics without word by word sync
+> Words needs to have dynamic blur and gradients
+> ولی من میخوام بگم حواست باشه باعث نشه بهینه سازی های برنامه خراب بشن
+> و اینکه مستقیما از اونا استفاده نکن و مشابهشو بسبک برنامه خودمون بساز و اضافه کن
+
+**Summary:**
+1. GitHub Actions **secrets are set** (4 signing secrets, repo now `mhrsdev/music-player-mowj`) → release workflow signs with our key; first release signed this way needs one uninstall/reinstall of v0.1.0.
+2. The **play/stop button** is ugly/weird (v0.1.0 shows the distorted polygon; U3's geometry fix is pending release) → redesign as a clean, beautiful shape (circle ↔ rounded squircle spring morph), coherent "jiggle" state transitions (agent M1).
+3. **New bug:** the empty *Liked songs* screen layout overlaps (big circle icon over the title, hint text over the Play/Shuffle buttons) → U2.
+4. The app is **too small/shallow — nothing to discover, reaches the end of Home immediately** → much richer Home/discovery (agent H1).
+5. **Lyrics + dynamic cover-art background blur** with **word-by-word sync** (embedded or external files), an **emulated word-by-word sync** for lines lacking word timing, and **dynamic blur + gradient fill on words** (reference: `docs/design-reference/09-lyrics-reference-blur-wordsync.jpg`) → agent L1.
+6. **Material theming is missing** (Material You/dynamic color, M3 roles/shape) and **Settings is very empty** → M1 (theme) + U1 (Settings content).
+7. Friend's brief (to adopt in OUR OWN style, **not** copied from Google code): M3 Expressive shapes + shape transitions; native-style bounce/spring physics; Google Sans Flex in different weights and **roundness** (ROND axis); nothing floating may be low-opacity (nav bar etc.); page transitions; coherent jiggle for state transitions.
+8. **Constraint from the owner:** must **not break the app's optimizations** (battery/RAM), and **don't use Google's implementations directly — build similar ones in our own style**.
+
+---
+
+## D20 — 2026-10-23 — Build, update README, real songs in sample screenshots (+ misc bug reports)
+
+**Original (verbatim):**
+
+> بیلدو بگیر بعدش ریدیمیشو اپدیت کن و تو عکسهای نمونه برنامه بجای فرم اهنگ های حالی چنتا اهنگ دانلود کن قرار بده
+
+**Also in this stretch (verbatim, summarised):** "دکمه پخش خوبه دکمه توقف زشته ولی اگه پیشنهاد بهتری داره میتونه ارائه بده" (play button good, PAUSE button ugly — M1 to propose options, D19); "اگه آهنگ فایل lyric نداره پس نیازی به اینم نیست" (hide the lyrics button when the track has no lyrics → L1); "رفرش کردن لیستش کلا باگ هستش، برای این که یه موزیکی که دانلود کردم رو اضافه کنم ناچار شدم Clear Data کنم" (library refresh broken → F1/F2: rescan on every foreground, MediaStore observer while visible, force rescan, pending/non-music filters).
+
+**Summary:** (1) take the full build, (2) update README/docs, (3) the sample/screenshot data must show **real songs with real covers** instead of the invented empty-looking placeholders → R2 (CC/public-domain tracks + covers, metadata only; audio not committed; debug-only assets; CREDITS.md). Final README screenshot refresh happens after the UI agents finish.

@@ -44,12 +44,16 @@ import java.util.Objects;
  * Library folders are picked with the system folder picker (Storage Access Framework) and stored as paths.
  */
 public final class SettingsFragment extends Fragment {
-    public static final String REPO_URL = "https://github.com/mhrsdev/music-player";
+    public static final String REPO_URL = "https://github.com/mhrsdev/music-player-mowj";
     private static final String STATE_PICK_EXCLUDE = "pick_exclude";
 
     private SettingsFragmentBinding b;
     private SettingsViewModel vm;
     private LibrarySettingsViewModel library;
+    private DeviceSettingsViewModel device;
+    private SettingsRowBinding notifRow;
+    private SettingsRowBinding cacheRow;
+    private SettingsRowBinding dbRow;
     private TextView[] sleepChips;
     private SettingsRowBinding rescanRow;
     private NumberFormat nf;
@@ -72,14 +76,147 @@ public final class SettingsFragment extends Fragment {
                 .get(SettingsViewModel.class);
         library = new ViewModelProvider(this, LibrarySettingsViewModel.factory(c.settings(), c.libraryAdmin(), c.library))
                 .get(LibrarySettingsViewModel.class);
+        device = new ViewModelProvider(this, DeviceSettingsViewModel.factory(c.settings(), c.ioExecutor,
+                requireContext().getCacheDir(), requireContext().getDatabasePath("x").getParentFile()))
+                .get(DeviceSettingsViewModel.class);
         nf = NumberFormat.getIntegerInstance(getResources().getConfiguration().getLocales().get(0));
         Adaptive.limitWidth(b.settingsContent, Adaptive.CONTENT_MAX_DP);
 
         bindPreferences();
+        bindMotionAndColor();
         bindFolders();
+        bindMinLength();
         bindRescan();
         bindFeatures();
+        bindNotifications();
+        bindBattery();
+        bindStorage();
         bindAbout();
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        renderNotifications(); // the person may come back from the system settings page
+        device.refreshSizes();
+    }
+
+    // ---- motion, dynamic color ----
+
+    private void bindMotionAndColor() {
+        b.reduceMotion.setOnCheckedChangeListener((v, on) -> device.setReduceMotion(on));
+        device.getReduceMotion().observe(getViewLifecycleOwner(), on -> {
+            if (b.reduceMotion.isChecked() != Boolean.TRUE.equals(on)) b.reduceMotion.setChecked(Boolean.TRUE.equals(on));
+        });
+        DynamicColor dc = DynamicColor.lookup(requireContext());
+        if (dc == null) return; // shown only when the theme layer supports it on this phone
+        b.dynamicColor.setVisibility(View.VISIBLE);
+        b.dynamicColorSub.setVisibility(View.VISIBLE);
+        b.dynamicColor.setText(R.string.settings_dynamic_color);
+        b.dynamicColor.setChecked(dc.isEnabled());
+        b.dynamicColor.setOnCheckedChangeListener((v, on) -> {
+            dc.setEnabled(on);
+            requireActivity().recreate();
+        });
+    }
+
+    // ---- skip short audio ----
+
+    private void bindMinLength() {
+        int[] choices = LibrarySettingsViewModel.MIN_LENGTH_CHOICES;
+        TextView[] chips = new TextView[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            int sec = choices[i];
+            TextView chip = chip(sec == 0 ? getString(R.string.settings_min_length_all)
+                    : getString(R.string.settings_seconds_f, nf.format(sec)));
+            chip.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+                library.setMinTrackSeconds(sec);
+            });
+            b.minLengthRow.addView(chip);
+            chips[i] = chip;
+        }
+        library.getMinTrackSeconds().observe(getViewLifecycleOwner(), cur -> {
+            for (int i = 0; i < choices.length; i++) chips[i].setSelected(cur != null && cur == choices[i]);
+        });
+    }
+
+    // ---- notifications ----
+
+    private void bindNotifications() {
+        notifRow = row(b.notifCard, R.drawable.ic_stat_playback, "", "", v -> openNotificationSettings());
+        chevron(notifRow);
+        renderNotifications();
+    }
+
+    private void renderNotifications() {
+        if (notifRow == null) return;
+        boolean on = androidx.core.app.NotificationManagerCompat.from(requireContext()).areNotificationsEnabled();
+        notifRow.rowTitle.setText(on ? R.string.settings_notif_on : R.string.settings_notif_off);
+        notifRow.rowSub.setText(on ? R.string.settings_notif_on_sub : R.string.settings_notif_off_sub);
+        notifRow.getRoot().setContentDescription(notifRow.rowTitle.getText() + ". " + notifRow.rowSub.getText()
+                + ". " + getString(R.string.settings_notif_open));
+    }
+
+    private void openNotificationSettings() {
+        Intent i = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+        try {
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", requireContext().getPackageName(), null)));
+        }
+    }
+
+    // ---- battery ----
+
+    private void bindBattery() {
+        TextView[] chips = {b.batteryAuto, b.batteryOn, b.batteryOff};
+        com.mhrsdev.musicplayer.data.settings.BatterySaverMode[] modes =
+                com.mhrsdev.musicplayer.data.settings.BatterySaverMode.values(); // AUTO, ON, OFF
+        int[] explain = {R.string.settings_battery_explain_auto, R.string.settings_battery_explain_on,
+                R.string.settings_battery_explain_off};
+        for (int i = 0; i < chips.length; i++) {
+            com.mhrsdev.musicplayer.data.settings.BatterySaverMode m = modes[i];
+            chips[i].setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+                device.setBatteryMode(m);
+            });
+        }
+        device.getBatteryMode().observe(getViewLifecycleOwner(), m -> {
+            for (int i = 0; i < chips.length; i++) chips[i].setSelected(modes[i] == m);
+            b.batterySub.setText(explain[m.ordinal()]);
+        });
+    }
+
+    // ---- storage ----
+
+    private void bindStorage() {
+        cacheRow = row(b.storageCard, R.drawable.settings_ic_refresh, getString(R.string.settings_cache), "", null);
+        cacheRow.rowIcon.setImageResource(R.drawable.ic_mp_folder);
+        cacheRow.rowEnd.setVisibility(View.VISIBLE);
+        cacheRow.rowEnd.setImageResource(R.drawable.ic_mp_close);
+        cacheRow.rowEnd.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        cacheRow.rowEnd.setContentDescription(getString(R.string.settings_cache_clear));
+        cacheRow.rowEnd.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            device.clearCache();
+            Toast.makeText(requireContext(), R.string.settings_cache_cleared, Toast.LENGTH_SHORT).show();
+        });
+        dbRow = row(b.storageCard, R.drawable.settings_ic_license, getString(R.string.settings_db), "", null);
+        device.getSizes().observe(getViewLifecycleOwner(), sz -> {
+            boolean busy = sz.cacheBytes() < 0;
+            cacheRow.rowSub.setText(busy ? getString(R.string.settings_computing)
+                    : getString(R.string.settings_cache_sub, size(sz.cacheBytes())));
+            dbRow.rowSub.setText(busy ? getString(R.string.settings_computing)
+                    : getString(R.string.settings_db_sub, size(sz.databaseBytes())));
+            cacheRow.rowEnd.setEnabled(!busy && sz.cacheBytes() > 0);
+            cacheRow.rowEnd.setAlpha(!busy && sz.cacheBytes() > 0 ? 1f : 0.38f);
+        });
+    }
+
+    private String size(long bytes) {
+        return android.text.format.Formatter.formatShortFileSize(requireContext(), bytes);
     }
 
     @Override public void onSaveInstanceState(@NonNull Bundle out) {
@@ -143,8 +280,8 @@ public final class SettingsFragment extends Fragment {
             ThemeController.get(requireContext()).setArtworkColorsEnabled(on);
         });
         b.onlineLyrics.setOnCheckedChangeListener((v, on) -> vm.setOnlineLyrics(on));
-        b.batterySaver.setOnCheckedChangeListener((v, on) -> vm.setBatterySaver(on));
 
+        vm.refresh();
         vm.getState().observe(getViewLifecycleOwner(), s -> {
             for (int i = 0; i < themes.length; i++) themes[i].setSelected(Theme.values()[i] == s.theme());
             for (int i = 0; i < seeks.length; i++) seeks[i].setSelected(SeekStyle.values()[i] == s.seekStyle());
@@ -152,7 +289,6 @@ public final class SettingsFragment extends Fragment {
             for (int i = 0; i < presets.length; i++) sleepChips[i].setSelected(presets[i] == s.sleepDefaultMinutes());
             if (b.artworkColors.isChecked() != s.artworkColors()) b.artworkColors.setChecked(s.artworkColors());
             if (b.onlineLyrics.isChecked() != s.onlineLyrics()) b.onlineLyrics.setChecked(s.onlineLyrics());
-            if (b.batterySaver.isChecked() != s.batterySaver()) b.batterySaver.setChecked(s.batterySaver());
         });
     }
 
@@ -284,7 +420,13 @@ public final class SettingsFragment extends Fragment {
         if (scanning) {
             sub = getString(R.string.settings_rescan_running);
         } else if (r == null) {
-            sub = getString(R.string.settings_rescan_sub, songs);
+            long at = com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner.lastScanAtMs(requireContext());
+            long now = System.currentTimeMillis();
+            CharSequence when = now - at < android.text.format.DateUtils.MINUTE_IN_MILLIS
+                    ? getString(R.string.settings_just_now)
+                    : android.text.format.DateUtils.getRelativeTimeSpanString(at, now,
+                            android.text.format.DateUtils.MINUTE_IN_MILLIS);
+            sub = at <= 0 ? getString(R.string.settings_rescan_sub, songs) : getString(R.string.settings_rescan_last, songs, when);
         } else if (!r.ok()) {
             sub = getString(R.string.settings_rescan_failed);
         } else if (!r.changed()) {
@@ -303,32 +445,55 @@ public final class SettingsFragment extends Fragment {
 
     private void bindFeatures() {
         List<FeatureScreens.Entry> entries = FeatureScreens.available(requireContext());
-        b.featuresLabel.setVisibility(entries.isEmpty() ? View.GONE : View.VISIBLE);
-        b.featuresCard.setVisibility(entries.isEmpty() ? View.GONE : View.VISIBLE);
+        int others = 0;
+        boolean sound = false;
         for (FeatureScreens.Entry e : entries) {
-            SettingsRowBinding r = row(b.featuresCard, e.icon(), getString(e.title()), getString(e.subtitle()), v -> {
+            boolean isSound = "sound".equals(e.tag());
+            if (isSound) sound = true; else others++;
+            SettingsRowBinding r = row(isSound ? b.soundCard : b.featuresCard, e.icon(), getString(e.title()), getString(e.subtitle()), v -> {
                 if (!FeatureScreens.open(this, e)) {
                     Toast.makeText(requireContext(), R.string.settings_feature_unavailable, Toast.LENGTH_SHORT).show();
                 }
             });
             chevron(r);
         }
+        b.soundCard.setVisibility(sound ? View.VISIBLE : View.GONE);
+        b.featuresLabel.setVisibility(others == 0 ? View.GONE : View.VISIBLE);
+        b.featuresCard.setVisibility(others == 0 ? View.GONE : View.VISIBLE);
     }
 
     private void bindAbout() {
-        row(b.aboutCard, R.drawable.settings_ic_info, getString(R.string.app_name),
-                getString(R.string.settings_version, versionName()), null);
+        b.aboutVersion.setText(getString(R.string.settings_about_version, versionName(), String.valueOf(versionCode())));
         row(b.aboutCard, R.drawable.settings_ic_license, getString(R.string.settings_license),
                 getString(R.string.settings_license_sub), null);
-        SettingsRowBinding gh = row(b.aboutCard, R.drawable.settings_ic_open, getString(R.string.settings_source),
-                REPO_URL.replace("https://", ""), v -> {
-                    try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(REPO_URL)));
-                    } catch (ActivityNotFoundException e) {
-                        Toast.makeText(requireContext(), REPO_URL, Toast.LENGTH_LONG).show();
-                    }
-                });
-        chevron(gh);
+        chevron(row(b.aboutCard, R.drawable.settings_ic_info, getString(R.string.settings_licenses),
+                getString(R.string.settings_licenses_sub), v -> new AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.settings_licenses)
+                        .setMessage(R.string.settings_licenses_body)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()));
+        chevron(row(b.aboutCard, R.drawable.settings_ic_open, getString(R.string.settings_source),
+                REPO_URL.replace("https://", ""), v -> openUrl(REPO_URL)));
+        chevron(row(b.aboutCard, R.drawable.search_ic_history, getString(R.string.settings_feedback),
+                getString(R.string.settings_feedback_sub), v -> openUrl(REPO_URL + "/issues/new")));
+    }
+
+    private void openUrl(String url) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(requireContext(), url, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private TextView chip(CharSequence text) {
+        TextView chip = new TextView(new ContextThemeWrapper(requireContext(), R.style.Search_Chip), null, 0);
+        chip.setText(text);
+        ViewGroup.MarginLayoutParams lp = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48));
+        lp.setMarginStart(dp(4));
+        lp.setMarginEnd(dp(4));
+        chip.setLayoutParams(lp);
+        return chip;
     }
 
     // ---- row helpers ----
@@ -367,6 +532,15 @@ public final class SettingsFragment extends Fragment {
         return Math.round(v * getResources().getDisplayMetrics().density);
     }
 
+    private long versionCode() {
+        try {
+            PackageInfo info = requireContext().getPackageManager().getPackageInfo(requireContext().getPackageName(), 0);
+            return androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(info);
+        } catch (PackageManager.NameNotFoundException e) {
+            return 0;
+        }
+    }
+
     private String versionName() {
         try {
             PackageInfo info = requireContext().getPackageManager().getPackageInfo(requireContext().getPackageName(), 0);
@@ -380,5 +554,8 @@ public final class SettingsFragment extends Fragment {
         super.onDestroyView();
         b = null;
         rescanRow = null;
+        notifRow = null;
+        cacheRow = null;
+        dbRow = null;
     }
 }

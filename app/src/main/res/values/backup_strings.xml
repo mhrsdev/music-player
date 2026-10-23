@@ -1,0 +1,30 @@
+<resources>
+    <string name="backup_title">Backup &amp; restore</string>
+    <string name="backup_intro">Likes, playlists, play history and settings in one file you keep. Music files and caches are not included.</string>
+    <string name="backup_export_group">Export</string>
+    <string name="backup_export_body">Save a copy on your phone, a drive or any app that stores files.</string>
+    <string name="backup_export_action">Export backup</string>
+    <string name="backup_restore_group">Restore</string>
+    <string name="backup_restore_body">Pick a backup file. You see what it contains before anything changes.</string>
+    <string name="backup_choose_action">Choose backup file</string>
+    <string name="backup_in_file">In this file</string>
+    <string name="backup_row_playlists">Playlists</string>
+    <string name="backup_row_likes">Liked songs</string>
+    <string name="backup_row_plays">Played songs</string>
+    <string name="backup_row_settings">Settings</string>
+    <string name="backup_row_unmatched">Not in this library</string>
+    <string name="backup_unmatched_sub">These songs are skipped. If you just copied your music here, rescan the library first.</string>
+    <string name="backup_mode_label">How to restore</string>
+    <string name="backup_mode_merge">Merge</string>
+    <string name="backup_mode_replace">Replace</string>
+    <string name="backup_mode_merge_sub">Adds what is missing and keeps what you already have.</string>
+    <string name="backup_mode_replace_sub">Erases your current likes, playlists and history first.</string>
+    <string name="backup_restore_action">Restore</string>
+    <string name="backup_working">Working…</string>
+    <string name="backup_done_export">Backup saved: %1$s playlists, %2$s liked songs, %3$s played songs.</string>
+    <string name="backup_done_restore">Restored: %1$s playlists, %2$s liked songs, %3$s played songs.</string>
+    <string name="backup_err_corrupt">This file is not a valid backup.</string>
+    <string name="backup_err_newer">This backup comes from a newer version of the app. Update the app and try again.</string>
+    <string name="backup_err_io">The file could not be read or written.</string>
+    <string name="backup_err_expired">Choose the backup file again.</string>
+</resources>

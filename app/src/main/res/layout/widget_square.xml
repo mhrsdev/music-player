@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 2x2: the cover fills the widget, a translucent pill with the controls sits on its bottom edge. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UseAppTint"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg"
+        android:tint="@color/widget_default_bg" />
+
+    <FrameLayout
+        android:id="@+id/cover_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/widget_cd_open">
+        <ImageView android:id="@+id/cover_bg" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:scaleType="fitXY" android:src="@drawable/widget_cover_bg" android:tint="@color/widget_default_cover" />
+        <ImageView android:id="@+id/cover_note" android:layout_width="44dp" android:layout_height="44dp" android:layout_gravity="center" android:layout_marginBottom="30dp" android:importantForAccessibility="no" android:src="@drawable/widget_ic_note" android:tint="@color/widget_default_note" />
+        <ImageView android:id="@+id/cover" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:scaleType="fitXY" android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Fixed size: a lone match_parent child would not be re-measured inside a wrap_content FrameLayout. -->
+    <FrameLayout
+        android:layout_width="124dp"
+        android:layout_height="52dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="14dp">
+        <ImageView android:id="@+id/pill" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:scaleType="fitXY" android:src="@drawable/widget_pill" android:tint="@color/widget_default_bg" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layoutDirection="ltr"
+            android:orientation="horizontal"
+            android:padding="4dp">
+            <ImageView android:id="@+id/prev" android:layout_width="36dp" android:layout_height="36dp" android:contentDescription="@string/widget_cd_previous" android:padding="6dp" android:src="@drawable/widget_ic_prev" android:tint="@color/widget_default_text" />
+            <FrameLayout android:id="@+id/play_frame" android:layout_width="44dp" android:layout_height="44dp" android:contentDescription="@string/widget_cd_play">
+                <ImageView android:id="@+id/play_bg" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:src="@drawable/widget_oval" android:tint="@color/widget_default_primary" />
+                <ImageView android:id="@+id/play" android:layout_width="match_parent" android:layout_height="match_parent" android:importantForAccessibility="no" android:padding="10dp" android:src="@drawable/widget_ic_play" android:tint="@color/widget_default_on_primary" />
+            </FrameLayout>
+            <ImageView android:id="@+id/next" android:layout_width="36dp" android:layout_height="36dp" android:contentDescription="@string/widget_cd_next" android:padding="6dp" android:src="@drawable/widget_ic_next" android:tint="@color/widget_default_text" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

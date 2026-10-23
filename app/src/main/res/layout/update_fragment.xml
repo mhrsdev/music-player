@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/nav_back"
+        android:src="@drawable/nav_ic_back"
+        app:tint="?attr/mpOnSurface" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/scr_bottom_chrome">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/Scr.PageTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:paddingTop="4dp" android:text="@string/update_title" />
+            <TextView style="@style/Settings.RowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/update_current" />
+            <TextView android:id="@+id/current_version" style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+            <TextView android:id="@+id/status_title" style="@style/Scr.SectionTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityLiveRegion="polite" android:paddingHorizontal="24dp" android:paddingTop="16dp" />
+            <TextView android:id="@+id/status_sub" style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="4dp" />
+            <ProgressBar
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="12dp"
+                android:max="100"
+                android:progressTint="?attr/mpPrimary"
+                android:indeterminateTint="?attr/mpPrimary"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/primary_action"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/nav_button_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:textAllCaps="false"
+                android:textColor="?attr/mpOnPrimary"
+                android:textSize="16sp"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/check_now"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="24dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/update_btn_check"
+                android:textAllCaps="false"
+                android:textColor="?attr/mpPrimary"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/skip"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="24dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/update_btn_skip"
+                android:textAllCaps="false"
+                android:textColor="?attr/mpOnSurfaceVariant"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <TextView android:id="@+id/notes_label" style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/update_notes_title" android:visibility="gone" />
+            <TextView android:id="@+id/notes" style="@style/Scr.Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingHorizontal="24dp" android:textIsSelectable="true" android:visibility="gone" />
+
+            <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/update_settings" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/auto_check"
+                style="@style/Settings.Switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/update_auto" />
+            <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/update_auto_sub" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/prereleases"
+                style="@style/Settings.Switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/update_pre" />
+            <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/update_pre_sub" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/wifi_only"
+                style="@style/Settings.Switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/update_wifi" />
+            <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/update_wifi_sub" />
+            <TextView android:id="@+id/last_checked" style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

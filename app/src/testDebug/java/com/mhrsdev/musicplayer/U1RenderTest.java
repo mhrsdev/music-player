@@ -31,17 +31,17 @@ import org.robolectric.shadows.ShadowLooper;
 @Config(application = FakeRenderApp.class, sdk = 35)
 public class U1RenderTest {
 
-    @Test @Config(qualifiers = "w411dp-h2200dp-night-xhdpi")
-    public void settings411() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-411-dark", 411, 2200); }
+    @Test @Config(qualifiers = "w411dp-h3400dp-night-xhdpi")
+    public void settings411() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-411-dark", 411, 3400); }
 
-    @Test @Config(qualifiers = "w360dp-h2300dp-notnight-xhdpi")
-    public void settings360Light() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-360-light", 360, 2300); }
+    @Test @Config(qualifiers = "w360dp-h3700dp-notnight-xhdpi")
+    public void settings360Light() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-360-light", 360, 3700); }
 
-    @Test @Config(qualifiers = "w411dp-h2600dp-night-xhdpi", fontScale = 1.3f)
-    public void settingsFont13() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-411-font1.3", 411, 2600); }
+    @Test @Config(qualifiers = "w411dp-h4300dp-night-xhdpi", fontScale = 1.3f)
+    public void settingsFont13() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-411-font1.3", 411, 4300); }
 
-    @Test @Config(qualifiers = "fa-w411dp-h2200dp-night-xhdpi")
-    public void settingsFa() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-411-fa", 411, 2200); }
+    @Test @Config(qualifiers = "fa-w411dp-h3500dp-notnight-xhdpi")
+    public void settingsFa() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-411-fa-light", 411, 3500); }
 
     @Test @Config(qualifiers = "w800dp-h1280dp-night-mdpi")
     public void settings800() throws Exception { render(ScreenNavigator.Tab.SETTINGS, null, "settings-800-dark", 800, 1280); }
