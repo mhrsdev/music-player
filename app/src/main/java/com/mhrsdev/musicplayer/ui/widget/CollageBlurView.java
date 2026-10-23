@@ -23,6 +23,7 @@ import com.mhrsdev.musicplayer.ui.theme.Tokens;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Card background (Library "Liked songs", DESIGN.md 03): up to three covers side by side, box-blurred once into a
@@ -32,7 +33,11 @@ import java.util.concurrent.ExecutorService;
  */
 public final class CollageBlurView extends View {
     private static final int W = 96, H = 48, COVER_PX = 96;
-    private static final ExecutorService EXEC = ArtworkLoader.idleExitPool(1, "collage-blur");
+    private static final ExecutorService EXEC = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "collage-blur");
+        t.setPriority(Thread.MIN_PRIORITY);
+        return t;
+    });
     private static final LruCache<String, Bitmap> CACHE = new LruCache<>(4);
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 

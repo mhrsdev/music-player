@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import androidx.annotation.OptIn;
-import com.mhrsdev.musicplayer.data.artwork.ArtworkSource;
 import androidx.media3.common.util.BitmapLoader;
 import androidx.media3.common.util.UnstableApi;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -27,11 +26,11 @@ import java.util.concurrent.TimeUnit;
 final class ArtworkLoader implements BitmapLoader {
     static final int MAX_PX = 512;
 
-    private final ArtworkSource source;
+    private final ContentResolver resolver;
     private final ListeningExecutorService executor;
 
     ArtworkLoader(Context context) {
-        source = ArtworkSource.get(context);
+        resolver = context.getContentResolver();
         ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         pool.allowCoreThreadTimeOut(true);
         executor = MoreExecutors.listeningDecorator(pool);
@@ -66,9 +65,16 @@ final class ArtworkLoader implements BitmapLoader {
                     && !ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme)) {
                 throw new IOException("Unsupported artwork scheme: " + scheme);
             }
-            // The scanner's albumart URIs often cannot be opened on Android 10+; the shared chain finds the cover anyway.
-            Bitmap bitmap = source.load(uri.toString(), MAX_PX, Bitmap.Config.RGB_565);
-            if (bitmap == null) throw new IOException("No artwork: " + uri);
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            try (InputStream in = resolver.openInputStream(uri)) {
+                BitmapFactory.decodeStream(in, null, bounds);
+            }
+            Bitmap bitmap;
+            try (InputStream in = resolver.openInputStream(uri)) {
+                bitmap = BitmapFactory.decodeStream(in, null, decodeOptions(bounds));
+            }
+            if (bitmap == null) throw new IOException("Undecodable artwork: " + uri);
             return bitmap;
         });
     }

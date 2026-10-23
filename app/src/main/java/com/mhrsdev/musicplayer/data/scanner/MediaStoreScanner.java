@@ -32,9 +32,6 @@ public final class MediaStoreScanner {
     private static final String PREFS = "scanner_state";
     private static final String KEY_SCANNED_AT = "scanned_at_ms";
     private static final String KEY_GENERATION = "media_generation";
-    /** Bump when the stored row shape changes (v2: untagged albums get their audio URI as artwork): forces a full rewrite. */
-    private static final int ROW_FORMAT = 2;
-    private static final String KEY_FORMAT = "row_format";
 
     @SuppressWarnings("deprecation") // DATA is the only column with the absolute path on API 26-28, still readable later
     private static final String[] PROJECTION = {
@@ -62,7 +59,7 @@ public final class MediaStoreScanner {
     /** True when a scan is worth running at app start: never scanned, or MediaStore changed since. */
     public boolean isStale() {
         long lastScan = state.getLong(KEY_SCANNED_AT, 0);
-        if (lastScan == 0 || state.getInt(KEY_FORMAT, 1) != ROW_FORMAT) return true;
+        if (lastScan == 0) return true;
         long generation = currentGeneration();
         if (generation >= 0) return generation != state.getLong(KEY_GENERATION, -1);
         return System.currentTimeMillis() - lastScan > STALE_AFTER_MS;
@@ -72,7 +69,6 @@ public final class MediaStoreScanner {
         long generation = currentGeneration(); // read first: changes during the scan make the next start re-scan
         SQLiteDatabase db = helper.getWritableDatabase();
         TrackQueries tracks = new TrackQueries(db);
-        boolean rewriteAll = state.getInt(KEY_FORMAT, 1) != ROW_FORMAT; // old rows lack the new artwork URI
         IncrementalDiff diff = new IncrementalDiff(tracks.modifiedById());
         FolderFilter folders = new FolderFilter(orEmpty(settings.includedFolders().getValue()),
                 orEmpty(settings.excludedFolders().getValue()));
@@ -88,7 +84,7 @@ public final class MediaStoreScanner {
                 ScannedAudio audio = read(c);
                 if (!folders.accepts(audio.path())) continue;
                 IncrementalDiff.Change change = diff.visit(String.valueOf(audio.id()), audio.modifiedMs());
-                if (change == IncrementalDiff.Change.UNCHANGED && !rewriteAll) continue;
+                if (change == IncrementalDiff.Change.UNCHANGED) continue;
                 tracks.upsert(audio.toTrack(), audio.modifiedMs());
                 if (change == IncrementalDiff.Change.ADDED) added++; else updated++;
                 if (++pending % CHUNK == 0) { // commit and reopen: partial progress is safe, the diff is idempotent
@@ -105,8 +101,7 @@ public final class MediaStoreScanner {
         } finally {
             db.endTransaction();
         }
-        state.edit().putLong(KEY_SCANNED_AT, System.currentTimeMillis()).putLong(KEY_GENERATION, generation)
-                .putInt(KEY_FORMAT, ROW_FORMAT).apply();
+        state.edit().putLong(KEY_SCANNED_AT, System.currentTimeMillis()).putLong(KEY_GENERATION, generation).apply();
         return new ScanResult(true, added, updated, removed);
     }
 

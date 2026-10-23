@@ -39,7 +39,6 @@ public class ArtworkView extends View {
     private int seed;
     @Nullable private String uri;
     @Nullable private String wantedKey;
-    @Nullable private ArtworkLoader.Request request;
     @Nullable private Bitmap bitmap;
     @Nullable private String monogram;
     private float fade = 1f;
@@ -120,8 +119,6 @@ public class ArtworkView extends View {
     }
 
     private void requestLoad() {
-        if (request != null) request.cancel(); // a recycled row must not keep a stale decode alive
-        request = null;
         if (uri == null || getWidth() == 0) {
             wantedKey = null;
             return;
@@ -136,26 +133,9 @@ public class ArtworkView extends View {
             setBitmap(hit, false);
             return;
         }
-        request = loader.load(u, size, (key, bmp) -> {
+        loader.load(u, size, (key, bmp) -> {
             if (key.equals(wantedKey)) setBitmap(bmp, true);
         });
-    }
-
-    @Override protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        // Off screen (scrolled away or pooled): stop the pending decode and let go of the bitmap so a pooled holder
-        // never pins one beyond the LruCache cap.
-        if (request != null) request.cancel();
-        request = null;
-        if (bitmap != null) {
-            bitmap = null;
-            artPaint.setShader(null);
-        }
-    }
-
-    @Override protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        if (bitmap == null && uri != null) requestLoad(); // cache hit in the common case
     }
 
     private void setBitmap(@Nullable Bitmap b, boolean animate) {
