@@ -29,6 +29,9 @@ final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHo
         void onTrackClick(HomeSection section, Track track);
 
         void onShuffle(HomeSection section);
+
+        /** "See all" on the Recently added hero row. */
+        void onSeeAll(HomeSection section);
     }
 
     /** One row of the Home list. */
@@ -95,11 +98,17 @@ final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHo
         Object b = ((Bound<?>) holder).b;
         if (b instanceof HomeHeaderBinding h) {
             h.title.setText(row.section().title());
-            boolean list = row.section().style() == HomeSectionStyle.LIST;
-            h.action.setVisibility(list ? View.VISIBLE : View.GONE);
-            h.action.setText(R.string.home_shuffle);
-            h.action.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.nav_ic_shuffle, 0, 0, 0);
-            h.action.setOnClickListener(v -> listener.onShuffle(row.section()));
+            HomeSectionStyle style = row.section().style();
+            h.action.setVisibility(style == HomeSectionStyle.CAROUSEL ? View.GONE : View.VISIBLE);
+            if (style == HomeSectionStyle.LIST) {
+                h.action.setText(R.string.home_shuffle);
+                h.action.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.nav_ic_shuffle, 0, 0, 0);
+                h.action.setOnClickListener(v -> listener.onShuffle(row.section()));
+            } else {
+                h.action.setText(R.string.home_see_all);
+                h.action.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.nav_ic_chevron, 0);
+                h.action.setOnClickListener(v -> listener.onSeeAll(row.section()));
+            }
         } else if (b instanceof LibraryRowTrackBinding t) {
             Track track = row.track();
             t.title.setText(track.title());

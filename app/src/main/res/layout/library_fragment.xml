@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
@@ -48,7 +49,7 @@
                     android:layout_height="28dp"
                     android:importantForAccessibility="no"
                     android:src="@drawable/nav_ic_heart"
-                    android:tint="@color/scr_liked" />
+                    app:tint="@color/scr_liked" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -75,7 +76,7 @@
                 android:background="@drawable/library_liked_play"
                 android:contentDescription="@string/library_play_liked"
                 android:src="@drawable/nav_ic_play"
-                android:tint="#1A1300" />
+                app:tint="#1A1300" />
         </FrameLayout>
 
         <Space android:layout_width="match_parent" android:layout_height="16dp" />
@@ -126,7 +127,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="?attr/mpOnSurfaceVariant" />
+                    app:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -175,7 +176,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="?attr/mpOnSurfaceVariant" />
+                    app:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -224,7 +225,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="?attr/mpOnSurfaceVariant" />
+                    app:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -268,7 +269,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_history"
-                    android:tint="?attr/mpOnSurfaceVariant" />
+                    app:tint="?attr/mpOnSurfaceVariant" />
 
                 <ImageView
                     android:layout_width="48dp"
@@ -276,7 +277,7 @@
                     android:importantForAccessibility="no"
                     android:scaleType="center"
                     android:src="@drawable/nav_ic_chevron"
-                    android:tint="?attr/mpOnSurfaceVariant" />
+                    app:tint="?attr/mpOnSurfaceVariant" />
             </LinearLayout>
 
         <TextView
