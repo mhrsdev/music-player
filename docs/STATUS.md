@@ -34,12 +34,12 @@ _Last updated: 2026-10-23 — D5: agents stopped, sequential mode_
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
-_(none — all sub-agents stopped by owner, D5)_
+- 🔄 **T2** [Opus] UI foundation + 3 seek-bar styles — branch `task/t2-ui-foundation` (pushes WIP often). Only agent running (D5). Next in order: T5.
 
 ### Todo
 **Execution order (sequential, ONE sub-agent at a time — D5):** T2 → T5 → T6 → T7 → T-W → T3 → T4 → T8 → T9 → T10. Each runs in its own branch `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally into `main`.
 Partial WIP from the stopped wave-1 agents is on origin: `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` (each only a few files — treat as a head start, or restart cleanly); `task/t6-playback` has nothing yet. Briefs for each task are in the task descriptions below + `docs/DIRECTIVES.md`; reuse the wave-1 scoping (each agent touches only its own package; own Koin module file `di/<X>Module.kt`; T8 wires them).
-- ⬜ **T2** [Opus] UI foundation + 3 seek-bar styles (Wavy/Waveform/**Bars** = voice-memo loudness bars, D4), `domain/repository/WaveformRepository.kt` contract (`fun waveformFor(track: Track, bars: Int = 128): Flow<FloatArray?>`) + fake; theme, components, nav shell per `docs/design/DESIGN.md`.
+- (T2 → see In progress) UI foundation + 3 seek-bar styles (Wavy/Waveform/**Bars** = voice-memo loudness bars, D4), `domain/repository/WaveformRepository.kt` contract (`fun waveformFor(track: Track, bars: Int = 128): Flow<FloatArray?>`) + fake; theme, components, nav shell per `docs/design/DESIGN.md`.
 - ⬜ **T-W** [Sonnet] Waveform extractor (MediaExtractor/MediaCodec → RMS → bars, LRU+disk cache) in `data/waveform/`.
 - ~~T1~~ (done) Scaffold Gradle project (app module, version catalog, Compose + M3 Expressive, Media3, Room, DI), Android SDK setup, `./gradlew assembleDebug` works, domain models/interfaces per ARCHITECTURE.md, in-memory fakes with sample data, CI workflow (GitHub Actions build + lint + unit tests).
 - ⬜ **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings (against fakes).
@@ -54,6 +54,7 @@ Partial WIP from the stopped wave-1 agents is on origin: `task/t2-ui-foundation`
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: Owner: continue, one sub at a time. T2 launched (Opus).
 - 2026-10-23: D5: all wave-1 agents stopped; WIP pushed to task branches; switched to sequential single-agent mode. Next: launch T2.
 - 2026-10-23: D4 archived. Wave 1 launched in isolated worktrees: T2 (Opus), T5, T6, T7, T-W (Sonnet). Wave 2 after T2 merges: T3 + T4 (Opus, parallel).
 - 2026-10-23: T2a done; mockups delivered in chat; waiting for owner feedback/approval, then T2–T4 (Opus) + T5–T7 (Sonnet) start.
