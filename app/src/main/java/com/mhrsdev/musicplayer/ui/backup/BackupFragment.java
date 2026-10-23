@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /** Backup &amp; restore screen. Public no-arg constructor: Settings opens it by class name. */
-public final class BackupFragment extends Fragment {
+public class BackupFragment extends Fragment {
     private BackupFragmentBinding b;
     private BackupViewModel vm;
     private NumberFormat numbers;

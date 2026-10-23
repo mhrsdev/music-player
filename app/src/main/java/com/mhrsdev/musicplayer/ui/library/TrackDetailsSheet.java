@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 /** Read-only "Track details": tags, file facts (from MediaStore, loaded on demand) and play count. */
-public final class TrackDetailsSheet extends BottomSheetDialogFragment {
+public class TrackDetailsSheet extends BottomSheetDialogFragment {
     private static final String TAG = "track_details";
     @Nullable private Track track;
     @Nullable private U2SheetBinding b;

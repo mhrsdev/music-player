@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 /** Width-class helpers so phone, tablet and landscape share one layout (no duplicated sw600dp screens). */
-public final class Adaptive {
+public class Adaptive {
     /** Reading width for single-column screens (settings, search) on wide windows. */
     public static final int CONTENT_MAX_DP = 640;
 

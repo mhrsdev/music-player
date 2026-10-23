@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-final class Fixtures {
+class Fixtures {
     private Fixtures() { }
 
     static String read(String name) throws IOException {

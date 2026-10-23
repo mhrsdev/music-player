@@ -14,7 +14,7 @@ import org.json.JSONObject;
  * drafts, tags that are not versions, releases without a {@code MusicPlayer-v*.apk} asset on https, and releases that
  * offer no checksum (neither the {@code <apk>.sha256} asset nor the asset's {@code digest}).
  */
-final class ReleaseParser {
+class ReleaseParser {
     private static final Pattern APK_NAME = Pattern.compile("MusicPlayer-v.+\\.apk");
     private static final String DIGEST_PREFIX = "sha256:";
 

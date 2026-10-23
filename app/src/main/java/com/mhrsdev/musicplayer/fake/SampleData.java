@@ -2,6 +2,8 @@ package com.mhrsdev.musicplayer.fake;
 
 import com.mhrsdev.musicplayer.domain.model.Album;
 import com.mhrsdev.musicplayer.domain.model.Artist;
+import com.mhrsdev.musicplayer.data.lyrics.LyricsParser;
+import com.mhrsdev.musicplayer.data.lyrics.WordTimingEstimator;
 import com.mhrsdev.musicplayer.domain.model.LyricLine;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
@@ -135,10 +137,6 @@ public final class SampleData {
             "90000|Turn it up, let the engine run loud", "96000|We're building a skyline out of the doubt",
             "102000|Hold the line, hold the line", "108000|The morning is here and it's burning bright", "118000|"};
 
-    private static final String[] PERSIAN_TIMES_AND_LINES = {
-            "0|", "10000|از کوه‌ها صدای باد می‌آید", "18000|دخترانی با گل‌ها و آفتاب",
-            "26000|راه دور است و دل ما روشن", "34000|آواز ما تا صبح بیدار می‌ماند", "44000|"};
-
     private static List<LyricLine> lines(String[] timesAndLines, boolean synced, boolean skipBlank) {
         List<LyricLine> out = new ArrayList<>();
         for (String s : timesAndLines) {
@@ -150,25 +148,53 @@ public final class SampleData {
         return out;
     }
 
-    /** Instrumentals: the piano (10-12), beats (13-16), Kevin MacLeod (22-24) and santoor (26) tracks. */
-    private static final Set<String> INSTRUMENTAL_IDS = Set.of("track-10", "track-11", "track-12", "track-13",
+    /** Instrumentals (no lyrics): piano (10-12), beats (13-16), Kevin MacLeod (22-24), santoor (26); plus track-4. */
+    private static final Set<String> NO_LYRICS_IDS = Set.of("track-4", "track-10", "track-11", "track-12", "track-13",
             "track-14", "track-15", "track-16", "track-22", "track-23", "track-24", "track-26");
 
+    /** Real word timing (enhanced LRC) for track-1 / track-25; the other synced tracks get emulated word timing. */
+    private static final String ENGLISH_ENHANCED = "[00:12.00]<00:12.00>Street<00:12.45>lights <00:13.10>flick<00:13.50>er "
+            + "<00:13.95>on <00:14.30>the <00:14.60>a<00:14.90>ve<00:15.20>nue<00:16.40>\n"
+            + "[00:17.50]<00:17.50>I <00:17.80>car<00:18.10>ry <00:18.50>the <00:18.80>weight <00:19.60>and <00:19.90>I "
+            + "<00:20.20>car<00:20.50>ry <00:20.90>the <00:21.20>view<00:22.40>\n"
+            + "[00:23.00]<00:23.00>Every <00:23.60>step <00:24.10>is <00:24.40>a <00:24.60>promise <00:25.40>I "
+            + "<00:25.70>make <00:26.20>to <00:26.50>myself<00:27.60>\n"
+            + "[00:28.50]<00:28.50>Nobody's <00:29.40>counting <00:30.20>but <00:30.50>I <00:30.80>still <00:31.30>keep "
+            + "<00:31.80>score<00:33.20>\n";
+    private static final String PERSIAN_ENHANCED = "[00:10.00]<00:10.00>از <00:10.80>کوه‌ها <00:12.00>صدای "
+            + "<00:13.20>باد <00:14.40>می‌آید<00:16.80>\n"
+            + "[00:18.00]<00:18.00>دخترانی <00:19.40>با <00:20.20>گل‌ها <00:21.00>و <00:21.40>آفتاب<00:24.80>\n"
+            + "[00:26.00]<00:26.00>راه <00:26.80>دور <00:27.80>است <00:28.80>و <00:29.20>دل <00:30.00>ما <00:30.60>روشن<00:32.40>\n"
+            + "[00:34.00]<00:34.00>آواز <00:35.00>ما <00:35.80>تا <00:36.60>صبح <00:37.60>بیدار <00:39.20>می‌ماند<00:41.00>\n"
+            + "[00:44.00]\n";
+
     /**
-     * Placeholder lyrics written for the UI (they are not the songs' real lyrics): track-3 has plain (unsynced) lyrics,
-     * instrumentals have none, the Persian song (track-25) has synced Persian lyrics, every other track has synced
-     * English lyrics.
+     * Placeholder lyrics written for the UI (they are not the songs' real lyrics). track-3 has plain (unsynced) lyrics,
+     * instrumentals and track-4 have none, track-1 and the Persian song (track-25) have real word timing, every other
+     * track has line-synced English lyrics with emulated word timing.
      */
     public static Lyrics lyricsFor(String trackId) {
-        if (INSTRUMENTAL_IDS.contains(trackId)) return Lyrics.none(trackId);
+        if (NO_LYRICS_IDS.contains(trackId)) return Lyrics.none(trackId);
         switch (trackId) {
             case "track-3":
                 return new Lyrics(trackId, lines(ENGLISH_TIMES_AND_LINES, false, true), false, "Embedded");
             case "track-25":
-                return new Lyrics(trackId, lines(PERSIAN_TIMES_AND_LINES, true, false), true, "LRC file");
+                return LyricsParser.toLyrics(trackId, PERSIAN_ENHANCED, "LRC file");
+            case "track-1": {
+                List<LyricLine> all = new ArrayList<>(lines(ENGLISH_TIMES_AND_LINES, true, false));
+                List<LyricLine> head = LyricsParser.toLyrics(trackId, ENGLISH_ENHANCED, "LRC file").lines();
+                for (int i = 0; i < all.size(); i++) {
+                    for (LyricLine h : head) if (h.timeMs() == all.get(i).timeMs()) all.set(i, h);
+                }
+                return estimated(trackId, all, "LRC file");
+            }
             default:
-                return new Lyrics(trackId, lines(ENGLISH_TIMES_AND_LINES, true, false), true, "LRCLIB");
+                return estimated(trackId, lines(ENGLISH_TIMES_AND_LINES, true, false), "LRCLIB");
         }
+    }
+
+    private static Lyrics estimated(String trackId, List<LyricLine> lines, String source) {
+        return new Lyrics(trackId, WordTimingEstimator.apply(lines), true, source);
     }
 
     private SampleData() { }

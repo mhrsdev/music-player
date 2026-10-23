@@ -1,32 +1,40 @@
 package com.mhrsdev.musicplayer.ui.player.lyrics;
 
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.LyricLine;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
 
 import java.util.Collections;
 import java.util.List;
 
-/** Centered lyric lines; active line full alpha + scale 1, others dimmed (DESIGN §8 alphas). Tap = seek (synced). */
-public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Holder> {
+/**
+ * Lyric lines as {@link LyricLineView}s. The active index decides each line's distance (emphasis, alpha, blur); only
+ * lines whose distance changed are rebound, and the per-frame word sweep is driven by {@link LyricsTicker}, which
+ * invalidates the active line's view alone. Tap = seek (synced lyrics).
+ */
+public class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Holder> {
     public interface OnLineClick { void onLine(LyricLine line); }
 
+    /** Lines farther than this from the active one share the same look, so they are not rebound on line changes. */
+    static final int FALLOFF_LINES = 6;
     private static final Object PAYLOAD_ACTIVE = new Object();
     private List<LyricLine> lines = Collections.emptyList();
     private boolean synced;
     private int active = -1;
     private final OnLineClick click;
+    private final LyricLineView.Clock clock;
     private int textColor = 0xFFFFFFFF;
+    private float textSp = 26f;
+    private boolean blur, decorative = true;
 
-    public LyricsAdapter(OnLineClick click) { this.click = click; }
+    public LyricsAdapter(OnLineClick click, LyricLineView.Clock clock) {
+        this.click = click;
+        this.clock = clock;
+    }
 
     @android.annotation.SuppressLint("NotifyDataSetChanged") // whole new song text
     public void setLyrics(Lyrics l) {
@@ -36,16 +44,18 @@ public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Hold
         notifyDataSetChanged();
     }
 
-    /** Rebinds only the two lines whose emphasis changed. */
+    public LyricLine lineAt(int i) { return lines.get(i); }
+
+    /** Rebinds only the lines whose distance-based look changed. */
     public void setActive(int index) {
         if (index == active) return;
         int old = active;
         active = index;
-        if (old >= 0 && old < lines.size()) notifyItemChanged(old, PAYLOAD_ACTIVE);
-        if (index >= 0 && index < lines.size()) notifyItemChanged(index, PAYLOAD_ACTIVE);
-        // past/upcoming alpha of the lines between also depends on the active index
-        int from = Math.min(old, index), to = Math.max(old, index);
-        for (int i = Math.max(0, from + 1); i < to && i < lines.size(); i++) notifyItemChanged(i, PAYLOAD_ACTIVE);
+        int n = lines.size();
+        int from = Math.max(0, Math.min(old, index) - FALLOFF_LINES);
+        int to = Math.min(n - 1, Math.max(old, index) + FALLOFF_LINES);
+        if (old < 0 || index < 0) { from = 0; to = n - 1; }
+        if (from <= to) notifyItemRangeChanged(from, to - from + 1, PAYLOAD_ACTIVE);
     }
 
     public int getActive() { return active; }
@@ -58,45 +68,59 @@ public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Hold
         notifyDataSetChanged();
     }
 
+    /** A−/A+ (SettingsStore lyrics text size). */
+    @android.annotation.SuppressLint("NotifyDataSetChanged")
+    public void setTextSizeSp(float sp) {
+        if (sp == textSp) return;
+        textSp = sp;
+        notifyDataSetChanged();
+    }
+
+    /** Blur (API 31+, not in battery saver / reduce motion / low RAM) and decorative lift/glow. */
+    @android.annotation.SuppressLint("NotifyDataSetChanged")
+    public void setEffects(boolean blur, boolean decorative) {
+        if (this.blur == blur && this.decorative == decorative) return;
+        this.blur = blur;
+        this.decorative = decorative;
+        notifyDataSetChanged();
+    }
+
     @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.lyrics_line_item, parent, false));
+        LyricLineView v = new LyricLineView(parent.getContext());
+        v.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        return new Holder(v);
     }
 
     @Override public void onBindViewHolder(@NonNull Holder h, int position, @NonNull List<Object> payloads) {
         if (payloads.isEmpty()) { onBindViewHolder(h, position); return; }
-        applyEmphasis(h, position, true);
+        h.view.setDistance(distance(position), true);
     }
 
     @Override public void onBindViewHolder(@NonNull Holder h, int position) {
         LyricLine line = lines.get(position);
-        h.text.setText(line.text());
-        h.text.setTextColor(textColor);
-        h.text.setOnClickListener(synced ? v -> click.onLine(line) : null);
-        h.text.setClickable(synced);
-        applyEmphasis(h, position, false);
+        h.view.bind(line, textSp, textColor, clock);
+        h.view.setEffects(blur && synced, decorative);
+        h.view.setOnClickListener(synced ? v -> click.onLine(line) : null);
+        h.view.setClickable(synced);
+        h.view.setDistance(distance(position), false);
     }
 
-    private void applyEmphasis(Holder h, int position, boolean animate) {
-        float alpha = LyricsScrollPolicy.alphaFor(position, active, synced);
-        float scale = !synced || position == active ? 1f : 0.94f;
-        View v = h.text;
-        if (animate) {
-            v.animate().alpha(alpha).scaleX(scale).scaleY(scale).setDuration(250).start();
-        } else {
-            v.animate().cancel();
-            v.setAlpha(alpha);
-            v.setScaleX(scale);
-            v.setScaleY(scale);
-        }
+    /** Signed distance from the active line (past lines negative); unsynced lyrics are all "active" (no falloff). */
+    float distance(int position) {
+        if (!synced) return 0f;
+        if (active < 0) return Math.min(FALLOFF_LINES, position + 1);
+        int d = position - active;
+        return Math.max(-FALLOFF_LINES, Math.min(FALLOFF_LINES, d));
     }
 
     @Override public int getItemCount() { return lines.size(); }
 
-    static final class Holder extends RecyclerView.ViewHolder {
-        final TextView text;
-        Holder(View v) {
+    static class Holder extends RecyclerView.ViewHolder {
+        final LyricLineView view;
+        Holder(LyricLineView v) {
             super(v);
-            text = (TextView) v;
+            view = v;
         }
     }
 }

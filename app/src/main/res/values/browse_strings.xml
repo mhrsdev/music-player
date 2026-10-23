@@ -1,0 +1,9 @@
+<resources>
+    <!-- Android Auto / Assistant browse tree (not shown inside the app). -->
+    <string name="browse_recent">Recently added</string>
+    <string name="browse_most_played">Most played</string>
+    <string name="browse_liked">Liked songs</string>
+    <string name="browse_playlists">Playlists</string>
+    <string name="browse_albums">Albums</string>
+    <string name="browse_artists">Artists</string>
+</resources>

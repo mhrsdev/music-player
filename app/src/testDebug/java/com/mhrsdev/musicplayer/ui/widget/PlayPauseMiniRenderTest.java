@@ -93,7 +93,7 @@ public class PlayPauseMiniRenderTest {
     public void miniLight() throws Exception { mini("u3-mini-light", 0); }
 
     @Test @Config(sdk = 35, qualifiers = "fa-ldrtl-" + DARK)
-    public void miniRtl() throws Exception { mini("u3-mini-fa-dark", 33); }
+    public void miniRtl() throws Exception { mini("u3-mini-fa-dark", 24); }
 
     private void mini(String name, int track) throws Exception {
         Activity a = Robolectric.buildActivity(WidgetGalleryActivity.class).setup().get();
