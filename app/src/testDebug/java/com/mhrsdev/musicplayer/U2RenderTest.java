@@ -111,6 +111,43 @@ public class U2RenderTest {
         save(a, null, "library-hub-dark");
     }
 
+    // ---- content-tinted headers ----
+
+    @Test @Config(sdk = 35, qualifiers = DARK)
+    public void tintAlbumDark() throws Exception { tint(ScreenNavigator.TrackList.ALBUM, "tint-album-dark"); }
+
+    @Test @Config(sdk = 35, qualifiers = LIGHT)
+    public void tintAlbumLight() throws Exception { tint(ScreenNavigator.TrackList.ALBUM, "tint-album-light"); }
+
+    @Test @Config(sdk = 35, qualifiers = DARK)
+    public void tintArtistDark() throws Exception { tint(ScreenNavigator.TrackList.ARTIST, "tint-artist-dark"); }
+
+    @Test @Config(sdk = 35, qualifiers = LIGHT)
+    public void tintArtistLight() throws Exception { tint(ScreenNavigator.TrackList.ARTIST, "tint-artist-light"); }
+
+    @Test @Config(sdk = 35, qualifiers = DARK)
+    public void tintPlaylistDark() throws Exception { tint(ScreenNavigator.TrackList.PLAYLIST, "tint-playlist-dark"); }
+
+    @Test @Config(sdk = 35, qualifiers = LIGHT)
+    public void tintPlaylistLight() throws Exception { tint(ScreenNavigator.TrackList.PLAYLIST, "tint-playlist-light"); }
+
+    @Test @Config(sdk = 35, qualifiers = DARK)
+    public void tintLikedDark() throws Exception { tint(ScreenNavigator.TrackList.LIKED, "tint-liked-dark"); }
+
+    private void tint(ScreenNavigator.TrackList kind, String name) throws Exception {
+        MainActivity a = start();
+        com.mhrsdev.musicplayer.di.AppContainer c = container(a);
+        String id = switch (kind) {
+            case ALBUM -> observe(c.library.getAlbums()).get(1).id();
+            case ARTIST -> observe(c.library.getArtists()).get(0).id();
+            case PLAYLIST -> firstPlaylist().id();
+            default -> null;
+        };
+        a.openTrackList(kind, id);
+        settle();
+        save(a, null, name);
+    }
+
     // ---- empty states (regression: the empty state used to overlap the header) ----
 
     @Test @Config(sdk = 35, qualifiers = "fa-w360dp-h800dp-night-xhdpi")

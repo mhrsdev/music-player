@@ -406,6 +406,12 @@ public class TrackListFragment extends Fragment implements TrackAdapter.Listener
             List<String> covers = header == null ? List.of() : header.artworkUris();
             int seed = header == null ? 0 : header.seed();
             boolean playlist = kind == TrackList.PLAYLIST;
+            // soft content-tinted backdrop: the cover (playlist: its first cover), else the list's own colour;
+            // the widget ignores repeated sources, so rebinding never restarts the single cross-fade
+            if (header != null) {
+                h.b.backdrop.setSource(covers.isEmpty() ? null : covers.get(0),
+                        com.mhrsdev.musicplayer.ui.widget.PlaceholderArt.seedColor(seed), true);
+            }
             h.b.mosaic.setVisibility(playlist ? View.VISIBLE : View.GONE);
             h.b.art.setVisibility(playlist ? View.GONE : View.VISIBLE);
             if (playlist) {
