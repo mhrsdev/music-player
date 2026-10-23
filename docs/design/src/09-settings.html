@@ -1,108 +1,64 @@
 <!doctype html>
-<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Settings</title><link rel="stylesheet" href="base.css">
-<style>
-  .screen { height: 1960px; }
-  .content { position: absolute; inset: 40px 0 0 0; }
-  .hdr { padding: 18px 20px 6px; }
-  .gl { font-size: 14px; font-weight: 650; color: var(--primary); padding: 22px 24px 8px; letter-spacing: .1px; }
-  .group { padding: 0 16px; }
-  .group > .row { min-height: 68px; padding: 12px 16px; gap: 16px; }
-  .row .lead { color: var(--on-surface-var); width: 24px; }
-  .row .t-title { font-weight: 520; font-size: 16.5px; }
-  .row .val { font-size: 14px; color: var(--on-surface-var); }
-  .sw { width: 52px; height: 32px; border-radius: 99px; position: relative; flex: none; background: var(--sc-highest); border: 2px solid var(--outline); }
-  .sw::after { content: ''; position: absolute; left: 6px; top: 6px; width: 16px; height: 16px; border-radius: 99px; background: var(--outline); }
-  .sw.on { background: var(--primary); border-color: var(--primary); }
-  .sw.on::after { left: 22px; top: 2px; width: 24px; height: 24px; background: var(--on-primary); }
-  .sw.on i { position: absolute; right: 4px; top: 4px; font-size: 16px; color: var(--primary); z-index: 1; }
-  .themes { display: flex; gap: 10px; padding: 4px 0 2px; }
-  .th { flex: 1; text-align: center; }
-  .th .pv { height: 118px; border-radius: 18px; position: relative; overflow: hidden; border: 1px solid var(--outline-var); }
-  .th.on .pv { outline: 3px solid var(--primary); outline-offset: 2px; border-color: transparent; }
-  .th .nm { font-size: 13px; font-weight: 600; margin-top: 8px; color: var(--on-surface-var); }
-  .th.on .nm { color: var(--on-surface); }
-  .pv .b1 { position: absolute; left: 9px; right: 9px; top: 12px; height: 40px; border-radius: 10px; }
-  .pv .b2 { position: absolute; left: 9px; width: 34px; top: 58px; height: 8px; border-radius: 4px; }
-  .pv .b3 { position: absolute; left: 9px; width: 50px; top: 72px; height: 8px; border-radius: 4px; }
-  .pv .nb { position: absolute; left: 14px; right: 14px; bottom: 9px; height: 14px; border-radius: 99px; }
-  .pv .ck { position: absolute; right: 6px; top: 6px; width: 22px; height: 22px; border-radius: 99px; background: var(--primary); color: var(--on-primary); display: grid; place-items: center; }
-  .seg { display: flex; gap: 2px; }
-  .seg div { flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; font-weight: 600; background: var(--sc-highest); color: var(--on-surface-var); }
-  .seg div:first-child { border-radius: 99px 8px 8px 99px; } .seg div:last-child { border-radius: 8px 99px 99px 8px; }
-  .seg div.on { background: var(--secondary-container); color: var(--on-secondary-container); border-radius: 99px; }
-  .folder { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 6px 0 14px; border-radius: 14px; background: var(--sc-high); margin-top: 8px; }
-  .folder .p { flex: 1; font-size: 14.5px; font-weight: 520; }
-  .folder .n { font-size: 13px; color: var(--on-surface-var); }
-  .block { background: var(--sc); padding: 16px; border-radius: 6px; }
-  .group > .block:first-child { border-top-left-radius: 22px; border-top-right-radius: 22px; }
-  .group > .block:last-child { border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; }
-  .mini-label { font-size: 16.5px; font-weight: 520; }
-</style></head>
-<body><div class="screen theme-dark">
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Settings</title><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="settings.css"></head>
+<body><div class="screen theme-dark" style="height:1900px">
   <div class="statusbar"></div>
-  <div class="content">
-    <div class="hdr"><div class="t-display">Settings</div></div>
+  <div class="content" style="position:absolute;inset:40px 0 0 0">
+    <div style="padding:22px 20px 6px"><div class="t-display">Settings</div></div>
 
-    <div class="gl">Appearance</div>
-    <div class="group">
-      <div class="block">
-        <div class="mini-label" style="margin-bottom:12px">Theme</div>
-        <div class="themes">
-          <div class="th"><div class="pv" style="background:linear-gradient(135deg,#F7F9FF 50%,#0F1216 50%)"><div class="b1" style="background:linear-gradient(135deg,#D4E3FF 50%,#1E4878 50%)"></div><div class="b2" style="background:#8a919c"></div><div class="b3" style="background:#8a919c;opacity:.5"></div><div class="nb" style="background:linear-gradient(135deg,#E4E8EF 50%,#252A30 50%)"></div></div><div class="nm">System</div></div>
-          <div class="th"><div class="pv" style="background:#F7F9FF"><div class="b1" style="background:#D4E3FF"></div><div class="b2" style="background:#414851"></div><div class="b3" style="background:#C1C7D2"></div><div class="nb" style="background:#E4E8EF"></div></div><div class="nm">Light</div></div>
-          <div class="th on"><div class="pv" style="background:#0F1216"><div class="b1" style="background:#1E4878"></div><div class="b2" style="background:#BFC6D2"></div><div class="b3" style="background:#3F4650"></div><div class="nb" style="background:#252A30"></div><div class="ck"><i class="ic s18">check</i></div></div><div class="nm">Dark</div></div>
-          <div class="th"><div class="pv" style="background:#000"><div class="b1" style="background:#1E4878"></div><div class="b2" style="background:#BFC6D2"></div><div class="b3" style="background:#2E343C"></div><div class="nb" style="background:#1A1E23"></div></div><div class="nm">Black</div></div>
-        </div>
-      </div>
-      <div class="row"><i class="ic lead">palette</i><div class="txt"><div class="t-title">Colors from artwork</div><div class="t-support">Player, mini-player and notification take their color from the cover</div></div><div class="sw on"><i class="ic">check</i></div></div>
-      <div class="row"><i class="ic lead">brightness_4</i><div class="txt"><div class="t-title">Wallpaper colors</div><div class="t-support">Use Material You colors for the rest of the app (Android 12+)</div></div><div class="sw"></div></div>
-    </div>
-
-    <div class="gl">Language</div>
-    <div class="group">
-      <div class="block">
-        <div class="seg"><div>System</div><div class="on"><i class="ic s18">check</i>English</div><div class="fa" style="font-family:Vazirmatn;font-size:15px">فارسی</div></div>
-        <div class="t-support" style="margin-top:10px">Choosing فارسی switches the whole app to right-to-left with Persian numerals.</div>
+    <div class="gl"><span>Look</span><i></i></div>
+    <div class="blk">
+      <div class="t-title">Theme</div>
+      <div class="themes">
+        <div class="th"><div class="sw" style="background:linear-gradient(135deg,#F4F1EA 50%,#0B0E17 50%)"></div><div class="nm">System</div></div>
+        <div class="th"><div class="sw" style="background:#F4F1EA"><i style="background:#0C6D65"></i></div><div class="nm">Porcelain</div></div>
+        <div class="th on"><div class="sw" style="background:#0B0E17"><i style="background:#63D5C7"></i></div><div class="nm">Ink</div><span class="tick"></span></div>
+        <div class="th"><div class="sw" style="background:#000"><i style="background:#63D5C7"></i></div><div class="nm">Black</div></div>
       </div>
     </div>
+    <div class="srow"><i class="g lead" data-g="palette"></i><div class="txt"><div class="t-title">Colors from artwork</div><div class="t-meta">Player, deck, widget and notification take their light from the cover</div></div><div class="lamp on"></div></div>
+    <div class="blk">
+      <div class="t-title">Motion &amp; effects</div>
+      <div class="choice"><div class="ch on"><span>Auto</span><span class="tick"></span></div><div class="ch"><span>Full</span></div><div class="ch"><span>Still</span></div></div>
+      <div class="t-meta" style="margin-top:4px">Auto goes Still in Battery Saver or when system animations are off: no moving waves, no grain, a calm gradient behind the player.</div>
+    </div>
 
-    <div class="gl">Library</div>
-    <div class="group">
-      <div class="block">
-        <div class="mini-label">Music folders</div>
-        <div class="folder"><i class="ic s20" style="color:var(--primary)">folder</i><div class="p">Music</div><div class="n">1,842 songs</div><div class="iconbtn" style="width:40px;height:40px;color:var(--on-surface-var)"><i class="ic s20">close</i></div></div>
-        <div class="folder"><i class="ic s20" style="color:var(--primary)">folder</i><div class="p">Download / Telegram Audio</div><div class="n">342 songs</div><div class="iconbtn" style="width:40px;height:40px;color:var(--on-surface-var)"><i class="ic s20">close</i></div></div>
-        <div class="btn btn-text" style="padding:0 12px;margin:6px 0 -6px -6px;height:44px"><i class="ic s20">add</i>Add folder</div>
+    <div class="gl"><span>Language</span><i></i></div>
+    <div class="blk" style="padding-top:2px">
+      <div class="choice"><div class="ch"><span>System</span></div><div class="ch on"><span>English</span><span class="tick"></span></div><div class="ch"><span class="fa" style="font-family:Vazirmatn;font-size:16px">فارسی</span></div></div>
+      <div class="t-meta" style="margin-top:4px">Choosing فارسی turns the whole app right-to-left, with Persian numerals.</div>
+    </div>
+
+    <div class="gl"><span>Player</span><i></i></div>
+    <div class="blk">
+      <div class="t-title">Seek bar</div>
+      <div class="styles">
+        <div class="st on"><div class="pv"><div class="seek" data-w="94" data-h="22" data-p=".55" data-c="#63D5C7" data-t="rgba(238,234,225,.22)" data-sw="3" data-amp="2.6" data-wl="16" data-r="6"></div></div><div class="nm">Wavy</div><span class="tick"></span></div>
+        <div class="st"><div class="pv"><div class="seek" data-w="94" data-h="30" data-p=".55" data-style="waveform" data-c="#63D5C7" data-t="rgba(238,234,225,.12)" data-seed="8" data-r="6"></div></div><div class="nm">Waveform</div></div>
+        <div class="st"><div class="pv"><div class="seek" data-w="94" data-h="30" data-p=".55" data-style="bars" data-c="#63D5C7" data-t="rgba(238,234,225,.26)" data-seed="12" data-bw="2.4" data-gap="2"></div></div><div class="nm">Bars</div></div>
       </div>
-      <div class="row"><i class="ic lead">sync</i><div class="txt"><div class="t-title">Rescan library</div><div class="t-support">2,184 songs · last scan 3 min ago</div></div></div>
-      <div class="row"><i class="ic lead">timer</i><div class="txt"><div class="t-title">Skip short audio</div><div class="t-support">Hide files shorter than 30 seconds (voice notes, ringtones)</div></div><div class="sw on"><i class="ic">check</i></div></div>
+      <div class="t-meta" style="margin-top:6px">Waveform and Bars follow each song's real loudness. They are measured once, while charging, and kept on the phone.</div>
     </div>
+    <div class="srow"><i class="g lead" data-g="lyrics"></i><div class="txt"><div class="t-title">Synced lyrics</div><div class="t-meta">From the file, or a matching .lrc next to it</div></div><div class="lamp on"></div></div>
+    <div class="srow"><i class="g lead" data-g="globe"></i><div class="txt"><div class="t-title">Find lyrics online</div><div class="t-meta">Sends only title, artist and length to lrclib.net</div></div><div class="lamp on"></div></div>
+    <div class="srow"><i class="g lead" data-g="moon"></i><div class="txt"><div class="t-title">Sleep timer</div><div class="t-meta">30 min by default · fades out over the last 30 s</div></div><i class="g s20 chev" data-g="chev"></i></div>
+    <div class="srow"><i class="g lead" data-g="eqs"></i><div class="txt"><div class="t-title">Equalizer</div><div class="t-meta">Opens your phone's sound settings</div></div><i class="g s20 chev" data-g="chev"></i></div>
 
-    <div class="gl">Player &amp; lyrics</div>
-    <div class="group">
-      <div class="block">
-        <div class="mini-label" style="margin-bottom:10px">Seek bar</div>
-        <div class="seg"><div class="on"><i class="ic s18">check</i>Wavy</div><div>Waveform</div><div>Flat</div></div>
-      </div>
-      <div class="row"><i class="ic lead">lyrics</i><div class="txt"><div class="t-title">Synced lyrics</div><div class="t-support">From the file or a matching .lrc next to it</div></div><div class="sw on"><i class="ic">check</i></div></div>
-      <div class="row"><i class="ic lead">language</i><div class="txt"><div class="t-title">Find lyrics online</div><div class="t-support">Sends song title, artist and length to lrclib.net</div></div><div class="sw on"><i class="ic">check</i></div></div>
-      <div class="row"><i class="ic lead">bedtime</i><div class="txt"><div class="t-title">Sleep timer</div><div class="t-support">30 min by default · fades out over the last 30 s</div></div><i class="ic" style="color:var(--on-surface-var)">chevron_right</i></div>
-      <div class="row"><i class="ic lead">equalizer</i><div class="txt"><div class="t-title">Equalizer</div><div class="t-support">Opens your phone's sound settings</div></div><i class="ic" style="color:var(--on-surface-var)">chevron_right</i></div>
+    <div class="gl"><span>Library</span><i></i></div>
+    <div class="blk" style="padding-bottom:4px">
+      <div class="t-title">Music folders</div>
+      <div class="folder"><i class="g s20" data-g="folder" style="color:var(--accent)"></i><div class="p">Music</div><div class="n num">1,842</div><div class="ib" style="color:var(--text3)"><i class="g s20" data-g="close"></i></div></div>
+      <div class="folder"><i class="g s20" data-g="folder" style="color:var(--accent)"></i><div class="p">Download / Telegram Audio</div><div class="n num">342</div><div class="ib" style="color:var(--text3)"><i class="g s20" data-g="close"></i></div></div>
+      <div class="btn text" style="margin:4px 0 0 -14px"><i class="g s20" data-g="plus"></i>Add folder</div>
     </div>
+    <div class="srow"><i class="g lead" data-g="refresh"></i><div class="txt"><div class="t-title">Rescan library</div><div class="t-meta num">2,184 songs · last scan 3 min ago</div></div></div>
+    <div class="srow"><i class="g lead" data-g="timer"></i><div class="txt"><div class="t-title">Skip short audio</div><div class="t-meta">Hide files under 30 seconds (voice notes, ringtones)</div></div><div class="lamp"></div></div>
 
-    <div class="gl">About</div>
-    <div class="group">
-      <div class="row"><i class="ic lead">info</i><div class="txt"><div class="t-title">Version</div><div class="t-support">1.0.0 (1)</div></div></div>
-      <div class="row"><i class="ic lead">library_music</i><div class="txt"><div class="t-title">Open-source licenses</div></div><i class="ic" style="color:var(--on-surface-var)">chevron_right</i></div>
-    </div>
+    <div class="gl"><span>About</span><i></i></div>
+    <div class="srow"><i class="g lead" data-g="info"></i><div class="txt"><div class="t-title">Version</div><div class="t-meta">1.0.0 (1)</div></div></div>
+    <div class="srow"><i class="g lead" data-g="doc"></i><div class="txt"><div class="t-title">Open-source licenses</div></div><i class="g s20 chev" data-g="chev"></i></div>
   </div>
-  <div class="navwrap"></div>
-  <div class="nav">
-    <div class="it"><i class="ic">home</i></div>
-    <div class="it"><i class="ic">search</i></div>
-    <div class="it"><i class="ic">library_music</i></div>
-    <div class="it on"><i class="ic f">settings</i><span class="l">Settings</span></div>
-  </div>
+  <div class="deckwrap"></div>
+  <div class="deck" data-on="settings"></div>
   <div class="gesture"></div>
 </div>
 <script src="lib.js"></script><script>buildMock()</script></body></html>

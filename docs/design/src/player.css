@@ -1,0 +1,43 @@
+/* Shared full-player layout (PlayerFragment, res/layout/fragment_player.xml).
+   Controls sit at identical y positions in cover, lyrics and bars views, so the thumb never hunts. */
+.pl { color: #fff; --sb: #fff; }
+.pl .tint { position: absolute; inset: 0; z-index: 1; background: var(--tintc); mix-blend-mode: soft-light; opacity: .55; }
+.pl .top { position: absolute; top: 46px; left: 8px; right: 8px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+.pl .from { text-align: center; line-height: 17px; }
+.pl .from .a { font-size: 11.5px; color: rgba(255,255,255,.64); font-weight: 450; }
+.pl .from .b { font-size: 14px; font-weight: 560; }
+.pl .cover { position: absolute; top: 112px; left: 36px; width: 340px; height: 340px; box-shadow: 0 26px 50px -18px rgba(0,0,0,.6); }
+.pl .meta { position: absolute; top: 478px; left: 24px; right: 14px; display: flex; align-items: center; gap: 8px; }
+.pl .meta .t-display { color: #fff; }
+.pl .meta .artist { font-size: 16px; font-weight: 400; color: rgba(255,255,255,.72); margin-top: 1px; }
+.pl .seekwrap { position: absolute; top: 566px; left: 24px; width: 364px; }
+.pl .seekwrap .times { margin-top: 8px; }
+.pl .transport { position: absolute; top: 650px; left: 0; right: 0; height: 96px; display: flex; align-items: center; justify-content: center; gap: 14px; }
+.pl .actions { position: absolute; top: 770px; left: 20px; right: 12px; display: flex; align-items: center; justify-content: space-between; }
+.pl .upnext { position: absolute; left: 16px; right: 16px; top: 832px; height: 54px; border-radius: 999px; display: flex; align-items: center; gap: 12px; padding: 0 18px 0 9px;
+  background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
+.pl .upnext .art { border-radius: 999px; }
+.pl .upnext .tx { flex: 1; min-width: 0; line-height: 17px; }
+.pl .upnext .a { font-size: 11.5px; color: rgba(255,255,255,.6); }
+.pl .upnext .b { font-size: 14px; font-weight: 500; }
+.pl .lyr { position: absolute; top: 104px; left: 0; right: 0; height: 360px; overflow: hidden; padding: 0 28px; text-align: center;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 20%, #000 74%, transparent 100%); }
+.pl .ln { text-wrap: balance; font-size: 25px; line-height: 34px; font-weight: 450; letter-spacing: -.3px; color: rgba(255,255,255,.58); margin: 0 0 20px; }
+.pl .ln.past { color: rgba(255,255,255,.46); }
+.pl .ln.act { color: rgba(255,255,255,.66); font-weight: 650; font-size: 27px; line-height: 36px; }
+.pl .ln.act .done { color: #fff; }
+.pl .ln.act .cur { background: linear-gradient(90deg, #fff 0 46%, rgba(255,255,255,.66) 64%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+[dir="rtl"] .pl .ln.act .cur, .pl[dir="rtl"] .ln.act .cur { background: linear-gradient(270deg, #fff 0 46%, rgba(255,255,255,.66) 64%); -webkit-background-clip: text; background-clip: text; }
+.pl .dots { display: flex; justify-content: center; gap: 7px; margin: -4px 0 24px; }
+.pl .dots i { width: 7px; height: 7px; border-radius: 9px; background: rgba(255,255,255,.4); display: block; }
+.pl .minimeta { position: absolute; top: 478px; left: 20px; right: 14px; display: flex; align-items: center; gap: 14px; }
+.pl .minimeta .tt { font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.3px; }
+.pl .minimeta .ar { font-size: 14.5px; color: rgba(255,255,255,.72); }
+/* Play disc: lamp-like — soft top highlight, a faint 8 dp halo ring, coloured drop light. */
+.play { background: radial-gradient(120% 120% at 50% 12%, color-mix(in srgb, var(--dyn) 62%, #fff) 0%, var(--dyn) 58%) !important; color: var(--on-dyn);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--dyn) 13%, transparent), 0 18px 36px -10px var(--dyn-shadow), inset 0 1px 0 rgba(255,255,255,.4); }
+.bubble { position: absolute; transform: translateX(-50%); height: 34px; padding: 0 14px; border-radius: 999px; display: flex; align-items: center; z-index: 3;
+  font-size: 15px; font-weight: 600; font-feature-settings: 'tnum' 1; background: #fff; color: var(--on-dyn); box-shadow: 0 10px 24px -8px rgba(0,0,0,.6); white-space: nowrap; }
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; margin-left: -5px; background: #fff; transform: rotate(45deg); border-radius: 2px; z-index: -1; }
+.bubble small { font-size: 12px; font-weight: 450; opacity: .7; margin-left: 6px; }
+.finger { position: absolute; width: 46px; height: 46px; border-radius: 99px; background: radial-gradient(circle, rgba(255,255,255,.35), rgba(255,255,255,.08) 60%, transparent 70%); transform: translate(-50%,-50%); pointer-events: none; }
