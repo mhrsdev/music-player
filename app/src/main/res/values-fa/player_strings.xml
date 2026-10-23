@@ -4,7 +4,6 @@
     <string name="player_pause">توقف</string>
     <string name="player_next">بعدی</string>
     <string name="player_previous">قبلی</string>
-    <string name="player_collapse">بستن پخش‌کننده</string>
     <string name="player_more">گزینه‌های بیشتر</string>
     <string name="player_like">پسندیدن</string>
     <string name="player_unlike">حذف از آهنگ‌های پسندیده</string>
@@ -19,15 +18,12 @@
     <string name="player_sleep_timer">زمان‌سنج خواب</string>
     <string name="player_sleep_timer_min">زمان‌سنج خواب، %1$s دقیقه مانده</string>
     <string name="player_output_device">همین گوشی</string>
-    <string name="player_playing_from">در حال پخش از</string>
     <string name="player_nothing_playing">چیزی پخش نمی‌شود</string>
     <string name="player_seek">جابه‌جایی</string>
     <string name="lyrics_loading">در جست‌وجوی متن ترانه…</string>
     <string name="lyrics_none">هنوز متنی برای این آهنگ نیست</string>
     <string name="lyrics_none_hint">یک فایل ‎.lrc‎ کنار آهنگ بگذارید.</string>
     <string name="lyrics_back_to_current">برگشت به خط فعلی</string>
-    <string name="lyrics_unsynced">متن با آهنگ هم‌زمان نیست</string>
-    <string name="queue_up_next">بعدی‌ها</string>
     <string name="queue_playing_from">در حال پخش از %1$s · %2$s دقیقه مانده</string>
     <string name="queue_min_left">%1$s دقیقه مانده</string>
     <string name="queue_shuffle">درهم‌کردن صف</string>

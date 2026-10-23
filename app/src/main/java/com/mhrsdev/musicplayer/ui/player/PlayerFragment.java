@@ -161,12 +161,26 @@ public final class PlayerFragment extends Fragment {
         b.playerShuffle.setOnClickListener(v -> vm.toggleShuffle());
         b.playerRepeat.setOnClickListener(v -> vm.cycleRepeat());
         b.playerLike.setOnClickListener(v -> {
-            v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            v.performHapticFeedback(android.os.Build.VERSION.SDK_INT >= 30
+                    ? HapticFeedbackConstants.CONFIRM : HapticFeedbackConstants.VIRTUAL_KEY);
             v.animate().scaleX(1.18f).scaleY(1.18f).setDuration(110)
                     .withEndAction(() -> v.animate().scaleX(1f).scaleY(1f).setDuration(180).start()).start();
             vm.toggleLike();
         });
         b.playerLyricsToggle.setOnClickListener(v -> vm.toggleLyrics());
+        b.playerMore.setOnClickListener(v -> {
+            android.widget.PopupMenu menu = new android.widget.PopupMenu(requireContext(), v);
+            boolean lyrics = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
+            menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
+            menu.getMenu().add(0, 2, 1, R.string.player_queue);
+            menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
+            menu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == 1) vm.toggleLyrics();
+                else b.playerQueue.performClick(); // sleep timer lives in the queue sheet (design v1, 07)
+                return true;
+            });
+            menu.show();
+        });
         b.playerQueue.setOnClickListener(v -> {
             PlayerNavigator nav = PlayerNavigator.from(requireContext());
             if (nav != null) nav.openQueue();

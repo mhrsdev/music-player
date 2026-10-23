@@ -27,6 +27,7 @@ public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Hold
 
     public LyricsAdapter(OnLineClick click) { this.click = click; }
 
+    @android.annotation.SuppressLint("NotifyDataSetChanged") // whole new song text
     public void setLyrics(Lyrics l) {
         lines = l.lines();
         synced = l.synced();

@@ -81,6 +81,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="center"
+            android:importantForAccessibility="no"
             android:src="@drawable/queue_ic_drag"
             app:tint="#BFC6D2" />
     </LinearLayout>

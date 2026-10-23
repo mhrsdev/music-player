@@ -4,7 +4,6 @@
     <string name="player_pause">Pause</string>
     <string name="player_next">Next</string>
     <string name="player_previous">Previous</string>
-    <string name="player_collapse">Collapse player</string>
     <string name="player_more">More options</string>
     <string name="player_like">Like</string>
     <string name="player_unlike">Remove from liked songs</string>
@@ -19,15 +18,12 @@
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_min">Sleep timer, %1$s min left</string>
     <string name="player_output_device">This phone</string>
-    <string name="player_playing_from">Playing from</string>
     <string name="player_nothing_playing">Nothing playing</string>
     <string name="player_seek">Seek</string>
     <string name="lyrics_loading">Finding lyrics…</string>
     <string name="lyrics_none">No lyrics for this song yet</string>
     <string name="lyrics_none_hint">Put a .lrc file next to the song to add them.</string>
     <string name="lyrics_back_to_current">Back to current line</string>
-    <string name="lyrics_unsynced">Lyrics aren\'t synced to this song</string>
-    <string name="queue_up_next">Up next</string>
     <string name="queue_playing_from">Playing from %1$s · %2$s min left</string>
     <string name="queue_min_left">%1$s min left</string>
     <string name="queue_shuffle">Shuffle queue</string>
