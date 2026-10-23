@@ -48,9 +48,11 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 
 
-- 🔄 **T2** [Opus] UI foundation: theme/tokens, custom widgets (Wavy/Waveform/Bars seek bars, morph play button, floating nav, mini-player), image loader. Branch `task/t2-ui-foundation-java`, worktree `../wt-t2`. Owns `ui/theme`, `ui/widget`, `res/values`, drawables.
 
 - 🔄 **T8** [Sonnet+ponytail] Wiring: AppContainer → real Data/Playback/Waveform(/Lyrics) modules. Branch `task/t8-wiring`, worktree `../wt-t8`.
+
+- 🔄 **P1** [Opus] Polish: fonts (Vazirmatn + v1 Latin), liked-card collage, multi-browse carousel, morph play buttons, skeletons; render screens to PNG. Branch `task/p1-polish-home`, worktree `../wt-p1`.
+- 🔄 **P2** [Opus] Polish: light player + contrast guard, lyrics offline/Retry, shared-element-like transition, real output chip, add-to-playlist sheet; render player PNGs. Branch `task/p2-polish-player`, worktree `../wt-p2`.
 
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
@@ -67,6 +69,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T2** [Opus] UI foundation merged (design v1 tokens): `ui/theme` (Tokens, ThemeController, AccentScheme w/ 4.5:1 guard, ColorExtractor, MotionPolicy), `ui/widget` (SeekBarView + Wavy/Waveform/Bars, MorphPlayPauseView, FloatingNavView, MiniPlayerView, ArtworkView/Loader, BackdropBlur, ChipView, SectionHeaderView, TrackRowView), 26 icons, debug WidgetGalleryActivity + Robolectric render test → `docs/screens/t2-widget-gallery-*.png` (real render from Android code). Gaps: fonts not bundled (system sans), LoadingIndicator, grain, hand-drawn 10-lobe cookie, device run.
 - ✅ **T3** [Opus] Screens merged (design v1): `ui/nav`+MainActivity shell (PlayerNavigator, ScreenNavigator, permission first-run), Home, Search, Library hub + detail lists + grids, Settings (PrefsSettingsStore), en+fa strings, VM tests. After merge supervisor re-ran `:app:assembleDebug test lint` → green. Gaps: liked-card collage, multi-browse carousel, plain play circles on Home/Library, system fonts, no skeletons/add-to-playlist dialog, folder picker not implemented; settings (battery-saver/seek-style/online-lyrics/sleep-default) not yet read by consumers → T8. Duplicate SettingsStore (ui vs data) → T8 reconciles.
 - ✅ **T4** [Opus] Player merged (retargeted to design v1): `ui/player` (PlayerFragment/ViewModel, cookie play, 3 seek bars from T2, 20px-backdrop + crossfade, swipe-down), `ui/player/lyrics` (centered, tap-to-seek, 3 s manual-scroll pause), `ui/queue` (sleep timer, drag, swipe-remove+Undo, shuffle+Undo), en+fa strings, VM tests. Branch also carried intermediate T2/T3 merges. Gaps: no light player (15), no word-sweep, no lyrics error/Retry state, no contrast guard, static output chip, not a true shared element, system bold instead of v1 type ramp. Lint: 32 errors outside T4 (18 MissingTranslation, 14 UseAppTint in T3 layouts) → assigned to T3. Not seen rendered anywhere.
 - ✅ **T7** [Sonnet+ponytail] Lyrics merged: `data/lyrics` (LrcParser, embedded ID3/FLAC/MP4 readers, sidecar .lrc/.txt, LrclibClient /get→/search, LyricsResolver with TTL cache 30d/3d/5min, LyricsRepositoryImpl observer-driven), `di/LyricsModule`, 118 JVM tests, supervisor re-ran `:app:assembleDebug test` after merge → green (all test XMLs pass). Not verified: real tagged files, MediaStore file locator, real Persian LRCLIB hits; LRCLIB /get returned 503s during agent checks. T8 must add INTERNET permission + bind LyricsCacheStore.
@@ -80,6 +83,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: T2 merged; P1/P2 polish agents launched (deadline ~19:28 UTC). Remaining: T8 finish, T9 QA (after T8), merge to main.
 - 2026-10-23: T3, T4 merged; ccr green (build+test+lint, supervisor-run). T2 widget gallery PNGs rendered from real Android code (docs/screens/) and sent to owner.
 - 2026-10-23: Merged T5, T7 into ccr (supervisor fixed a conflict-marker slip from the T5 merge; one flaky T5 test `SqliteRepositoryTest.historyAndPlayCountsMoveToTheTop` (same-ms ties) passed on re-run; T8 told to make ordering deterministic).
 - 2026-10-23: D13: owner rejects v2, wants v1. docs/design restored to v1; T2/T3/T4 retargeted.
