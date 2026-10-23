@@ -9,7 +9,7 @@ import com.mhrsdev.musicplayer.domain.model.HomeSection;
  * Home section titles come from the data layer in English; the UI shows them in the app language by section id.
  * Ids are stable; an unknown id falls back to the title the data layer gave.
  */
-final class HomeSectionTitles {
+class HomeSectionTitles {
     private HomeSectionTitles() { }
 
     @StringRes

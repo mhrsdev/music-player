@@ -3,8 +3,12 @@ package com.mhrsdev.musicplayer.di;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.os.Process;
 import androidx.core.content.ContextCompat;
 import com.mhrsdev.musicplayer.BuildConfig;
@@ -37,7 +41,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Hand-written dependency container (plain Java DI), created once by {@code MusicPlayerApp}. Screens never construct
@@ -51,6 +54,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class AppContainer {
     /** The one place that decides real vs fake for the running app. */
     static final boolean USE_FAKES = false;
+    /** App start: skip the incremental scan if one finished this recently. */
+    static final long FOREGROUND_SCAN_THROTTLE_MS = 20_000L;
+    /** After a MediaStore change event: wait for the burst (a download) to settle before scanning. */
+    static final long OBSERVER_DEBOUNCE_MS = 2_500L;
 
     /** Shared background thread for disk / DB / network work. Its thread exits after 30 s idle (battery, RAM). */
     public final Executor ioExecutor;
@@ -69,7 +76,9 @@ public final class AppContainer {
     private final LibraryAdmin libraryAdmin;
     private final LibraryBrowser libraryBrowser;
     private final AudioEffectsController audioEffects;
-    private final AtomicBoolean foregroundScanDone = new AtomicBoolean();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Runnable observedScan = this::scanAfterMediaChange;
+    private ContentObserver mediaObserver;
     private UpdateRepository updates;
 
     public AppContainer(Context context) {
@@ -114,6 +123,7 @@ public final class AppContainer {
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
+            PlaybackModule.setLibraryReader(data.reader);
             // Home-screen widgets: redrawn on track / play-pause changes only, and only while this process lives.
             NowPlayingBridge.attach(appContext, np -> WidgetUpdater.update(appContext, np, io));
             audioEffects = PlaybackModule.createAudioEffects(appContext);
@@ -151,19 +161,42 @@ public final class AppContainer {
 
     /** Call when the user grants the audio permission: runs the first scan (or a stale one). */
     public void onAudioPermissionGranted() {
-        foregroundScanDone.set(true);
         libraryAdmin.scanIfStale();
     }
 
     /**
-     * Call whenever an activity starts: refreshes the library once per process if the device's media changed, and runs
-     * the automatic update check if it is due (at most daily; cheap when not).
+     * Call on EVERY activity start: an incremental scan if MediaStore changed (throttled to once per
+     * {@link #FOREGROUND_SCAN_THROTTLE_MS}; the generation check makes it nearly free), and watches MediaStore for new
+     * files while the app is visible; also runs the automatic update check if it is due (at most daily). Pair with {@link #onAppBackground()}.
      */
     public void onAppForeground() {
-        if (!useFakes) updates().checkIfDue();
-        if (!useFakes && hasAudioPermission() && foregroundScanDone.compareAndSet(false, true)) {
-            libraryAdmin.scanIfStale();
+        if (useFakes) return;
+        updates().checkIfDue();
+        if (mediaObserver == null) {
+            mediaObserver = new ContentObserver(mainHandler) {
+                @Override public void onChange(boolean selfChange) {
+                    // A download touches MediaStore many times: scan once, shortly after it settles.
+                    mainHandler.removeCallbacks(observedScan);
+                    mainHandler.postDelayed(observedScan, OBSERVER_DEBOUNCE_MS);
+                }
+            };
+            appContext.getContentResolver().registerContentObserver(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaObserver);
         }
+        if (hasAudioPermission()) libraryAdmin.scanIfStale(FOREGROUND_SCAN_THROTTLE_MS);
+    }
+
+    /** Call when no activity is visible any more: stops watching MediaStore (no background observers). */
+    public void onAppBackground() {
+        mainHandler.removeCallbacks(observedScan);
+        if (mediaObserver != null) {
+            appContext.getContentResolver().unregisterContentObserver(mediaObserver);
+            mediaObserver = null;
+        }
+    }
+
+    private void scanAfterMediaChange() {
+        if (hasAudioPermission()) libraryAdmin.scanIfStale();
     }
 
     /** The user's battery-saver setting combined with the system's; read on any thread. */

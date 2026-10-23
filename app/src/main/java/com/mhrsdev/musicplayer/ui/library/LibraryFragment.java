@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.library;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Library hub (DESIGN.md 03). */
-public final class LibraryFragment extends Fragment {
+public class LibraryFragment extends Fragment {
     private LibraryFragmentBinding b;
 
     @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -36,6 +38,8 @@ public final class LibraryFragment extends Fragment {
         LibraryViewModel vm = new ViewModelProvider(this, LibraryViewModel.factory(c.library, c.player, c.libraryBrowser()))
                 .get(LibraryViewModel.class);
         Resources r = getResources();
+        c.libraryAdmin().isScanning().observe(getViewLifecycleOwner(),
+                s -> b.scanProgress.setVisibility(Boolean.TRUE.equals(s) ? View.VISIBLE : View.GONE));
         String likedLabel = getString(R.string.library_liked);
 
         b.likedCard.setOnClickListener(v -> Screens.openTrackList(this, TrackList.LIKED, null));
@@ -60,6 +64,8 @@ public final class LibraryFragment extends Fragment {
         b.hubPlaylists.setOnClickListener(v -> Screens.openCollection(this, Collection.PLAYLISTS));
         b.hubArtists.setOnClickListener(v -> Screens.openCollection(this, Collection.ARTISTS));
         b.hubHistory.setOnClickListener(v -> Screens.openTrackList(this, TrackList.HISTORY, null));
+        b.hubGenres.setOnClickListener(v -> com.mhrsdev.musicplayer.ui.home.SectionPageFragment.open(this, "genres", null));
+        b.hubFolders.setOnClickListener(v -> com.mhrsdev.musicplayer.ui.home.SectionPageFragment.open(this, "folders", null));
         b.hubSongs.setOnClickListener(v -> Screens.openTrackList(this, TrackList.SONGS, null));
         b.hubMostPlayed.setOnClickListener(v -> Screens.openTrackList(this, TrackList.MOST_PLAYED, null));
         b.hubRecentAdded.setOnClickListener(v -> Screens.openTrackList(this, TrackList.RECENT, null));
@@ -76,7 +82,8 @@ public final class LibraryFragment extends Fragment {
             ArtworkView[] peeks = {b.hubAlbumsPeek, b.hubAlbumsPeek2, b.hubAlbumsPeek3};
             for (int i = 0; i < peeks.length; i++) {
                 peeks[i].setVisibility(i < n ? View.VISIBLE : View.GONE);
-                if (i < n) Art.bind(peeks[i], list.get(i).artworkUri(), list.get(i).placeholderSeed(), 8, false);
+                if (i < n) Art.bind(peeks[i], list.get(i).artworkUri(), list.get(i).placeholderSeed(), 8, false,
+                        CoverSpec.forAlbum(list.get(i)));
             }
         });
         vm.getPlaylists().observe(getViewLifecycleOwner(), list -> {
@@ -87,7 +94,8 @@ public final class LibraryFragment extends Fragment {
                 peeks[i].setVisibility(i < n ? View.VISIBLE : View.GONE);
                 if (i < n) {
                     List<String> art = list.get(i).artworkUris();
-                    Art.bind(peeks[i], art.isEmpty() ? null : art.get(0), list.get(i).placeholderSeed(), 8, false);
+                    Art.bind(peeks[i], art.isEmpty() ? null : art.get(0), list.get(i).placeholderSeed(), 8, false,
+                            CoverSpec.forPlaylist(list.get(i).id(), list.get(i).name()));
                 }
             }
         });

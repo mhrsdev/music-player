@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
  * Hook for app-wide banners shown at the top of Home (today: the update banner from {@code ui.update}). Resolved by
  * class name so Home builds without it. The banner view decides its own visibility (GONE when nothing to show).
  */
-public final class Banners {
+public class Banners {
     static final String UPDATE_BANNER = "com.mhrsdev.musicplayer.ui.update.UpdateBanner";
 
     private Banners() { }

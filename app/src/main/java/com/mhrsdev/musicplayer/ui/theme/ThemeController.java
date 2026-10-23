@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.view.animation.PathInterpolator;
 
 import androidx.annotation.MainThread;
@@ -14,6 +15,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.mhrsdev.musicplayer.R;
+import com.mhrsdev.musicplayer.ui.nav.Screens;
 
 /**
  * App-wide theme state: theme mode (System/Light/Dark/Black) and the artwork-derived {@link AccentScheme}.
@@ -71,6 +73,11 @@ public final class ThemeController {
     public void setArtworkColorsEnabled(boolean enabled) {
         artworkColors = enabled;
         if (!enabled) animateTo(AccentScheme.base(Tokens.isDark(app)));
+    }
+
+    /** Settings "Colors from artwork" as last applied (Home glow follows it too). */
+    public boolean isArtworkColorsEnabled() {
+        return artworkColors;
     }
 
     /** Extracts the seed from {@code artwork} (any size; downscaled to 32x32). {@code key} dedupes repeats. */
@@ -144,6 +151,36 @@ public final class ThemeController {
             default: night = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM; break;
         }
         AppCompatDelegate.setDefaultNightMode(night);
+    }
+
+    // ---- Dynamic colour (Material You, API 31+). Contract for Settings: docs/THEMING.md ----
+
+    /** True on Android 12+ where the system exposes wallpaper tonal palettes. */
+    public static boolean isDynamicColorSupported() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
+    }
+
+    /** Persisted choice (default off: the lapis identity stays the default). */
+    public static boolean isDynamicColor(Context context) {
+        return isDynamicColorSupported() && Screens.container(context).settings().isDynamicColor();
+    }
+
+    /** Settings row: persists the choice and recreates {@code activity} so every token re-resolves. */
+    @MainThread
+    public static void setDynamicColor(Activity activity, boolean enabled) {
+        Screens.container(activity).settings().setDynamicColor(enabled);
+        if (isDynamicColorSupported()) activity.recreate();
+    }
+
+    /**
+     * Call right after {@link Activity#setTheme(int)} (before inflating views): when dynamic colour is on, overlays
+     * the system wallpaper palettes (android.R.color.system_accent1/2/3, neutral1/2) onto our mp* tokens and the
+     * M3 roles. Black mode keeps its black surfaces and takes only the accents. No-op below API 31 or when off.
+     */
+    public static void applyDynamicColor(Activity activity, boolean black) {
+        if (!isDynamicColor(activity)) return;
+        activity.getTheme().applyStyle(black ? R.style.ThemeOverlay_Mowj_DynamicAccents
+                : R.style.ThemeOverlay_Mowj_Dynamic, true);
     }
 
     /** Theme to pass to {@link Activity#setTheme(int)} before {@code super.onCreate}. */

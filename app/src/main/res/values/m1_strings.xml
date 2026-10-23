@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- M1 theming contract for the Settings screen (docs/THEMING.md). -->
+    <string name="mp_setting_dynamic_color">Wallpaper colours</string>
+    <string name="mp_setting_dynamic_color_summary">Use your wallpaper\'s colours (Android 12 and later) instead of Mowj lapis</string>
+    <string name="mp_setting_dynamic_color_unsupported">Needs Android 12 or later</string>
+</resources>

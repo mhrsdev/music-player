@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.ui.library;
 
+import android.os.Bundle;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -13,43 +14,47 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The one track context menu of the app: play next, add to queue / playlist, like, go to album / artist,
- * remove from this playlist, details, share, delete from device.
+ * The one track context menu of the app. Queue actions as a row of tiles (play next / add to queue / add to
+ * playlist), then like, go to album / artist, remove from this playlist, details, share, delete from device.
+ * State lives in the arguments, so it survives recreation.
  */
-public final class TrackMenuSheet extends ActionSheet {
+public class TrackMenuSheet extends ActionSheet {
     private static final String TAG = "track_menu";
-
-    @Nullable private Track track;
-    @Nullable private String playlistId;
-    @Nullable private FragmentActivity host;
+    private static final String ARG_PLAYLIST = "playlist_id";
 
     public static void show(FragmentActivity activity, Track track, @Nullable String playlistId) {
         if (activity.getSupportFragmentManager().findFragmentByTag(TAG) != null) return;
         TrackMenuSheet s = new TrackMenuSheet();
-        s.track = track;
-        s.playlistId = playlistId;
-        s.host = activity;
+        Bundle args = TrackArgs.put(new Bundle(), track);
+        args.putString(ARG_PLAYLIST, playlistId);
+        s.setArguments(args);
         s.show(activity.getSupportFragmentManager(), TAG);
     }
 
     @Override protected boolean hasState() {
-        return track != null && host != null;
+        return TrackArgs.get(getArguments()) != null;
     }
 
-    @Nullable @Override protected Header build(List<Row> rows) {
-        Track t = track;
-        FragmentActivity a = host;
+    @Override protected void buildTiles(List<Row> tiles) {
+        Track t = TrackArgs.get(getArguments());
+        FragmentActivity a = requireActivity();
         AppContainer c = Screens.container(a);
-        rows.add(Row.of(R.drawable.u2_ic_play_next, getString(R.string.library_menu_play_next), () -> {
+        tiles.add(Row.of(R.drawable.u2_ic_play_next, getString(R.string.library_menu_play_next), () -> {
             c.player.playNext(t);
             toast(a, a.getString(R.string.u2_playing_next, t.title()));
         }));
-        rows.add(Row.of(R.drawable.ic_mp_queue, getString(R.string.library_menu_add_queue), () -> {
+        tiles.add(Row.of(R.drawable.ic_mp_queue, getString(R.string.library_menu_add_queue), () -> {
             c.player.addToQueue(t);
             toast(a, a.getString(R.string.u2_added_to_queue, t.title()));
         }));
-        rows.add(Row.of(R.drawable.library_ic_playlist, getString(R.string.library_menu_add_playlist),
+        tiles.add(Row.of(R.drawable.library_ic_playlist, getString(R.string.library_menu_add_playlist),
                 () -> AddToPlaylistSheet.show(a.getSupportFragmentManager(), Collections.singletonList(t))));
+    }
+
+    @Nullable @Override protected Header build(List<Row> rows) {
+        Track t = TrackArgs.get(getArguments());
+        FragmentActivity a = requireActivity();
+        AppContainer c = Screens.container(a);
         rows.add(Row.of(t.liked() ? R.drawable.ic_mp_heart_filled : R.drawable.ic_mp_heart,
                 getString(t.liked() ? R.string.library_menu_unlike : R.string.library_menu_like),
                 () -> c.library.toggleLike(t.id())));
@@ -57,7 +62,7 @@ public final class TrackMenuSheet extends ActionSheet {
                 ScreenNavigator.TrackList.ALBUM, t.albumId())));
         rows.add(Row.of(R.drawable.library_ic_artist, getString(R.string.u2_go_artist), () -> open(a,
                 ScreenNavigator.TrackList.ARTIST, t.artistId())));
-        String pid = playlistId;
+        String pid = requireArguments().getString(ARG_PLAYLIST);
         if (pid != null) {
             rows.add(Row.of(R.drawable.ic_mp_close, getString(R.string.u2_remove_from_playlist),
                     () -> c.libraryAdmin().removeFromPlaylist(pid, t.id())));

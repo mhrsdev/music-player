@@ -3,7 +3,7 @@ package com.mhrsdev.musicplayer.ui.update;
 import java.util.regex.Pattern;
 
 /** Release notes are GitHub markdown; the screen shows them as plain text with the markup stripped. */
-final class NotesText {
+class NotesText {
     private static final int MAX_CHARS = 4000;
     private static final Pattern LINK = Pattern.compile("!?\\[([^\\]]*)\\]\\([^)]*\\)");
     private static final Pattern COMMENT = Pattern.compile("(?s)<!--.*?-->");

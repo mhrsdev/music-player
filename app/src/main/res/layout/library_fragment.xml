@@ -11,6 +11,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <ProgressBar
+            android:id="@+id/scan_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:indeterminate="true"
+            android:visibility="gone" />
+
         <TextView
             style="@style/Scr.PageTitle"
             android:layout_width="match_parent"
@@ -372,6 +380,9 @@
                 <TextView android:id="@+id/hub_recent_added" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_sparkle" android:text="@string/u2_recently_added" />
                 <TextView android:id="@+id/hub_never_played" style="@style/U2.ActionPill" android:drawableStart="@drawable/nav_ic_history" android:text="@string/u2_never_played" />
                 <TextView android:id="@+id/hub_years" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_calendar" android:text="@string/u2_years" />
+                <!-- H1: Genres / Folders (tracks.genre / tracks.path, DB v4), pages built from the Home feed. -->
+                <TextView android:id="@+id/hub_genres" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_note" android:text="@string/library_genres" />
+                <TextView android:id="@+id/hub_folders" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_folder" android:text="@string/library_folders" />
             </LinearLayout>
         </HorizontalScrollView>
 

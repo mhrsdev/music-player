@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.library;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -38,7 +40,7 @@ final class CardAdapter extends ListAdapter<Track, CardAdapter.Holder> {
         Track t = getItem(position);
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, t.title());
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, t.artistName());
-        Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 24, false);
+        Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 24, false, CoverSpec.forTrack(t));
         h.itemView.setContentDescription(t.title() + ", " + t.artistName());
         h.itemView.setOnClickListener(v -> {
             int p = h.getBindingAdapterPosition();

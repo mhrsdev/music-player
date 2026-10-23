@@ -39,6 +39,11 @@ final class DbLiveData<T> extends LiveData<T> implements ChangeNotifier.Listener
         if ((changedTopics & topics) != 0) load();
     }
 
+    /** Forces a reload now (pull-to-refresh); a no-op while one is already queued. */
+    void reload() {
+        load();
+    }
+
     private void load() {
         if (!loadPending.compareAndSet(false, true)) return;
         io.execute(() -> {

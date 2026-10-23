@@ -24,7 +24,7 @@ import java.util.List;
  * Null means "no art": the caller draws the seeded gradient. Album art = the art of its first track that has any.
  * All platform access goes through {@link Backend} so the chain is testable on the JVM.
  */
-public final class ArtworkResolver {
+public class ArtworkResolver {
 
     /** A track as far as artwork is concerned: its content URI and (maybe) its file path. */
     public record AudioRef(Uri uri, @Nullable String path) { }

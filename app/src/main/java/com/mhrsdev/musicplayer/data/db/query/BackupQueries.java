@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /** All SQL of backup / restore: whole-table reads of the user's data and the bulk writes of a restore. */
-public final class BackupQueries {
+public class BackupQueries {
     public record PlaylistRow(String id, String name, @Nullable String description, long createdAt) { }
 
     public record PlayRow(int count, long lastPlayedAt) { }

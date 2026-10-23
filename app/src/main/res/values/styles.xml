@@ -12,27 +12,28 @@
         <item name="android:tint">?attr/mpOnSurfaceVariant</item>
     </style>
 
-    <!-- v1 type ramp (DESIGN.md section 3): Google Sans Flex (Latin) / Vazirmatn (font-fa) via @font/mp_sans.
+    <!-- v1 type ramp (DESIGN.md section 3): Google Sans Flex (Latin) / Vazirmatn (font-fa) via @font/mp_sans (body, ROND 20),
+         mp_sans_soft (titles/labels/lyrics, ROND 60) and mp_sans_round (display/headline, ROND 100).
          The weight picks a variable-font instance from mp_sans.xml; API 26-27 fall back to textStyle. -->
     <style name="TextAppearance.MusicPlayer.Display" parent="">
         <item name="android:textSize">@dimen/mp_text_display</item>
-        <item name="android:fontFamily">@font/mp_sans</item>
-        <item name="android:textFontWeight" tools:targetApi="28">600</item>
+        <item name="android:fontFamily">@font/mp_sans_round</item>
+        <item name="android:textFontWeight" tools:targetApi="28">700</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
     </style>
     <style name="TextAppearance.MusicPlayer.Headline" parent="">
         <item name="android:textSize">@dimen/mp_text_headline</item>
-        <item name="android:fontFamily">@font/mp_sans</item>
-        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:fontFamily">@font/mp_sans_round</item>
+        <item name="android:textFontWeight" tools:targetApi="28">600</item>
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
     </style>
     <style name="TextAppearance.MusicPlayer.Lyrics" parent="">
         <item name="android:textSize">@dimen/mp_text_lyrics</item>
-        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:fontFamily">@font/mp_sans_soft</item>
         <item name="android:textFontWeight" tools:targetApi="28">500</item>
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>
@@ -40,7 +41,7 @@
     </style>
     <style name="TextAppearance.MusicPlayer.Title" parent="">
         <item name="android:textSize">@dimen/mp_text_title</item>
-        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:fontFamily">@font/mp_sans_soft</item>
         <item name="android:textFontWeight" tools:targetApi="28">500</item>
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>
@@ -64,7 +65,7 @@
     </style>
     <style name="TextAppearance.MusicPlayer.Label" parent="">
         <item name="android:textSize">@dimen/mp_text_label</item>
-        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:fontFamily">@font/mp_sans_soft</item>
         <item name="android:textFontWeight" tools:targetApi="28">500</item>
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>

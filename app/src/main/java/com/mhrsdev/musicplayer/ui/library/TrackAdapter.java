@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.library;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * selection changes are dispatched as payloads that only flip the row's check state. In reorder mode a drag
  * handle is shown and {@link #moveLocal} moves rows without waiting for the database.
  */
-public final class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
+public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
 
     public interface Listener {
         void onTrackClick(List<Track> list, int position);
@@ -171,7 +173,7 @@ public final class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder
         h.b.explicit.setVisibility(t.explicit() ? View.VISIBLE : View.GONE);
         h.title = t.title(); // the "More options for <title>" label is built on demand (TalkBack), not by a format() per bind
         h.b.drag.setVisibility(reorderable ? View.VISIBLE : View.GONE);
-        Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 12, false);
+        Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 12, false, CoverSpec.forTrack(t));
         bindSelection(h, t);
     }
 
@@ -189,7 +191,7 @@ public final class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder
         h.b.art.setArtwork(null, 0); // drops the pending load key: a late bitmap is not applied to a reused row
     }
 
-    final class Holder extends RecyclerView.ViewHolder {
+    class Holder extends RecyclerView.ViewHolder {
         final LibraryRowTrackBinding b;
         @Nullable String title;
 

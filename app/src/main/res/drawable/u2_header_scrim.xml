@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fades the header's content-tinted backdrop into the page background (rows below sit on the plain surface). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:endColor="?attr/mpBackground"
+        android:startColor="#00000000" />
+</shape>

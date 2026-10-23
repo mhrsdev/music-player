@@ -21,7 +21,33 @@ public record ScannedAudio(
         int year,
         long addedAtMs,
         long modifiedMs,
-        @Nullable String path) {
+        @Nullable String path,
+        long sizeBytes,
+        /** MediaStore IS_MUSIC. */
+        boolean music,
+        /** Ringtone, notification, alarm or podcast. */
+        boolean special,
+        /** Android 10+: the file is still being written (a running download). */
+        boolean pending,
+        /** MediaStore GENRE (API 30+), cleaned; null when unknown. */
+        @Nullable String genre) {
+
+    /** Rows / tests without a genre. */
+    public ScannedAudio(long id, @Nullable String title, @Nullable String displayName, @Nullable String artist,
+                        long artistId, @Nullable String album, long albumId, long durationMs, int trackNumber, int year,
+                        long addedAtMs, long modifiedMs, @Nullable String path, long sizeBytes, boolean music,
+                        boolean special, boolean pending) {
+        this(id, title, displayName, artist, artistId, album, albumId, durationMs, trackNumber, year, addedAtMs,
+                modifiedMs, path, sizeBytes, music, special, pending, null);
+    }
+
+    /** Trims; blank, "<unknown>" and ID3v1 numeric codes like "(17)" become null. */
+    @Nullable public static String cleanGenre(@Nullable String raw) {
+        if (raw == null) return null;
+        String g = raw.trim();
+        if (g.isEmpty() || UNKNOWN.equals(g) || g.matches("\\(?\\d+\\)?")) return null;
+        return g.length() > 40 ? g.substring(0, 40) : g;
+    }
 
     /** MediaStore's placeholder for missing tags. */
     private static final String UNKNOWN = "<unknown>";
@@ -31,7 +57,7 @@ public record ScannedAudio(
     public Track toTrack() {
         String albumKey = String.valueOf(albumId);
         return new Track(String.valueOf(id), titleOrFileName(), String.valueOf(artistId),
-                known(artist, "Unknown artist"), albumKey, known(album, "Unknown album"), durationMs,
+                known(artist, Track.UNKNOWN_ARTIST), albumKey, known(album, Track.UNKNOWN_ALBUM), durationMs,
                 albumId > 0 ? ALBUM_ART_URI + albumId : null, Seeds.of(albumKey), AUDIO_URI + id,
                 false, false, year, trackNumber, addedAtMs);
     }

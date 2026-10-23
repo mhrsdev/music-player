@@ -30,7 +30,7 @@ public class MusicPlayerApp extends Application {
         container.settings().reduceMotion().observeForever(MotionPolicy::setAppReduceMotion);
         // Below API 33 AppCompat keeps the chosen locale only in memory: re-apply the stored choice on every start.
         if (Build.VERSION.SDK_INT < 33) ThemeApplier.applyLanguage(container.settings().language().getValue());
-        registerActivityLifecycleCallbacks(new ActivityStart());
+        registerActivityLifecycleCallbacks(new VisibilityCallbacks());
     }
 
     /** The UI is gone (app backgrounded): bitmaps are the biggest thing the UI process holds; playback keeps running. */
@@ -48,16 +48,22 @@ public class MusicPlayerApp extends Application {
         return container;
     }
 
-    /** Fires {@link AppContainer#onAppForeground()} on every activity start (its work is throttled and idempotent). */
-    private final class ActivityStart implements ActivityLifecycleCallbacks {
+    /** Every activity start rechecks the library; the last stop drops the MediaStore observer (nothing runs in background). */
+    private class VisibilityCallbacks implements ActivityLifecycleCallbacks {
+        private int started;
+
         @Override public void onActivityStarted(Activity activity) {
+            started++;
             container.onAppForeground();
+        }
+
+        @Override public void onActivityStopped(Activity activity) {
+            if (--started == 0) container.onAppBackground();
         }
 
         @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) { }
         @Override public void onActivityResumed(Activity activity) { }
         @Override public void onActivityPaused(Activity activity) { }
-        @Override public void onActivityStopped(Activity activity) { }
         @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) { }
         @Override public void onActivityDestroyed(Activity activity) { }
     }

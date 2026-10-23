@@ -32,7 +32,7 @@ public class SearchViewModelTest {
 
     @Test public void queryFindsTracks() {
         value(vm.getMode());
-        vm.setQuery("neffex");
+        vm.setQuery("woodward");
         assertFalse(value(vm.getResults()).isEmpty());
         assertEquals(SearchViewModel.Mode.RESULTS, value(vm.getMode()));
     }
@@ -45,14 +45,14 @@ public class SearchViewModelTest {
 
     @Test public void filterRestrictsKinds() {
         value(vm.getMode());
-        vm.setQuery("best");
+        vm.setQuery("texas");
         vm.setFilter(SearchFilter.SONGS);
         assertTrue(value(vm.getResults()).stream().allMatch(r -> r.kind() == SearchResult.Kind.TRACK));
     }
 
     @Test public void playTrackQueuesTrackResults() {
         value(vm.getMode());
-        vm.setQuery("neffex");
+        vm.setQuery("woodward");
         SearchResult first = value(vm.getResults()).stream()
                 .filter(r -> r.kind() == SearchResult.Kind.TRACK).findFirst().orElseThrow();
         vm.playTrack(first.track());

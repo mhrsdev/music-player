@@ -135,8 +135,9 @@ Model notes:
   byte codec as `WaveformMath`; validity = the track's `modified_ms`; empty blob = negative cache), passed to `WaveformModule`.
 
 ## Fakes (`fake/`, bound in `di/AppContainer` when `useFakes`)
-`SampleData` (37 tracks, 7 artists incl. NEFFEX and Persian artist "سهراب نوری", 8 albums, 3 playlists, seeded likes/history,
-sample lyrics: track-3 plain, track-4 none, track-34..37 Persian synced, rest synced English),
+`SampleData` (26 real CC0 / CC BY / public-domain tracks, 8 artists incl. two Persian, 9 albums, 4 playlists, seeded likes/history;
+metadata + covers only, see `docs/CREDITS.md`; covers are debug-only assets `app/src/debug/assets/sample-covers/` served by the
+debug `SampleCoverProvider`; sample lyrics: track-3 plain, instrumentals none, track-25 Persian synced, rest synced English),
 `FakePlayerController` (Handler ticker, 250 ms, runs only while playing; starts paused mid-track in a 12-item queue),
 `FakeLibraryRepository`, `FakeLyricsRepository`, `FakeWaveformRepository`, `FakeHomeFeedSource`, `FakeMusicSource`.
 The UI must not notice which set is bound.

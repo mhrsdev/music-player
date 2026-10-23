@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
  * Settings → Battery, motion and Storage. Folder sizes are walked on the io executor (never on the main thread)
  * and only when the screen asks (no background work while Settings is closed).
  */
-public final class DeviceSettingsViewModel extends ViewModel {
+public class DeviceSettingsViewModel extends ViewModel {
 
     /** Bytes; -1 while computing. */
     public record Sizes(long cacheBytes, long databaseBytes) {
@@ -41,6 +41,10 @@ public final class DeviceSettingsViewModel extends ViewModel {
     public LiveData<Boolean> getReduceMotion() { return settings.reduceMotion(); }
 
     public void setReduceMotion(boolean on) { settings.setReduceMotion(on); }
+
+    public LiveData<Boolean> getImmersivePlayer() { return settings.immersivePlayer(); }
+
+    public void setImmersivePlayer(boolean on) { settings.setImmersivePlayer(on); }
 
     public LiveData<Sizes> getSizes() { return sizes; }
 

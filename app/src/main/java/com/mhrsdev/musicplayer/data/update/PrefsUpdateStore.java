@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.domain.model.UpdateSettings;
 
 /** {@link UpdateStore} on its own SharedPreferences file. Defaults: auto-check on, pre-releases included (v0.x are all pre-releases). */
-final class PrefsUpdateStore implements UpdateStore {
+class PrefsUpdateStore implements UpdateStore {
     private final SharedPreferences prefs;
 
     PrefsUpdateStore(Context context) {

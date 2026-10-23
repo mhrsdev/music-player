@@ -4,7 +4,7 @@ package com.mhrsdev.musicplayer.ui.player.lyrics;
  * Pure auto-scroll rule for the lyrics list: a manual scroll pauses auto-scroll for {@link #PAUSE_MS}; tapping
  * "back to current line" or a line resumes immediately. Time is passed in so it is JVM-testable.
  */
-public final class LyricsScrollPolicy {
+public class LyricsScrollPolicy {
     public static final long PAUSE_MS = 3_000L;
     private long userScrolledAt = Long.MIN_VALUE / 2;
 

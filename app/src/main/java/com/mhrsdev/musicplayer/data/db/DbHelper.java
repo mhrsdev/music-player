@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.mhrsdev.musicplayer.data.db.contract.LikesContract;
 import com.mhrsdev.musicplayer.data.db.contract.LyricsCacheContract;
+import com.mhrsdev.musicplayer.data.db.contract.PlayEventsContract;
 import com.mhrsdev.musicplayer.data.db.contract.PlayStatsContract;
 import com.mhrsdev.musicplayer.data.db.contract.PlaylistTracksContract;
 import com.mhrsdev.musicplayer.data.db.contract.PlaylistsContract;
@@ -17,11 +18,12 @@ import com.mhrsdev.musicplayer.data.db.contract.WaveformsContract;
  * Bump {@link #VERSION} and add a migration step in {@link #onUpgrade} whenever a contract changes.
  *
  * <p>History: v1 = likes only (scaffold), v2 = library, playlists, play stats, waveform + lyrics caches,
- * v3 = lyrics cache keyed by expiry instead of fetch time.
+ * v3 = lyrics cache keyed by expiry instead of fetch time, v4 = tracks keep file size + path (change detection,
+ * folder browser) + genre, and play_events (timestamped history for the Home mixes). v0.2.0 shipped v3.
  */
 public final class DbHelper extends SQLiteOpenHelper {
     public static final String NAME = "musicplayer.db";
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     public DbHelper(Context context) {
         super(context.getApplicationContext(), NAME, null, VERSION);
@@ -36,6 +38,7 @@ public final class DbHelper extends SQLiteOpenHelper {
     @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL(LikesContract.CREATE);
         createV2Tables(db);
+        for (String sql : PlayEventsContract.SCHEMA) db.execSQL(sql);
     }
 
     @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -43,6 +46,13 @@ public final class DbHelper extends SQLiteOpenHelper {
         if (oldVersion == 2) { // v1 databases just got the v3 shape from createV2Tables
             db.execSQL(LyricsCacheContract.DROP);
             for (String sql : LyricsCacheContract.SCHEMA) db.execSQL(sql);
+        }
+        // One v3 -> v4 step (v1 databases got the v4 tracks table from createV2Tables above).
+        if (oldVersion >= 2 && oldVersion < 4) {
+            for (String sql : TracksContract.UPGRADE_V4) db.execSQL(sql);
+        }
+        if (oldVersion < 4) {
+            for (String sql : PlayEventsContract.SCHEMA) db.execSQL(sql);
         }
     }
 

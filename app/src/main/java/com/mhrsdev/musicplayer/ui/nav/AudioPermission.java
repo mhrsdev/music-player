@@ -7,7 +7,7 @@ import android.os.Build;
 import androidx.core.content.ContextCompat;
 
 /** READ_MEDIA_AUDIO on API 33+, READ_EXTERNAL_STORAGE below. */
-public final class AudioPermission {
+public class AudioPermission {
     private AudioPermission() { }
 
     public static String name() {

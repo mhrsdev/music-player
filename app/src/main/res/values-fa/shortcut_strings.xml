@@ -1,0 +1,9 @@
+<resources>
+    <string name="shortcut_shuffle_all">پخش تصادفی</string>
+    <string name="shortcut_shuffle_all_long">پخش تصادفی همه‌ی آهنگ‌ها</string>
+    <string name="shortcut_liked">آهنگ‌های پسندیده</string>
+    <string name="shortcut_liked_long">باز کردن آهنگ‌های پسندیده</string>
+    <string name="shortcut_search">جستجو</string>
+    <string name="shortcut_search_long">جستجو در موسیقی‌ها</string>
+    <string name="shortcut_shuffle_playing_from">پخش تصادفی</string>
+</resources>

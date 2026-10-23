@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Google Sans Flex subset (wght 400-800, ROND 0-100; tools/fonts/build_sans_subset.py). Display and headline: ROND 100 (fully rounded terminals, echoes the squircle shapes).
+     Pick weights with android:textFontWeight / Typeface.create(family, weight); see ui/theme/TypeRoles. -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="400" android:fontVariationSettings="'wght' 420, 'ROND' 100" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="500" android:fontVariationSettings="'wght' 560, 'ROND' 100" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="600" android:fontVariationSettings="'wght' 640, 'ROND' 100" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="700" android:fontVariationSettings="'wght' 720, 'ROND' 100" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="800" android:fontVariationSettings="'wght' 800, 'ROND' 100" />
+</font-family>

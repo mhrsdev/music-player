@@ -61,9 +61,11 @@ public class TrackListViewModelTest {
     @Test public void sortsByTitleWithSections() {
         TrackListViewModel vm = vm(TrackList.SONGS, null, new SortOrder(SortOrder.Field.TITLE, true));
         List<Track> sorted = rows(vm);
+        java.text.Collator collator = java.text.Collator.getInstance(Locale.US); // same rule as SortOrder (primary strength)
+        collator.setStrength(java.text.Collator.PRIMARY);
         for (int i = 1; i < sorted.size(); i++) {
-            assertTrue(sorted.get(i - 1).title().compareToIgnoreCase(sorted.get(i).title()) <= 0
-                    || !Character.isLetter(sorted.get(i).title().charAt(0)));
+            assertTrue(sorted.get(i - 1).title() + " before " + sorted.get(i).title(),
+                    collator.compare(sorted.get(i - 1).title(), sorted.get(i).title()) <= 0);
         }
         assertFalse(value(vm.getRows()).sections().isEmpty());
         vm.setSort(new SortOrder(SortOrder.Field.DURATION, false));

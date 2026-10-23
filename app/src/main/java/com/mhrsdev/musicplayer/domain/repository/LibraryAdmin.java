@@ -14,7 +14,13 @@ public interface LibraryAdmin {
     /** True while a scan runs (progress indicator). */
     LiveData<Boolean> isScanning();
 
-    /** Manual rescan. {@code callback} (may be null) gets the result on the main thread; FAILED if one is already running. */
+    /** As {@link #scanIfStale()}, but a no-op when a scan finished less than {@code minIntervalMs} ago (app start). */
+    void scanIfStale(long minIntervalMs);
+
+    /**
+     * Manual refresh (Settings, pull-to-refresh): re-reads everything, ignoring the staleness check.
+     * {@code callback} (may be null) gets the result on the main thread; FAILED if one is already running.
+     */
     void rescan(@Nullable Callback<ScanResult> callback);
 
     /** Scans only if the device's media changed since the last scan (or never scanned). Needs the audio permission. */

@@ -77,7 +77,7 @@ public class PlayerRenderTest {
 
     @Test @Config(sdk = 35, qualifiers = "fa-ldrtl-" + DARK)
     public void persianRtl() throws Exception {
-        FragmentActivity a = host(SettingsStore.SeekStyle.BARS, 33); // track-34: Persian, synced lyrics
+        FragmentActivity a = host(SettingsStore.SeekStyle.BARS, 24); // track-25: Persian, synced lyrics
         PlayerFragment f = player(a);
         snap(content(a), "u3-player-cover-fa-dark");
         f.requireView().findViewById(R.id.player_lyrics_toggle).performClick();

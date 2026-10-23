@@ -35,6 +35,10 @@ import com.mhrsdev.musicplayer.domain.model.RepeatMode;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsAdapter;
+import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsClock;
+import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsEffects;
+import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsOffsetStore;
+import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsTicker;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsScrollPolicy;
 import com.mhrsdev.musicplayer.ui.queue.QueueFragment;
 import com.mhrsdev.musicplayer.ui.widget.BarsSeekView;
@@ -61,6 +65,10 @@ public final class PlayerFragment extends Fragment {
     private PlayerViewModel vm;
     private LyricsAdapter lyricsAdapter;
     private final LyricsScrollPolicy scrollPolicy = new LyricsScrollPolicy();
+    private final LyricsClock lyricsClock = new LyricsClock();
+    private LyricsTicker lyricsTicker;
+    @Nullable private LyricsOffsetStore offsets;
+    @Nullable private Lyrics shownLyrics;
     private PlayerPalette palette = PlayerPalette.forSeed(0);
     @Nullable private String paletteTrackId;
     private boolean scrubbing;
@@ -86,9 +94,11 @@ public final class PlayerFragment extends Fragment {
         vm = new ViewModelProvider(this, PlayerViewModel.factory(c.player, c.library, c.lyrics, c.waveform))
                 .get(PlayerViewModel.class);
 
+        int basePadLeft = b.playerContent.getPaddingLeft(), basePadRight = b.playerContent.getPaddingRight();
         ViewCompat.setOnApplyWindowInsetsListener(b.playerContent, (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), bars.bottom + dp(12));
+            // Controls clear the bars and a side/top cutout (landscape punch hole); the backdrop stays full-bleed.
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            v.setPadding(basePadLeft + bars.left, bars.top, basePadRight + bars.right, bars.bottom + dp(12));
             return insets;
         });
 
@@ -112,6 +122,8 @@ public final class PlayerFragment extends Fragment {
         applyThemeColors();
         setupControls();
         setupLyrics();
+        c.settings().lyricsTextSize().observe(getViewLifecycleOwner(),
+                size -> lyricsAdapter.setTextSizeSp(LyricsEffects.textSp(size)));
         setupSwipeToCollapse();
         applyPalette(palette, null, false); // theme-correct accents before the first track arrives
 
@@ -122,6 +134,7 @@ public final class PlayerFragment extends Fragment {
         // (WaveformSeekView extends WavySeekView, so compare the exact class.)
         if (seek.getClass() != WavySeekView.class) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
         vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
+        vm.getLyricsAvailability().observe(getViewLifecycleOwner(), this::renderLyricsButton);
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
 
@@ -225,15 +238,29 @@ public final class PlayerFragment extends Fragment {
         b.playerMore.setOnClickListener(v -> {
             android.widget.PopupMenu menu = new android.widget.PopupMenu(requireContext(), v);
             boolean lyrics = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
-            menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
+            if (lyrics || vm.getLyricsAvailability().getValue() == LyricsAvailability.AVAILABLE) {
+                menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
+            }
             menu.getMenu().add(0, 2, 1, R.string.player_queue);
             menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
             Track current = vm.getCurrentTrack().getValue();
             if (current != null) menu.getMenu().add(0, 4, 3, R.string.player_add_to_playlist);
+            if (lyrics && shownLyrics != null && !shownLyrics.isEmpty()) {
+                menu.getMenu().add(0, 11, 4, R.string.lyrics_text_larger);
+                menu.getMenu().add(0, 12, 5, R.string.lyrics_text_smaller);
+                if (shownLyrics.synced()) {
+                    menu.getMenu().add(0, 13, 6, R.string.lyrics_earlier);
+                    menu.getMenu().add(0, 14, 7, R.string.lyrics_later);
+                }
+            }
             if (current != null) menu.getMenu().add(0, 5, 4, R.string.player_share);
             if (soundFragmentClass() != null) menu.getMenu().add(0, 6, 5, R.string.player_sound);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) vm.toggleLyrics();
+                else if (item.getItemId() == 11) stepLyricsSize(1);
+                else if (item.getItemId() == 12) stepLyricsSize(-1);
+                else if (item.getItemId() == 13) nudgeLyrics(-LyricsOffsetStore.STEP_MS);
+                else if (item.getItemId() == 14) nudgeLyrics(LyricsOffsetStore.STEP_MS);
                 else if (item.getItemId() == 4 && current != null)
                     com.mhrsdev.musicplayer.ui.playlist.AddToPlaylistSheet.show(getParentFragmentManager(), current);
                 else if (item.getItemId() == 3) com.mhrsdev.musicplayer.ui.queue.SleepTimerSheet.show(getParentFragmentManager());
@@ -261,18 +288,22 @@ public final class PlayerFragment extends Fragment {
     }
 
     private void setupLyrics() {
+        offsets = new LyricsOffsetStore(requireContext());
         lyricsAdapter = new LyricsAdapter(line -> {
             scrollPolicy.resume();
             b.lyricsBackToCurrent.setVisibility(View.GONE);
-            vm.seekTo(line.timeMs());
-        });
+            vm.seekTo(line.timeMs() + lyricsClock.offsetMs());
+        }, lyricsClock);
+        lyricsAdapter.setEffects(LyricsEffects.blurAllowed(requireContext()),
+                com.mhrsdev.musicplayer.ui.theme.MotionPolicy.decorativeMotionEnabled(requireContext()));
+        lyricsTicker = new LyricsTicker(b.lyricsList, lyricsClock, () -> renderActiveLine(null));
         b.lyricsList.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.lyricsList.setAdapter(lyricsAdapter);
         lyricsAdapter.setTextColor(light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK);
         b.lyricsList.setItemAnimator(null);
         b.lyricsList.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
             int h = bt - t;
-            if (h != ob - ot) v.post(() -> v.setPadding(0, (int) (h * 0.4f), 0, (int) (h * 0.5f)));
+            if (h != ob - ot) v.post(() -> v.setPadding(0, (int) (h * LyricsEffects.ANCHOR), 0, (int) (h * 0.5f)));
         });
         b.lyricsList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override public void onScrollStateChanged(@NonNull RecyclerView rv, int newState) {
@@ -326,6 +357,8 @@ public final class PlayerFragment extends Fragment {
     }
 
     @Override public void onStop() {
+        if (b != null) b.playerBackdrop.setAnimating(false); // screen off / app in background: no drift
+        if (lyricsTicker != null) lyricsTicker.stop();
         if (outputRoute != null) outputRoute.stop();
         outputRoute = null;
         super.onStop();
@@ -462,6 +495,12 @@ public final class PlayerFragment extends Fragment {
         seek.setPlaying(s.playing());
         seek.setDuration(s.durationMs());
         seek.setBuffered(s.durationMs());
+        lyricsClock.update(s.positionMs(), s.playing());
+        b.playerBackdrop.setAnimating(s.playing()); // drift only while this (visible) player plays
+        if (lyricsTicker != null) {
+            lyricsTicker.poke();
+            if (!s.playing()) { renderActiveLine(null); lyricsTicker.invalidateActive(); } // exact paused frame
+        }
         if (!scrubbing && !seek.isDragging()) {
             seek.setPosition(s.positionMs());
             long sec = s.positionMs() / 1000;
@@ -566,6 +605,9 @@ public final class PlayerFragment extends Fragment {
 
     private void renderLiked(Boolean liked) {
         boolean on = Boolean.TRUE.equals(liked);
+        boolean wasOn = Boolean.TRUE.equals(b.playerLike.getTag(R.id.mp_motion_state));
+        b.playerLike.setTag(R.id.mp_motion_state, on);
+        if (on && !wasOn && b.playerLike.isLaidOut()) com.mhrsdev.musicplayer.ui.motion.Motion.pop(b.playerLike);
         b.playerLike.setImageResource(on ? R.drawable.player_ic_favorite : R.drawable.player_ic_favorite_border);
         b.playerLike.setContentDescription(getString(on ? R.string.player_unlike : R.string.player_like));
     }
@@ -576,7 +618,31 @@ public final class PlayerFragment extends Fragment {
         b.playerLyricsToggle.setContentDescription(getString(lyrics ? R.string.player_show_cover : R.string.player_show_lyrics));
         b.playerLyricsToggle.setActivated(lyrics);
         b.playerLyricsToggle.setAlpha(lyrics ? 1f : 0.82f);
+        renderLyricsButton(vm.getLyricsAvailability().getValue());
         renderLyrics(vm.getLyrics().getValue());
+    }
+
+    /**
+     * Lyrics button only when the track has lyrics. INVISIBLE (not GONE) so the centred pill group never jumps when
+     * the next track's answer arrives; a short fade-in when it appears, nothing while checking.
+     */
+    private void renderLyricsButton(@Nullable LyricsAvailability a) {
+        View v = b.playerLyricsToggle;
+        boolean show = a == LyricsAvailability.AVAILABLE || Boolean.TRUE.equals(vm.getShowLyrics().getValue());
+        if (show == (v.getVisibility() == View.VISIBLE)) return;
+        v.animate().cancel();
+        float target = Boolean.TRUE.equals(vm.getShowLyrics().getValue()) ? 1f : 0.82f;
+        if (show) {
+            v.setVisibility(View.VISIBLE);
+            if (com.mhrsdev.musicplayer.ui.theme.MotionPolicy.decorativeMotionEnabled(requireContext())) {
+                v.setAlpha(0f);
+                v.animate().alpha(target).setDuration(180).start();
+            } else {
+                v.setAlpha(target);
+            }
+        } else {
+            v.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void crossfade(View v, boolean show) {
@@ -593,6 +659,7 @@ public final class PlayerFragment extends Fragment {
 
     private void renderLyrics(@Nullable Lyrics l) {
         boolean showing = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
+        lyricsTicker.setEnabled(showing && l != null && l.synced() && !l.isEmpty());
         if (!showing) {
             b.lyricsList.setVisibility(View.GONE);
             b.lyricsMessage.setVisibility(View.GONE);
@@ -617,9 +684,10 @@ public final class PlayerFragment extends Fragment {
         boolean fresh = b.lyricsList.getTag() != l;
         if (fresh) {
             b.lyricsList.setTag(l);
+            shownLyrics = l;
+            lyricsClock.setOffsetMs(offsets == null ? 0 : offsets.get(l.trackId()));
             lyricsAdapter.setLyrics(l);
-            Integer active = vm.getActiveLyricLine().getValue();
-            lyricsAdapter.setActive(active == null ? -1 : active);
+            lyricsAdapter.setActive(activeLine());
             if (!l.synced()) b.lyricsList.scrollToPosition(0);
         }
         // Opening lyrics (or a new song's text) jumps straight to the current line instead of scrolling from the top.
@@ -628,31 +696,53 @@ public final class PlayerFragment extends Fragment {
         }
     }
 
-    private void renderActiveLine(@Nullable Integer index) {
-        int i = index == null ? -1 : index;
+    /** Active line from the smooth clock (includes the per-track offset); the VM's 4 Hz index is only the trigger. */
+    private int activeLine() {
+        Lyrics l = shownLyrics;
+        return l == null ? -1 : l.activeLineIndex(lyricsClock.positionMs());
+    }
+
+    private void renderActiveLine(@Nullable Integer ignored) {
+        if (b == null || lyricsAdapter == null) return;
+        int i = activeLine();
+        if (i == lyricsAdapter.getActive()) return;
         lyricsAdapter.setActive(i);
         if (b.lyricsList.getVisibility() == View.VISIBLE && scrollPolicy.shouldAutoScroll(SystemClock.uptimeMillis())) {
             scrollToLine(i, true);
         }
     }
 
+    /** Lyrics timing ±0.5 s for this track (remembered per track). */
+    private void nudgeLyrics(long deltaMs) {
+        Lyrics l = shownLyrics;
+        if (l == null || offsets == null) return;
+        long v = offsets.nudge(l.trackId(), deltaMs);
+        lyricsClock.setOffsetMs(v);
+        renderActiveLine(null);
+        lyricsTicker.invalidateActive();
+        android.widget.Toast.makeText(requireContext(), getString(R.string.lyrics_offset_now,
+                LyricsOffsetStore.format(v, getResources().getConfiguration().getLocales().get(0))),
+                android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    private void stepLyricsSize(int dir) {
+        AppContainer c = ((MusicPlayerApp) requireActivity().getApplication()).getContainer();
+        c.settings().setLyricsTextSize(LyricsEffects.step(c.settings().lyricsTextSize().getValue(), dir));
+    }
+
     private void scrollToLine(int index, boolean smooth) {
         if (index < 0 || index >= lyricsAdapter.getItemCount()) return;
         RecyclerView.LayoutManager lm = b.lyricsList.getLayoutManager();
         if (lm == null) return;
-        if (!smooth || !PlayerPalette.motionAllowed(requireContext())) {
-            ((LinearLayoutManager) lm).scrollToPositionWithOffset(index, (int) (b.lyricsList.getHeight() * 0.4f)
-                    - b.lyricsList.getPaddingTop());
+        int anchor = (int) (b.lyricsList.getHeight() * LyricsEffects.ANCHOR);
+        View target = lm.findViewByPosition(index);
+        if (!smooth || target == null || !PlayerPalette.motionAllowed(requireContext())) {
+            ((LinearLayoutManager) lm).scrollToPositionWithOffset(index, anchor - b.lyricsList.getPaddingTop());
             return;
         }
-        LinearSmoothScroller s = new LinearSmoothScroller(requireContext()) {
-            @Override public int calculateDtToFit(int vs, int ve, int bs, int be, int pref) {
-                return (bs + (int) ((be - bs) * 0.4f)) - (vs + (ve - vs) / 2);
-            }
-            @Override protected float calculateSpeedPerPixel(DisplayMetrics dm) { return 90f / dm.densityDpi; }
-        };
-        s.setTargetPosition(index);
-        lm.startSmoothScroll(s);
+        // our spring curve (lyrics motion), one smooth scroll per line change
+        int dy = target.getTop() - anchor;
+        if (dy != 0) b.lyricsList.smoothScrollBy(0, dy, com.mhrsdev.musicplayer.ui.player.lyrics.LyricsMotion.SPRING, 620);
     }
 
     // ---------------------------------------------------------------- cover gestures, share, sound
@@ -836,6 +926,7 @@ public final class PlayerFragment extends Fragment {
 
     @Override public void onDestroyView() {
         b.lyricsList.removeCallbacks(resumeAutoScroll);
+        if (lyricsTicker != null) lyricsTicker.stop();
         renderedOnce = false;
         rElapsedSec = -1;
         b = null;

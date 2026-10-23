@@ -43,8 +43,13 @@ public abstract class ActionSheet extends BottomSheetDialogFragment {
     /** Fills {@code rows}; returns the header, or null to hide it. */
     @Nullable protected abstract Header build(List<Row> rows);
 
-    /** False when the sheet was recreated without its in-memory state (it then dismisses itself). */
-    protected abstract boolean hasState();
+    /** Optional primary actions shown as a row of tiles above the rows. */
+    protected void buildTiles(List<Row> tiles) { }
+
+    /** False when the sheet's arguments are missing (it then dismisses itself). */
+    protected boolean hasState() {
+        return getArguments() != null;
+    }
 
     @NonNull @Override public Dialog onCreateDialog(@Nullable Bundle state) {
         BottomSheetDialog d = (BottomSheetDialog) super.onCreateDialog(state);
@@ -85,6 +90,21 @@ public abstract class ActionSheet extends BottomSheetDialogFragment {
         }
         b.sheetRows.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(requireContext());
+        List<Row> tiles = new ArrayList<>();
+        buildTiles(tiles);
+        b.sheetTiles.removeAllViews();
+        b.sheetTiles.setVisibility(tiles.isEmpty() ? View.GONE : View.VISIBLE);
+        for (Row tile : tiles) {
+            com.mhrsdev.musicplayer.databinding.U2SheetTileBinding t =
+                    com.mhrsdev.musicplayer.databinding.U2SheetTileBinding.inflate(inflater, b.sheetTiles, false);
+            t.tileIcon.setImageResource(tile.icon());
+            t.tileLabel.setText(tile.label());
+            t.getRoot().setOnClickListener(v -> {
+                dismissAllowingStateLoss();
+                tile.action().run();
+            });
+            b.sheetTiles.addView(t.getRoot());
+        }
         int error = Tokens.color(requireContext(), R.attr.mpError);
         for (Row row : rows) {
             U2SheetRowBinding r = U2SheetRowBinding.inflate(inflater, b.sheetRows, false);

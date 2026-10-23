@@ -15,7 +15,7 @@ import java.util.List;
  * compiles without them. An entry is shown only when its class is present and is a {@link Fragment} with a public
  * no-arg constructor (same pattern {@code MainActivity} uses for the player).
  */
-public final class FeatureScreens {
+public class FeatureScreens {
 
     public record Entry(String className, String tag, @StringRes int title, @StringRes int subtitle,
             @DrawableRes int icon) { }
