@@ -67,6 +67,11 @@ public final class PlayerFragment extends Fragment {
     private final Runnable resumeAutoScroll = this::onAutoScrollResume;
     @Nullable private OutputRoute outputRoute;
     private boolean light;
+    private boolean btNameNeedsPermission;
+    private static final String PREFS = "player_ui", K_BT_ASKED = "bt_name_asked";
+    private final androidx.activity.result.ActivityResultLauncher<String> btPermission = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+            granted -> { if (outputRoute != null) outputRoute.refresh(); });
 
     public static PlayerFragment newInstance() { return new PlayerFragment(); }
 
@@ -114,7 +119,8 @@ public final class PlayerFragment extends Fragment {
         vm.getCurrentTrack().observe(getViewLifecycleOwner(), this::renderTrack);
         vm.getLiked().observe(getViewLifecycleOwner(), this::renderLiked);
         // Wavy ignores the envelope: don't extract it (CPU/battery) unless the chosen style draws it.
-        if (!(seek instanceof WavySeekView)) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
+        // (WaveformSeekView extends WavySeekView, so compare the exact class.)
+        if (seek.getClass() != WavySeekView.class) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
         vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
@@ -191,6 +197,15 @@ public final class PlayerFragment extends Fragment {
     }
 
     private void setupControls() {
+        b.playerPlay.setOnLongClickListener(v -> { // long-press = stop (pause and back to the start)
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            vm.stop();
+            android.widget.Toast.makeText(requireContext(), R.string.player_stopped, android.widget.Toast.LENGTH_SHORT).show();
+            return true;
+        });
+        ViewCompat.replaceAccessibilityAction(b.playerPlay,
+                androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK,
+                getString(R.string.player_stop), null);
         b.playerPlay.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             vm.togglePlayPause();
@@ -215,11 +230,16 @@ public final class PlayerFragment extends Fragment {
             menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
             Track current = vm.getCurrentTrack().getValue();
             if (current != null) menu.getMenu().add(0, 4, 3, R.string.player_add_to_playlist);
+            if (current != null) menu.getMenu().add(0, 5, 4, R.string.player_share);
+            if (soundFragmentClass() != null) menu.getMenu().add(0, 6, 5, R.string.player_sound);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) vm.toggleLyrics();
                 else if (item.getItemId() == 4 && current != null)
                     com.mhrsdev.musicplayer.ui.playlist.AddToPlaylistSheet.show(getParentFragmentManager(), current);
-                else b.playerQueue.performClick(); // sleep timer lives in the queue sheet (design v1, 07)
+                else if (item.getItemId() == 3) com.mhrsdev.musicplayer.ui.queue.SleepTimerSheet.show(getParentFragmentManager());
+                else if (item.getItemId() == 5 && current != null) share(current);
+                else if (item.getItemId() == 6) openSound();
+                else b.playerQueue.performClick();
                 return true;
             });
             menu.show();
@@ -229,6 +249,7 @@ public final class PlayerFragment extends Fragment {
             if (nav != null) nav.openQueue();
             else QueueFragment.show(getParentFragmentManager());
         });
+        b.playerOutput.setOnClickListener(v -> { if (btNameNeedsPermission) explainBluetoothName(); });
         seek.setOnSeekListener(new SeekBarView.OnSeekListener() {
             @Override public void onSeekStart(long pos) { scrubbing = true; }
             @Override public void onSeek(long pos) { renderTimes(pos, seek.getDuration()); }
@@ -325,6 +346,9 @@ public final class PlayerFragment extends Fragment {
         }
         b.playerOutput.setText(label);
         b.playerOutput.setContentDescription(getString(R.string.player_output_cd, label));
+        btNameNeedsPermission = r.nameNeedsPermission();
+        b.playerOutput.setClickable(btNameNeedsPermission);
+        if (btNameNeedsPermission) maybeOfferBluetoothName();
         b.playerOutput.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
     }
 
@@ -385,7 +409,7 @@ public final class PlayerFragment extends Fragment {
                         vt[0] = null;
                     }
                     if (!tracking[0]) {
-                        if (e.getActionMasked() == MotionEvent.ACTION_UP && v != b.playerRoot) v.performClick();
+                        if (e.getActionMasked() == MotionEvent.ACTION_UP && v != b.playerRoot && v != b.playerArtwork) v.performClick();
                         return true;
                     }
                     boolean close = root.getTranslationY() > root.getHeight() * 0.22f || vy > 1200;
@@ -403,7 +427,11 @@ public final class PlayerFragment extends Fragment {
                     return false;
             }
         };
-        b.playerArtwork.setOnTouchListener(l);
+        android.view.GestureDetector cover = new android.view.GestureDetector(requireContext(), new CoverGestures());
+        b.playerArtwork.setOnTouchListener((v, e) -> {
+            cover.onTouchEvent(e);
+            return l.onTouch(v, e); // vertical drag still collapses the player
+        });
         b.playerHandle.setOnTouchListener(l);
         b.playerRoot.setOnTouchListener(l);
     }
@@ -428,6 +456,7 @@ public final class PlayerFragment extends Fragment {
             seek.setPosition(s.positionMs());
             renderTimes(s.positionMs(), s.durationMs());
         }
+        updateTitleMarquee(s.playing());
         b.playerNext.setEnabled(s.hasNext() || s.repeatMode() == RepeatMode.ALL);
         b.playerNext.setAlpha(b.playerNext.isEnabled() ? 1f : 0.38f);
         b.playerPlay.setEnabled(s.currentTrack() != null);
@@ -463,8 +492,10 @@ public final class PlayerFragment extends Fragment {
             return;
         }
         b.playerTitle.setText(t.title());
-        b.playerTitle.setSelected(true); // one marquee pass for long titles
         b.playerArtist.setText(t.artistName());
+        fitTitle();
+        b.playerTitle.setContentDescription(null);
+        b.playerTitleBlock.setContentDescription(getString(R.string.player_now_playing_cd, t.title(), t.artistName()));
         boolean changed = paletteTrackId != null && !paletteTrackId.equals(t.id());
         paletteTrackId = t.id();
         boolean artColors = new com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore(requireContext()).isArtworkColors();
@@ -553,13 +584,19 @@ public final class PlayerFragment extends Fragment {
         }
         b.lyricsRetry.setVisibility(View.GONE);
         b.lyricsMessage.setVisibility(View.GONE);
-        if (b.lyricsList.getVisibility() != View.VISIBLE) crossfade(b.lyricsList, true);
-        if (b.lyricsList.getTag() != l) {
+        boolean appearing = b.lyricsList.getVisibility() != View.VISIBLE;
+        if (appearing) crossfade(b.lyricsList, true);
+        boolean fresh = b.lyricsList.getTag() != l;
+        if (fresh) {
             b.lyricsList.setTag(l);
             lyricsAdapter.setLyrics(l);
             Integer active = vm.getActiveLyricLine().getValue();
-            renderActiveLine(active);
+            lyricsAdapter.setActive(active == null ? -1 : active);
             if (!l.synced()) b.lyricsList.scrollToPosition(0);
+        }
+        // Opening lyrics (or a new song's text) jumps straight to the current line instead of scrolling from the top.
+        if ((appearing || fresh) && l.synced()) {
+            b.lyricsList.post(() -> { if (b != null) scrollToLine(lyricsAdapter.getActive(), false); });
         }
     }
 
@@ -588,6 +625,183 @@ public final class PlayerFragment extends Fragment {
         };
         s.setTargetPosition(index);
         lm.startSmoothScroll(s);
+    }
+
+    // ---------------------------------------------------------------- cover gestures, share, sound
+
+    /** Tap = lyrics, double-tap left/right half = -10/+10 s (tape direction, also in RTL), horizontal fling = skip. */
+    private final class CoverGestures extends android.view.GestureDetector.SimpleOnGestureListener {
+        @Override public boolean onDown(@NonNull MotionEvent e) { return true; }
+
+        @Override public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+            vm.toggleLyrics();
+            return true;
+        }
+
+        @Override public boolean onDoubleTap(@NonNull MotionEvent e) {
+            boolean forward = e.getX() > b.playerArtwork.getWidth() / 2f;
+            vm.seekBy(forward ? SEEK_STEP_MS : -SEEK_STEP_MS);
+            b.playerArtwork.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            showSeekHint(forward);
+            return true;
+        }
+
+        @Override public boolean onFling(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float vx, float vy) {
+            if (e1 == null || Math.abs(vx) < 2f * Math.abs(vy) || Math.abs(vx) < 600f) return false;
+            if (Math.abs(e2.getRawX() - e1.getRawX()) < dp(48)) return false;
+            b.playerArtwork.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            if (vx < 0) vm.next(); else vm.previous(); // tape direction: swipe left = next
+            return true;
+        }
+    }
+
+    static final long SEEK_STEP_MS = 10_000L;
+    @Nullable private TextView seekHint;
+
+    private void showSeekHint(boolean forward) {
+        if (seekHint == null) {
+            seekHint = new TextView(requireContext());
+            seekHint.setBackgroundResource(R.drawable.player_chip_bg);
+            seekHint.setTextColor(0xFFFFFFFF);
+            seekHint.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            seekHint.setTypeface(seekHint.getTypeface(), android.graphics.Typeface.BOLD);
+            seekHint.setPadding(dp(16), dp(8), dp(16), dp(8));
+            seekHint.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            b.playerStage.addView(seekHint, new android.widget.FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        android.widget.FrameLayout.LayoutParams lp = (android.widget.FrameLayout.LayoutParams) seekHint.getLayoutParams();
+        // absolute left/right: the seek direction is tape direction in every locale
+        lp.gravity = android.view.Gravity.CENTER_VERTICAL | (forward ? android.view.Gravity.RIGHT : android.view.Gravity.LEFT);
+        lp.leftMargin = lp.rightMargin = dp(28);
+        seekHint.setLayoutParams(lp);
+        seekHint.setText(forward ? R.string.player_hint_forward_10 : R.string.player_hint_back_10);
+        seekHint.setTranslationZ(dp(24));
+        seekHint.animate().cancel();
+        seekHint.setAlpha(1f);
+        seekHint.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
+    }
+
+    private void share(Track t) {
+        android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(android.content.Intent.EXTRA_TEXT, t.title() + " \u2014 " + t.artistName());
+        startActivity(android.content.Intent.createChooser(send, getString(R.string.player_share_chooser)));
+    }
+
+    @Nullable static Class<?> soundFragmentClass() {
+        try {
+            return Class.forName("com.mhrsdev.musicplayer.ui.sound.SoundFragment");
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    /** Opens the Sound screen (equalizer, speed) by class name over everything; back closes it. */
+    private void openSound() {
+        Class<?> c = soundFragmentClass();
+        if (c == null) return;
+        try {
+            Fragment f = (Fragment) c.getDeclaredConstructor().newInstance();
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .add(android.R.id.content, f, "sound").addToBackStack("sound").commit();
+        } catch (ReflectiveOperationException | ClassCastException ignored) {
+            // no Sound screen in this build
+        }
+    }
+
+    // ---------------------------------------------------------------- title fitting
+
+    static final float TITLE_MAX_SP = 30f, TITLE_MIN_SP = 20f;
+
+    /** Largest size in [min, max] (2 sp steps) at which {@code textWidthAt(size)} fits {@code avail}; min when none. */
+    static float fitTextSize(float avail, float maxSp, float minSp, java.util.function.DoubleUnaryOperator widthAt) {
+        for (float sp = maxSp; sp > minSp; sp -= 2f) if (widthAt.applyAsDouble(sp) <= avail) return sp;
+        return minSp;
+    }
+
+    /** Once per bind: shrink long titles from 30 sp down to 20 sp, then ellipsize (no per-frame work). */
+    private void fitTitle() {
+        TextView t = b.playerTitle;
+        if (t.getWidth() == 0) { // not laid out yet: once, on the next layout
+            t.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override public void onLayoutChange(View v, int l, int tp, int r, int bt, int ol, int ot, int or, int ob) {
+                    v.removeOnLayoutChangeListener(this);
+                    if (b != null && v.getWidth() > 0) v.post(() -> { if (b != null) fitTitle(); });
+                }
+            });
+            return;
+        }
+        CharSequence text = t.getText();
+        float avail = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
+        android.text.TextPaint p = new android.text.TextPaint(t.getPaint());
+        android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+        float sp = fitTextSize(avail, TITLE_MAX_SP, TITLE_MIN_SP, size -> {
+            p.setTextSize(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, (float) size, dm));
+            return p.measureText(text, 0, text.length());
+        });
+        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, sp);
+        // An ellipsized RTL line inside an LTR layout (or the reverse) is clipped at its start when aligned to the
+        // view start; such a line fills the width anyway, so align it to its own text start instead.
+        p.setTextSize(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, sp, dm));
+        alignOverflowing(t, p.measureText(text, 0, text.length()) > avail);
+        CharSequence artist = b.playerArtist.getText();
+        if (artist != null) alignOverflowing(b.playerArtist, b.playerArtist.getPaint().measureText(artist, 0, artist.length())
+                > b.playerArtist.getWidth() - b.playerArtist.getTotalPaddingLeft() - b.playerArtist.getTotalPaddingRight());
+        PlaybackState st = vm.getState().getValue();
+        updateTitleMarquee(st != null && st.playing());
+    }
+
+    private static void alignOverflowing(TextView t, boolean overflows) {
+        int want = overflows ? View.TEXT_ALIGNMENT_TEXT_START : View.TEXT_ALIGNMENT_VIEW_START;
+        if (t.getTextAlignment() != want) t.setTextAlignment(want);
+    }
+
+    /** Ellipsis by default; one cheap marquee pass only while playing with motion allowed (not in battery saver). */
+    private void updateTitleMarquee(boolean playing) {
+        TextView t = b.playerTitle;
+        boolean marquee = playing && PlayerPalette.motionAllowed(requireContext());
+        android.text.TextUtils.TruncateAt want = marquee ? android.text.TextUtils.TruncateAt.MARQUEE
+                : android.text.TextUtils.TruncateAt.END;
+        if (t.getEllipsize() != want) t.setEllipsize(want);
+        if (t.isSelected() != marquee) t.setSelected(marquee);
+    }
+
+    // ---------------------------------------------------------------- Bluetooth device name (API 31+)
+
+    private android.content.SharedPreferences uiPrefs() {
+        return requireContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    }
+
+    /** First Bluetooth output seen without the permission: one unobtrusive offer, never again automatically. */
+    private void maybeOfferBluetoothName() {
+        if (android.os.Build.VERSION.SDK_INT < 31 || uiPrefs().getBoolean(K_BT_ASKED, false)) return;
+        uiPrefs().edit().putBoolean(K_BT_ASKED, true).apply();
+        com.google.android.material.snackbar.Snackbar.make(b.playerRoot, R.string.player_bt_snack,
+                        com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                .setAction(R.string.player_bt_allow, v -> btPermission.launch(android.Manifest.permission.BLUETOOTH_CONNECT))
+                .show();
+    }
+
+    /** Tap on the generic "Bluetooth" chip: explain, then ask again (or open settings if the system no longer asks). */
+    private void explainBluetoothName() {
+        if (android.os.Build.VERSION.SDK_INT < 31) return;
+        boolean systemWillAsk = !uiPrefs().getBoolean(K_BT_ASKED, false)
+                || shouldShowRequestPermissionRationale(android.Manifest.permission.BLUETOOTH_CONNECT);
+        uiPrefs().edit().putBoolean(K_BT_ASKED, true).apply();
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.player_bt_title)
+                .setMessage(R.string.player_bt_rationale)
+                .setNegativeButton(R.string.queue_cancel, null)
+                .setPositiveButton(systemWillAsk ? R.string.player_bt_allow : R.string.player_bt_settings, (d, w) -> {
+                    if (systemWillAsk) {
+                        btPermission.launch(android.Manifest.permission.BLUETOOTH_CONNECT);
+                    } else {
+                        startActivity(new android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                android.net.Uri.fromParts("package", requireContext().getPackageName(), null)));
+                    }
+                })
+                .show();
     }
 
     private int dp(int v) { return Math.round(v * getResources().getDisplayMetrics().density); }

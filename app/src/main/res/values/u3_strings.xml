@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- U3 (player UX): queue tools, sleep timer sheet, player gestures, lyrics tools. Persian in values-fa/u3_strings.xml. -->
+<resources>
+    <string name="queue_more">Queue options</string>
+    <string name="queue_jump_current">Jump to current song</string>
+    <string name="queue_save_playlist">Save queue as playlist</string>
+    <string name="queue_save_playlist_default">My queue</string>
+    <string name="queue_save">Save</string>
+    <string name="queue_cancel">Cancel</string>
+    <string name="queue_saved">Saved to %1$s</string>
+    <string name="queue_save_failed">Couldn\'t save the playlist</string>
+    <string name="queue_clear">Clear up next</string>
+    <string name="queue_cleared">Up next cleared</string>
+    <string name="queue_dedupe">Remove duplicates</string>
+    <string name="queue_deduped">Removed %1$s duplicates</string>
+    <string name="queue_no_duplicates">No duplicates in the queue</string>
+    <string name="queue_playing_from_h">Playing from %1$s · %2$s h %3$s min left</string>
+    <string name="queue_left_h">%1$s h %2$s min left</string>
+    <string name="queue_now_playing_cd">%1$s, now playing. Double-tap to go back to the player</string>
+
+    <string name="sleep_status_off">Music keeps playing</string>
+    <string name="sleep_status_min">Stops in %1$s min</string>
+    <string name="sleep_status_end">Stops when this song ends</string>
+    <string name="sleep_custom">Custom</string>
+    <string name="sleep_less">5 minutes less</string>
+    <string name="sleep_more">5 minutes more</string>
+    <string name="sleep_start">Start</string>
+    <string name="sleep_turn_off">Turn off</string>
+
+    <string name="player_share">Share</string>
+    <string name="player_share_chooser">Share song</string>
+    <string name="player_sound">Sound</string>
+    <string name="player_stop">Stop</string>
+    <string name="player_stopped">Stopped</string>
+    <string name="player_up_next">Up next · %1$s</string>
+    <string name="player_up_next_cd">Up next: %1$s. Opens the queue</string>
+    <string name="player_back_10">Back 10 seconds</string>
+    <string name="player_forward_10">Forward 10 seconds</string>
+    <string name="player_hint_back_10">−10 s</string>
+    <string name="player_hint_forward_10">+10 s</string>
+    <string name="player_now_playing_cd">Now playing %1$s by %2$s</string>
+
+    <string name="lyrics_smaller">Smaller lyrics</string>
+    <string name="lyrics_larger">Larger lyrics</string>
+    <string name="lyrics_earlier">Lyrics half a second earlier</string>
+    <string name="lyrics_later">Lyrics half a second later</string>
+    <string name="lyrics_offset_value">%1$s s</string>
+    <string name="lyrics_offset_cd">Lyrics timing %1$s seconds. Double-tap to reset</string>
+    <string name="lyrics_copied">Line copied</string>
+    <string name="player_bt_title">Show your device\'s name</string>
+    <string name="player_bt_rationale">Allow Nearby devices access so this chip can show which Bluetooth speaker or headphones are playing. Nothing else is used.</string>
+    <string name="player_bt_allow">Allow</string>
+    <string name="player_bt_settings">Open settings</string>
+    <string name="player_bt_snack">Show the Bluetooth device\'s name here?</string>
+</resources>

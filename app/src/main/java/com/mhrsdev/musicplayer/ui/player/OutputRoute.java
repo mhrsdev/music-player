@@ -22,8 +22,13 @@ import androidx.core.content.ContextCompat;
 public final class OutputRoute {
     public enum Kind { SPEAKER, WIRED, USB, BLUETOOTH }
 
-    /** What the chip shows; {@code name} is null for the generic label. */
-    public record Route(Kind kind, @Nullable String name) {}
+    /**
+     * What the chip shows; {@code name} is null for the generic label. {@code nameNeedsPermission}: Bluetooth output
+     * whose product name is hidden until BLUETOOTH_CONNECT is granted (API 31+).
+     */
+    public record Route(Kind kind, @Nullable String name, boolean nameNeedsPermission) {
+        public Route(Kind kind, @Nullable String name) { this(kind, name, false); }
+    }
 
     public interface Listener { void onRoute(Route r); }
 
@@ -48,6 +53,9 @@ public final class OutputRoute {
         publish();
     }
 
+    /** Re-reads the devices (e.g. after the Bluetooth permission was granted). */
+    public void refresh() { if (am != null) publish(); }
+
     public void stop() {
         listener = null;
         if (am != null) am.unregisterAudioDeviceCallback(callback);
@@ -62,11 +70,12 @@ public final class OutputRoute {
         int best = pick(types);
         Kind kind = best < 0 ? Kind.SPEAKER : kindOf(types[best]);
         String name = null;
-        if (kind == Kind.BLUETOOTH && canReadBluetoothName()) {
+        boolean allowed = canReadBluetoothName();
+        if (kind == Kind.BLUETOOTH && allowed) {
             CharSequence n = devices[best].getProductName();
             if (n != null && n.length() > 0) name = n.toString();
         }
-        l.onRoute(new Route(kind, name));
+        l.onRoute(new Route(kind, name, kind == Kind.BLUETOOTH && !allowed));
     }
 
     private boolean canReadBluetoothName() {
