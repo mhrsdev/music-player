@@ -46,6 +46,10 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 - 🔄 **T1b** [Sonnet + ponytail] Java re-scaffold (Gradle 9.0.0, framework SQLite, contracts + fakes). Worktree `../wt-t1b`, branch `task/t1b-java-scaffold`. Gates T5/T6/T7/T-W/T2 (they start in parallel once T1b contracts are merged).
 
+- 🔄 **T5** [Sonnet + ponytail] Data layer (SQLite DB + MediaStore scanner + repos + settings). Branch `task/t5-data-java`, worktree `../wt-t5`.
+- 🔄 **T6** [Sonnet + ponytail] Playback (Media3 service, PlayerController impl, queue, sleep timer, notification). Branch `task/t6-playback`, worktree `../wt-t6`.
+- 🔄 **T7** [Sonnet + ponytail] Lyrics (LRC parser/sidecar/embedded + LRCLIB + cache). Branch `task/t7-lyrics-java`, worktree `../wt-t7`.
+
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
 Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room), tidy query classes, clean packages, Gradle 9.0.0 (CLAUDE.md "Hard code rules").
@@ -68,6 +72,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D11 archived: up to 5 parallel agents; design screenshots go to the owner in chat when T2b is complete. Launched T5, T6, T7 on top of T1b contracts (origin/task/t1b-java-scaffold).
 - 2026-10-23: D10 archived: ui-ux-pro-max skill installed + relayed to the UI agent.
 - 2026-10-23: D9 archived and relayed to T2b (god-tier UI/UX, reasonable battery).
 - 2026-10-23: D8 archived: parallel agents allowed (replaces D5), ponytail skill installed in .claude/skills and mandatory for non-UI agents, UI must be prettier/own-identity, battery+RAM minimal. T2b told; T1b launched in parallel.

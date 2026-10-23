@@ -191,3 +191,16 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
 
 **Summary:** Give the UI/design sub-agent (Opus) the `ui-ux-pro-max` skill. Installed (reviewed: local CSV data + pure-Python search script, no network/exec of external code; MIT) at `.claude/skills/ui-ux-pro-max`. Run it as `python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system|--domain ux|motion|typography|color ...` (no `-I`). It is web-leaning; its output is advice only — design-atelier + owner directives (D2, D6–D9) win.
+
+---
+
+## D11 — 2026-10-23 — Five parallel sub-agents, design screenshots in chat, go faster
+
+**Original (verbatim):**
+
+> همزمان 5 تا ساب ایجنت رو استفاده کن و اینکه یو آی هم هر وقت که حالا دیزاین جدیدش کامل شدهش اسکرین شاتاشو همین تو این چت برام بذار. و اینکه پروژه رو سریعتر پیش ببر و آمادش بکن، یه پروژه خیلی خفن میخوام بشه. عجله ای از بابت زمان نداریم، ولی هرچی کارمون تو تایم کمتری انجام بشه خب باز بهتره.
+
+**Summary:**
+1. Run **up to 5 sub-agents at the same time** (each in its own git worktree + `task/<id>-<slug>` branch).
+2. As soon as the new design is complete, **post its screenshots in this chat** (SendUserFile).
+3. Move faster and get the project ready; the owner wants a very impressive ("خفن") result. No hard deadline, but less elapsed time is better.
