@@ -27,7 +27,7 @@ import java.util.concurrent.Executor;
  * Every track-list screen: album / artist / playlist / year detail and the Songs, Liked, History, Recently added,
  * Most played and Never played lists. Owns the sort order, the multi-select state and the playlist edits.
  */
-public final class TrackListViewModel extends ViewModel {
+public class TrackListViewModel extends ViewModel {
 
     /**
      * Header shown above the list. {@code title} is null for the built-in lists (the screen uses its own label).
