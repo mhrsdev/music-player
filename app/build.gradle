@@ -39,6 +39,7 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
     }
 }
 
@@ -58,4 +59,5 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.androidx.arch.core.testing
+    testImplementation libs.robolectric
 }
