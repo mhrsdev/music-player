@@ -21,7 +21,24 @@ public record ScannedAudio(
         int year,
         long addedAtMs,
         long modifiedMs,
-        @Nullable String path) {
+        @Nullable String path,
+        @Nullable String genre) {
+
+    /** Older call sites / tests without a genre. */
+    public ScannedAudio(long id, @Nullable String title, @Nullable String displayName, @Nullable String artist,
+                        long artistId, @Nullable String album, long albumId, long durationMs, int trackNumber, int year,
+                        long addedAtMs, long modifiedMs, @Nullable String path) {
+        this(id, title, displayName, artist, artistId, album, albumId, durationMs, trackNumber, year, addedAtMs,
+                modifiedMs, path, null);
+    }
+
+    /** Trims; blank, "<unknown>" and ID3v1 numeric codes like "(17)" become null. */
+    @Nullable public static String cleanGenre(@Nullable String raw) {
+        if (raw == null) return null;
+        String g = raw.trim();
+        if (g.isEmpty() || UNKNOWN.equals(g) || g.matches("\\(?\\d+\\)?")) return null;
+        return g.length() > 40 ? g.substring(0, 40) : g;
+    }
 
     /** MediaStore's placeholder for missing tags. */
     private static final String UNKNOWN = "<unknown>";

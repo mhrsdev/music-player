@@ -7,9 +7,11 @@ import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_ARTIST
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_ARTIST_NAME;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_ARTWORK_URI;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_DURATION_MS;
+import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_GENRE;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_ID;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_MEDIA_URI;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_MODIFIED_MS;
+import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_PATH;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_TITLE;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_TRACK_NUMBER;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_YEAR;
@@ -32,6 +34,10 @@ import java.util.Map;
 public final class TrackQueries {
     /** A track with its listening numbers, input of the Home "Quick picks" ranking. */
     public record TrackStat(Track track, int plays, long lastPlayedMs) { }
+
+    /** Every library track with its numbers, genre and path: input of the Home feed builder. */
+    public record FeedTrack(Track track, int plays, long lastPlayedMs, @androidx.annotation.Nullable String genre,
+                            @androidx.annotation.Nullable String path) { }
 
     private static final int CHUNK = 500; // stays below SQLite's 999 bound-variable limit
     private static final String BY_TITLE = " ORDER BY t." + COL_TITLE + " COLLATE LOCALIZED";
@@ -110,6 +116,26 @@ public final class TrackQueries {
         return out;
     }
 
+    /** The whole library with play numbers, genre and path, in one pass (Home feed; io thread). */
+    public List<FeedTrack> feedTracks() {
+        String sql = "SELECT " + COLUMNS + ", COALESCE(ps." + PlayStatsContract.COL_PLAY_COUNT + ", 0), COALESCE(ps."
+                + PlayStatsContract.COL_LAST_PLAYED_AT + ", 0), t." + COL_GENRE + ", t." + COL_PATH + FROM + JOIN_STATS;
+        List<FeedTrack> out = new ArrayList<>();
+        try (Cursor c = db.rawQuery(sql, null)) {
+            while (c.moveToNext()) {
+                out.add(new FeedTrack(read(c), c.getInt(13), c.getLong(14), c.getString(15), c.getString(16)));
+            }
+        }
+        return out;
+    }
+
+    /** True when a row still waits for a re-read (marked by the v4 migration), so the next scan must run. */
+    public boolean needsRescan() {
+        try (Cursor c = db.rawQuery("SELECT 1 FROM " + TABLE + " WHERE " + COL_MODIFIED_MS + " < 0 LIMIT 1", null)) {
+            return c.moveToFirst();
+        }
+    }
+
     /** Track id to file modification time, what the incremental scan compares against. */
     public Map<String, Long> modifiedById() {
         Map<String, Long> out = new HashMap<>();
@@ -121,7 +147,15 @@ public final class TrackQueries {
 
     /** Inserts or replaces the row of {@code track}. The liked flag is ignored (likes live in their own table). */
     public void upsert(Track track, long modifiedMs) {
+        upsert(track, modifiedMs, null, null);
+    }
+
+    /** As {@link #upsert(Track, long)} plus the scanner-only genre / path columns. */
+    public void upsert(Track track, long modifiedMs, @androidx.annotation.Nullable String genre,
+                       @androidx.annotation.Nullable String path) {
         ContentValues v = new ContentValues();
+        v.put(COL_GENRE, genre);
+        v.put(COL_PATH, path);
         v.put(COL_ID, track.id());
         v.put(COL_TITLE, track.title());
         v.put(COL_ARTIST_ID, track.artistId());

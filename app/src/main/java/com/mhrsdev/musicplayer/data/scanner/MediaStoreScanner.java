@@ -32,13 +32,16 @@ public final class MediaStoreScanner {
     private static final String KEY_GENERATION = "media_generation";
 
     @SuppressWarnings("deprecation") // DATA is the only column with the absolute path on API 26-28, still readable later
-    private static final String[] PROJECTION = {
+    private static final String[] BASE_PROJECTION = {
         MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DISPLAY_NAME,
         MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.ALBUM,
         MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.TRACK,
         MediaStore.Audio.Media.YEAR, MediaStore.Audio.Media.DATE_ADDED, MediaStore.Audio.Media.DATE_MODIFIED,
         MediaStore.Audio.Media.DATA
     };
+    /** Column 13: MediaStore's GENRE (API 30+); older devices get no genre (a per-file tag read is too heavy). */
+    private static final String[] PROJECTION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+            ? withGenre(BASE_PROJECTION) : BASE_PROJECTION;
     private static final String SELECTION = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND "
             + MediaStore.Audio.Media.DURATION + " >= ?";
 
@@ -58,6 +61,7 @@ public final class MediaStoreScanner {
     public boolean isStale() {
         long lastScan = state.getLong(KEY_SCANNED_AT, 0);
         if (lastScan == 0) return true;
+        if (new TrackQueries(helper.getWritableDatabase()).needsRescan()) return true; // v4 migration: fill genre / path
         long generation = currentGeneration();
         if (generation >= 0) return generation != state.getLong(KEY_GENERATION, -1);
         return System.currentTimeMillis() - lastScan > STALE_AFTER_MS;
@@ -92,7 +96,7 @@ public final class MediaStoreScanner {
                 if (!folders.accepts(audio.path())) continue;
                 IncrementalDiff.Change change = diff.visit(String.valueOf(audio.id()), audio.modifiedMs());
                 if (change == IncrementalDiff.Change.UNCHANGED) continue;
-                tracks.upsert(audio.toTrack(), audio.modifiedMs());
+                tracks.upsert(audio.toTrack(), audio.modifiedMs(), audio.genre(), audio.path());
                 if (change == IncrementalDiff.Change.ADDED) added++; else updated++;
             }
             removed = tracks.deleteByIds(diff.missingIds());
@@ -110,7 +114,15 @@ public final class MediaStoreScanner {
     private static ScannedAudio read(Cursor c) {
         return new ScannedAudio(c.getLong(0), c.getString(1), c.getString(2), c.getString(3), c.getLong(4),
                 c.getString(5), c.getLong(6), c.getLong(7), c.getInt(8), c.getInt(9),
-                c.getLong(10) * 1000, c.getLong(11) * 1000, c.getString(12));
+                c.getLong(10) * 1000, c.getLong(11) * 1000, c.getString(12),
+                c.getColumnCount() > 13 ? ScannedAudio.cleanGenre(c.getString(13)) : null);
+    }
+
+    @android.annotation.SuppressLint("InlinedApi") // only used on API 30+
+    private static String[] withGenre(String[] base) {
+        String[] out = java.util.Arrays.copyOf(base, base.length + 1);
+        out[base.length] = MediaStore.Audio.Media.GENRE;
+        return out;
     }
 
     private static Set<String> orEmpty(Set<String> set) {

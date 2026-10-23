@@ -8,4 +8,7 @@ import java.util.List;
 public interface HomeFeedSource {
 
     LiveData<List<HomeSection>> getSections();
+
+    /** Pull-to-refresh / "Surprise me": rebuild with a new discovery seed (random picks change, section order does not). */
+    default void refresh() { }
 }

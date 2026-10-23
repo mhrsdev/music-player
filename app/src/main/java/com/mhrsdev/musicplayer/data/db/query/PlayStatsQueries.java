@@ -16,7 +16,7 @@ public final class PlayStatsQueries {
     }
 
     /**
-     * Counts one play and moves the track to the top of the history. The stored time is forced strictly above every
+     * Counts one play (plus a timestamped {@code play_events} row) and moves the track to the top of the history. The stored time is forced strictly above every
      * existing one, so plays within the same millisecond keep their order. (No UPSERT: SQLite on API 26 is 3.18.)
      */
     public void recordPlay(String trackId, long nowMs) {
@@ -27,6 +27,7 @@ public final class PlayStatsQueries {
             db.execSQL("UPDATE " + TABLE + " SET " + COL_PLAY_COUNT + " = " + COL_PLAY_COUNT + " + 1, "
                     + COL_LAST_PLAYED_AT + " = MAX(?, (SELECT MAX(" + COL_LAST_PLAYED_AT + ") FROM " + TABLE
                     + ") + 1) WHERE " + COL_TRACK_ID + " = ?", new Object[] {nowMs, trackId});
+            new PlayEventQueries(db).insert(trackId, nowMs);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

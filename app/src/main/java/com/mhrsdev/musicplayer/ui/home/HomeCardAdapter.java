@@ -31,6 +31,8 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
             case TRACK -> "t:" + i.track().id();
             case ALBUM -> "a:" + i.album().id();
             case PLAYLIST -> "p:" + i.playlist().id();
+            case ARTIST -> "r:" + i.artist().id();
+            case MIX -> "m:" + i.mix().id();
         };
     }
 

@@ -21,6 +21,10 @@ public final class TracksContract {
     public static final String COL_ADDED_AT_MS = "added_at_ms";
     /** File modification time (ms); the scanner re-reads a row only when this changes, waveform cache keys on it. */
     public static final String COL_MODIFIED_MS = "modified_ms";
+    /** MediaStore genre (API 30+), null when unknown. Added in DB v4. */
+    public static final String COL_GENRE = "genre";
+    /** Absolute file path (folder browser), null when MediaStore has none. Added in DB v4. */
+    public static final String COL_PATH = "path";
 
     public static final String CREATE = "CREATE TABLE " + TABLE + " ("
             + COL_ID + " TEXT PRIMARY KEY NOT NULL, "
@@ -35,7 +39,9 @@ public final class TracksContract {
             + COL_YEAR + " INTEGER NOT NULL DEFAULT 0, "
             + COL_TRACK_NUMBER + " INTEGER NOT NULL DEFAULT 0, "
             + COL_ADDED_AT_MS + " INTEGER NOT NULL, "
-            + COL_MODIFIED_MS + " INTEGER NOT NULL)";
+            + COL_MODIFIED_MS + " INTEGER NOT NULL, "
+            + COL_GENRE + " TEXT, "
+            + COL_PATH + " TEXT)";
 
     /** Table plus the indices the album / artist / recently-added queries use. */
     public static final String[] SCHEMA = {
@@ -43,6 +49,16 @@ public final class TracksContract {
         "CREATE INDEX idx_tracks_album ON " + TABLE + " (" + COL_ALBUM_ID + ")",
         "CREATE INDEX idx_tracks_artist ON " + TABLE + " (" + COL_ARTIST_ID + ")",
         "CREATE INDEX idx_tracks_added ON " + TABLE + " (" + COL_ADDED_AT_MS + ")"
+    };
+
+    /**
+     * v3 -> v4: genre + path columns. {@code modified_ms = -1} marks every row stale so the next scan re-reads it and
+     * fills the new columns (see {@code TrackQueries.needsRescan}).
+     */
+    public static final String[] UPGRADE_V4 = {
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_GENRE + " TEXT",
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_PATH + " TEXT",
+        "UPDATE " + TABLE + " SET " + COL_MODIFIED_MS + " = -1"
     };
 
     private TracksContract() { }
