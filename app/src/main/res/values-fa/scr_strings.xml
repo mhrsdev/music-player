@@ -83,6 +83,8 @@
     <string name="settings_version">نسخه‌ی %1$s</string>
     <string name="library_menu_play_next">پخش بعدی</string>
     <string name="library_menu_add_queue">افزودن به صف</string>
+    <string name="library_menu_add_playlist">افزودن به فهرست پخش</string>
+    <string name="library_new_playlist">فهرست پخش جدید</string>
     <string name="library_menu_like">پسندیدن</string>
     <string name="library_menu_unlike">حذف از پسندیده‌ها</string>
     <string name="settings_sleep_end">پایان آهنگ</string>

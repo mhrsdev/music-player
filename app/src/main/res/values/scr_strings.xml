@@ -83,6 +83,8 @@
     <string name="settings_version">Version %1$s</string>
     <string name="library_menu_play_next">Play next</string>
     <string name="library_menu_add_queue">Add to queue</string>
+    <string name="library_menu_add_playlist">Add to playlist</string>
+    <string name="library_new_playlist">New playlist</string>
     <string name="library_menu_like">Like</string>
     <string name="library_menu_unlike">Remove from Liked songs</string>
     <string name="settings_sleep_end">End of track</string>
