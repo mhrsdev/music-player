@@ -89,6 +89,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D15: MIT license added (LICENSE); README license section to say MIT.
 - 2026-10-23: D14: owner wants a GitHub release now + README OK + main fully updated; then full-featured version. Release agent R1 launched (signing, release workflow, README/CHANGELOG, APK build).
 - 2026-10-23: T2 merged; P1/P2 polish agents launched (deadline ~19:28 UTC). Remaining: T8 finish, T9 QA (after T8), merge to main.
 - 2026-10-23: T3, T4 merged; ccr green (build+test+lint, supervisor-run). T2 widget gallery PNGs rendered from real Android code (docs/screens/) and sent to owner.

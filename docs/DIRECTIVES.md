@@ -244,3 +244,13 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 4. **Afterwards:** build the **complete version** with **everything a music player needs** (second phase / next release).
 
 **Supervisor notes:** `gh` CLI has an invalid token and the GitHub MCP has no create-release tool, so the Release is created by a **tag-triggered GitHub Actions workflow** (`.github/workflows/release.yml`, uses the built-in `GITHUB_TOKEN`); the APK is also sent to the owner in chat. First release is a **pre-release v0.1.0**: not tested on a real device (no emulator in the sandbox), APK signed with the debug key unless the owner provides a keystore.
+
+---
+
+## D15 — 2026-10-23 — License: MIT
+
+**Original (verbatim):**
+
+> لایسنسو بزار MIT
+
+**Summary:** Put an **MIT license** on the project. Added `LICENSE` (MIT, "Copyright (c) 2026 mhrsdev" — the GitHub account name; owner can change the holder name). README/README.fa must say MIT (R1 told). Bundled fonts keep their own OFL notice (`assets/licenses/FONTS-NOTICE.txt`).
