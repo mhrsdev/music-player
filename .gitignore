@@ -12,6 +12,4 @@
 *.keystore
 *.jks
 **/build/
-.kotlin/
-app/schemas/*.tmp
 .claude/worktrees/
