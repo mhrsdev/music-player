@@ -116,7 +116,12 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 مراحل نصب Android SDK روی لینوکس خام در [README.md](README.md) (بخش «Installing the Android SDK on a bare Linux box») آمده است.
 
 ### انتشار (Release)
-با push کردن یک tag به شکل `vX.Y.Z` فایل `.github/workflows/release.yml` اجرا می‌شود: unit testها، `assembleRelease` و سپس یک GitHub Release شامل `MusicPlayer-vX.Y.Z.apk`، فایل `.sha256` و بخش مربوط از `CHANGELOG.md`. tagهایی که با `v0.` شروع شوند یا `-` داشته باشند pre-release علامت می‌خورند. برای امضای واقعی secretهای اختیاری مخزن: `ANDROID_KEYSTORE_BASE64`، `ANDROID_KEYSTORE_PASSWORD`، `ANDROID_KEY_ALIAS`، `ANDROID_KEY_PASSWORD`.
+دو راه برای ساخت release وجود دارد که هر دو را `.github/workflows/release.yml` انجام می‌دهد:
+
+1. push کردن یک tag به شکل `vX.Y.Z`.
+2. اجرای دستی: GitHub > Actions > *Release* > *Run workflow*، انتخاب branch (معمولاً `main`) و وارد کردن نسخه (مثلاً `0.1.0`). GitHub خودش tag با نام `v<version>` را روی آخرین commit آن branch می‌سازد.
+
+workflow ابتدا unit testها و `assembleRelease` را اجرا می‌کند و سپس یک GitHub Release شامل `MusicPlayer-vX.Y.Z.apk`، فایل `.sha256` و بخش مربوط از `CHANGELOG.md`. tagهایی که با `v0.` شروع شوند یا `-` داشته باشند pre-release علامت می‌خورند. برای امضای واقعی secretهای اختیاری مخزن: `ANDROID_KEYSTORE_BASE64`، `ANDROID_KEYSTORE_PASSWORD`، `ANDROID_KEY_ALIAS`، `ANDROID_KEY_PASSWORD`.
 
 ## تست‌ها
 

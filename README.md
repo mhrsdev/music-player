@@ -120,7 +120,13 @@ AGP 8.13 officially supports up to compileSdk 36, hence `android.suppressUnsuppo
 Dependency versions are pinned in `gradle/libs.versions.toml`.
 
 ### Releasing
-Pushing a tag `vX.Y.Z` runs `.github/workflows/release.yml`: unit tests, `assembleRelease`, then a GitHub Release with
+Two ways to make a release, both handled by `.github/workflows/release.yml`:
+
+1. **Push a tag** `vX.Y.Z`.
+2. **Run it manually**: GitHub > Actions > *Release* > *Run workflow*, pick the branch (normally `main`) and enter the version
+   (e.g. `0.1.0`). GitHub creates the tag `v<version>` itself at the head commit of that branch.
+
+The workflow runs the unit tests and `assembleRelease`, then publishes a GitHub Release with
 `MusicPlayer-vX.Y.Z.apk`, its `.sha256` and the matching `CHANGELOG.md` section. Tags that start with `v0.` or contain `-` are
 marked pre-release. Optional repository secrets for real signing: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
