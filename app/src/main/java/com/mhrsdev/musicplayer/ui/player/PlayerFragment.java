@@ -66,6 +66,8 @@ public final class PlayerFragment extends Fragment {
     @Nullable private String paletteTrackId;
     private boolean scrubbing;
     private final Runnable resumeAutoScroll = this::onAutoScrollResume;
+    @Nullable private OutputRoute outputRoute;
+    private boolean light;
 
     public static PlayerFragment newInstance() { return new PlayerFragment(); }
 
@@ -101,6 +103,9 @@ public final class PlayerFragment extends Fragment {
                 v.post(() -> { if (b != null) b.playerArtwork.setLayoutParams(lp); });
             }
         });
+        light = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                != android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        applyThemeColors();
         setupControls();
         setupLyrics();
         setupSwipeToCollapse();
@@ -170,8 +175,12 @@ public final class PlayerFragment extends Fragment {
             menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
             menu.getMenu().add(0, 2, 1, R.string.player_queue);
             menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
+            Track current = vm.getCurrentTrack().getValue();
+            if (current != null) menu.getMenu().add(0, 4, 3, R.string.player_add_to_playlist);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) vm.toggleLyrics();
+                else if (item.getItemId() == 4 && current != null)
+                    com.mhrsdev.musicplayer.ui.playlist.AddToPlaylistSheet.show(getParentFragmentManager(), current);
                 else b.playerQueue.performClick(); // sleep timer lives in the queue sheet (design v1, 07)
                 return true;
             });
@@ -200,6 +209,7 @@ public final class PlayerFragment extends Fragment {
         });
         b.lyricsList.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.lyricsList.setAdapter(lyricsAdapter);
+        lyricsAdapter.setTextColor(light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK);
         b.lyricsList.setItemAnimator(null);
         b.lyricsList.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
             int h = bt - t;
@@ -216,6 +226,80 @@ public final class PlayerFragment extends Fragment {
             }
         });
         b.lyricsBackToCurrent.setOnClickListener(v -> onAutoScrollResume());
+        b.lyricsRetry.setOnClickListener(v -> {
+            b.lyricsRetry.setVisibility(View.GONE);
+            b.lyricsMessageTitle.setText(R.string.lyrics_loading);
+            b.lyricsMessageBody.setText(null);
+            vm.retryLyrics();
+        });
+    }
+
+    /** Dark (05) or light (15) player: text/icon colors over the backdrop; the backdrop's guard keeps the contrast. */
+    private void applyThemeColors() {
+        int text = light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK;
+        int rgb = text & 0x00FFFFFF;
+        b.playerRoot.setBackgroundColor(light ? 0xFFF7F9FF : 0xFF0F1216);
+        b.playerBackdrop.setLight(light);
+        b.playerTitle.setTextColor(text);
+        b.playerArtist.setTextColor(rgb | 0xB8000000);
+        b.playerElapsed.setTextColor(rgb | 0xC7000000);
+        b.playerRemaining.setTextColor(rgb | 0xC7000000);
+        b.lyricsMessageTitle.setTextColor(text);
+        b.lyricsMessageBody.setTextColor(rgb | 0xB8000000);
+        b.lyricsBackToCurrent.setTextColor(text);
+        b.lyricsRetry.setTextColor(text);
+        b.playerOutput.setTextColor(text);
+        androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(b.playerOutput, ColorStateList.valueOf(text));
+        ColorStateList icon = ColorStateList.valueOf(text);
+        for (ImageButton ib : new ImageButton[]{b.playerLyricsToggle, b.playerMore, b.playerPrev, b.playerNext}) {
+            ib.setImageTintList(icon);
+        }
+        if (light) {
+            b.playerHandle.getBackground().mutate().setTint(rgb | 0x52000000);
+        }
+    }
+
+    @Override public void onStart() {
+        super.onStart();
+        // Output chip: an AudioDeviceCallback only while the player is visible (no background cost).
+        outputRoute = new OutputRoute(requireContext());
+        outputRoute.start(this::renderOutput);
+    }
+
+    @Override public void onStop() {
+        if (outputRoute != null) outputRoute.stop();
+        outputRoute = null;
+        super.onStop();
+    }
+
+    private void renderOutput(OutputRoute.Route r) {
+        if (b == null) return;
+        String label;
+        int icon;
+        switch (r.kind()) {
+            case BLUETOOTH:
+                label = r.name() != null ? r.name() : getString(R.string.player_output_bluetooth);
+                icon = R.drawable.player_ic_bluetooth;
+                break;
+            case WIRED: label = getString(R.string.player_output_headphones); icon = R.drawable.player_ic_headphones; break;
+            case USB: label = getString(R.string.player_output_usb); icon = R.drawable.player_ic_headphones; break;
+            default: label = getString(R.string.player_output_device); icon = R.drawable.player_ic_speaker; break;
+        }
+        b.playerOutput.setText(label);
+        b.playerOutput.setContentDescription(getString(R.string.player_output_cd, label));
+        b.playerOutput.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
+    }
+
+    private boolean isOnline() {
+        android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
+                requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return true;
+        try {
+            android.net.NetworkCapabilities nc = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            return nc != null && nc.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        } catch (SecurityException e) {
+            return true;
+        }
     }
 
     private void onAutoScrollResume() {
@@ -284,7 +368,8 @@ public final class PlayerFragment extends Fragment {
     private void setToggle(ImageButton btn, boolean on) {
         btn.setActivated(on);
         btn.setBackgroundTintList(on ? ColorStateList.valueOf(palette.primary) : null);
-        btn.setImageTintList(ColorStateList.valueOf(on ? palette.onPrimary : 0xFFFFFFFF));
+        btn.setImageTintList(ColorStateList.valueOf(on ? palette.onPrimary
+                : light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK));
     }
 
     private void renderTrack(@Nullable Track t) {
@@ -317,8 +402,10 @@ public final class PlayerFragment extends Fragment {
         palette = p;
         b.playerBackdrop.setContent(p, tinyArt, animate);
         b.playerPlay.setColors(p.primary, p.onPrimary);
-        seek.setColors(p.primary, 0x47FFFFFF);
-        b.playerLike.setImageTintList(ColorStateList.valueOf(p.primary));
+        // Light theme: the tone-40 role reads on the pale scrim; dark theme keeps the tone-80 primary.
+        int accent = light ? p.glow : p.primary;
+        seek.setColors(accent, light ? 0x3D181C21 : 0x47FFFFFF);
+        b.playerLike.setImageTintList(ColorStateList.valueOf(accent));
         render(vm.getState().getValue());
     }
 
@@ -372,10 +459,15 @@ public final class PlayerFragment extends Fragment {
         if (l == null || l.isEmpty()) {
             b.lyricsList.setVisibility(View.GONE);
             b.lyricsMessage.setVisibility(View.VISIBLE);
-            b.lyricsMessageTitle.setText(l == null ? R.string.lyrics_loading : R.string.lyrics_none);
-            b.lyricsMessageBody.setText(l == null ? null : getString(R.string.lyrics_none_hint));
+            boolean offline = PlayerViewModel.showOfflineRetry(l, isOnline());
+            b.lyricsRetry.setVisibility(offline ? View.VISIBLE : View.GONE);
+            b.lyricsMessageTitle.setText(l == null ? R.string.lyrics_loading
+                    : offline ? R.string.lyrics_offline : R.string.lyrics_none);
+            b.lyricsMessageBody.setText(l == null ? null
+                    : getString(offline ? R.string.lyrics_offline_hint : R.string.lyrics_none_hint));
             return;
         }
+        b.lyricsRetry.setVisibility(View.GONE);
         b.lyricsMessage.setVisibility(View.GONE);
         if (b.lyricsList.getVisibility() != View.VISIBLE) crossfade(b.lyricsList, true);
         if (b.lyricsList.getTag() != l) {

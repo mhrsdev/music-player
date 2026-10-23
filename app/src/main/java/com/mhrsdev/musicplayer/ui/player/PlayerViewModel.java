@@ -39,6 +39,8 @@ public final class PlayerViewModel extends ViewModel {
     private final MediatorLiveData<Boolean> liked = new MediatorLiveData<>();
     private final MediatorLiveData<Integer> activeLyricLine = new MediatorLiveData<>();
     private final MutableLiveData<Boolean> showLyrics = new MutableLiveData<>(false);
+    /** Re-emits the current track on {@link #retryLyrics()} so the repository is asked again. */
+    private final MediatorLiveData<Track> lyricsRequest = new MediatorLiveData<>();
     private Set<String> likedIds = new HashSet<>();
     private boolean likedLoaded;
 
@@ -52,7 +54,8 @@ public final class PlayerViewModel extends ViewModel {
             Track old = currentTrack.getValue();
             if (!sameId(old, t)) currentTrack.setValue(t);
         });
-        lyrics = Transformations.switchMap(currentTrack, t -> t == null ? new MutableLiveData<>() : lyricsRepo.lyricsFor(t));
+        lyricsRequest.addSource(currentTrack, lyricsRequest::setValue);
+        lyrics = Transformations.switchMap(lyricsRequest, t -> t == null ? new MutableLiveData<>() : lyricsRepo.lyricsFor(t));
         waveform = Transformations.switchMap(currentTrack,
                 t -> t == null ? new MutableLiveData<>() : waveformRepo.waveformFor(t, WAVEFORM_BARS));
 
@@ -118,6 +121,17 @@ public final class PlayerViewModel extends ViewModel {
         if (s == null) return;
         seekTo(Math.min(s.durationMs(), s.positionMs() + deltaMs));
     }
+    /** Re-requests lyrics for the current track (offline state's Retry chip). */
+    public void retryLyrics() { lyricsRequest.setValue(currentTrack.getValue()); }
+
+    /**
+     * Offline state (design 13): the domain {@link Lyrics} has no error value, so "no lyrics while the network is
+     * unavailable" is shown as offline with a Retry chip; with a network it is the plain "no lyrics" state.
+     */
+    static boolean showOfflineRetry(@Nullable Lyrics l, boolean online) {
+        return l != null && l.isEmpty() && !online;
+    }
+
     public void toggleShuffle() { player.toggleShuffle(); }
     public void cycleRepeat() { player.cycleRepeat(); }
     public void toggleLyrics() { showLyrics.setValue(!Boolean.TRUE.equals(showLyrics.getValue())); }

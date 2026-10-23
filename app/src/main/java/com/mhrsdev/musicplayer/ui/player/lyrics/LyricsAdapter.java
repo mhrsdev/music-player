@@ -24,6 +24,7 @@ public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Hold
     private boolean synced;
     private int active = -1;
     private final OnLineClick click;
+    private int textColor = 0xFFFFFFFF;
 
     public LyricsAdapter(OnLineClick click) { this.click = click; }
 
@@ -49,6 +50,14 @@ public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Hold
 
     public int getActive() { return active; }
 
+    /** White on the dark player, onSurface on the light one (design 15). */
+    @android.annotation.SuppressLint("NotifyDataSetChanged")
+    public void setTextColor(int color) {
+        if (color == textColor) return;
+        textColor = color;
+        notifyDataSetChanged();
+    }
+
     @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.lyrics_line_item, parent, false));
     }
@@ -61,6 +70,7 @@ public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Hold
     @Override public void onBindViewHolder(@NonNull Holder h, int position) {
         LyricLine line = lines.get(position);
         h.text.setText(line.text());
+        h.text.setTextColor(textColor);
         h.text.setOnClickListener(synced ? v -> click.onLine(line) : null);
         h.text.setClickable(synced);
         applyEmphasis(h, position, false);

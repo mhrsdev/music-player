@@ -144,6 +144,20 @@
                     android:gravity="center"
                     android:textColor="#B8FFFFFF"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/lyrics_retry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/player_chip_bg"
+                    android:gravity="center"
+                    android:minWidth="96dp"
+                    android:paddingHorizontal="20dp"
+                    android:text="@string/lyrics_retry"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <TextView

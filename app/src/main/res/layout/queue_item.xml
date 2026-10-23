@@ -30,7 +30,7 @@
         android:paddingStart="12dp"
         android:paddingEnd="4dp">
 
-        <com.mhrsdev.musicplayer.ui.queue.QueueArtView
+        <com.mhrsdev.musicplayer.ui.widget.ArtworkView
             android:id="@+id/queue_art"
             android:layout_width="52dp"
             android:layout_height="52dp"
