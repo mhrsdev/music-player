@@ -91,4 +91,6 @@
     <string name="settings_feedback">ارسال بازخورد</string>
     <string name="settings_feedback_sub">گزارش اشکال یا پیشنهاد ایده در گیت‌هاب</string>
     <string name="settings_just_now">همین حالا</string>
+    <string name="settings_immersive_player">پخش‌کنندهٔ تمام‌صفحه</string>
+    <string name="settings_immersive_player_sub">وقتی پخش‌کننده باز است نوار وضعیت پنهان شود. برای دیدنش از بالا به پایین بکشید.</string>
 </resources>

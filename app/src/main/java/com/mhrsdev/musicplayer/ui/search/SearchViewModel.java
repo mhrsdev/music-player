@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Search: query + filter chips -> results from the library. */
-public final class SearchViewModel extends ViewModel {
+public class SearchViewModel extends ViewModel {
 
     /** What the screen should show. */
     public enum Mode { PROMPT, RESULTS, NO_RESULTS }

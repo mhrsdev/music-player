@@ -7,7 +7,7 @@ import com.mhrsdev.musicplayer.ui.theme.ThemeController;
 import com.mhrsdev.musicplayer.ui.theme.ThemeMode;
 
 /** Applies theme mode and app language (View layer; ViewModels only store the choice). Delegates to T2's ThemeController. */
-public final class ThemeApplier {
+public class ThemeApplier {
     private ThemeApplier() { }
 
     static ThemeMode toMode(SettingsStore.Theme theme) {
