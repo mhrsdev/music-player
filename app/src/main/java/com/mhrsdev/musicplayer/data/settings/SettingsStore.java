@@ -16,6 +16,7 @@ import java.util.Set;
  */
 public final class SettingsStore {
     public static final int DEFAULT_SLEEP_TIMER_MINUTES = 30;
+    public static final int DEFAULT_MIN_TRACK_SECONDS = 30;
 
     private static final String PREFS = "settings";
     private static final String K_THEME = "theme";
@@ -28,6 +29,8 @@ public final class SettingsStore {
     private static final String K_BATTERY_SAVER = "battery_saver";
     private static final String K_INCLUDE = "folders_include";
     private static final String K_EXCLUDE = "folders_exclude";
+    private static final String K_NON_MUSIC = "include_non_music";
+    private static final String K_MIN_SECONDS = "min_track_seconds";
 
     private final SharedPreferences prefs;
     private final MutableLiveData<ThemeMode> theme;
@@ -40,6 +43,8 @@ public final class SettingsStore {
     private final MutableLiveData<BatterySaverMode> batterySaver;
     private final MutableLiveData<Set<String>> includedFolders;
     private final MutableLiveData<Set<String>> excludedFolders;
+    private final MutableLiveData<Boolean> includeNonMusic;
+    private final MutableLiveData<Integer> minTrackSeconds;
 
     public SettingsStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -53,6 +58,8 @@ public final class SettingsStore {
         batterySaver = new MutableLiveData<>(readEnum(K_BATTERY_SAVER, BatterySaverMode.AUTO));
         includedFolders = new MutableLiveData<>(readSet(K_INCLUDE));
         excludedFolders = new MutableLiveData<>(readSet(K_EXCLUDE));
+        includeNonMusic = new MutableLiveData<>(prefs.getBoolean(K_NON_MUSIC, false));
+        minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
     }
 
     public LiveData<ThemeMode> theme() {
@@ -149,6 +156,26 @@ public final class SettingsStore {
     public void setExcludedFolders(Set<String> folders) {
         prefs.edit().putStringSet(K_EXCLUDE, new HashSet<>(folders)).apply();
         publish(excludedFolders, Collections.unmodifiableSet(new HashSet<>(folders)));
+    }
+
+    /** Also scan ringtones, notifications, alarms and podcasts. Changing it needs a rescan. */
+    public LiveData<Boolean> includeNonMusic() {
+        return includeNonMusic;
+    }
+
+    public void setIncludeNonMusic(boolean value) {
+        prefs.edit().putBoolean(K_NON_MUSIC, value).apply();
+        publish(includeNonMusic, value);
+    }
+
+    /** Audio shorter than this many seconds is not scanned. Changing it needs a rescan. */
+    public LiveData<Integer> minTrackSeconds() {
+        return minTrackSeconds;
+    }
+
+    public void setMinTrackSeconds(int seconds) {
+        prefs.edit().putInt(K_MIN_SECONDS, seconds).apply();
+        publish(minTrackSeconds, seconds);
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {

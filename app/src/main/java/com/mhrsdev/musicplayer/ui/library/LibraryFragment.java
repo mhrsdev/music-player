@@ -36,6 +36,8 @@ public final class LibraryFragment extends Fragment {
         LibraryViewModel vm = new ViewModelProvider(this, LibraryViewModel.factory(c.library, c.player))
                 .get(LibraryViewModel.class);
         Resources r = getResources();
+        c.libraryAdmin().isScanning().observe(getViewLifecycleOwner(),
+                s -> b.scanProgress.setVisibility(Boolean.TRUE.equals(s) ? View.VISIBLE : View.GONE));
         String likedLabel = getString(R.string.library_liked);
 
         b.likedCard.setOnClickListener(v -> Screens.openTrackList(this, TrackList.LIKED, null));

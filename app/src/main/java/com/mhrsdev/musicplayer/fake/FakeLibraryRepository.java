@@ -206,6 +206,8 @@ public final class FakeLibraryRepository implements LibraryRepository, LibraryAd
 
     @Override public void scanIfStale() { }
 
+    @Override public void scanIfStale(long minIntervalMs) { }
+
     @Override public void renamePlaylist(String playlistId, String name) {
         Playlist p = playlists.get(playlistId);
         if (p == null || name.trim().isEmpty()) return;

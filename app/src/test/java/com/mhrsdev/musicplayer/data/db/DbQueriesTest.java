@@ -193,10 +193,10 @@ public class DbQueriesTest {
 
     @Test public void incrementalHelpersWork() {
         seed();
-        assertEquals(Long.valueOf(10), tracks.modifiedById().get("1"));
+        assertEquals(10L, tracks.storedById().get("1").modifiedMs());
         tracks.upsert(track("1", "Alpha 2", "a1", "al1", 1, 100), 20); // replace, not duplicate
         assertEquals(3, tracks.all().size());
-        assertEquals(Long.valueOf(20), tracks.modifiedById().get("1"));
+        assertEquals(20L, tracks.storedById().get("1").modifiedMs());
         List<String> many = new ArrayList<>();
         for (int i = 0; i < 1200; i++) {
             tracks.upsert(track("x" + i, "T" + i, "a9", "al9", 1, 1), 1);

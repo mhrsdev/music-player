@@ -23,24 +23,29 @@ public class MusicPlayerApp extends Application {
                 mode == BatterySaverMode.AUTO ? null : mode == BatterySaverMode.ON));
         // Below API 33 AppCompat keeps the chosen locale only in memory: re-apply the stored choice on every start.
         if (Build.VERSION.SDK_INT < 33) ThemeApplier.applyLanguage(container.settings().language().getValue());
-        registerActivityLifecycleCallbacks(new FirstActivityStart());
+        registerActivityLifecycleCallbacks(new VisibilityCallbacks());
     }
 
     public AppContainer getContainer() {
         return container;
     }
 
-    /** Fires {@link AppContainer#onAppForeground()} for the first started activity, then removes itself. */
-    private final class FirstActivityStart implements ActivityLifecycleCallbacks {
+    /** Every activity start rechecks the library; the last stop drops the MediaStore observer (nothing runs in background). */
+    private final class VisibilityCallbacks implements ActivityLifecycleCallbacks {
+        private int started;
+
         @Override public void onActivityStarted(Activity activity) {
-            unregisterActivityLifecycleCallbacks(this);
+            started++;
             container.onAppForeground();
+        }
+
+        @Override public void onActivityStopped(Activity activity) {
+            if (--started == 0) container.onAppBackground();
         }
 
         @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) { }
         @Override public void onActivityResumed(Activity activity) { }
         @Override public void onActivityPaused(Activity activity) { }
-        @Override public void onActivityStopped(Activity activity) { }
         @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) { }
         @Override public void onActivityDestroyed(Activity activity) { }
     }

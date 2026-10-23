@@ -15,6 +15,9 @@
     <string name="home_empty_title">Your library is empty</string>
     <string name="home_empty_body">Add music to your phone, then scan again.</string>
     <string name="home_empty_rescan">Scan again</string>
+    <plurals name="scan_added"><item quantity="one">%d new song added</item><item quantity="other">%d new songs added</item></plurals>
+    <string name="scan_up_to_date">Library up to date</string>
+    <string name="scan_failed">Couldn’t scan. Allow access to music and try again.</string>
     <string name="home_loading">Scanning your library…</string>
 
     <string name="search_hint">Songs, albums, artists</string>
