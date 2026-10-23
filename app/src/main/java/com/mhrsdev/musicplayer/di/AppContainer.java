@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import com.mhrsdev.musicplayer.BuildConfig;
 import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
+import com.mhrsdev.musicplayer.data.update.UpdateModule;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
 import com.mhrsdev.musicplayer.domain.repository.HomeFeedSource;
 import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
@@ -16,6 +17,7 @@ import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
 import com.mhrsdev.musicplayer.domain.repository.LyricsRepository;
 import com.mhrsdev.musicplayer.domain.repository.MusicSource;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
+import com.mhrsdev.musicplayer.domain.repository.UpdateRepository;
 import com.mhrsdev.musicplayer.domain.repository.WaveformRepository;
 import com.mhrsdev.musicplayer.fake.FakeHomeFeedSource;
 import com.mhrsdev.musicplayer.fake.FakeLibraryRepository;
@@ -57,6 +59,7 @@ public final class AppContainer {
     private final SettingsStore settings;
     private final LibraryAdmin libraryAdmin;
     private final AtomicBoolean foregroundScanDone = new AtomicBoolean();
+    private UpdateRepository updates;
 
     public AppContainer(Context context) {
         this(context, USE_FAKES);
@@ -104,14 +107,24 @@ public final class AppContainer {
         return libraryAdmin;
     }
 
+    /** Self-update from GitHub Releases; created on first use (no network or disk work until a check runs). */
+    public synchronized UpdateRepository updates() {
+        if (updates == null) updates = UpdateModule.create(appContext, BuildConfig.VERSION_NAME, BuildConfig.GITHUB_REPO);
+        return updates;
+    }
+
     /** Call when the user grants the audio permission: runs the first scan (or a stale one). */
     public void onAudioPermissionGranted() {
         foregroundScanDone.set(true);
         libraryAdmin.scanIfStale();
     }
 
-    /** Call when the first activity of this process starts: refreshes the library once if the device's media changed. */
+    /**
+     * Call whenever an activity starts: refreshes the library once per process if the device's media changed, and runs
+     * the automatic update check if it is due (at most daily; cheap when not).
+     */
     public void onAppForeground() {
+        if (!useFakes) updates().checkIfDue();
         if (!useFakes && hasAudioPermission() && foregroundScanDone.compareAndSet(false, true)) {
             libraryAdmin.scanIfStale();
         }
