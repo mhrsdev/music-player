@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Player.IconButton" parent="">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/player_icon_button_bg</item>
+        <item name="android:scaleType">center</item>
+        <item name="android:tint">#FFFFFF</item>
+    </style>
+    <style name="Player.SideButton" parent="">
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:background">@drawable/player_side_button_bg</item>
+        <item name="android:scaleType">center</item>
+        <item name="android:tint">#FFFFFF</item>
+    </style>
+    <style name="Player.ToggleButton" parent="">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/player_toggle_bg</item>
+        <item name="android:scaleType">center</item>
+    </style>
+</resources>
