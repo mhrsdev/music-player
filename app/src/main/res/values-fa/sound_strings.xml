@@ -1,0 +1,35 @@
+<resources>
+    <string name="sound_title">صدا</string>
+    <string name="sound_unsupported">جلوه‌های صوتی روی این دستگاه در دسترس نیستند.</string>
+    <string name="sound_eq">اکولایزر</string>
+    <string name="sound_eq_on">اکولایزر روشن</string>
+    <string name="sound_band_desc">%1$s هرتز</string>
+    <string name="sound_band_state">%1$s دسی‌بل</string>
+    <string name="sound_preset_custom">سفارشی</string>
+    <string name="sound_preset_normal">عادی</string>
+    <string name="sound_preset_classical">کلاسیک</string>
+    <string name="sound_preset_dance">رقص</string>
+    <string name="sound_preset_flat">تخت</string>
+    <string name="sound_preset_folk">فولک</string>
+    <string name="sound_preset_heavy_metal">هوی متال</string>
+    <string name="sound_preset_hip_hop">هیپ‌هاپ</string>
+    <string name="sound_preset_jazz">جاز</string>
+    <string name="sound_preset_pop">پاپ</string>
+    <string name="sound_preset_rock">راک</string>
+    <string name="sound_effects">جلوه‌ها</string>
+    <string name="sound_bass">تقویت باس</string>
+    <string name="sound_virtualizer">فضاسازی</string>
+    <string name="sound_loudness">افزایش بلندی صدا</string>
+    <string name="sound_db">%1$s دسی‌بل</string>
+    <string name="sound_playback">پخش</string>
+    <string name="sound_speed">سرعت</string>
+    <string name="sound_speed_value">%1$s×</string>
+    <string name="sound_skip_silence">رد کردن سکوت</string>
+    <string name="sound_skip_silence_sub">پرش از روی بخش‌های بی‌صدای آهنگ</string>
+    <string name="sound_replaygain">یکسان‌سازی بلندی صدا (ReplayGain)</string>
+    <string name="sound_replaygain_sub">با استفاده از برچسب‌های فایل‌ها، بلندی آهنگ‌ها را یکسان می‌کند. فقط صدای آهنگ‌های بلند را کم می‌کند، پس تحریف ایجاد نمی‌شود.</string>
+    <string name="sound_rg_off">خاموش</string>
+    <string name="sound_rg_track">آهنگ</string>
+    <string name="sound_rg_album">آلبوم</string>
+    <string name="sound_reset">بازنشانی</string>
+</resources>
