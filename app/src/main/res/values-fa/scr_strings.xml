@@ -81,7 +81,6 @@
     <string name="settings_lyrics_online_sub">وقتی فایل ‎.lrc پیدا نشد، متن همگام را جستجو کن</string>
     <string name="settings_playback">پخش</string>
     <string name="settings_sleep_default">زمان‌سنج خواب پیش‌فرض</string>
-    <string name="settings_sleep_minutes">%d دقیقه</string>
     <string name="settings_battery_saver">صرفه‌جویی باتری</string>
     <string name="settings_battery_saver_sub">حرکت، محوشدگی و دانه را خاموش کن</string>
     <string name="settings_about">درباره</string>
@@ -90,4 +89,6 @@
     <string name="library_menu_add_queue">افزودن به صف</string>
     <string name="library_menu_like">پسندیدن</string>
     <string name="library_menu_unlike">حذف از پسندیده‌ها</string>
+    <string name="settings_sleep_end">پایان آهنگ</string>
+    <string name="settings_sleep_minutes_f">%1$s دقیقه</string>
 </resources>

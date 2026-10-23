@@ -81,7 +81,6 @@
     <string name="settings_lyrics_online_sub">Look up synced lyrics when no .lrc file is found</string>
     <string name="settings_playback">Playback</string>
     <string name="settings_sleep_default">Default sleep timer</string>
-    <string name="settings_sleep_minutes">%d min</string>
     <string name="settings_battery_saver">Battery saver</string>
     <string name="settings_battery_saver_sub">Turn off motion, blur and grain</string>
     <string name="settings_about">About</string>
@@ -90,4 +89,6 @@
     <string name="library_menu_add_queue">Add to queue</string>
     <string name="library_menu_like">Like</string>
     <string name="library_menu_unlike">Remove from Liked songs</string>
+    <string name="settings_sleep_end">End of track</string>
+    <string name="settings_sleep_minutes_f">%1$s min</string>
 </resources>
