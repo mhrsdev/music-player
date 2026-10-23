@@ -12,7 +12,8 @@ media3 = "1.11.1"
 junit = "4.13.2"
 androidxTestCore = "1.7.0"
 archCoreTesting = "2.2.0"
-orgJson = "20250107"
+orgJson = "20250517"
+robolectric = "4.16"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -30,6 +31,7 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 
 junit = { module = "junit:junit", version.ref = "junit" }
 org-json = { module = "org.json:json", version.ref = "orgJson" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "archCoreTesting" }
 
 [plugins]
