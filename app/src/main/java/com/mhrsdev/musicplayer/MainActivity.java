@@ -195,17 +195,21 @@ public class MainActivity extends AppCompatActivity
     private void layoutDockForWidth() {
         if (!com.mhrsdev.musicplayer.ui.nav.Adaptive.isWide(this)) return;
         int gap = getResources().getDimensionPixelSize(R.dimen.mp_dock_gap);
+        int side = getResources().getDimensionPixelSize(R.dimen.mp_dock_margin_h);
         binding.chrome.setOrientation(android.widget.LinearLayout.HORIZONTAL);
         binding.chrome.setGravity(android.view.Gravity.CENTER_VERTICAL | android.view.Gravity.CENTER_HORIZONTAL);
         android.widget.LinearLayout.LayoutParams mini = (android.widget.LinearLayout.LayoutParams) binding.miniPlayerSlot.getLayoutParams();
         mini.width = 0;
         mini.weight = 1f;
         mini.bottomMargin = 0;
+        // Set both relative margins: once one is relative, the XML left/right ones are ignored.
+        mini.setMarginStart(side);
         mini.setMarginEnd(gap);
         binding.miniPlayerSlot.setLayoutParams(mini);
         android.widget.LinearLayout.LayoutParams nav = (android.widget.LinearLayout.LayoutParams) binding.navSlot.getLayoutParams();
         nav.width = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
         nav.setMarginStart(0);
+        nav.setMarginEnd(side);
         binding.navSlot.setLayoutParams(nav);
         binding.miniPlayerSlot.setVisibility(View.GONE); // renderMini shows it with the mini-player
     }

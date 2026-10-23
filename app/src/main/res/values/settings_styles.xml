@@ -28,6 +28,9 @@
         <item name="android:textColor">?attr/mpOnSurface</item>
         <item name="android:paddingHorizontal">16dp</item>
         <item name="android:textAlignment">viewStart</item>
+        <!-- Design-v1 colors instead of the platform accent. -->
+        <item name="trackTint">@color/settings_switch_track</item>
+        <item name="thumbTint">@color/settings_switch_thumb</item>
     </style>
     <style name="Settings.CardSub" parent="">
         <item name="android:layout_width">match_parent</item>

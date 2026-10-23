@@ -28,6 +28,10 @@ public final class SettingsStore {
     private static final String K_BATTERY_SAVER = "battery_saver";
     private static final String K_INCLUDE = "folders_include";
     private static final String K_EXCLUDE = "folders_exclude";
+    private static final String K_MIN_TRACK_SECONDS = "min_track_seconds";
+    private static final String K_REDUCE_MOTION = "reduce_motion";
+    /** Files shorter than this are skipped by the scanner (ringtones, notification sounds, voice notes). */
+    public static final int DEFAULT_MIN_TRACK_SECONDS = 30;
 
     private final SharedPreferences prefs;
     private final MutableLiveData<ThemeMode> theme;
@@ -40,6 +44,8 @@ public final class SettingsStore {
     private final MutableLiveData<BatterySaverMode> batterySaver;
     private final MutableLiveData<Set<String>> includedFolders;
     private final MutableLiveData<Set<String>> excludedFolders;
+    private final MutableLiveData<Integer> minTrackSeconds;
+    private final MutableLiveData<Boolean> reduceMotion;
 
     public SettingsStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -53,6 +59,8 @@ public final class SettingsStore {
         batterySaver = new MutableLiveData<>(readEnum(K_BATTERY_SAVER, BatterySaverMode.AUTO));
         includedFolders = new MutableLiveData<>(readSet(K_INCLUDE));
         excludedFolders = new MutableLiveData<>(readSet(K_EXCLUDE));
+        minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_TRACK_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
+        reduceMotion = new MutableLiveData<>(prefs.getBoolean(K_REDUCE_MOTION, false));
     }
 
     public LiveData<ThemeMode> theme() {
@@ -149,6 +157,26 @@ public final class SettingsStore {
     public void setExcludedFolders(Set<String> folders) {
         prefs.edit().putStringSet(K_EXCLUDE, new HashSet<>(folders)).apply();
         publish(excludedFolders, Collections.unmodifiableSet(new HashSet<>(folders)));
+    }
+
+    /** Minimum track length in seconds the scanner keeps (0 = keep everything). Changing it needs a rescan. */
+    public LiveData<Integer> minTrackSeconds() {
+        return minTrackSeconds;
+    }
+
+    public void setMinTrackSeconds(int seconds) {
+        prefs.edit().putInt(K_MIN_TRACK_SECONDS, Math.max(0, seconds)).apply();
+        publish(minTrackSeconds, Math.max(0, seconds));
+    }
+
+    /** App-level "reduce motion": decorative animation off regardless of the system setting. */
+    public LiveData<Boolean> reduceMotion() {
+        return reduceMotion;
+    }
+
+    public void setReduceMotion(boolean value) {
+        prefs.edit().putBoolean(K_REDUCE_MOTION, value).apply();
+        publish(reduceMotion, value);
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {
