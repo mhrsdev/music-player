@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/mpBackground"
+    android:clickable="true"
+    android:clipToPadding="false"
+    android:focusable="false"
+    android:paddingBottom="@dimen/scr_bottom_chrome">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView style="@style/Scr.PageTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/sound_title" />
+
+        <TextView
+            android:id="@+id/unsupported"
+            style="@style/Scr.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="12dp"
+            android:text="@string/sound_unsupported"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/eq_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/sound_eq" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/eq_switch"
+                style="@style/Settings.Switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sound_eq_on" />
+            <com.mhrsdev.musicplayer.ui.sound.EqualizerView
+                android:id="@+id/equalizer"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/sound_card_bg"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp" />
+            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none" android:layout_marginTop="8dp">
+                <LinearLayout android:id="@+id/preset_row" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="20dp" android:paddingBottom="4dp" />
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/effects_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/sound_effects" />
+            <FrameLayout android:id="@+id/bass_slot" android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <FrameLayout android:id="@+id/virt_slot" android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <FrameLayout android:id="@+id/loud_slot" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/sound_playback" />
+        <FrameLayout android:id="@+id/speed_slot" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+            <LinearLayout android:id="@+id/speed_chips" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="20dp" android:paddingBottom="12dp" />
+        </HorizontalScrollView>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/skip_silence"
+            style="@style/Settings.Switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sound_skip_silence" />
+        <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sound_skip_silence_sub" />
+        <TextView style="@style/Settings.RowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sound_replaygain" />
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="20dp" android:paddingBottom="4dp">
+                <TextView android:id="@+id/rg_off" style="@style/Search.Chip" android:text="@string/sound_rg_off" />
+                <TextView android:id="@+id/rg_track" style="@style/Search.Chip" android:text="@string/sound_rg_track" />
+                <TextView android:id="@+id/rg_album" style="@style/Search.Chip" android:text="@string/sound_rg_album" />
+            </LinearLayout>
+        </HorizontalScrollView>
+        <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="8dp" android:text="@string/sound_replaygain_sub" />
+
+        <TextView
+            android:id="@+id/reset"
+            style="@style/Sound.Reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/sound_reset" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
