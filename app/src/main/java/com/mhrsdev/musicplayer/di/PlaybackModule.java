@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.domain.repository.AudioEffectsController;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
-import com.mhrsdev.musicplayer.domain.repository.LibraryBrowser;
+import com.mhrsdev.musicplayer.domain.repository.LibraryReader;
 import com.mhrsdev.musicplayer.playback.AudioEffectsEngine;
 import com.mhrsdev.musicplayer.playback.BrowseHolder;
 import com.mhrsdev.musicplayer.playback.ExoPlayerController;
@@ -26,8 +26,8 @@ public final class PlaybackModule {
     }
 
     /** Makes the library browsable from outside the app (Android Auto, Assistant) through the playback service. */
-    public static void setLibraryBrowser(LibraryBrowser browser) {
-        BrowseHolder.set(browser);
+    public static void setLibraryReader(LibraryReader reader) {
+        BrowseHolder.set(reader);
     }
 
     /** Equalizer / bass / virtualizer / loudness on the shared player's audio session (effects attach lazily). */

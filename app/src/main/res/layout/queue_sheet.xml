@@ -32,25 +32,25 @@
             android:gravity="center_vertical"
             android:minWidth="48dp"
             android:paddingHorizontal="14dp"
-            android:textColor="#D4E3FF"
+            android:textColor="?attr/mpOnPrimaryContainer"
             android:textSize="16sp"
             android:textStyle="bold"
             android:contentDescription="@string/player_sleep_timer"
             app:drawableStartCompat="@drawable/player_ic_sleep"
-            app:drawableTint="#D4E3FF" />
+            app:drawableTint="?attr/mpOnPrimaryContainer" />
 
         <TextView
             android:id="@+id/queue_playing_from"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:background="@drawable/queue_chip_bg"
             android:gravity="center"
             android:minHeight="48dp"
             android:paddingHorizontal="14dp"
             android:paddingVertical="6dp"
-            android:textColor="#E2E2E9"
+            android:textColor="?attr/mpOnSurface"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -58,7 +58,16 @@
             android:id="@+id/queue_shuffle"
             style="@style/Player.IconButton"
             android:contentDescription="@string/queue_shuffle"
+            app:tint="?attr/mpOnSurface"
             android:src="@drawable/player_ic_shuffle" />
+
+        <ImageButton
+            android:id="@+id/queue_more"
+            style="@style/Player.IconButton"
+            android:contentDescription="@string/queue_more"
+            app:tint="?attr/mpOnSurface"
+            android:rotation="90"
+            android:src="@drawable/player_ic_more" />
     </LinearLayout>
 
     <FrameLayout
@@ -79,7 +88,7 @@
             android:layout_height="240dp"
             android:gravity="center"
             android:text="@string/queue_empty"
-            android:textColor="#BFC6D2"
+            android:textColor="?attr/mpOnSurfaceVariant"
             android:textSize="15sp"
             android:visibility="gone" />
     </FrameLayout>

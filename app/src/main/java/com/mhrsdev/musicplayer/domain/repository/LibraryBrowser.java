@@ -1,33 +1,49 @@
 package com.mhrsdev.musicplayer.domain.repository;
 
 import androidx.annotation.Nullable;
-import com.mhrsdev.musicplayer.domain.model.Album;
-import com.mhrsdev.musicplayer.domain.model.Artist;
-import com.mhrsdev.musicplayer.domain.model.Playlist;
+import androidx.lifecycle.LiveData;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.domain.model.TrackDetails;
+import com.mhrsdev.musicplayer.domain.model.YearCount;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-/** Blocking one-shot reads of the library for external browsers (Android Auto, Assistant). Background thread only. */
+/**
+ * Library browsing and management beyond {@link LibraryRepository} / {@link LibraryAdmin}: smart lists, years,
+ * play counts for sorting, batch playlist edits with duplicate feedback, track details and forgetting deleted files.
+ * Same conventions: LiveData on the main thread, fire-and-forget writes, callbacks on the main thread.
+ * Obtain it from {@code AppContainer.libraryBrowser()}.
+ */
 public interface LibraryBrowser {
-    List<Track> recentlyAdded(int limit);
 
-    /** Tracks with at least one play, most played first. */
-    List<Track> mostPlayed(int limit);
+    /** Played tracks, most plays first (ties: most recent play first). */
+    LiveData<List<Track>> getMostPlayed();
 
-    List<Track> liked(int limit);
+    /** Tracks with no recorded play, newest added first. */
+    LiveData<List<Track>> getNeverPlayed();
 
-    List<Playlist> playlists();
+    /** Years that occur in the library (unknown year excluded), newest first. */
+    LiveData<List<YearCount>> getYears();
 
-    List<Album> albums();
+    /** Tracks of one release year, by album then track number. */
+    LiveData<List<Track>> getYearTracks(int year);
 
-    List<Artist> artists();
+    /** Track id to play count, only tracks played at least once (for "most played" sorting). */
+    LiveData<Map<String, Integer>> getPlayCounts();
 
-    List<Track> albumTracks(String albumId);
+    /**
+     * Appends {@code trackIds} in order, skipping ones already in the playlist. {@code callback} (may be null) gets the
+     * number actually added (0 = all were duplicates).
+     */
+    void addAllToPlaylist(String playlistId, List<String> trackIds, @Nullable Callback<Integer> callback);
 
-    List<Track> artistTracks(String artistId);
+    /** Puts {@code trackId} back at {@code index} of the playlist (undo of a removal); clamps the index. */
+    void restoreToPlaylist(String playlistId, String trackId, int index);
 
-    List<Track> playlistTracks(String playlistId);
+    /** Loads the details of {@code track}; never delivers null. */
+    void loadDetails(Track track, Callback<TrackDetails> callback);
 
-    @Nullable
-    Track track(String trackId);
+    /** Drops tracks whose files were deleted from the device; their playlist / like / history rows become inert. */
+    void forgetTracks(Collection<String> trackIds);
 }

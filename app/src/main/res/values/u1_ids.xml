@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Marks a view whose bottom padding follows the dock height (BottomChrome). -->
+    <item name="mp_dock_padded" type="id" />
+</resources>

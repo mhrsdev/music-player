@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#22FFFFFF">
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#29808080">
     <item><selector>
-        <item android:state_activated="true"><shape><corners android:radius="16dp"/><solid android:color="#1E4878"/></shape></item>
-        <item><shape><corners android:radius="6dp"/><solid android:color="#171A1F"/></shape></item>
+        <item android:state_activated="true"><shape><corners android:radius="16dp"/><solid android:color="?attr/mpPrimaryContainer"/></shape></item>
+        <item><shape><corners android:radius="6dp"/><solid android:color="?attr/mpSurfaceContainerLow"/></shape></item>
     </selector></item>
 </ripple>

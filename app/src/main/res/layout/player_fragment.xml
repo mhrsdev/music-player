@@ -184,16 +184,21 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/player_title_block"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
+                android:accessibilityLiveRegion="polite"
+                android:focusable="true"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/player_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ellipsize="marquee"
+                    android:ellipsize="end"
+                    android:importantForAccessibility="no"
                     android:marqueeRepeatLimit="1"
                     android:singleLine="true"
                     android:textAlignment="viewStart"
@@ -207,6 +212,7 @@
                     android:id="@+id/player_artist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textAlignment="viewStart"

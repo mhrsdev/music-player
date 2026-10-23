@@ -68,6 +68,9 @@ public class PlaybackService extends MediaLibraryService {
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
         }
         session = builder.build();
+        // Without this nobody owns the session: onGetSession only runs when a MediaController connects, and the app
+        // has none (shared in-process player), so Media3 would never post the notification or go foreground.
+        addSession(session);
         // Stock notification (prev / play-pause / next from the player's commands) with our channel and small icon.
         DefaultMediaNotificationProvider provider = new DefaultMediaNotificationProvider.Builder(this)
                 .setChannelId(CHANNEL_ID)
@@ -82,6 +85,13 @@ public class PlaybackService extends MediaLibraryService {
     @Nullable @Override
     public MediaLibrarySession onGetSession(MediaSession.ControllerInfo controllerInfo) {
         return session;
+    }
+
+    /** Every start (play, or the notification permission just granted) re-posts the notification: it is dropped while denied. */
+    @Override public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        int result = super.onStartCommand(intent, flags, startId);
+        triggerNotificationUpdate();
+        return result;
     }
 
     @Override public void onDestroy() {

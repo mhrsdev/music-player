@@ -12,7 +12,7 @@ import com.mhrsdev.musicplayer.domain.model.Album;
 import com.mhrsdev.musicplayer.domain.model.Artist;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
 import com.mhrsdev.musicplayer.domain.model.Track;
-import com.mhrsdev.musicplayer.domain.repository.LibraryBrowser;
+import com.mhrsdev.musicplayer.domain.repository.LibraryReader;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ public class BrowseTreeTest {
                 "content://media/" + id, false, false, 0, 1, 1);
     }
 
-    private static final class Stub implements LibraryBrowser {
+    private static final class Stub implements LibraryReader {
         public List<Track> recentlyAdded(int limit) { return List.of(sample("1"), sample("2")); }
         public List<Track> mostPlayed(int limit) { return List.of(sample("2")); }
         public List<Track> liked(int limit) { return List.of(); }

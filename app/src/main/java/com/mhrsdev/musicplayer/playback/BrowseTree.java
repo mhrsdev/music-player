@@ -9,7 +9,7 @@ import com.mhrsdev.musicplayer.domain.model.Album;
 import com.mhrsdev.musicplayer.domain.model.Artist;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
 import com.mhrsdev.musicplayer.domain.model.Track;
-import com.mhrsdev.musicplayer.domain.repository.LibraryBrowser;
+import com.mhrsdev.musicplayer.domain.repository.LibraryReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
  * Artists -> tracks. Playable items are {@link TrackMapper} items (media id = track id, content URIs, no bitmaps), so a
  * selected item can be played as is. All methods block on the database: call them off the main thread.
  */
-final class BrowseTree {
+class BrowseTree {
     static final String ROOT = "[root]";
     static final String RECENT = "[recent]", MOST = "[most]", LIKED = "[liked]", PLAYLISTS = "[playlists]",
             ALBUMS = "[albums]", ARTISTS = "[artists]";
@@ -27,9 +27,9 @@ final class BrowseTree {
     private static final int SHORT_LIST = 100, LONG_LIST = 300;
 
     private final Resources res;
-    @Nullable private final LibraryBrowser library;
+    @Nullable private final LibraryReader library;
 
-    BrowseTree(Resources res, @Nullable LibraryBrowser library) {
+    BrowseTree(Resources res, @Nullable LibraryReader library) {
         this.res = res;
         this.library = library;
     }

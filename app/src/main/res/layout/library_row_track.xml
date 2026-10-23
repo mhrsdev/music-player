@@ -4,16 +4,33 @@
     android:layout_width="match_parent"
     android:layout_height="72dp"
     android:layout_marginHorizontal="8dp"
-    android:background="@drawable/library_row_bg"
+    android:background="@drawable/u2_row_bg"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingStart="8dp">
 
-    <com.mhrsdev.musicplayer.ui.widget.ArtworkView
-        android:id="@+id/art"
+    <FrameLayout
         android:layout_width="52dp"
-        android:layout_height="52dp"
-        android:importantForAccessibility="no" />
+        android:layout_height="52dp">
+
+        <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+            android:id="@+id/art"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no" />
+
+        <!-- Multi-select: the cover turns into a check (no extra row height, no layout shift). -->
+        <ImageView
+            android:id="@+id/check"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/u2_check_badge"
+            android:importantForAccessibility="no"
+            android:padding="12dp"
+            android:src="@drawable/ic_mp_check"
+            android:visibility="gone"
+            app:tint="?attr/mpOnPrimary" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -84,5 +101,16 @@
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/nav_ic_more"
+        app:tint="?attr/mpOnSurfaceVariant" />
+
+    <!-- Playlist detail only: drag handle for reordering. -->
+    <ImageView
+        android:id="@+id/drag"
+        android:layout_width="40dp"
+        android:layout_height="48dp"
+        android:contentDescription="@string/u2_reorder"
+        android:scaleType="center"
+        android:src="@drawable/ic_mp_drag"
+        android:visibility="gone"
         app:tint="?attr/mpOnSurfaceVariant" />
 </LinearLayout>

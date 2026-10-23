@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 /** The launcher's static shortcuts (res/xml/shortcuts.xml): the intent actions and what each one does. */
-public final class ShortcutIntents {
+public class ShortcutIntents {
     public static final String ACTION_SHUFFLE_ALL = "com.mhrsdev.musicplayer.action.SHUFFLE_ALL";
     public static final String ACTION_LIKED = "com.mhrsdev.musicplayer.action.LIKED";
     /** Voice search ("play ...") from Assistant or a head unit; opens search. */

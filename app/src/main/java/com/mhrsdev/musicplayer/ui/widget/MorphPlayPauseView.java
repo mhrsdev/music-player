@@ -41,6 +41,7 @@ public class MorphPlayPauseView extends View {
     private final long origin = SystemClock.uptimeMillis();
 
     private boolean playing;
+    private boolean bound;
     private boolean buffering;
     private float morph; // 0 squircle/play .. 1 cookie/pause
     private float rotationDeg;
@@ -74,6 +75,11 @@ public class MorphPlayPauseView extends View {
 
     /** Sets the state; {@code animate=false} jumps (use when binding a recycled view). */
     public void setPlaying(boolean playing, boolean animate) {
+        if (!bound) { // first bind: show the final shape at once, never a morph from the default state
+            bound = true;
+            animate = false;
+            this.playing = !playing;
+        }
         if (this.playing == playing && !morphAnim.isRunning()) {
             if (!animate) setMorphNow(playing ? 1f : 0f);
             return;
@@ -124,9 +130,15 @@ public class MorphPlayPauseView extends View {
         setMeasuredDimension(s, s);
     }
 
+    /** Radius of the container inside the padded square, 1.5 px in so anti-aliasing never touches the edge. */
+    static float outerRadius(float w, float h, int pl, int pt, int pr, int pb) {
+        float inner = Math.min(w - pl - pr, h - pt - pb);
+        return Math.max(0f, inner / 2f - 1.5f);
+    }
+
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
-        float s = Math.min(w, h);
+        float s = 2f * outerRadius(w, h, getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom());
         float cx = w / 2f, cy = h / 2f, u = s * 0.11f;
         // Play: rounded-ish triangle, optically centred (+0.12u).
         playIcon.rewind();
@@ -166,12 +178,14 @@ public class MorphPlayPauseView extends View {
         lastFrame = now;
 
         float w = getWidth(), h = getHeight(), cx = w / 2f, cy = h / 2f;
-        float r = Math.min(w, h) / 2f;
+        float r = outerRadius(w, h, getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom());
         double rot = Math.toRadians(rotationDeg);
+        float m = Math.max(0f, Math.min(1f, morph)); // overshoot would push the edge past the bounds
         shape.rewind();
         for (int i = 0; i <= POINTS; i++) {
             double t = WaveMath.TWO_PI * i / POINTS;
-            float rr = r * ShapeMath.radius(t - rot, morph);
+            // Only the cookie turns; the squircle stays axis-aligned so its corners never leave the square.
+            float rr = r * ShapeMath.radiusRotated(t, rot, m);
             float x = cx + rr * (float) Math.cos(t), y = cy + rr * (float) Math.sin(t);
             if (i == 0) shape.moveTo(x, y); else shape.lineTo(x, y);
         }

@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
  * Pushes the current {@link NowPlaying} to every placed widget. Called by the playback bridge on changes and by the
  * providers when the system asks; with no widget on the home screen it costs one cheap id lookup per kind.
  */
-public final class WidgetUpdater {
+public class WidgetUpdater {
     private static final int ART_PX = 420;
 
     private WidgetUpdater() { }

@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * shared player: no timers beyond one 200 ms coalescing post, and nothing at all for position ticks or seeks.
  */
 @OptIn(markerClass = UnstableApi.class)
-public final class NowPlayingBridge {
+public class NowPlayingBridge {
     private static final long COALESCE_MS = 200L;
 
     private NowPlayingBridge() {}
