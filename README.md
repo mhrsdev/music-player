@@ -127,8 +127,8 @@ Two ways to make a release, both handled by `.github/workflows/release.yml`:
    (e.g. `0.1.0`). GitHub creates the tag `v<version>` itself at the head commit of that branch.
 
 The workflow runs the unit tests and `assembleRelease`, then publishes a GitHub Release with
-`MusicPlayer-vX.Y.Z.apk`, its `.sha256` and the matching `CHANGELOG.md` section. Tags that start with `v0.` or contain `-` are
-marked pre-release. Optional repository secrets for real signing: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
+`MusicPlayer-vX.Y.Z.apk`, its `.sha256` and the matching `CHANGELOG.md` section. A release is a normal (stable, "latest") release unless the version has a `-` suffix
+(e.g. `v1.0.0-rc.1`), which marks it as a pre-release. (`v0.1.0` and `v0.2.0` were published as pre-releases; `v0.3.0` onward are normal releases.) Optional repository secrets for real signing: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
 
 ## Tests

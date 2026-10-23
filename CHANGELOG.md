@@ -1,5 +1,7 @@
 # Changelog
 
+Releases are stable unless the version has a `-` suffix (e.g. `v1.0.0-rc.1`). `v0.1.0` and `v0.2.0` were published as pre-releases; `v0.3.0` onward are normal releases.
+
 ## v0.1.0
 
 Pre-release (first installable build). Not tested on a physical device yet - expect rough edges.
