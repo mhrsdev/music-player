@@ -64,3 +64,17 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 1. Screenshots are of the app **"Melodiha"** (Persian music app): media notification in the shade (artwork-tinted deep-red card, **waveform-style progress** with thumb, round prev/pause/next buttons, device name) and the lock-screen media pill (waveform at the bottom edge). Saved as `docs/design-reference/07-*.jpg`, `08-*.jpg`. Persian/RTL is first-class.
 2. Owner finds this design very cool and wants **ours to be outstanding ("معرکه")**.
 3. **Do the design phase now and show the design images in the chat** (owner reviews visually before implementation).
+
+---
+
+## D4 — 2026-10-23 — Design approved; start implementation; add voice-memo bar seekbar
+
+**Original (verbatim):**
+
+> دیزاین تایید شد، شروع کن پیاده‌سازی رو
+> ولی یدونه به اون نوارا اضافه شه که شبیه نوت های موسیقی این نوارا هستن وقتی ویس میگیری با شدت صداته اونمدلی باشه
+
+**Summary:**
+1. Design in `docs/design/` is **approved**. Start implementation (T2–T9).
+2. Add **one more seek-bar style** next to Wavy and Waveform: vertical **bars whose heights follow the song's actual loudness**, like the voice-message/voice-recording waveform ("Bars"). Played part highlighted, tap/drag to seek. Needs real amplitude extraction per track (cached).
+3. The owner did not answer the 5 open design questions; supervisor applied the recommended defaults (see STATUS → Decisions K5–K9). Owner can change them anytime.
