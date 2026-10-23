@@ -1,4 +1,4 @@
 Font files in this folder (subset WOFF2 as served by Google Fonts) are used only to render the design mockups.
-- GoogleSansFlex-latin.woff2: SIL Open Font License 1.1, see OFL-GoogleSansFlex.txt
-- Vazirmatn-*.woff2: SIL Open Font License 1.1, see OFL-Vazirmatn.txt
-- MaterialSymbolsRounded-subset.woff2: Apache License 2.0 (https://github.com/google/material-design-icons/blob/master/LICENSE)
+- ReadexPro-latin.woff2: SIL Open Font License 1.1, see OFL-ReadexPro.txt (Latin UI face, design v2)
+- Vazirmatn-*.woff2: SIL Open Font License 1.1, see OFL-Vazirmatn.txt (Persian UI face)
+Icons are drawn for this project (see lib.js `ICONS`); no icon font is used since design v2.
