@@ -1,0 +1,19 @@
+<resources>
+    <!-- T3 screen tokens (DESIGN.md §2.1). Temporary until T2's theme tokens land; names are prefixed to avoid clashes. -->
+    <color name="scr_bg">#F7F9FF</color>
+    <color name="scr_surface_low">#F1F3FA</color>
+    <color name="scr_surface">#EAEEF5</color>
+    <color name="scr_surface_high">#E4E8EF</color>
+    <color name="scr_on_surface">#181C21</color>
+    <color name="scr_on_surface_variant">#414851</color>
+    <color name="scr_outline_variant">#C1C7D2</color>
+    <color name="scr_primary">#2F5F95</color>
+    <color name="scr_on_primary">#FFFFFF</color>
+    <color name="scr_primary_container">#D4E3FF</color>
+    <color name="scr_on_primary_container">#001C3A</color>
+    <color name="scr_secondary_container">#D6E3F7</color>
+    <color name="scr_on_secondary_container">#0F1D2C</color>
+    <color name="scr_tertiary">#006A62</color>
+    <color name="scr_liked">#B8860B</color>
+    <color name="scr_error">#BA1A1A</color>
+</resources>

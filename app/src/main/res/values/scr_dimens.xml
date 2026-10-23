@@ -1,0 +1,4 @@
+<resources>
+    <!-- Floating nav (68) + gap (8) + mini-player (76) + insets margin: content scrolls under the chrome. -->
+    <dimen name="scr_bottom_chrome">180dp</dimen>
+</resources>
