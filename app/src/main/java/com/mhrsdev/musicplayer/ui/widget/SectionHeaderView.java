@@ -36,7 +36,7 @@ public class SectionHeaderView extends LinearLayout {
         texts.setOrientation(VERTICAL);
         title = new TextView(context);
         title.setTextAppearance(R.style.TextAppearance_MusicPlayer_Headline);
-        title.setAccessibilityHeading(true);
+        androidx.core.view.ViewCompat.setAccessibilityHeading(title, true);
         title.setMaxLines(2);
         title.setEllipsize(TextUtils.TruncateAt.END);
         subtitle = new TextView(context);

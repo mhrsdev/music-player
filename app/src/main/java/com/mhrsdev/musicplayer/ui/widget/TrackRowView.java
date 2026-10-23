@@ -175,8 +175,8 @@ public class TrackRowView extends LinearLayout {
         this.nowPlaying = nowPlaying;
         title.setTextColor(nowPlaying ? accentTitle : titleColor);
         setSelected(nowPlaying);
-        if (nowPlaying) setStateDescription(getContext().getString(R.string.mp_cd_now_playing));
-        else setStateDescription(null);
+        androidx.core.view.ViewCompat.setStateDescription(this,
+                nowPlaying ? getContext().getString(R.string.mp_cd_now_playing) : null);
         updateBackground();
     }
 

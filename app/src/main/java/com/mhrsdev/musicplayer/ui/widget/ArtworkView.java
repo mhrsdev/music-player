@@ -95,8 +95,11 @@ public class ArtworkView extends View {
     /** Artwork URI (nullable) + placeholder seed. Monogram is cleared. */
     public void setArtwork(@Nullable String artworkUri, int placeholderSeed) {
         monogram = null;
-        if (seed != placeholderSeed || placeholder == null) placeholder = PlaceholderArt.colors(placeholderSeed);
-        seed = placeholderSeed;
+        if (seed != placeholderSeed || placeholderPaint.getShader() == null) {
+            seed = placeholderSeed;
+            placeholder = PlaceholderArt.colors(placeholderSeed);
+            updatePlaceholderShader();
+        }
         if (artworkUri != null && artworkUri.equals(uri) && bitmap != null) return;
         uri = artworkUri;
         setBitmap(null, false);
@@ -149,6 +152,13 @@ public class ArtworkView extends View {
         invalidate();
     }
 
+    private void updatePlaceholderShader() {
+        if (getWidth() == 0) return;
+        placeholderPaint.setShader(new LinearGradient(0, 0, getWidth(), getHeight(),
+                placeholder[0], placeholder[1], Shader.TileMode.CLAMP));
+        invalidate();
+    }
+
     private void updateShader() {
         Bitmap b = bitmap;
         Shader s = artPaint.getShader();
@@ -162,7 +172,7 @@ public class ArtworkView extends View {
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
         bounds.set(0, 0, w, h);
-        placeholderPaint.setShader(null);
+        updatePlaceholderShader();
         monogramPaint.setTextSize(Math.min(w, h) * 0.42f);
         int ns = (int) (Math.min(w, h) * 0.42f);
         if (note != null) note.setBounds((w - ns) / 2, (h - ns) / 2, (w + ns) / 2, (h + ns) / 2);
@@ -173,11 +183,6 @@ public class ArtworkView extends View {
         float r = circle ? Math.min(getWidth(), getHeight()) / 2f : cornerRadius;
         boolean showArt = bitmap != null;
         if (!showArt || fade < 1f) {
-            if (placeholderPaint.getShader() == null || placeholderPaint.getColor() != placeholder[0]) {
-                placeholderPaint.setColor(placeholder[0]);
-                placeholderPaint.setShader(new LinearGradient(0, 0, getWidth(), getHeight(),
-                        placeholder[0], placeholder[1], Shader.TileMode.CLAMP));
-            }
             canvas.drawRoundRect(bounds, r, r, placeholderPaint);
             if (!showArt) {
                 if (monogram != null) {
