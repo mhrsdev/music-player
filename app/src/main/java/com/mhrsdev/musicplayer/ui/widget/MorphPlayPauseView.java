@@ -111,11 +111,11 @@ public class MorphPlayPauseView extends View {
     }
 
     private static ShapeMorph.Shape pauseShape(PauseStyle s) {
-        switch (s) {
-            case CIRCLE: return ShapeMorph.Shape.CIRCLE;
-            case ROUNDED_SQUARE: return ShapeMorph.Shape.ROUNDED_SQUARE;
-            default: return ShapeMorph.Shape.SQUIRCLE;
-        }
+        return switch (s) {
+            case CIRCLE -> ShapeMorph.Shape.CIRCLE;
+            case ROUNDED_SQUARE -> ShapeMorph.Shape.ROUNDED_SQUARE;
+            default -> ShapeMorph.Shape.SQUIRCLE;
+        };
     }
 
     /** Sets the state; {@code animate=false} jumps (use when binding a recycled view). */
@@ -211,12 +211,11 @@ public class MorphPlayPauseView extends View {
 
     /** Bar corner radius in u per style (the play triangle uses 0.14u, its seam stays sharp). */
     private float barCorner() {
-        switch (style) {
-            case SQUIRCLE_ROUND_BARS: return 0.33f;
-            case BREATHING_BLOCKS: return 0.3f;
-            case ROUNDED_SQUARE: return 0.2f;
-            default: return 0.3f;
-        }
+        return switch (style) {
+            case SQUIRCLE_ROUND_BARS -> 0.33f;
+            case ROUNDED_SQUARE -> 0.2f;
+            default -> 0.3f;
+        };
     }
 
     @Override public void onVisibilityAggregated(boolean isVisible) {

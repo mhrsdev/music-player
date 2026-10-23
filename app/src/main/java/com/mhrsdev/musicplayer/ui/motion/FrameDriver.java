@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * the moment the last animation settles: no idle ticking, no timers. Main thread only; no per-frame allocation.
  */
 @MainThread
-public final class FrameDriver implements Choreographer.FrameCallback {
+public class FrameDriver implements Choreographer.FrameCallback {
     /** Something that advances once per frame. */
     public interface Tick {
         /** @return true to keep receiving frames. */

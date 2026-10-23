@@ -13,7 +13,7 @@ import com.mhrsdev.musicplayer.R;
  * The full player keeps its own cover flight (PlayerFragment) and is not touched here.
  * Under reduce motion / animator scale 0 / battery saver they are skipped entirely (instant swap).
  */
-public final class PageTransitions {
+public class PageTransitions {
     private PageTransitions() {}
 
     /** Tab switch: fade through with a slight 0.96 -> 1 scale; the tab's state is kept by the caller. */

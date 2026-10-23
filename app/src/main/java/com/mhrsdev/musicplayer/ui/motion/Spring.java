@@ -5,7 +5,7 @@ package com.mhrsdev.musicplayer.ui.motion;
  * Each {@link #step} uses the closed-form solution over the frame delta, so it is exact and stable for any frame
  * time (a dropped frame never makes it explode) and allocates nothing. Pure Java: unit-tested on the JVM.
  */
-public final class Spring {
+public class Spring {
     /** Stiffness / damping-ratio presets, tuned for Mowj (see docs/THEMING.md, Motion). */
     public enum Preset {
         /** Quick and firm, a hint of overshoot: presses, nav pill, chips. */

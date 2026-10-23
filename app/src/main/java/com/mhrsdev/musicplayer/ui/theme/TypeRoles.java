@@ -19,7 +19,7 @@ import com.mhrsdev.musicplayer.R;
  * XML text uses the matching TextAppearance.MusicPlayer.* styles instead.
  */
 @MainThread
-public final class TypeRoles {
+public class TypeRoles {
     public enum Role {
         DISPLAY(R.font.mp_sans_round, 700),
         HEADLINE(R.font.mp_sans_round, 600),

@@ -18,7 +18,7 @@ import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
  * <p>Policy: {@link #enabled} is false under the app's reduce-motion setting, system animator scale 0 or battery
  * saver; then springs snap, jiggles are skipped and page transitions become a short fade or nothing.
  */
-public final class Motion {
+public class Motion {
     private Motion() {}
 
     // Durations (ms) for the few tweened things (fades, page transitions). Springs have no duration.
@@ -71,7 +71,7 @@ public final class Motion {
     /** Scale spring of {@code v}, created once and cached in a view tag. */
     public static SpringAnimator scaleSpring(View v) {
         Object tag = v.getTag(R.id.mp_motion_scale);
-        if (tag instanceof SpringAnimator) return (SpringAnimator) tag;
+        if (tag instanceof SpringAnimator a) return a;
         SpringAnimator a = SpringAnimator.scaleOf(v, Spring.Preset.SNAPPY);
         v.setTag(R.id.mp_motion_scale, a);
         return a;
@@ -115,10 +115,9 @@ public final class Motion {
         v.setOnTouchListener((view, e) -> {
             if (!view.isEnabled()) return false;
             switch (e.getActionMasked()) {
-                case android.view.MotionEvent.ACTION_DOWN: press(view, scale); break;
-                case android.view.MotionEvent.ACTION_UP:
-                case android.view.MotionEvent.ACTION_CANCEL: release(view); break;
-                default: break;
+                case android.view.MotionEvent.ACTION_DOWN -> press(view, scale);
+                case android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> release(view);
+                default -> { }
             }
             return false;
         });

@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
  * 0, battery saver) every call snaps straight to the target and no frame is ever scheduled.
  */
 @MainThread
-public final class SpringAnimator implements FrameDriver.Tick {
+public class SpringAnimator implements FrameDriver.Tick {
     /** Receives each frame's value (e.g. {@code v -> view.setScaleX(v)}). */
     public interface Setter {
         void set(float value);

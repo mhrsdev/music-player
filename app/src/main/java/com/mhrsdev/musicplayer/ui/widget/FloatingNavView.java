@@ -144,7 +144,7 @@ public class FloatingNavView extends LinearLayout {
             t.setDuration(PILL_SPRING.durationMs());
             TransitionManager.beginDelayedTransition(this, t);
             View item = findViewById(id);
-            if (item instanceof ViewGroup) Motion.jiggle(((ViewGroup) item).getChildAt(0));
+            if (item instanceof ViewGroup g) Motion.jiggle(g.getChildAt(0));
         }
         selectedId = id;
         for (int i = 0; i < getChildCount(); i++) {

@@ -8,7 +8,7 @@ import android.graphics.Path;
  * point. Shapes are mirror-symmetric on both axes and never leave the unit box, so a morph never clips.
  * Paths are rebuilt into a caller-owned {@link Path} with quadratic smoothing through the midpoints: no allocation.
  */
-public final class ShapeMorph {
+public class ShapeMorph {
     /** The Mowj shape set. */
     public enum Shape { CIRCLE, SQUIRCLE, ROUNDED_SQUARE, COOKIE, PILL }
 

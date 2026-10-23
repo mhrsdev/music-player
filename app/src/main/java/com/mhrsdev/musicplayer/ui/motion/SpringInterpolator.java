@@ -7,7 +7,7 @@ import android.animation.TimeInterpolator;
  * XML, ViewPropertyAnimator). Pair it with {@link #durationMs()}: the time the spring needs to settle, so the
  * curve ends exactly at rest. The value is evaluated in closed form per call; no allocation.
  */
-public final class SpringInterpolator implements TimeInterpolator {
+public class SpringInterpolator implements TimeInterpolator {
     private final Spring scratch;
     private final float durationSec;
 
