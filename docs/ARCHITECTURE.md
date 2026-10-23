@@ -38,7 +38,9 @@ data/lyrics         LRC parser, LRCLIB client, cache
 data/waveform       waveform extractor + cache
 data/repository     implementations of domain.repository on top of data.*
 data/settings       SharedPreferences-backed settings
-playback            Media3 MediaSessionService, real PlayerController, sleep timer, notification (PlaybackService = stub)
+playback            ExoPlayerController (real PlayerController), PlaybackService (MediaSessionService + notification), PlayerHolder
+                    (one in-process ExoPlayer shared by both), PlaybackStore (queue/position persistence), pure logic
+                    (SleepTimerLogic, PlayCountTracker, QueueShuffler); di/PlaybackModule.createController(ctx, playCountListener)
 di                  AppContainer (hand-written DI, today bound to fakes)
 fake                in-memory implementations + SampleData (UI development and tests)
 ui/theme  ui/widget  ui/nav  ui/home  ui/search  ui/library  ui/player  ui/queue  ui/settings

@@ -1,33 +1,57 @@
 <!doctype html>
-<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Home</title><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="home.css"></head>
-<body><div class="screen theme-dark" style="--glow:146,64,170">
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Home</title><link rel="stylesheet" href="base.css">
+<style>
+  .glow { position: absolute; left: -120px; top: -160px; width: 680px; height: 640px; z-index: 0; pointer-events: none;
+    background: radial-gradient(closest-side at 38% 46%, rgba(146,64,170,.42), rgba(146,64,170,.12) 55%, rgba(146,64,170,0) 100%); }
+  .content { position: absolute; inset: 40px 0 0 0; z-index: 2; }
+  .sec { display: flex; align-items: center; justify-content: space-between; padding: 0 12px 0 20px; height: 48px; }
+  .sec .more { width: 40px; height: 40px; display: grid; place-items: center; color: var(--on-surface-var); border-radius: 99px; }
+  .car { position: relative; height: 272px; margin-top: 6px; }
+  .car .art { position: absolute; top: 0; height: 272px; }
+  .car .cap { position: absolute; left: 20px; top: 280px; width: 260px; }
+  .playfab { position: absolute; right: 14px; bottom: 14px; }
+  .chipdate { position: absolute; left: 14px; top: 14px; height: 28px; padding: 0 10px; border-radius: 99px; background: rgba(10,6,24,.55); color: #fff; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 4px; backdrop-filter: blur(8px); }
+  .tb { display: flex; gap: 12px; padding: 0 16px; margin-top: 8px; }
+  .tb .card { width: 152px; flex: none; }
+  .tb .card .t-title { margin-top: 10px; }
+</style></head>
+<body><div class="screen theme-dark">
   <div class="glow"></div>
   <div class="statusbar"></div>
   <div class="content">
-    <div class="sec" style="margin-top:14px"><div class="t-section">Recently added</div><div class="act">See all<i class="g s18" data-g="chev"></i></div></div>
+    <div class="sec" style="margin-top:8px"><div class="t-headline">Recently added</div><div class="more"><i class="ic">chevron_right</i></div></div>
     <div class="car">
-      <div class="art sl16 edge" data-art="tehran-nights" style="left:20px;width:264px">
-        <div class="disc play-sm playd" style="background:#E3B6FF;color:#4A1A6B;box-shadow:0 0 0 6px rgba(227,182,255,.16),0 10px 22px -6px rgba(40,0,60,.8)"><i class="g s28" data-g="play"></i></div>
+      <div class="art r28" data-art="tehran-nights" style="left:16px;width:272px">
+                <div class="playfab cookie lift" data-size="56" data-c="#E3B6FF" data-rot="8"><i class="ic f s28" style="color:#4A1A6B">play_arrow</i></div>
       </div>
-      <div class="art sl14 edge" data-art="electric-dusk" style="left:292px;width:84px"></div>
-      <div class="art sl12 edge" data-art="koucheh-bagh" style="left:384px;width:40px"></div>
-    </div>
-    <div class="cap fa" dir="rtl" style="text-align:left"><div class="t-title ell">شب‌های تهران</div><div class="t-meta ell">آوا نیک‌زاد · آلبوم · ۱۲ آهنگ</div></div>
-
-    <div class="sec" style="margin-top:22px"><div class="t-section">Throwbacks</div><div class="act">See all<i class="g s18" data-g="chev"></i></div></div>
-    <div class="mixes">
-      <div class="mix" style="--lab:#ff7aa8"><div class="rec"></div><div class="art sl10" data-art="mix-2016"></div><div class="t-title ell">On repeat, 2016</div><div class="t-meta ell">42 songs you loved</div></div>
-      <div class="mix" style="--lab:#d9573a"><div class="rec"></div><div class="art sl10" data-art="mix-fa"></div><div class="t-title ell fa" dir="rtl" style="text-align:left">دهه‌ی هشتاد</div><div class="t-meta ell fa" dir="rtl" style="text-align:left">۵۸ آهنگ · ۱۳۸۰ تا ۱۳۸۹</div></div>
-      <div class="mix" style="--lab:#0f8a8a"><div class="rec"></div><div class="art sl10" data-art="mix-summer"></div><div class="t-title ell">Summer of 2019</div><div class="t-meta ell">31 songs</div></div>
+      <div class="art r24" data-art="electric-dusk" style="left:296px;width:68px"></div>
+      <div class="art r20" data-art="koucheh-bagh" style="left:372px;width:40px;border-top-right-radius:0;border-bottom-right-radius:0"></div>
+      <div class="cap fa" dir="rtl" style="text-align:left;width:272px;left:16px;padding:0 4px">
+        <div class="t-title ell">شب‌های تهران</div><div class="t-support ell">آوا نیک‌زاد · آلبوم · امروز اضافه شد</div>
+      </div>
     </div>
 
-    <div class="sec" style="margin-top:20px"><div class="t-section">Quick picks</div><div class="act"><i class="g s18" data-g="shuffle"></i>&nbsp;Shuffle</div></div>
-    <div class="row"><div class="art sl8 edge" data-art="without-you" style="width:48px;height:48px"></div><div class="txt"><div class="t-title ell">Without You</div><div class="t-meta ell">NEFFEX</div></div><div class="d">3:10</div><div class="ib more"><i class="g" data-g="more"></i></div></div>
-    <div class="row"><div class="art sl8 edge" data-art="anar" style="width:48px;height:48px"></div><div class="txt fa" dir="rtl" style="text-align:left"><div class="t-title ell">انار</div><div class="t-meta ell">سامان آرین</div></div><div class="d">4:21</div><div class="ib more"><i class="g" data-g="more"></i></div></div>
-    <div class="row"><div class="art sl8 edge" data-art="topography" style="width:48px;height:48px"></div><div class="txt"><div class="t-title ell">Cold Light</div><div class="t-meta ell">Mira Vale</div></div><div class="d">3:47</div><div class="ib more"><i class="g" data-g="more"></i></div></div>
+    <div class="sec" style="margin-top:68px"><div class="t-headline">Throwbacks</div><div class="more"><i class="ic">chevron_right</i></div></div>
+    <div class="tb">
+      <div class="card"><div class="art r24" data-art="mix-2016" style="width:152px;height:152px"></div><div class="t-title ell">On repeat, 2016</div><div class="t-support ell">Most played · 42 songs</div></div>
+      <div class="card"><div class="art r24" data-art="mix-fa" style="width:152px;height:152px"></div><div class="t-title ell fa" dir="rtl" style="text-align:left">دهه‌ی هشتاد</div><div class="t-support ell fa" dir="rtl" style="text-align:left">۵۸ آهنگ · ۱۳۸۰ تا ۱۳۸۹</div></div>
+      <div class="card"><div class="art r24" data-art="mix-summer" style="width:152px;height:152px"></div><div class="t-title ell">Summer of 2019</div><div class="t-support ell">31 songs</div></div>
+    </div>
+
+    <div class="sec" style="margin-top:14px"><div class="t-headline">Quick picks</div><div class="more"><i class="ic">chevron_right</i></div></div>
+    <div class="group" style="padding:4px 16px 0">
+      <div class="row"><div class="art r12" data-art="without-you" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Without You</div><div class="t-support ell">NEFFEX</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="anar" style="width:52px;height:52px"></div><div class="txt fa" dir="rtl" style="text-align:left"><div class="t-title ell">انار</div><div class="t-support ell">سامان آرین</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+      <div class="row"><div class="art r12" data-art="topography" style="width:52px;height:52px"></div><div class="txt"><div class="t-title ell">Cold Light</div><div class="t-support ell">Mira Vale</div></div><div class="trail"><i class="ic">more_vert</i></div></div>
+    </div>
   </div>
-  <div class="deckwrap"></div>
-  <div class="deck" data-on="home"></div>
+  <div class="navwrap"></div>
+  <div class="nav">
+    <div class="it on"><i class="ic">home</i><span class="l">Home</span></div>
+    <div class="it"><i class="ic">search</i></div>
+    <div class="it"><i class="ic">library_music</i></div>
+    <div class="it"><i class="ic">settings</i></div>
+  </div>
   <div class="gesture"></div>
 </div>
 <script src="lib.js"></script><script>buildMock()</script></body></html>
