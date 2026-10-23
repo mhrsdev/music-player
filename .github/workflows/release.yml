@@ -82,11 +82,14 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk "$APK"
           (cd release-out && sha256sum "MusicPlayer-${TAG}.apk" > "MusicPlayer-${TAG}.apk.sha256")
           # CHANGELOG.md section "## <tag> ..." up to the next "## " heading; fallback text if there is none.
-          awk -v v="$TAG" '$1 == "##" && $2 == v { f = 1; next } /^## / { f = 0 } f' CHANGELOG.md > release-out/notes.md
-          if [ ! -s release-out/notes.md ]; then
-            echo "Release ${TAG}. See CHANGELOG.md for details." > release-out/notes.md
+          awk -v v="$TAG" '$1 == "##" && $2 == v { f = 1; next } /^## / { f = 0 } f' CHANGELOG.md > release-out/changes.md
+          if [ ! -s release-out/changes.md ]; then
+            echo "Release ${TAG}. See CHANGELOG.md for details." > release-out/changes.md
           fi
           {
+            echo "## Mowj ${TAG}"
+            echo
+            cat release-out/changes.md
             echo
             echo "### Install"
             echo "Download \`MusicPlayer-${TAG}.apk\`, allow installs from this source, open it."
@@ -120,7 +123,7 @@ jobs:
               TAGFLAG="--verify-tag"
             fi
             gh release create "$TAG" $TAGFLAG --prerelease="$PRE" $LATEST \
-              --title "Music Player ${TAG}" \
+              --title "Mowj ${TAG}" \
               --notes-file release-out/notes.md \
               "release-out/MusicPlayer-${TAG}.apk" "release-out/MusicPlayer-${TAG}.apk.sha256"
           fi
