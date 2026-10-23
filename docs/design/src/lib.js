@@ -254,6 +254,9 @@
     return `M${f(x0)} ${f(y0 + s)} C${f(x0)} ${f(y0 + s * .42)} ${f(x0 + w * .30)} ${f(y0 + s * .1)} ${f(x0 + m)} ${f(y0)} C${f(x0 + w * .70)} ${f(y0 + s * .1)} ${f(x0 + w)} ${f(y0 + s * .42)} ${f(x0 + w)} ${f(y0 + s)}`
       + ` L${f(x0 + w)} ${f(y0 + h - r)} Q${f(x0 + w)} ${f(y0 + h)} ${f(x0 + w - r)} ${f(y0 + h)} L${f(x0 + r)} ${f(y0 + h)} Q${f(x0)} ${f(y0 + h)} ${f(x0)} ${f(y0 + h - r)} Z`;
   }
+  function archline(el) { const w = +el.dataset.w, h = +el.dataset.h, c = el.dataset.c || 'var(--accent)', sw = +(el.dataset.sw || 1.5), f = el.dataset.f || 'none';
+    el.style.width = w + 'px'; el.style.height = h + 'px';
+    el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" style="position:absolute;inset:0;overflow:visible"><path d="${archPath(w - sw, h - sw, +(el.dataset.r || 16), sw / 2, sw / 2)}" fill="${f}" stroke="${c}" stroke-width="${sw}"/></svg>`); }
   function arch(el) { const w = el.offsetWidth, h = el.offsetHeight; el.style.clipPath = `path('${archPath(w, h, +(el.dataset.r || 12))}')`; el.style.borderRadius = '0'; }
 
   // ---------- Loudness model (stands in for WaveformRepository output: N buckets 0..1) ----------
@@ -359,6 +362,7 @@
     document.querySelectorAll('.g[data-g]').forEach(icon);
     document.querySelectorAll('.seek').forEach(seek);
     document.querySelectorAll('.glyph').forEach(glyph);
+    document.querySelectorAll('.archline').forEach(archline);
     document.querySelectorAll('.tick').forEach(tick);
     document.querySelectorAll('.statusbar').forEach(statusbar);
     return document.fonts.ready.then(() => { document.querySelectorAll('.arch').forEach(arch); document.body.dataset.ready = '1'; });

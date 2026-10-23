@@ -1,281 +1,228 @@
-# Music Player: Design Spec (T2a, design v1)
+# Music Player: Design Spec v2 (T2b — own identity, Java + XML + custom Views)
 
-Status: **design phase. For owner review before implementation (T2–T4).**
-Mockups: `docs/design/png/` (start with `00-overview.png`). Sources: `docs/design/src/` (HTML/CSS/SVG).
-Re-render: `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node docs/design/src/render.mjs [prefix…]` (renders `00-overview` last if you pass `00` separately).
+Status: **design v2, for owner review; implementation agents build from this file.** Supersedes v1 (Compose / M3 Expressive).
+Mockups: `docs/design/png/` (start with `00-overview.png`). Sources: `docs/design/src/` (HTML/CSS/SVG; `base.css` = tokens, `lib.js` = icons, shapes, seek bars).
+Re-render: `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node docs/design/src/render.mjs [prefix…]` (render `00` last; it embeds the other PNGs).
 
 | PNG | What it shows |
 |---|---|
-| 00-overview | All screens + sheets on one page |
-| 01-home | Recently added hero carousel (multi-browse), Throwbacks, Quick picks, floating pill nav |
-| 02-search | Search field, filter chips, top result, match highlight, explicit badge, overflow |
-| 03-library | Liked songs hero card, Albums/Playlists/Artists/History tiles with content peeks, Recently saved |
-| 04-artists | Circular artist grid (crops of the artist's own album art) |
-| 05-player-cover | Full player, cover view, **Waveform** seek style, cookie play button, output chip |
-| 06-player-lyrics | Full player, synced lyrics with word sweep, **Wavy** seek |
-| 07-queue | Compact player + queue sheet: sleep timer, "Playing from" chip, drag, swipe-remove, Undo snackbar |
-| 08-miniplayer | Home scrolled; artwork-tinted mini-player above the floating nav |
-| 09-settings | Full scroll capture: theme (System/Light/Dark/Black), artwork colors, language, folders, lyrics, sleep timer, about |
-| 10-rtl-home / 11-rtl-player | Persian (fa, RTL) Home and Player |
-| 12-notification-sheet | Android 13–16 shade + lock screen, Samsung Now Bar, Android 8–12 MediaStyle (collapsed/expanded), Glance widgets |
-| 13-states-sheet | First run/permission, scanning/loading, search no-results, lyrics offline error |
-| 14-light-home / 15-light-player | Light theme variants |
-| 16-components-sheet | Play/pause morph, seek states, nav + mini-player states, row states, fallbacks, LoadingIndicator, type, color tokens |
+| 00-overview | Everything on one page |
+| 01-home | Recently added carousel (sleeve covers), Throwbacks as sleeves with the vinyl peeking out, Quick picks, the Deck (nav) |
+| 02-search | Capsule field, text tabs with the wave tick, top result spotlight, match highlight |
+| 03-library | Liked songs behind an arch "window" mosaic, shelves with cover fans, Recently saved |
+| 04-artists | Artist portraits in Persian arches (طاق) |
+| 05-player-cover | Player, **Waveform** seek (Melodiha-like layered hills), lamp play disc, Up-next strip |
+| 06-player-lyrics | Player, synced lyrics with word sweep, **Wavy** seek; controls at the same y as 05 |
+| 17-player-bars | Player, **Bars** seek (voice-message loudness bars) **while dragging**: lens, time bubble |
+| 07-queue | Compact player + queue sheet: sleep chip, drag (tilted lift), swipe-remove, Undo toast |
+| 08-miniplayer | The Deck with the artwork-tinted mini-player row and loudness-hills progress |
+| 09-settings | Full scroll: theme discs, LampSwitch, Motion & effects (Auto/Full/Still), seek-style picker with live previews |
+| 10-rtl-home / 11-rtl-player | Persian RTL Home; Persian lyrics player with Bars seek |
+| 12-notification-sheet | Android 13–16 shade + lock (system-drawn), Now Bar, Android 8–12 MediaStyle, our widgets |
+| 13-states-sheet | First run, scanning (BarsLoader + skeletons), no results, lyrics offline |
+| 14-light-home / 15-light-player | Porcelain (light) theme |
+| 16-components-sheet | Every custom View with states, icon set, type, color tokens |
 
 ---
 
-## 1. Brief and thesis
+## 0. What changed vs v1 and why (owner D6, D7, D8, D9)
 
-- **Person / job:** the owner, a bilingual listener (Persian + English) with a local library who often listens at night with the phone in hand. Jobs: start music fast, see and steer what's playing, read lyrics, manage the queue.
-- **Mode:** Reference + Create. Keep the structure and visual language of the reference app (`docs/design-reference/01–06`, M3 Expressive dark) and Melodiha's artwork-tinted media card (`07–08`), with higher polish.
-- **Constraints:** Phase 1 is a **local-library** app (ARCHITECTURE K2). The design therefore uses "Recently added" instead of "New releases", has **no profile avatar** in the nav, and shows artist images as crops of the artist's own album art (local files have no artist photos). Lyrics shown in the mockups were written fresh for these mockups; no real lyrics are reproduced.
-
-**Thesis:** *For a night-time, bilingual listener, the artwork is the light source. Each surface takes its color, glow and depth from the cover that's playing, while the controls stay quiet, rounded and tactile (M3 Expressive shapes that morph with playback). Persian and English text get equal typographic care, and legibility of text over artwork is guaranteed by measured scrims.*
-
-**Expression budget (where we spend novelty):**
-1. Artwork-derived light: blurred backdrop plus grain on the player, an ambient glow at the top of Home taken from the focused hero cover, an artwork-tinted mini-player, notification and widget.
-2. Tactile playback: the shape-morphing cookie play button, and a seek bar that is wavy or a real waveform (setting).
-
-Everything else (lists, chips, settings, search) is conventional M3, so it stays learnable.
-
-## 2. Color
-
-### 2.1 Base schemes (app chrome when no artwork drives color)
-Seed: **lapis** (Persian tile blue), tertiary **turquoise**. Generated as an M3 tonal scheme and hand-checked.
-
-| Role | Dark | Light | Black (AMOLED) |
-|---|---|---|---|
-| background / surface | `#0F1216` | `#F7F9FF` | `#000000` |
-| surfaceContainerLowest | `#0A0D10` | `#FFFFFF` | `#000000` |
-| surfaceContainerLow | `#171A1F` | `#F1F3FA` | `#0C0E11` |
-| surfaceContainer | `#1B1F24` | `#EAEEF5` | `#111418` |
-| surfaceContainerHigh | `#252A30` | `#E4E8EF` | `#1A1E23` |
-| surfaceContainerHighest | `#30353C` | `#DEE3EA` | `#24292F` |
-| onSurface | `#E2E2E9` | `#181C21` | `#E2E2E9` |
-| onSurfaceVariant | `#BFC6D2` | `#414851` | `#BFC6D2` |
-| outline / outlineVariant | `#8A919C` / `#3F4650` | `#717883` / `#C1C7D2` | `#8A919C` / `#2E343C` |
-| primary / onPrimary | `#A6C8FF` / `#00315F` | `#2F5F95` / `#FFFFFF` | same as dark |
-| primaryContainer / on | `#1E4878` / `#D4E3FF` | `#D4E3FF` / `#001C3A` | same as dark |
-| secondaryContainer / on | `#364659` / `#D6E3F7` | `#D6E3F7` / `#0F1D2C` | `#2B394A` / `#D6E3F7` |
-| tertiary / container | `#7FD6CB` / `#00504A` | `#006A62` / `#9EF2E7` | same as dark |
-| error / errorContainer / on | `#FFB4AB` / `#93000A` / `#FFDAD6` | `#BA1A1A` / `#FFDAD6` / `#410002` | same as dark |
-| inverseSurface / inverseOnSurface / inversePrimary | `#E2E2E9` / `#2E3036` / `#2F5F95` | `#2D3137` / `#EFF0F7` / `#A6C8FF` | same as dark |
-
-Settings → **Wallpaper colors** (Android 12+) swaps the base scheme for `dynamicDark/LightColorScheme(context)`. **Black** only replaces the background and surface containers. Black is a theme mode, not a separate palette.
-
-### 2.2 Artwork-derived roles (the "dynamic" in the thesis)
-- **Seed extraction:** `androidx.palette` on a 128 px downscale of the cover → choose `vibrantSwatch ?: dominantSwatch`, then generate a scheme with **SchemeContent** (fidelity to the cover's hue) via material-color-utilities. The MaterialKolor library (`rememberDynamicColorScheme(seed, isDark, style = PaletteStyle.Content)`) is a convenient Compose wrapper. The T2 agent should check the current version before adding it.
-- **Roles used by the player / mini-player / widget / Android 8–12 notification:** `dynPrimary` (tone 80 dark / 40 light), `dynOnPrimary` (20 / 100), `dynContainer` (30 / 90), `dynOnContainer` (90 / 10), `dynGlow` (container hue, used for the soft-light tint and the Home glow).
-- Sample values used in the mockups (dark): Without You `#A9D4F5/#00344D/#1A4B66/#CDE8FF` · Electric Dusk `#FFB0CD/#5E1133/#7B2950/#FFD9E4` · شب‌های تهران `#E3B6FF/#4A1A6B/#5A2F78/#F3DAFF` · انار `#FFB3B1/#5F1416/#7C1E24/#FFDAD8` · باران `#86D5C9/#003731/#1D4F49/#A2F2E5` · Cold Light `#B8F27A/#1F3700/#2E4F0A/#D3FF9C`.
-- **Transition:** when the track changes, crossfade the scheme colors over 600 ms (`animateColorAsState`, tween with the emphasized easing) and the backdrop bitmap over 800 ms. Never cut instantly.
-- **Off switch:** "Colors from artwork" off → the player uses the base scheme over the same blurred backdrop.
-
-### 2.3 Backdrop recipe (player, queue top, lyrics)
-1. The cover bitmap, scaled to fill the screen plus 80 dp bleed, blurred with a 64 dp radius and saturation ×1.35. `Modifier.blur` needs API 31+. Below 31, pre-blur a 64 px downscale in code (stack blur) and upscale it.
-2. A soft-light tint of `dynGlow` at 50–55%.
-3. A vertical scrim (dark: `rgba(bg-ish, .30→.22→.62→.82)` top→bottom; light: `rgba(240,247,253, .62→.55→.84→.94)`).
-4. **Contrast guard (required):** sample the backdrop luminance under the lyrics band. If white text at the dimmest lyric alpha would fall under 3:1 (large text), raise the scrim alpha until it doesn't. The mockups needed this on the bright pink cover (§8).
-5. Grain: a tiled 220 px noise bitmap, BlendMode.Overlay at 14%. Purely decorative, so it is skipped in battery saver.
-
-## 3. Typography
-
-| Role | Latin (Google Sans Flex) | Persian (Vazirmatn) |
+| v1 (stock Google look) | v2 (ours) | Why |
 |---|---|---|
-| Display (player title, page titles) | 34/40, wght 560, ROND 40 | 25–32/36–44, wght 800 |
-| Headline (section titles) | 26/32, wght 520, ROND 40 | 24/38, wght 800 |
-| Lyrics | 26/35, wght 560 → **760 active**, ROND 30 | 25/44, wght 500 → **800 active** |
-| Title (row title) | 17/22, wght 560 | 16/26, wght 650 |
-| Body | 15/20, wght 420 | 15/26 |
-| Supporting | 14/19, wght 430 | 13.5/22 |
-| Label | 13/16, wght 560 | 13/20, wght 600 |
+| Google Sans Flex (Google's brand face) | **Readex Pro** (Latin) + **Vazirmatn** (Persian) | Readex was drawn to sit next to Arabic script: same x-height and width as Vazirmatn, so bilingual lines look like one voice. Not a Google brand face. |
+| Material Symbols icon font | **Own icon set** (42 glyphs, 24 grid, 1.8 stroke); Home = an arch, Settings = sliders, Library = shelf | Icons are the loudest "this is Google" tell. |
+| Pill nav with tonal selected pill | **Deck**: one floating object = mini-player row + nav row; labels always visible; selection = **wave tick** | Fewer floating layers (cheaper, calmer), beginner-readable labels, a mark nobody else uses. |
+| Cookie (MaterialShapes) play button, squircle | **Lamp disc**: round, artwork-colored, soft top highlight + 8 dp halo; **MorphPlayPauseView** glyph morph (path interpolation) | Melodiha-like round controls; buildable with Canvas. |
+| Connected toggle button group (shuffle/repeat/queue) at the top | Shuffle / repeat flank the transport with a **lit dot**; lyrics, sleep, output and **Up next** live in the bottom third | One-hand reach; no M3 button group. |
+| M3 filter chips, segmented buttons, switches | **TabStrip** (text + wave tick), choice rows, **LampSwitch** | No stock widget silhouettes. |
+| Segmented list groups / tonal cards | Rows on the ground, no cards; shelves; arch windows | Removes the M3 Expressive "grouped list" look. |
+| Big M3 corners everywhere (24–32 dp) | **Sleeve** corners (tight, record-sleeve: 8–20 dp by size), **Arch** for people/collections, **Disc** for controls | Shape by role, drawn from the subject (records, Persian architecture). |
+| LoadingIndicator, Snackbar | **BarsLoader**, **ToastCapsule** | Same language in waiting/feedback states. |
+| Live blur (`Modifier.blur`, RenderEffect) | **Pre-blurred 64 px bitmap**, scaled up; gradient in Still mode | RAM/battery budget (D8), works on every API level. |
+| Lapis/turquoise M3 tonal palette | **Ink** (lapis night) / **Porcelain** (tile glaze) / **Black**; turquoise action, **saffron** for "yours" (Liked) | Persian tile palette: lapis, turquoise, saffron-gold lines, glaze white. |
+| Two seek styles | **Wavy, Waveform, Bars** (D4), user setting with live previews | Owner order. |
 
-- **Why Google Sans Flex:** it is the family M3 Expressive itself is drawn in, so it matches the reference. It is a variable font with `wght`, `wdth`, `opsz` and **`ROND` (roundness)**; we use ROND 30–50 on display sizes so the letterforms echo the rounded shapes. It is on Google Fonts under **SIL OFL 1.1** (license file checked in google/fonts and saved as `src/fonts/OFL-GoogleSansFlex.txt`).
-- **Why Vazirmatn:** OFL, variable weight 100–900, excellent Persian shaping. پ چ ژ گ ک ی, the ZWNJ half-space (شب‌های, می‌آید, کوچه‌باغ) and Persian digits ۰–۹ were verified in the renders (10, 11, 16).
-- **Delivery:** bundle both variable TTFs in `res/font/` and use `Font(R.font.x, variationSettings = FontVariation.Settings(FontVariation.weight(560), FontVariation.Setting("ROND", 40f)))` (API 26+ = our minSdk).
-- **Mixed scripts:** Compose does not fall back per glyph to a *named* second family. Use a helper `scriptAwareFamily(text)` that returns Vazirmatn if the string contains U+0600–06FF, otherwise Google Sans Flex. Use it for all user content (titles, artists, lyrics). UI strings take the family of the app locale.
-- Tabular figures (`fontFeatureSettings = "tnum"`) for durations and times.
-- No letter-spacing on Persian. No all-caps labels anywhere (there is no case in Persian, and they read as generated).
-- `LineBreak.Heading` (balanced) for lyrics and for headline titles, which avoids orphan words (fixed in the renders).
+## 1. Thesis and UX principles
 
-## 4. Shape
+**Thesis:** *For a bilingual night listener, the cover is the only lamp in the room. Surfaces are ink tinted by that lamp; every control is a lit disc or a drawn line (wave, hills, bars) rather than a stock widget; the Persian arch and tile colors give the app a home that is not Google's. Beauty is spent where it is cheap to draw, and the app goes Still when the battery asks.*
+
+**UX principles (owner D9)**
+1. **One-hand reach.** Everything you press while listening lives in the bottom 45% of the player: seek, transport, shuffle/repeat, output, sleep, lyrics, Up next. The top holds only collapse and the overflow menu.
+2. **Controls never move.** Cover, lyrics and Bars views share the exact same y positions for seek and transport (05/06/17). Only the upper half changes.
+3. **Queue and lyrics are one gesture away.** Swipe up anywhere on the bottom strip (or tap "Up next") → queue sheet. Tap the cover or the lyrics button → lyrics; tap a lyric line → seek there. Long-press the cover → add to playlist.
+4. **The cover is a handle.** Swipe the cover left/right → next/previous (cover slides, colors crossfade). Swipe down on the player → collapse to the Deck. Gesture zones keep 24 dp clear of the screen edges so system back still works (ui-ux-pro-max: gesture conflicts).
+5. **Always say what is playing next and where from.** "Playing from …" at the top, "Up next · …" at the bottom, sleep timer folded into the Up-next line when set ("Up next · sleep in 23 min").
+6. **Every destructive step is undoable** (remove from queue, shuffle queue, dismiss mini-player) via the ToastCapsule, 5 s.
+7. **Labels are visible.** Nav items always show their label; icon-only buttons have content descriptions and long-press tooltips.
+8. **Persian is not a translation.** RTL layout, Persian numerals, Vazirmatn metrics; playback direction stays tape order (decision K5).
+9. **Beauty within a budget.** Rich look from static, pre-baked pixels; motion only where it tells state (playing, dragging, selected), only while visible.
+
+**Expression budget:** (1) artwork light (backdrop, cover glow, tinted Deck/widget, Home glow); (2) the three loudness-driven seek bars and the lamp play disc; (3) the arch. Everything else is quiet.
+
+## 2. Color tokens (`res/values/colors.xml`, `values-night/colors.xml`)
+
+Token names are final (implementers depend on them). CSS names in `base.css` map 1:1 (`--ink0` → `@color/ink0`).
+
+| Token | Ink (dark, default) | Porcelain (light) | Black (AMOLED) | Role |
+|---|---|---|---|---|
+| `ink0` | `#0B0E17` | `#F4F1EA` | `#000000` | window background |
+| `ink1` | `#131826` | `#FCFAF6` | `#0C0F16` | Deck, sheets, panels |
+| `ink2` | `#1B2133` | `#E9E4DA` | `#141925` | fields, pressed rows, switch track |
+| `ink3` | `#252C42` | `#FFFFFF` | `#1D2333` | lifted (dragged row, toast) |
+| `line` / `line2` | `#EEEAE1` @9% / @16% | `#151B2C` @9% / @16% | as Ink | hairlines, inner strokes |
+| `text` | `#EEEAE1` | `#151B2C` | `#EEEAE1` | primary text (warm paper white / lapis ink) |
+| `text2` | `#A7AEBE` | `#4E566A` | `#A7AEBE` | secondary text, inactive icons |
+| `text3` | `#737B8F` | `#7A8194` | `#737B8F` | durations, inactive nav (dark only for text; light uses text2 for text) |
+| `accent` / `onAccent` | `#63D5C7` / `#052420` | `#0C6D65` / `#FFFFFF` | as Ink | turquoise (firuzeh): action, selection, focus |
+| `accentSoft` | accent @14% | accent @10% | | halos, lit backgrounds |
+| `lapis` | `#7FA2F5` | `#2B56B5` | | links, info |
+| `saffron` / `onSaffron` | `#EDC06A` / `#2B1C00` | `#9C6A10` / `#FFFFFF` | | "yours": Liked songs |
+| `danger` / `dangerInk` | `#FF8A7A` / `#3D120E` | `#B3261E` / `#FFE4E0` | | remove, errors |
+| `glass` / `glass2` | white @8% / @13% | ink @6% / @10% | | disc and capsule fills over artwork |
+
+**Artwork-derived roles** (player, Deck mini row, widget, 8–12 notification): `dyn` (tone ≈80 of the cover's vibrant-or-dominant swatch), `onDyn` (≈20), `dynInk` (≈30), `onDynInk` (≈90), `dynGlow` (container hue). Extract with `androidx.palette` on a **48–64 px** downscale (same bitmap as the backdrop), tone-map in Java with HCT from `material-color-utilities` (Java artifact) or a small HSL clamp. Crossfade on track change: 600 ms `ArgbEvaluator`. Samples in 16-components.
+
+Measured (design-atelier `contrast.py`, WCAG 2.x): text/ink0 **16.05** · text2/ink0 **8.66** · text2/ink1 **7.95** · text2/ink2 **7.19** · text3/ink0 **4.55** · accent/ink0 **10.89** · onAccent/accent **9.27** · saffron/ink1 **10.4** · danger/ink1 **7.72** · light text/ink0 **15.19** · light text2/ink0 **6.50** · light accent/ink0 **5.49** · white/light accent **6.19** · light saffron/ink0 **4.15** (large text and icons only) · light text3/ink0 **3.45** (non-text only) · black text/ink0 **17.49**.
+Text over artwork keeps v1's rule: a **runtime contrast guard** samples the backdrop under the text band and raises the scrim until white text ≥ 4.5:1 (body) / 3:1 (lyrics ≥ 23 sp).
+
+## 3. Typography (`res/font/`, `TextAppearance.Shab.*`)
+
+| Style | Latin: Readex Pro | Persian: Vazirmatn |
+|---|---|---|
+| `Display` (page titles, player title) | 32/38 sp, 600, tracking −0.6 | 28/44, 800 |
+| `Section` | 20/26, 560, −0.2 | 19/32, 800 |
+| `Title` (rows) | 16/22, 500 | 15.5/26, 600 |
+| `Body` | 15/22, 380 | 15/26, 400 |
+| `Meta` | 13/18, 380, `text2` | 13/22 |
+| `Label` | 12/16, 560 | 12.5/20, 600 |
+| `Lyric` / `LyricActive` | 25/34, 450 → 27/36, 650 | 23/42, 500 → 24/44, 800 |
+| `Time` | 12.5 sp, 450, `fontFeatureSettings="tnum"` | Persian digits via locale formatting |
+
+- Both are variable TTFs (OFL; licenses in `src/fonts/`). Ship as `res/font/readex_pro.ttf` and `vazirmatn.ttf`; on API 26+ use `Typeface.Builder(...).setFontVariationSettings("'wght' 560")`, cache one `Typeface` per (family, weight) in a `Fonts` singleton.
+- **Script-aware family:** `Fonts.forText(CharSequence)` returns Vazirmatn when the string contains U+0600–06FF, else Readex. Use it for all user content (titles, artists, lyrics). UI strings use the locale's family.
+- No letter-spacing on Persian; no all-caps anywhere. Balanced line breaks for lyrics (`Layout.BREAK_STRATEGY_BALANCED`, `HYPHENATION_FREQUENCY_NONE`).
+
+## 4. Shape, spacing, elevation
 
 | Element | Shape |
 |---|---|
-| Hero carousel item | 28 dp (extraLarge); medium 24, small 20 (mask by `maskClip`) |
-| Cards / tiles / Throwback covers | 24–26 dp |
-| Liked songs card | 32 dp |
-| List group | outer 22 dp, inner 6 dp, 3 dp gaps (segmented list) |
-| Row artwork | 12 dp (52 dp art), mini-player art 16 dp, player cover 32 dp |
-| Search field, nav, chips-in-pill, buttons | full (pill) |
-| Filter chip | 12 dp |
-| Bottom sheet | 32 dp top corners |
-| Snackbar | 16 dp |
-| Play/pause | **paused: squircle (30% corners) → playing: `MaterialShapes.Cookie9Sided`** |
-| Transport side buttons | 22 dp rounded rect (76×64) |
-| Toggle group | connected button group: outer full, inner 14 dp; selected item becomes full pill |
-| LoadingIndicator | M3 Expressive `LoadingIndicator` (shape sequence) |
+| Cover "sleeve" | radius by size: 36–48 dp → 8 · 56 → 10 · 132–152 → 12 · 264 → 16 · 340 (player) → 20 |
+| Arch (طاق) | artists, Liked-songs window, empty-state frames, 2×2 widget. Path: apex at top centre, two cubic Béziers to the springing line at `s = w/2` (controls at `0.42·s` and `0.30·w`), straight jambs, foot radius 12–14 dp. `ArchOutlineProvider` (API 30+ `Outline.setPath`); below 30 clip via `canvas.clipPath` once into a cached bitmap. |
+| Disc | every button (48 icon target, 56 small play, 64 transport side, 88 play) |
+| Capsule | search field (52 h), output chip (40 h), Up-next strip (54 h), toast (48 h) |
+| Deck | 26 dp rounded rect, 12 dp side inset, 22 dp above gesture bar |
+| Sheets | 28 dp top corners |
 
-The mockup cookie is drawn with 10 lobes. **Implement with `MaterialShapes.Cookie9Sided`** (the closest stock shape); do not hand-roll a 10-lobe polygon.
+Spacing: 4 dp grid; window gutter **20 dp** (16 for floating objects); rows 64 dp; section gap 20–24 dp; ≥ 8 dp between touch targets; all targets ≥ 48 dp (ui-ux-pro-max: touch target/spacing).
+Elevation: only things that float cast a shadow (Deck, dragged row, toast, player cover, play disc's colored drop light). Use `View.setElevation` + `setOutlineSpotShadowColor(dyn)` (API 28+) for colored shadows — RenderThread-drawn, cheap.
 
-## 5. Elevation, blur, depth
-- Tonal elevation only for in-app surfaces (no drop shadows on cards).
-- Shadows only where something truly floats: floating nav (0 8 24 @35%), mini-player (0 10 28 @45%), dragged queue row (0 14 30 @45%), player cover (0 30 70 @55% dark, 0 30 60 tinted @35% light), snackbar.
-- Blur only where real layers overlap (player backdrop, mini-player background art, nav: 20 dp backdrop blur API 31+, otherwise 92% opaque `surfaceContainerHigh`).
+## 5. Motion language (`res/values/motion.xml` + `Motion.java`)
 
-## 6. Spacing and layout
-- Window margin 16 dp; section title inset 20 dp; vertical rhythm: 8 dp inside groups, 20–28 dp between sections.
-- Rows: 72 dp tall; touch targets ≥ 48 dp everywhere (icon buttons are 48×48).
-- Floating nav: 68 dp tall, 24 dp above the gesture inset. Mini-player: 76 dp tall, 12 dp side insets, 8 dp above the nav. Content gets bottom padding equal to the nav + mini-player height, and a bottom scrim (transparent → background 96%) sits under the floating chrome.
-- Edge-to-edge. Status-bar icons are light over player backdrops, theme-default elsewhere.
-- Tablets/foldables (not mocked): Home and Library use two columns; the player becomes cover-left / lyrics-right at ≥ 600 dp width.
+Character: **"lamp and string"** — things light up and settle like a plucked string: quick, slightly springy, never bouncy-cartoon. Implemented with `androidx.dynamicanimation` `SpringAnimation` (Java) and `ValueAnimator` + `PathInterpolator`.
 
-## 7. Components → Compose mapping
-
-| Mockup element | Compose / M3 Expressive API | Notes |
+| Token | Value | Used for |
 |---|---|---|
-| Theme | `MaterialExpressiveTheme(colorScheme, motionScheme = MotionScheme.expressive(), typography, shapes)` | dynamic artwork scheme provided by a `CompositionLocal` for the player subtree |
-| Floating pill nav (01) | Custom: `Surface(shape = CircleShape, tonalElevation)` + `Row` of items; selected item `animateContentSize(spring)` shows label | `HorizontalFloatingToolbar` is a fit if its item API allows the expanding label; hide on scroll via `exitAlwaysScrollBehavior` |
-| Hero carousel "Recently added" | `HorizontalMultiBrowseCarousel(preferredItemWidth = 272.dp, itemSpacing = 8.dp)` + `Modifier.maskClip(RoundedCornerShape(28.dp))` | Cookie play FAB on the large item (56 dp, drop shadow) |
-| Throwbacks | `HorizontalUncontainedCarousel(itemWidth = 152.dp)` | caption below |
-| Quick picks / track rows | `ListItem` inside a custom segmented-group container (§4) | Persian title in an LTR list: `TextDirection.Content` + `TextAlign.Left` (align to the layout, not the text) |
-| Search | `SearchBar` (expanded/docked) + `FilterChip` row (Songs, Albums, Artists, Playlists, Folders) | match highlight = `SpanStyle(fontWeight = W760)` on the matched range |
-| Explicit badge | 16 dp rounded square, onSurfaceVariant fill, "E" 10.5 sp bold | content description "Explicit" |
-| Liked songs card | `Card(colors = primaryContainer)` + blurred collage of 3 liked covers (alpha .55) + left-to-right container gradient | play = Cookie9Sided 72 dp |
-| Library tiles | `Card` 2×2 grid; content peeks (stacked covers / avatars) | |
-| Artists grid | `LazyVerticalGrid(2)`, circular `AsyncImage` of the artist's top album, zoomed 1.7–2× | fallback: monogram on secondaryContainer |
-| Wavy seek (06, 07) | `Slider` with custom `track` drawing a sine path for the active part (amplitude 3 dp, wavelength 26 dp, phase advancing while playing), inactive part straight; default expressive line thumb | when paused animate amplitude → 0 (300 ms). `LinearWavyProgressIndicator` is display-only and suits the mini-player bar |
-| Waveform seek (05, setting) | Custom `Canvas`: 3 layered smoothed envelopes (alpha .42/.5/.85) clipped at the thumb | amplitudes from a one-time decode (MediaExtractor + MediaCodec, ~120 buckets, cached in Room). Fall back to wavy until ready |
-| Play/pause | `Surface` with a `Morph(squircle, MaterialShapes.Cookie9Sided)` shape driven by `animateFloatAsState(spring)`; `rememberInfiniteTransition` rotation 360° / 24 s while playing | press: scale .92 + morph toward circle; buffering: small `LoadingIndicator` inside |
-| Shuffle / repeat / queue | Connected `ButtonGroup` of `ToggleButton`s (`ButtonGroupDefaults.connected*ButtonShapes`) | repeat cycles off → all → one (icon `repeat` / `repeat_one`) |
-| Heart | `IconToggleButton` filled/outlined `favorite` in dynPrimary | haptic `CONFIRM` |
-| Player (05/06) | `SharedTransitionLayout`: mini-player art → cover (`sharedElement`), title/artist `sharedBounds` | predictive back collapses to mini-player |
-| Lyrics | `LazyColumn` with `animateScrollToItem` to keep the active line at 40% height, `TextStyle(brush = Brush.horizontalGradient(...))` for the word sweep (only if the LRC has word timings, otherwise line-level), tap a line → seek | fade mask top/bottom via `drawWithContent` + `BlendMode.DstIn` |
-| Queue sheet (07) | `ModalBottomSheet` (or anchored-draggable sheet over the player) + reorderable `LazyColumn` (e.g. the "Reorderable" library) + `SwipeToDismissBox` (end-to-start, errorContainer background) | "Queue shuffled · Undo": `SnackbarHost`, `SnackbarDuration.Long`, undo restores the previous order |
-| Sleep timer chip | `AssistChip`/`FilledTonalButton` with `bedtime` + "23 min" | tap → sheet of presets (15/30/45/60, end of track) |
-| Mini-player (08) | Custom `Surface(24 dp)`: blurred art background + container wash, `LinearWavyProgressIndicator` along the bottom edge | swipe up = open, sideways = skip, down = stop and dismiss |
-| Snackbar | `Snackbar` with inverse colors | |
-| Loading (13) | `LoadingIndicator` / `ContainedLoadingIndicator`; skeletons = surfaceContainer with a slow shimmer | scan progress = determinate wavy indicator |
-| Settings (09) | Segmented `ListItem` groups, `Switch` (with check icon), `SingleChoiceSegmentedButtonRow` (language, seek style), theme picker = 4 preview cards | language → `AppCompatDelegate.setApplicationLocales` |
-| Notification (12) | Media3 `MediaSessionService` + default `DefaultMediaNotificationProvider`; `MediaSession.setCustomLayout`/media button preferences with Like + Shuffle `CommandButton`s | see §10 |
-| Widget (12) | Glance `GlanceAppWidget`, sizes 4×2 and 2×2 | see §10 |
+| `spring_press` | stiffness 1500, damping 0.8 | press squash to 0.94 and release |
+| `spring_morph` | stiffness 700, damping 0.72 | play/pause glyph, wave-tick travel |
+| `spring_sheet` | stiffness 380, damping 0.86 | queue sheet, player expand/collapse, toast rise |
+| `ease_emph` | `PathInterpolator(0.2, 0, 0, 1)` | crossfades, track change |
+| `dur_fast` 160 ms · `dur_med` 280 ms · `dur_slow` 420 ms · `dur_color` 600 ms | | exits use `dur_fast` (exit faster than enter) |
 
-## 8. Accessibility (measured with `.claude/skills/design-atelier/scripts/contrast.py`)
+Moments: press feedback ≤ 100 ms (scale .94 + fill +10%); play toggles → glyph morph + **one** halo ripple ring (420 ms); wave travels 1 wavelength / 1.8 s while playing; pause eases amplitude → 0 (280 ms); like → heart fills bottom-up + 6 sparks (360 ms) + `HapticFeedbackConstants.CONFIRM`; seek drag → thumb grows, bubble, Bars lens, haptic tick per 10 s; track change → cover slides 24 dp in the skip direction + fade, colors crossfade 600 ms, backdrop crossfade 800 ms, new loudness bars grow left→right once (360 ms); nav → wave tick draws in (180 ms); lyrics → active line weight/alpha 250 ms, list scroll 450 ms `ease_emph`, auto-scroll pauses 3 s after a manual scroll; queue drag → lift (scale 1.03, −1.2° tilt, elevation) 150 ms. At most **two** things animate on a screen at once (ui-ux-pro-max: excessive motion).
 
-Token pairs (WCAG 2.x ratio):
+## 6. Battery and RAM budget (owner D6, D8) — and the Still mode
 
-| Pair | Ratio |
-|---|---|
-| dark onSurface / background | 14.56 |
-| dark onSurfaceVariant / surfaceContainer (row support text) | 9.63 |
-| dark onSurfaceVariant / surfaceContainerHigh (nav icons) | 8.41 |
-| dark primary / background | 11.02 |
-| dark onPrimary / primary | 7.68 |
-| dark onSecondaryContainer / secondaryContainer (selected nav, chips) | 7.43 |
-| snackbar text / inverseSurface · Undo (inversePrimary) / inverseSurface | 10.23 · 5.10 |
-| dark onErrorContainer / errorContainer (swipe "Remove") | 7.23 |
-| light onSurface / background · onSurfaceVariant / surfaceContainer | 16.25 · 7.94 |
-| light primary / background · onPrimary / primary | 6.25 · 6.57 |
-| black onSurface / background · onSurfaceVariant / surfaceContainer | 16.28 · 10.74 |
-| dynamic onPrimary / primary (6 covers, dark) | 7.51 – 9.98 |
-| dynamic light (white / #2B6386) | 6.49 |
-| dark outline / surfaceContainerHighest (switch off track, non-text) | 3.88 |
-| dark outlineVariant / background (unselected chip border, non-text) | **1.96**: decorative; the chip is identified by its label (9.6:1). Use `outline` if a stricter 1.4.11 reading is required |
+**Default ("Full") is already cheap:**
+- **Backdrop** = the cover decoded at **64×64**, stack-blurred once off the main thread (radius 8), stored as one 16 KB ARGB bitmap, drawn scaled to the screen with `FILTER_BITMAP_FLAG` + dither, then tint + scrim as one `LinearGradient` shader. **No live RenderEffect/blur, no full-screen offscreen layer.** Two bitmaps exist only during the 800 ms crossfade (32 KB). The same bitmap feeds the cover glow, the Deck mini-row wash and palette extraction.
+- **Grain**: one 128×128 `ALPHA_8` tile (16 KB) with `BitmapShader` REPEAT at 11% overlay. Dropped in Still.
+- **Covers**: decoded at exact view size (row 48 dp ≈ 144 px ≈ 81 KB; player 340 dp ≈ 950 px ≈ 3.5 MB, only the current one). Thumbnail `LruCache` capped at `min(memoryClass/16, 12 MB)`. Use the loader the T2 agent picks (Glide is Java-friendly) with these sizes, or a small in-house loader.
+- **Loudness data**: one `byte[]` of 200 buckets per track (200 B), cached in SQLite; computed by T-W in WorkManager **only while charging/idle**, never during playback start. Until it exists, Waveform/Bars draw the "not measured" state and still seek.
+- **Paths are built once** per (track, width) and reused; per frame we only translate a phase or move a clip rect. Zero allocations in `onDraw`.
+- **Animation runs only when** playing **and** the view is attached, visible and the screen is on (`onVisibilityAggregated`, `onWindowFocusChanged`). Wave phase is capped at **30 fps** (`postInvalidateDelayed(33)`), only the seek view invalidates. Deck progress hills update at **1 Hz**. Position UI ticks at 4 Hz max (ARCHITECTURE).
+- Lyrics fade uses `requiresFadingEdge` on the RecyclerView (no custom saveLayer).
 
-Text over artwork, measured on **composited pixels sampled from the renders** (white text alpha-composited over the sampled backdrop):
+**Still mode** (Settings → Motion & effects: *Auto / Full / Still*; Auto = Still when `PowerManager.isPowerSaveMode()` or `ANIMATOR_DURATION_SCALE == 0`):
+| Element | Full | Still |
+|---|---|---|
+| Player backdrop | 64 px pre-blurred bitmap + tint + grain | vertical gradient `dynInk` → `ink0` (no bitmap) |
+| Cover glow | blurred bitmap under the cover | off (plain shadow) |
+| Wavy seek | travelling wave | static wave (frozen phase) |
+| Waveform / Bars | static drawing (same) + lens on drag | same, no lens animation, bubble only |
+| Play disc | morph + one ripple ring | instant glyph swap, no ring |
+| Live bars on now-playing row | 4 bars bounce (only while visible) | static bars |
+| Lyrics | word sweep | line-level highlight only |
+| Crossfades | 600–800 ms | 150 ms |
+| Home glow | radial gradient (static draw) | same (it is static) |
+| BarsLoader | breathing | static bars + text |
 
-| Location | Ratio |
-|---|---|
-| 05 player title / artist (white .72) / times (white .78) | 13.78 / 7.86 / 10.20 |
-| 06 lyrics active line / title area | 8.93 / 16.39 |
-| 06 lyrics inactive (white .60) / past (white .50) / unsung part of the active line (white .66) | 4.45 / 3.82 / 4.89 |
-| 11 RTL lyrics active / inactive | 17.41 / 6.67 |
-| 07 queue title over backdrop | 6.50 |
+## 7. Components → Java Views (`ui/widget/`, `res/layout`, `res/drawable`)
 
-The first render failed here: inactive lyric lines were at 2.68:1 on the pink cover. The alphas were raised (inactive .42→.60, past .34→.50, unsung .50→.66) and the scrim strengthened. All lyric lines are now ≥ 3:1 for large text (26 sp). Keep the contrast guard in §2.3, because other covers will differ.
+| Component | Class / resource | Spec |
+|---|---|---|
+| Theme | `Theme.Shab` (parent `Theme.Material3.DayNight.NoActionBar`, invisible base) + `Theme.Shab.Black` | maps tokens to `colorSurface` etc. only so framework dialogs look right; we never use stock M3 widgets on screen |
+| Icons | `res/drawable/ic_*.xml` VectorDrawables from `lib.js ICONS` (same path data, 24 vp, stroke 1.8, round caps) | `.f` variants filled for selected nav / liked |
+| Lamp play disc | `MorphPlayPauseView` | circle `dyn` + radial highlight (`RadialGradient`, top 12%), 8 dp halo ring `dyn`@13%, colored elevation shadow; glyph = 2 interpolated quads (see 16) + `CornerPathEffect(2dp)`; `SpringAnimation` on t; buffering = 3 dp arc on the halo after 400 ms; sizes 88 / 56 / 46 |
+| Disc buttons | `DiscButton` (extends `AppCompatImageButton`) | glass fill, inner 1 dp line, press scale .94 + fill 18%; 64 dp transport, 48 icon |
+| Toggle with lit dot | `LitToggleButton` | glyph tinted `dyn`/`accent` when on + 4 dp dot 5 dp under the glyph with a 6 dp glow; content description includes state |
+| Wavy seek | `WavySeekView` | stroke 3.5, amplitude 3.4, wavelength 28, played wave / unplayed straight @24%; thumb disc 16 (white ring 3.2, `dyn` core) → 24 + halo on drag |
+| Waveform seek | `WaveformSeekView` | 3 layers of Gaussian hills from loudness (13/10/17 hills, scales 1/.82/.6), played `dyn` @38/50/gradient, unplayed white @11%, 3 dp baseline, same thumb |
+| Bars seek | `BarsSeekView` | 3 dp bars, 2.6 gap, height = min 3 dp + loudness^1.5 × 0.9 × h (h = 40–44), centred; played `dyn`, current bar white, unplayed white @26%; drag lens ×1.5 Gaussian σ 22 dp + 2 dp playhead; "not measured" = flat 12% bars |
+| Common seek base | `BaseSeekView` | `AccessibilityNodeInfo.RangeInfo`, `ACTION_SCROLL_FORWARD/BACKWARD` = ±10 s, haptic ticks, time bubble `SeekBubbleView`, RTL = still LTR (K5) |
+| Deck | `DeckView` (`res/layout/view_deck.xml`) | `ink1` 26 dp, 1 dp `line` stroke, shadow; nav row 64 dp (4 items: icon 24 + label 11.5 sp, selected = filled icon `accent` + `WaveTickDrawable`); optional mini row 68 dp: 46 art, title/artist, 46 play disc, next; wash = backdrop bitmap + `dynInk` gradient; seam progress = 12 dp hills (`WaveformSeekView` in mini mode, 1 Hz) |
+| Wave tick | `WaveTickDrawable` | 18×6 dp, 2 dp stroke, `accent`; draw-in 180 ms |
+| Tab strip | `TabStripView` (HorizontalScrollView of TextViews) | 15 sp, selected 600 + tick; count in `text3` 12 sp; fading edge |
+| LampSwitch | `LampSwitch` (extends `CompoundButton`, custom draw) | track 46×28 capsule (`ink2`, `line2` stroke) / on: `accentSoft` + accent stroke; knob off = 16 dp hollow ring `text3`, on = 20 dp `accent` disc with glow; 48 dp touch target |
+| Rows | `TrackRowView` + `item_track.xml` | 64 dp, art 48 sleeve, title/meta, duration `text3`, "⋯" 48 dp; now-playing = accent title + `LiveBarsView`; pressed = `ink2` wash |
+| Arch image | `ArchImageView` + `ArchOutlineProvider` | see §4; mosaic variant = 2×2 covers inside one arch (`ArchMosaicView`) |
+| Vinyl sleeve | `SleeveWithRecordView` | cover + record disc drawn with `RadialGradient` grooves + label colored by `dyn`, peeking 30 dp on the end side |
+| Player backdrop | `BackdropView` | §6 |
+| Lyrics | `LyricsRecyclerView` + `LyricLineView` | centered, active line `LyricActive` with `LinearGradient` text shader for the word sweep (only if LRC has word timings) |
+| Queue | `QueueSheetBehavior` (BottomSheetBehavior subclass, our skin) + `ItemTouchHelper` (drag with tilt, swipe end→start reveals `dangerInk` + trash) | Accessibility actions "Move up / Move down / Remove" on each row (ui-ux-pro-max: dragging alternative) |
+| Toast | `ToastCapsuleView` | `ink3`, `line2`, accent action pill; 5 s with Undo; replaces Snackbar |
+| Loader | `BarsLoaderView` | 5 bars 4 dp, heights breathe out of phase (900 ms loop), static in Still |
+| Up-next strip | `UpNextView` | capsule glass, 36 round art, "Up next" 11.5 sp + title; tap/swipe-up opens queue |
+| Notification | Media3 `MediaSessionService` + `DefaultMediaNotificationProvider`; custom commands Like + Shuffle; small icon `ic_app` (arch + bars) | §8 |
+| Widget | `AppWidgetProvider` + RemoteViews (Glance is Kotlin-only) | 4×2 / 2×2; bars progress = pre-rendered bitmap updated on track/state change only |
 
-Other obligations:
-- Every icon-only control needs a `contentDescription` ("Shuffle, on", "Repeat one", "Show lyrics", "Like", "Sleep timer, 23 minutes left", "Reorder Grateful").
-- Nav items without visible labels also get a tooltip on long-press.
-- Targets ≥ 48 dp. Drag-to-reorder has an accessible alternative: custom actions "Move up/down" on each row.
-- Seek: `Modifier.semantics { progressBarRangeInfo; setProgress }` so TalkBack can adjust it, with 10 s steps.
-- Font scale 200%: rows grow (no fixed heights on text containers); lyrics reflow; the nav label may truncate, but the icon and its description remain.
-- **Reduced motion** (`ANIMATOR_DURATION_SCALE == 0` or the app setting): no cookie rotation, no wave travel (static wave), no word sweep (line-level emphasis only), crossfades shortened to 150 ms.
+## 8. Notification, lock screen, widget
+Unchanged facts from v1: on Android 13+ SystemUI/One UI draws the media card from our `MediaSession` (we control artwork ≥ 720 px, metadata, state, Like/Shuffle commands, small icon). Android 8–12: `MediaStyle` + `setColorized(true)` with `dynInk`. Samsung Now Bar = One UI rendering of the same session (approximation in 12). The widget is fully ours (12, column 4).
 
-## 9. Motion
-Use `MotionScheme.expressive()` springs. Values below are intent; tune on a device.
+## 9. RTL / Persian
+Mirrors: layout, nav order, headers, carousels, record peeks, top player row, chevrons (`android:autoMirrored="true"`), lyrics icon. Not mirrored: transport order, play triangle, all three seek bars and their fill (K5, tape direction). Persian digits through locale formatting; ZWNJ preserved; Persian copy is model-written → native check by the owner.
 
-| Moment | Spec |
-|---|---|
-| Play ↔ pause morph | spatial **default** spring (expressive: damping ≈ .8, stiffness ≈ 380); the icon crossfades in the first 40% |
-| Press feedback (all buttons) | scale .92, spatial **fast** spring; button-group neighbours shrink as the pressed item widens (M3 Expressive button group) |
-| Cookie rotation while playing | linear, 1 turn / 24 s; pauses with playback |
-| Wavy seek | phase advance 1 wavelength / 1.6 s while playing; amplitude → 0 in 300 ms on pause |
-| Nav selection | selected pill width and label: spatial **fast** spring; the icon fills (FILL 0→1) over 150 ms |
-| Mini-player → player | shared element on the artwork + container transform, ~450 ms emphasized; predictive back scrubs it in reverse |
-| Track change | cover slides 24 dp in the skip direction + fade; scheme colors crossfade 600 ms; backdrop crossfade 800 ms |
-| Lyrics | active line: weight 560→760 and color alpha .60→1 over 250 ms; list auto-scroll ~450 ms emphasized decelerate; auto-scroll pauses for 3 s after a manual scroll ("Back to current line" chip) |
-| Queue | drag lift: scale 1.025 + elevation in 150 ms; neighbours animate with `animateItem()`; swipe-remove: row collapses 200 ms, then the Undo snackbar |
-| Home glow | crossfades to the newly focused hero card's color over 500 ms while the carousel scrolls |
-| Haptics | `TEXT_HANDLE_MOVE` ticks while seeking (every 10 s), `CONFIRM` on like, `GESTURE_START` on drag lift |
+## 10. Accessibility
+Targets ≥ 48 dp, ≥ 8 dp apart; content descriptions with state ("Shuffle, on", "Sleep timer, 23 minutes left"); nav labels always visible; seek bars expose range + ±10 s actions; drag alternatives in the queue; font scale 200%: rows grow (no fixed text heights), the player's upper half shrinks first; Still mode covers reduced motion. Screen-reader order = visual order (top row, cover, title, seek, transport, actions, Up next).
 
-## 10. Notification, lock screen, widget: what the app really controls
+## 11. ui-ux-pro-max (owner D10): what was adopted
+Ran `--design-system "music player dark immersive artwork"` and `--domain ux` queries (touch target, animation timing, reduced motion, dragging movements, gesture conflicts) + `pro-rules.md` checklist.
+- **Adopted:** 48 dp targets and 8 dp spacing; press feedback within ~100 ms without layout shift (scale transform only); exit faster than enter; continuous animation only as a state indicator (wave only while playing) and ≤ 2 animated elements per view; reduced-motion honored (Still mode); single-pointer alternatives to drag (Move up/down); one primary gesture per region and edge clearance for system back; consistent icon family/stroke; separate dark/light contrast checks.
+- **Rejected:** its generated palette/typography (Poppins + Righteous, green play button, landing-page section pattern): generic web output that would erase the identity the owner asked for.
 
-**Android 13–16 (shade + lock screen):** SystemUI draws the media player from the `MediaSession`. The app **cannot** change its layout, fonts, colors or the squiggly progress bar. The app **does** control, and therefore must get right:
-- Artwork: a square bitmap ≥ 720 px (`MediaMetadata.artworkData` or `artworkUri` with a content provider). SystemUI derives the card's colors from it, so good artwork = a beautiful card.
-- Title, artist, album, duration, and correct playback state/position (makes the progress bar draggable).
-- Two custom actions via Media3's custom layout / media button preferences: **Like** (heart, filled when liked) and **Shuffle**. Prev/play/next come for free.
-- The session stays alive while paused, so the card persists and playback resumes from the lock screen.
-- **Samsung One UI 7+ Now Bar / lock-screen pill** (the Melodiha look the owner liked) is Samsung's own rendering of the same session. We get it automatically; its waveform and colors are not ours to design. The mockup in 12 is an approximation.
-
-**Android 8–12:** classic `MediaStyle` notification. Here the app **does** pick the color: `setColorized(true)` + `setColor(dynContainer)`. Large icon = artwork. 3 compact actions (prev, play/pause, next) when collapsed, 5 when expanded (Like, prev, play/pause, next, Shuffle). The seek bar shows on Android 10+ when the session reports a duration.
-
-**Glance widget (fully ours):** 4×2 (art, title, artist, wavy progress, prev / cookie play / next, like) and 2×2 (art plus play). The background is `dynContainer`, falling back to wallpaper colors (Android 12+) and then to the base scheme. Glance cannot animate or draw custom paths at runtime, so the wavy bar and the cookie/squircle are **pre-rendered bitmaps**, updated on track or state change rather than every second. RTL follows the device locale; transport stays in tape order.
-
-## 11. RTL / Persian rules
-1. Locale fa → `LayoutDirection.Rtl` for the whole app: the nav order, headers, carousels (the large item starts on the right), the top player row (lyrics toggle on the right, heart on the left) and toggle-group order all mirror. Directional icons (`chevron_right`, `arrow_back`) mirror (`autoMirrored` icons).
-2. **Not mirrored:** prev/play/next glyphs, the play triangle, the seek bar and its fill direction, elapsed (left) / remaining (right). This follows Material's bidirectionality guidance that media playback controls refer to tape direction. **Owner decision D-A below.**
-3. Persian digits (۰–۹) for all numbers in fa (durations, counts, the status-bar clock is the system's), produced by locale-aware formatting. Stored values stay ASCII.
-4. Per-string direction: user content keeps its own direction (`TextDirection.Content`) for correct shaping and punctuation, but **aligns to the layout's start edge** in lists and cards, so a Persian title in an English list sits left like its neighbours, and an English title in a Persian list sits right (10, 08).
-5. Vazirmatn line height ≈ 1.6–1.75× (26/16, 38/24, 44/25). Zero letter-spacing. ZWNJ must be preserved in titles from tags.
-6. Persian copy used in the mockups (تازه‌های کتابخانه, خاطره‌بازی, انتخاب‌های سریع, امروز اضافه شد) is model-written. **A native-speaker check is advised**, and the owner is a native speaker.
-
-## 12. States (13, 16)
-Covered: first run / permission (explains why; secondary path "Choose folders instead"), scanning (determinate count plus skeletons), search no results (keeps the query, offers "Search all categories" and a near match), lyrics offline (music keeps playing, one Retry), lyrics not found (same layout, "No lyrics for this song yet", suggest a `.lrc` next to the file), track file missing (row at 42% + "File missing · tap to remove"), no cover (gradient seeded from the album name + note glyph), artist without art (monogram; Persian monogram in Vazirmatn), buffering (LoadingIndicator inside the play button), disabled play (nothing queued).
-Not mocked yet: permission permanently denied (→ "Open settings" button), empty playlist, empty Liked songs ("Tap ♥ on any song to keep it here"), sleep-timer sheet, the overflow menu content, and the add-to-playlist dialog. These follow the same pattern and should be built in T3/T4.
-
-## 13. Self-critique record (three perspectives + authorship)
-Inspected: every PNG listed above, at phone size and zoomed crops. This was a full loop with two or more repair rounds per screen.
-
+## 12. Self-critique record (design-atelier, rendered PNGs inspected)
 | Perspective | Finding (evidence) | Fix | Recheck |
 |---|---|---|---|
-| Professional | Hero cover cropped non-square; the Persian title on the cover was cut (01, round 1) | carousel item 272×272 | fixed (01) |
-| Professional | SVG RTL text anchoring pushed cover text off-card; "2016" lost in RTL (10) | anchor swap + explicit `direction` on cover text | fixed |
-| Professional | Waveform read as a flat plateau (05, rounds 1–2) | rebuilt as three phase-shifted smooth layers | fixed (05, 16) |
-| Professional | Lyric orphans ("tune", "one", "sun") (06) | balanced line breaking | fixed |
-| Professional | The fan of covers collided with the "Liked songs" title (03) | replaced with a blurred collage of the liked covers | fixed |
-| Professional | Toggle-group icons dark on dark in light player (15) | on-color fix | fixed |
-| Professional | Overview grid misaligned (CSS class collision) | renamed class | fixed |
-| Professional / a11y | Inactive lyrics 2.68:1 on the pink cover (measured) | alphas + scrim | 3.82–4.89 |
-| Beginner | Generic silhouettes looked like broken images (04) | the artist's own album art | fixed |
-| Beginner | Sleep chip "23:41" could read as the clock time (07) | "23 min" | fixed |
-| Beginner | Nav icons other than the selected one have no visible label (reference pattern) | tooltip + content descriptions (§8) | hypothesis, needs real users |
-| Beginner | How to leave the full player? | drag handle at top + system back/predictive back | partially: the handle is subtle |
-| Experienced | Persian rows right-aligned inside an LTR list looked ragged (08, 01) | align to layout start (§11.4) | fixed |
-| Experienced | Dragged queue row sat on its own slot, so no sense of movement (07) | offset over the next item, placeholder visible | fixed |
-| Experienced | Play/next/prev mirroring in RTL | kept in tape order (decision D-A) | owner to confirm |
-| Authorship | Decorative "Added today" chip over cover text (01, 10) | cut; info moved into the caption | fixed |
-| Authorship | Kept on purpose: dark ground (reference + night use); grain only on artwork/backdrops; covers drawn from each subject (Alborz skyline, girih, pomegranate, rain, cassette) rather than blobs; the JBL device chip from the owner's own screenshot | n/a | n/a |
+| Professional | Waveform read as a grey plateau (05 round 1) | rebuilt as layered Gaussian hills like Melodiha | fixed (05, 16) |
+| Professional | Bars looked uniform, lens invisible (17 round 1) | loudness^1.5 contrast, per-bar variation, lens ×1.5 | fixed (17) |
+| Professional | Vinyl records invisible on Ink (01 round 1) | lighter grooves, sheen, 44 dp peek | fixed (01) |
+| Professional | Lyrics icon read as a chat bubble (05 round 1) | lines + note glyph | fixed |
+| Professional | Queue header title truncated "Without …" (07) | removed prev from compact header | fixed |
+| Professional | Lyrics-offline "Try again" overlapped the title (13) | moved state block up | fixed |
+| Beginner | Unlabeled nav icons (v1) | labels always visible in the Deck | fixed |
+| Beginner | How to reach the queue? | visible "Up next" strip with chevron | fixed (05/06/17) |
+| Experienced | Transport layout familiar (shuffle · prev · play · next · repeat) | kept on purpose | — |
+| Experienced | Controls jump between cover and lyrics views (v1) | same y in all player views | fixed |
+| Authorship | Stock M3 silhouettes (pill nav, cookie, chips, switches, segmented lists, Material Symbols, Google Sans) | all replaced (§0) | 00 overview |
+| Kept on purpose | dark ground (night use, reference), grain only on artwork backdrops, generated covers drawn per subject | | |
 
-## 14. Decisions for the owner
-- **D-A RTL playback direction:** keep prev/next and the seek bar LTR in Persian (Material guidance, as mocked), or mirror the seek fill like Samsung does?
-- **D-B Seek-bar default:** Wavy (reference look, cheap) or Waveform (Melodiha-like; needs a one-time audio decode per song)? Both are mocked; the setting allows either.
-- **D-C App name and icon:** the mockups use the placeholder "Music Player" and a small wavy-line glyph. The owner should pick a name.
-- **D-D Profile slot:** dropped from the nav because a local app has no account. Restore it if an online catalog/account comes later (STATUS open question 1).
-- **D-E Lyrics alignment:** centered like the reference (as mocked) or start-aligned (easier to read for long lines)?
+## 13. Owner decisions (open)
+- **D-A** RTL playback direction stays LTR (tape order) — confirm.
+- **D-B** Default seek style: Wavy (cheapest, works before loudness is measured) vs Waveform/Bars (need the one-time measurement). Recommendation: **Wavy** default; Bars is the showpiece in Settings.
+- **D-C** App name + icon (mock uses "Music Player" and the arch-with-bars glyph).
+- **D-E** Lyrics centered (as mocked) or start-aligned.
+- **D-F (new)** Liked color: saffron in the app chrome, artwork color on the player (as mocked) — or saffron everywhere?
 
-## 15. What is not verified
-- Nothing here was compiled or run on Android. These are browser mockups at 412×915 css px (≈ dp), rendered with Chromium, so they are not proof of Compose behavior, TalkBack, performance or actual SystemUI rendering.
-- System surfaces (12) are approximations of SystemUI / One UI. Exact spacing, fonts and the Now Bar's look are the OS's.
-- Persian copy has had no native-speaker review.
-- Contrast was measured on these sample covers only. Real covers need the runtime contrast guard (§2.3).
-- Not mocked: tablet/foldable layouts, landscape, the overflow menus, the sleep-timer sheet, the add-to-playlist dialog, and permission-denied-forever.
+## 14. Not verified
+- Browser mockups at 412×915 css px (≈ dp), Chromium; not compiled or run on Android: no TalkBack, performance, battery or real SystemUI evidence. The RAM/battery numbers above are budgets/estimates, to be measured in T9.
+- Narrow phones (360 dp) and landscape/tablet were not mocked: transport gaps shrink to 8 dp and the cover scales to width − 72 dp; tablet = cover left / lyrics right ≥ 600 dp.
+- Not mocked: overflow menus, sleep-timer sheet, add-to-playlist dialog, permission denied forever, empty playlist / empty Liked songs.
+- Persian copy not reviewed by a native speaker. Contrast over artwork measured on sample covers only (runtime guard required).
