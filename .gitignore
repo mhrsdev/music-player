@@ -13,3 +13,4 @@
 *.jks
 **/build/
 .claude/worktrees/
+release-out/

@@ -2,6 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// Release signing: RELEASE_KEYSTORE_FILE / _PASSWORD / RELEASE_KEY_ALIAS / _PASSWORD from gradle properties or env.
+// Without them the release APK is signed with the Android debug keystore (installable, but not a store key).
+def releaseProp = { String name -> project.findProperty(name) ?: System.getenv(name) }
+def releaseKeystore = releaseProp('RELEASE_KEYSTORE_FILE')
+
 android {
     namespace 'com.mhrsdev.musicplayer'
     compileSdkVersion 'android-37.0'
@@ -10,12 +15,24 @@ android {
         applicationId 'com.mhrsdev.musicplayer'
         minSdk 26
         targetSdk 37
-        versionCode 1
-        versionName '0.1.0'
+        versionCode = Integer.parseInt("${project.findProperty('appVersionCode') ?: '1'}")
+        versionName = "${project.findProperty('appVersionName') ?: '0.1.0'}"
+    }
+
+    signingConfigs {
+        if (releaseKeystore) {
+            release {
+                storeFile file(releaseKeystore)
+                storePassword releaseProp('RELEASE_KEYSTORE_PASSWORD')
+                keyAlias releaseProp('RELEASE_KEY_ALIAS')
+                keyPassword releaseProp('RELEASE_KEY_PASSWORD')
+            }
+        }
     }
 
     buildTypes {
         release {
+            signingConfig releaseKeystore ? signingConfigs.release : signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
