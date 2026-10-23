@@ -17,7 +17,10 @@ public class MusicPlayerApp extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
-        if (BuildConfig.DEBUG) enableStrictMode(); // logcat tag "StrictMode"; release builds pay nothing
+        if (BuildConfig.DEBUG) { // logcat tags "StrictMode" and "MowjJank"; release builds pay nothing
+            enableStrictMode();
+            com.mhrsdev.musicplayer.debug.JankLogger.install(this);
+        }
         Trace.beginSection("MusicPlayerApp.onCreate"); // visible in Perfetto; the container is lazy except the player
         container = new AppContainer(this);
         Trace.endSection();

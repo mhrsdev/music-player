@@ -50,6 +50,7 @@ public final class ArtworkLoader {
     private final LruCache<String, Boolean> misses = new LruCache<>(MISS_CAPACITY);
     private final Map<String, Pending> pending = new HashMap<>();
     private final ThreadPoolExecutor executor;
+    private final Object[] probeLocks = new Object[8];
     private final Handler main = new Handler(Looper.getMainLooper());
 
     private static final class Pending {
@@ -64,13 +65,16 @@ public final class ArtworkLoader {
     @VisibleForTesting
     ArtworkLoader(ArtworkResolver resolver) {
         this.resolver = resolver;
+        for (int i = 0; i < probeLocks.length; i++) probeLocks[i] = new Object();
         int max = (int) Math.min(16L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 16);
         cache = new LruCache<String, Bitmap>(max) {
             @Override protected int sizeOf(String key, Bitmap value) {
                 return value.getAllocationByteCount();
             }
         };
-        executor = new ThreadPoolExecutor(2, 2, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> {
+        // Decoding is CPU + I/O heavy: never more workers than the device has spare cores (1 on dual-core phones).
+        int workers = Math.max(1, Math.min(2, Runtime.getRuntime().availableProcessors() - 1));
+        executor = new ThreadPoolExecutor(workers, workers, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> {
             Thread t = new Thread(r, "artwork");
             t.setPriority(Thread.MIN_PRIORITY);
             return t;
@@ -116,7 +120,12 @@ public final class ArtworkLoader {
         np.callbacks.add(callback);
         pending.put(key, np);
         np.future = executor.submit(() -> {
-            Bitmap bmp = resolver.resolve(uri, sizePx);
+            Bitmap bmp;
+            // One probe per cover at a time: the same album asked at 3 sizes (row, card, player) must not run the
+            // thumbnail / retriever / folder probes three times in parallel. The later ones find the miss or the winner.
+            synchronized (probeLocks[(uri.hashCode() & 0x7fffffff) % probeLocks.length]) {
+                bmp = misses.get(uri) != null ? null : resolver.resolve(uri, sizePx);
+            }
             main.post(() -> deliver(uri, key, bmp));
         });
     }

@@ -52,6 +52,8 @@ public final class ArtworkResolver {
             "Cover.jpg", "Folder.jpg", "Front.jpg", "AlbumArt.jpg", "AlbumArtSmall.jpg"};
 
     private final Backend backend;
+    /** Track that gave an album its cover, so other sizes of the same cover skip the failed probes before it. */
+    private final android.util.LruCache<String, AudioRef> winners = new android.util.LruCache<>(256);
 
     public ArtworkResolver(Backend backend) { this.backend = backend; }
 
@@ -63,10 +65,15 @@ public final class ArtworkResolver {
             Bitmap b = thumbnail(Uri.parse("content://media/external/audio/albums/" + albumId), sizePx);
             if (b == null) b = decodeStream(uri, sizePx);
             if (b != null) return b;
+            AudioRef known = winners.get(albumId);
+            if (known != null && (b = fromAudio(known, sizePx)) != null) return b;
             try {
                 for (AudioRef ref : backend.albumTracks(albumId, ALBUM_TRACK_LIMIT)) {
                     b = fromAudio(ref, sizePx);
-                    if (b != null) return b;
+                    if (b != null) {
+                        winners.put(albumId, ref);
+                        return b;
+                    }
                 }
             } catch (Exception ignored) {
                 // no permission / provider gone: no art

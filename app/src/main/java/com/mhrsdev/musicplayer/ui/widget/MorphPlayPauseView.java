@@ -34,6 +34,9 @@ public class MorphPlayPauseView extends View {
     private final Paint iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint arcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path shape = new Path();
+    private final Path squircleShape = new Path();
+    private final Path cookieShape = new Path();
+    private float builtCx = -1f, builtCy = -1f, builtR = -1f; // geometry the cached shapes were built for
     private final Path playIcon = new Path();
     private final Path pauseIcon = new Path();
     private final RectF arcRect = new RectF();
@@ -171,6 +174,28 @@ public class MorphPlayPauseView extends View {
         super.onDetachedFromWindow();
     }
 
+    private void buildSettled(float cx, float cy, float r) {
+        squircleShape.rewind();
+        cookieShape.rewind();
+        for (int i = 0; i <= POINTS; i++) {
+            double t = WaveMath.TWO_PI * i / POINTS;
+            float c = (float) Math.cos(t), s = (float) Math.sin(t);
+            float rs = r * ShapeMath.radius(t, 0f), rc = r * ShapeMath.radius(t, 1f);
+            if (i == 0) {
+                squircleShape.moveTo(cx + rs * c, cy + rs * s);
+                cookieShape.moveTo(cx + rc * c, cy + rc * s);
+            } else {
+                squircleShape.lineTo(cx + rs * c, cy + rs * s);
+                cookieShape.lineTo(cx + rc * c, cy + rc * s);
+            }
+        }
+        squircleShape.close();
+        cookieShape.close();
+        builtCx = cx;
+        builtCy = cy;
+        builtR = r;
+    }
+
     @Override protected void onDraw(Canvas canvas) {
         long now = SystemClock.uptimeMillis();
         boolean spin = playing && motionAllowed && visibleToUser && isEnabled();
@@ -179,19 +204,30 @@ public class MorphPlayPauseView extends View {
 
         float w = getWidth(), h = getHeight(), cx = w / 2f, cy = h / 2f;
         float r = outerRadius(w, h, getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom());
-        double rot = Math.toRadians(rotationDeg);
         float m = Math.max(0f, Math.min(1f, morph)); // overshoot would push the edge past the bounds
-        shape.rewind();
-        for (int i = 0; i <= POINTS; i++) {
-            double t = WaveMath.TWO_PI * i / POINTS;
-            // Only the cookie turns; the squircle stays axis-aligned so its corners never leave the square.
-            float rr = r * ShapeMath.radiusRotated(t, rot, m);
-            float x = cx + rr * (float) Math.cos(t), y = cy + rr * (float) Math.sin(t);
-            if (i == 0) shape.moveTo(x, y); else shape.lineTo(x, y);
-        }
-        shape.close();
         containerPaint.setColor(isEnabled() ? containerColor : 0x1FFFFFFF & containerColor | 0x1F000000);
-        canvas.drawPath(shape, containerPaint);
+        if (m == 0f || m == 1f) {
+            // Settled shapes are cached: the cookie only turns rigidly, so rotating the canvas replaces rebuilding
+            // 120 trig-heavy points per frame (the squircle never turns).
+            Path settled = m == 1f ? cookieShape : squircleShape;
+            if (builtCx != cx || builtCy != cy || builtR != r) buildSettled(cx, cy, r);
+            int save = canvas.save();
+            if (m == 1f) canvas.rotate(rotationDeg, cx, cy);
+            canvas.drawPath(settled, containerPaint);
+            canvas.restoreToCount(save);
+        } else {
+            double rot = Math.toRadians(rotationDeg);
+            shape.rewind();
+            for (int i = 0; i <= POINTS; i++) {
+                double t = WaveMath.TWO_PI * i / POINTS;
+                // Only the cookie turns; the squircle stays axis-aligned so its corners never leave the square.
+                float rr = r * ShapeMath.radiusRotated(t, rot, m);
+                float x = cx + rr * (float) Math.cos(t), y = cy + rr * (float) Math.sin(t);
+                if (i == 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+            }
+            shape.close();
+            canvas.drawPath(shape, containerPaint);
+        }
 
         int iconAlphaBase = isEnabled() ? 255 : 97;
         if (buffering) {
