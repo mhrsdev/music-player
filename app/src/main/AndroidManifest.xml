@@ -15,6 +15,9 @@
     <!-- API 31+: only to show the connected Bluetooth device's NAME on the player's output chip (asked in context). -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
+    <!-- Self-update from GitHub Releases: the system installer session is started by the app (user confirms in the system dialog). -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <application
         android:name=".MusicPlayerApp"
         android:allowBackup="false"
@@ -45,6 +48,11 @@
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
+
+        <!-- Status of the self-update install session; only the system's PendingIntent reaches it. -->
+        <receiver
+            android:name=".data.update.InstallResultReceiver"
+            android:exported="false" />
 
         <!-- Headset / Bluetooth media buttons, also when the app process is not running. -->
         <receiver
