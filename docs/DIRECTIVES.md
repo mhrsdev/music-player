@@ -169,3 +169,14 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 2. **UI quality bar:** very beautiful, **less Google-like, an exclusive identity of our own**, in the spirit of the mockups already shown but a bit prettier and more polished ("سیقل‌خورده‌تر"). **Battery AND RAM must be fully optimized — very low.** The rest is left to the supervisor's judgment.
 3. **Use several sub-agents in parallel** — this **replaces D5's one-at-a-time rule** (parallel work uses separate git worktrees/branches).
 4. **All sub-agents except the UI sub-agent must use the "ponytail" skill** (https://github.com/DietrichGebert/ponytail — "lazy senior dev": smallest complete change, no speculative abstraction). Installed (reviewed, MIT, no hooks) at `.claude/skills/ponytail`, `ponytail-review`, `ponytail-audit`. Supervisor note: where ponytail's minimalism conflicts with D7 (clean packaging, tidy query classes, MVVM layering) the D7 structure rules win.
+
+---
+
+## D9 — 2026-10-23 — Design must be god-tier, battery stays reasonable
+
+**Original (verbatim):**
+
+> ببین به اوپس بگو دیزیان باید خدا باشه ولی مصرف باتری مناسب بمونه
+> بهترین UI/UX رو میخوام
+
+**Summary:** Tell the UI agent (Opus) the design must be outstanding ("god-tier") while battery use stays reasonable. Owner wants the best possible UI/UX. Relayed to T2b; balance = beautiful where cheap, documented low-power fallbacks.
