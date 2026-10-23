@@ -215,6 +215,10 @@ public class MorphPlayPauseView extends View {
         return super.onTouchEvent(e);
     }
 
+    @Override public boolean performClick() {
+        return super.performClick();
+    }
+
     @Override public CharSequence getAccessibilityClassName() {
         return Button.class.getName();
     }
