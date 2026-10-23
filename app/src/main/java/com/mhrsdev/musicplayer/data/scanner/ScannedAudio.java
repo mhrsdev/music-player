@@ -21,7 +21,14 @@ public record ScannedAudio(
         int year,
         long addedAtMs,
         long modifiedMs,
-        @Nullable String path) {
+        @Nullable String path,
+        long sizeBytes,
+        /** MediaStore IS_MUSIC. */
+        boolean music,
+        /** Ringtone, notification, alarm or podcast. */
+        boolean special,
+        /** Android 10+: the file is still being written (a running download). */
+        boolean pending) {
 
     /** MediaStore's placeholder for missing tags. */
     private static final String UNKNOWN = "<unknown>";

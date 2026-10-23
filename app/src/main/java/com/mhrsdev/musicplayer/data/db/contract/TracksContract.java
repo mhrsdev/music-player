@@ -21,6 +21,9 @@ public final class TracksContract {
     public static final String COL_ADDED_AT_MS = "added_at_ms";
     /** File modification time (ms); the scanner re-reads a row only when this changes, waveform cache keys on it. */
     public static final String COL_MODIFIED_MS = "modified_ms";
+    /** File size and absolute path as of the last scan: with {@link #COL_MODIFIED_MS} they tell the scanner a file changed. */
+    public static final String COL_SIZE_BYTES = "size_bytes";
+    public static final String COL_PATH = "path";
 
     public static final String CREATE = "CREATE TABLE " + TABLE + " ("
             + COL_ID + " TEXT PRIMARY KEY NOT NULL, "
@@ -35,7 +38,15 @@ public final class TracksContract {
             + COL_YEAR + " INTEGER NOT NULL DEFAULT 0, "
             + COL_TRACK_NUMBER + " INTEGER NOT NULL DEFAULT 0, "
             + COL_ADDED_AT_MS + " INTEGER NOT NULL, "
-            + COL_MODIFIED_MS + " INTEGER NOT NULL)";
+            + COL_MODIFIED_MS + " INTEGER NOT NULL, "
+            + COL_SIZE_BYTES + " INTEGER NOT NULL DEFAULT 0, "
+            + COL_PATH + " TEXT)";
+
+    /** v3 -> v4: columns the incremental scan compares besides the modified time. */
+    public static final String[] ADD_SIGNATURE_COLUMNS = {
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_SIZE_BYTES + " INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE " + TABLE + " ADD COLUMN " + COL_PATH + " TEXT"
+    };
 
     /** Table plus the indices the album / artist / recently-added queries use. */
     public static final String[] SCHEMA = {

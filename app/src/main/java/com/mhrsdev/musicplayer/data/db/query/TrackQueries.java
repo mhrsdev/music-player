@@ -10,6 +10,8 @@ import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_DURATI
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_ID;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_MEDIA_URI;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_MODIFIED_MS;
+import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_PATH;
+import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_SIZE_BYTES;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_TITLE;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_TRACK_NUMBER;
 import static com.mhrsdev.musicplayer.data.db.contract.TracksContract.COL_YEAR;
@@ -148,17 +150,25 @@ public final class TrackQueries {
         return out;
     }
 
-    /** Track id to file modification time, what the incremental scan compares against. */
-    public Map<String, Long> modifiedById() {
-        Map<String, Long> out = new HashMap<>();
-        try (Cursor c = db.query(TABLE, new String[] {COL_ID, COL_MODIFIED_MS}, null, null, null, null, null)) {
-            while (c.moveToNext()) out.put(c.getString(0), c.getLong(1));
+    /** What the scanner stored about a file; any difference from MediaStore's current row means "re-read it". */
+    public record Stored(long modifiedMs, long sizeBytes, String path) { }
+
+    /** Track id to {@link Stored}, what the incremental scan compares against. */
+    public Map<String, Stored> storedById() {
+        Map<String, Stored> out = new HashMap<>();
+        try (Cursor c = db.query(TABLE, new String[] {COL_ID, COL_MODIFIED_MS, COL_SIZE_BYTES, COL_PATH}, null, null,
+                null, null, null)) {
+            while (c.moveToNext()) out.put(c.getString(0), new Stored(c.getLong(1), c.getLong(2), c.getString(3)));
         }
         return out;
     }
 
     /** Inserts or replaces the row of {@code track}. The liked flag is ignored (likes live in their own table). */
     public void upsert(Track track, long modifiedMs) {
+        upsert(track, modifiedMs, 0, null);
+    }
+
+    public void upsert(Track track, long modifiedMs, long sizeBytes, String path) {
         ContentValues v = new ContentValues();
         v.put(COL_ID, track.id());
         v.put(COL_TITLE, track.title());
@@ -173,6 +183,8 @@ public final class TrackQueries {
         v.put(COL_TRACK_NUMBER, track.trackNumber());
         v.put(COL_ADDED_AT_MS, track.addedAtMs());
         v.put(COL_MODIFIED_MS, modifiedMs);
+        v.put(COL_SIZE_BYTES, sizeBytes);
+        v.put(COL_PATH, path);
         db.insertWithOnConflict(TABLE, null, v, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
