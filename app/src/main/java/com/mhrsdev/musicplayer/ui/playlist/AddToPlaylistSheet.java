@@ -65,7 +65,7 @@ public final class AddToPlaylistSheet extends BottomSheetDialogFragment {
 
         TextView title = text(c, getString(R.string.playlist_add_title), 22, onSurface);
         title.setTypeface(title.getTypeface(), android.graphics.Typeface.BOLD);
-        title.setAccessibilityHeading(true);
+        androidx.core.view.ViewCompat.setAccessibilityHeading(title, true);
         root.addView(title);
         String trackTitle = requireArguments().getString(ARG_TITLE);
         if (!TextUtils.isEmpty(trackTitle)) {
