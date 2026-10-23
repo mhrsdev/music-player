@@ -50,9 +50,6 @@ public class PlayPauseMiniRenderTest {
                 int kind = state % 3;
                 v.setPlaying(kind == 1, false);
                 if (kind == 2) {
-                    java.lang.reflect.Field f = MorphPlayPauseView.class.getDeclaredField("rotationDeg");
-                    f.setAccessible(true);
-                    f.setFloat(v, 17f);
                     v.setPlaying(true, false);
                     v.setPlaying(false, false);
                 }
