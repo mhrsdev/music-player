@@ -1,7 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Scr.PageTitle" parent="">
-        <item name="android:textSize">34sp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/mp_text_display</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
         <item name="android:textAlignment">viewStart</item>
         <item name="android:paddingHorizontal">20dp</item>
@@ -9,8 +11,10 @@
         <item name="android:paddingBottom">12dp</item>
     </style>
     <style name="Scr.SectionTitle" parent="">
-        <item name="android:textSize">24sp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/mp_text_headline</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
         <item name="android:textAlignment">viewStart</item>
     </style>

@@ -11,6 +11,15 @@
         <item name="colorOnSurface">@color/mp_on_surface</item>
         <item name="android:textColorPrimary">@color/mp_on_surface</item>
         <item name="android:textColorSecondary">@color/mp_on_surface_variant</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="fontFamily">@font/mp_sans</item>
+        <item name="android:textAppearance">@style/TextAppearance.MusicPlayer.Body</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.MusicPlayer.Headline</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.MusicPlayer.Display</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.MusicPlayer.Title</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.MusicPlayer.Body</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.MusicPlayer.Supporting</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.MusicPlayer.Label</item>
         <item name="mpBackground">@color/mp_background</item>
         <item name="mpSurfaceContainerLow">@color/mp_surface_container_low</item>
         <item name="mpSurfaceContainer">@color/mp_surface_container</item>

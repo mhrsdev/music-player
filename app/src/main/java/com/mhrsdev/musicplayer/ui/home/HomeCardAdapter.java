@@ -69,7 +69,7 @@ final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder
             }
             case ALBUM -> {
                 title = item.album().title();
-                subtitle = item.album().artistName() + " · "
+                subtitle = android.text.BidiFormatter.getInstance().unicodeWrap(item.album().artistName()) + " · "
                         + r.getQuantityString(R.plurals.library_songs, item.album().trackCount(), item.album().trackCount());
                 seed = item.album().placeholderSeed();
                 art = item.album().artworkUri();
