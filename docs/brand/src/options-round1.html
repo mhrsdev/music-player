@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="brand.css"><script src="options.js"></script><script>window.SHEET="round1"</script>
+<style>
+#shot{width:2000px;padding:48px;box-sizing:border-box;background:#0F1216;color:#E2E2E9;font-family:GSF}
+h1{font-weight:640;font-size:40px;margin:0 0 6px} .sub{color:#BFC6D2;font-size:19px;margin:0 0 36px;max-width:1500px}
+.opt{display:grid;grid-template-columns:260px 512px 1fr;gap:36px;align-items:center;padding:28px;border-radius:32px;background:#171A1F;margin-bottom:24px}
+.opt.rec{outline:3px solid #7FD6CB}
+.lab b{display:block;font-size:30px;font-weight:640;margin-bottom:8px} .lab span{color:#BFC6D2;font-size:17px;line-height:1.45;display:block}
+.lab i{display:inline-block;margin-top:12px;font-style:normal;font-weight:600;color:#0F1216;background:#7FD6CB;border-radius:99px;padding:4px 14px;font-size:15px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cell{border-radius:22px;padding:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.d{background:#0F1216}.l{background:#F1F3FA;color:#181C21}
+.cap{width:100%;font-size:14px;opacity:.7;margin-top:-6px}
+</style></head>
+<body data-out="options/logo-directions-round1.png"><div id="shot"><h1>Mowj — logo directions, round 1 (superseded by the bilingual M + م family)</h1>
+<p class="sub">Each direction as the adaptive launcher icon (512 rounded tile; circle and squircle masks at 180 / 96 / 48 / 24 px) on dark and light, as the Android 13 themed one-colour icon, and as the status-bar mark. Same lapis → turquoise background with a soft glow for all, so only the mark differs.</p>
+<div id="list"></div></div>
+<script>
+const NOTES = {
+  M1: 'The M\'s valley closes into م\'s round head and its tail falls from it: M read whole, م read in the middle.',
+  M2: 'Latin M on the left, Persian م on the right, joined by one wave line that both stand on.',
+  M3: 'Rounded M made of two wave crests; its last stem is the tail of م, whose head sits at its foot.',
+  M4: 'The silhouette is a bold م (round head + tail); a geometric M is cut out of the head.',
+  M5: 'Left stem and diagonal of a sans M; the valley drops as م\'s tail and the bowl forms the right half.',
+  A: 'Seven capsules from the in-app Bars seek bar hang from one lintel; their ends carve a pointed Persian arch (طاق).',
+  B: 'Isolated Persian م drawn geometrically: round head on the baseline, connector, upright tail.',
+  C: 'A bright source dot and two broken rings; the aligned gaps act as a play notch / record groove.',
+  D: 'Monogram M whose middle strokes are one sine wave: the name and the wave in one line.',
+  E: 'Persian eight-point girih star; equaliser bars are cut from its heart. Works as a solid one-colour seal.',
+  F: 'A water drop with one sound wave cut through its belly.',
+  G: 'A pointed iwan arch with two waves crossing its threshold: a Persian doorway onto the sea.',
+};
+const REC = window.SHEET === 'round1' ? '' : RECOMMENDED;
+let h = '';
+for (const o of (window.SHEET === 'round1' ? ROUND1 : OPTIONS)) {
+  const sizes = (bg, mask) => [180, 96, 48, 24].map((s) => optIcon(o, s, mask)).join('');
+  h += `<div class="opt ${o.id === REC ? 'rec' : ''}"><div class="lab"><b>${o.id} · ${o.name}</b><span>${NOTES[o.id]}</span>${o.id === REC ? '<i>Recommended</i>' : ''}</div>
+  <div>${optIcon(o, 512, 'rounded')}</div>
+  <div class="grid">
+   <div class="cell d">${sizes('d', 'circle')}<div class="cap">Circle · dark wallpaper · 180 / 96 / 48 / 24</div></div>
+   <div class="cell l">${sizes('l', 'squircle')}<div class="cap">Squircle · light wallpaper</div></div>
+   <div class="cell d">${optIcon(o, 96, 'circle', { themed: { bg: '#1E3048', fg: '#C9DCF5' } })}${optIcon(o, 48, 'circle', { themed: { bg: '#1E3048', fg: '#C9DCF5' } })}${optIcon(o, 24, 'circle', { themed: { bg: '#1E3048', fg: '#C9DCF5' } })}
+     <span style="width:24px"></span>${optMark(o, 48, '#FFFFFF')}${optMark(o, 24, '#FFFFFF')}<div class="cap">Themed (dark) · status-bar mark 48 / 24</div></div>
+   <div class="cell l">${optIcon(o, 96, 'circle', { themed: { bg: '#D4E3FF', fg: '#0B2745' } })}${optIcon(o, 48, 'circle', { themed: { bg: '#D4E3FF', fg: '#0B2745' } })}${optIcon(o, 24, 'circle', { themed: { bg: '#D4E3FF', fg: '#0B2745' } })}
+     <span style="width:24px"></span>${optMark(o, 48, '#181C21')}${optMark(o, 24, '#181C21')}<div class="cap">Themed (light) · one-colour mark</div></div>
+  </div></div>`;
+}
+list.innerHTML = h;
+</script></body></html>
