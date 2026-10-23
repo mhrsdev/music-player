@@ -441,3 +441,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > در اپدیت بعدی
 
 **Summary:** For the next release (v0.3.0): Settings gets a **Performance** section where the user can dial animations/effects down for laggy phones. Defaults keep full effects (D24: optimise, don't cut); the section is an opt-in escape hatch. Task Q1 (Opus, `task/q1-performance-settings`).
+
+---
+
+## D27 — 2026-10-24 — Keep all 6 new seek bars
+
+**Original (verbatim):** "همه ۶ تا نوار"
+
+**Summary:** Owner keeps all six new seek-bar styles from B2 (Ribbon, Pulse dots, LED ladder, Mountain, Thread & beads, Liquid) alongside Wavy/Waveform/Bars. B2 merged into ccr.

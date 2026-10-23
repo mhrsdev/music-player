@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:minHeight="56dp"
+    android:orientation="vertical"
+    android:paddingVertical="8dp">
+
+    <TextView
+        android:id="@+id/gesture"
+        style="@style/Settings.CardTitle"
+        android:paddingBottom="0dp" />
+
+    <TextView
+        android:id="@+id/action"
+        style="@style/Settings.CardSub"
+        android:paddingBottom="4dp"
+        android:textColor="?attr/mpPrimary" />
+</LinearLayout>

@@ -10,6 +10,7 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
 import androidx.media3.common.Timeline;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.session.MediaSession;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import android.util.AtomicFile;
 import java.io.BufferedInputStream;
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * are saved on item transitions, pause, mode changes and by {@link #saveNow()} (UI went to background / service
  * stopping). Restore happens paused and unprepared.
  */
-final class PlaybackStore implements Player.Listener {
+class PlaybackStore implements Player.Listener {
     private static final String FILE = "playback_state";
     private static final String QUEUE_FILE = "queue.bin";
     private static final String K_INDEX = "index", K_POSITION = "position",
@@ -72,17 +73,33 @@ final class PlaybackStore implements Player.Listener {
     /** Loads the persisted queue into {@code target} (paused, not prepared) and starts listening to it. */
     void restoreAndAttach(ExoPlayer target) {
         player = target;
-        List<Track> tracks = readQueueFile();
-        if (!tracks.isEmpty()) {
-            List<MediaItem> items = new ArrayList<>(tracks.size());
-            for (Track t : tracks) items.add(TrackMapper.toMediaItem(t));
-            int index = Math.max(0, Math.min(prefs.getInt(K_INDEX, 0), items.size() - 1));
-            target.setMediaItems(items, index, Math.max(0L, prefs.getLong(K_POSITION, 0L)));
+        MediaSession.MediaItemsWithStartPosition saved = resumption();
+        if (saved != null) {
+            target.setMediaItems(saved.mediaItems, saved.startIndex, saved.startPositionMs);
             target.setShuffleModeEnabled(prefs.getBoolean(K_SHUFFLE, false));
             target.setRepeatMode(prefs.getInt(K_REPEAT, Player.REPEAT_MODE_OFF));
         }
         queueDirty = false;
         target.addListener(this);
+    }
+
+    /**
+     * The saved queue with the saved index and position, or null when there is none. Reads files only, so it may run
+     * on any thread: it backs both the startup restore and {@code MediaSession.Callback.onPlaybackResumption}.
+     */
+    @Nullable MediaSession.MediaItemsWithStartPosition resumption() {
+        List<Track> tracks = readQueueFile();
+        if (tracks.isEmpty()) return null;
+        List<MediaItem> items = new ArrayList<>(tracks.size());
+        for (Track t : tracks) items.add(TrackMapper.toMediaItem(t));
+        int index = Math.max(0, Math.min(prefs.getInt(K_INDEX, 0), items.size() - 1));
+        return new MediaSession.MediaItemsWithStartPosition(items, index, Math.max(0L, prefs.getLong(K_POSITION, 0L)));
+    }
+
+    /** Cheap check (no parsing) for "is there anything a media button could resume": the queue file exists and is not empty. */
+    static boolean hasSavedQueue(Context context) {
+        File f = new File(context.getFilesDir(), QUEUE_FILE);
+        return f.length() > 16; // magic + table size + track count is 12 bytes: anything more holds tracks
     }
 
     /** Flushes everything now (cheap when nothing changed). */

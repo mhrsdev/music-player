@@ -134,6 +134,20 @@ public abstract class BaseSeekView extends View implements SeekBarView {
 
     protected void onWaveformChanged() {}
 
+    /** Thumb on top of the track; {@code grow} 0 idle .. 1 dragging. Default: a 4 dp line, 20 dp tall (32 dragging). */
+    protected void drawThumb(Canvas canvas, float thumbX, float cy, float grow) {
+        float half = (10f + 6f * grow) * density;
+        float tw = (2f + 1f * grow) * density;
+        canvas.drawRoundRect(thumbX - tw, cy - half, thumbX + tw, cy + half, tw, tw, thumbPaint);
+    }
+
+    /** Forces the dragging look without touch (style previews and render tests). */
+    public void setPreviewDragging(boolean on) {
+        dragging = on;
+        thumbGrow = on ? 1f : 0f;
+        invalidate();
+    }
+
     protected final boolean canAnimate() { return motionAllowed && visibleToUser; }
 
     protected final float trackLeft() { return getPaddingLeft() + 8f * density; }
@@ -181,10 +195,7 @@ public abstract class BaseSeekView extends View implements SeekBarView {
 
         drawTrack(canvas, left, right, cy, thumbX, dt);
 
-        // Line thumb: 4 dp wide, 20 dp tall, 32 dp while dragging.
-        float half = (10f + 6f * thumbGrow) * density;
-        float tw = (2f + 1f * thumbGrow) * density;
-        canvas.drawRoundRect(thumbX - tw, cy - half, thumbX + tw, cy + half, tw, tw, thumbPaint);
+        drawThumb(canvas, thumbX, cy, thumbGrow);
 
         boolean more = thumbGrow != growTarget || (wantsFrames() && canAnimate());
         moreFrames = more;

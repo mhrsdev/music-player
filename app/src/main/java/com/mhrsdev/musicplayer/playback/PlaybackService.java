@@ -2,8 +2,13 @@ package com.mhrsdev.musicplayer.playback;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.media.AudioDeviceCallback;
+import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
+import androidx.core.content.IntentCompat;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.media3.common.MediaItem;
@@ -21,6 +26,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mhrsdev.musicplayer.R;
+import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,24 +49,39 @@ public class PlaybackService extends MediaLibraryService {
     private ExoPlayer player;
     @Nullable private MediaLibrarySession session;
     private ListeningExecutorService browseExecutor;
+    private HeadsetControls headset;
+    private MediaLibrarySession.Callback callback;
+    private AudioManager audioManager;
+
+    /** Event-driven and only registered while this service lives: a headset showing up can resume paused playback. */
+    private final AudioDeviceCallback deviceCallback = new AudioDeviceCallback() {
+        @Override public void onAudioDevicesAdded(AudioDeviceInfo[] added) {
+            headset.onDevicesAdded(added);
+        }
+    };
 
     private final Player.Listener idleWatcher = new Player.Listener() {
         @Override public void onEvents(Player p, Player.Events events) {
             if (!events.containsAny(Player.EVENT_PLAY_WHEN_READY_CHANGED, Player.EVENT_PLAYBACK_STATE_CHANGED)) return;
             handler.removeCallbacks(idleStopTask);
-            if (!isActive()) handler.postDelayed(idleStopTask, IDLE_STOP_DELAY_MS);
+            if (!isActive()) handler.postDelayed(idleStopTask, idleDelayMs());
         }
     };
 
     @Override public void onCreate() {
         super.onCreate();
         player = PlayerHolder.get(this);
+        PlaybackStore store = PlayerHolder.store(this);
+        headset = new HeadsetControls(player, () -> SettingsStore.readHeadset(this), store::resumption);
+        player.addListener(headset);
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioManager != null) audioManager.registerAudioDeviceCallback(deviceCallback, handler);
         // Browse queries hit SQLite: one worker thread that exits after 10 s idle.
         ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         pool.allowCoreThreadTimeOut(true);
         browseExecutor = MoreExecutors.listeningDecorator(pool);
-        MediaLibrarySession.Builder builder = new MediaLibrarySession.Builder(this, player,
-                new BrowseCallback(new BrowseTree(getResources(), BrowseHolder.get())))
+        callback = new BrowseCallback(new BrowseTree(getResources(), BrowseHolder.get()), store);
+        MediaLibrarySession.Builder builder = new MediaLibrarySession.Builder(this, player, callback)
                 .setBitmapLoader(new ArtworkLoader(this));
         Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (launch != null) {
@@ -79,7 +100,22 @@ public class PlaybackService extends MediaLibraryService {
         provider.setSmallIcon(R.drawable.ic_stat_playback);
         setMediaNotificationProvider(provider);
         player.addListener(idleWatcher);
-        if (!isActive()) handler.postDelayed(idleStopTask, IDLE_STOP_DELAY_MS);
+        if (!isActive()) handler.postDelayed(idleStopTask, idleDelayMs());
+    }
+
+    /** For tests: the session the system sees. */
+    @Nullable MediaLibrarySession session() {
+        return session;
+    }
+
+    /** For tests: the session callback (browse, playback resumption, media buttons). */
+    MediaLibrarySession.Callback callback() {
+        return callback;
+    }
+
+    /** For tests: the button / interruption logic behind the session callback. */
+    HeadsetControls headset() {
+        return headset;
     }
 
     @Nullable @Override
@@ -97,6 +133,9 @@ public class PlaybackService extends MediaLibraryService {
     @Override public void onDestroy() {
         handler.removeCallbacks(idleStopTask);
         player.removeListener(idleWatcher);
+        player.removeListener(headset);
+        headset.release();
+        if (audioManager != null) audioManager.unregisterAudioDeviceCallback(deviceCallback);
         browseExecutor.shutdown();
         PlayerHolder.store(this).saveNow();
         if (session != null) {
@@ -106,12 +145,46 @@ public class PlaybackService extends MediaLibraryService {
         super.onDestroy();
     }
 
-    /** Android Auto / Assistant browsing; the system UI and media buttons keep using the default session behaviour. */
+    /** One minute normally; longer when "resume when the headset connects" is on, so a reconnect finds the service. */
+    private long idleDelayMs() {
+        return SettingsStore.readHeadset(this).resumeOnConnect() ? HeadsetControls.RESUME_WINDOW_MS : IDLE_STOP_DELAY_MS;
+    }
+
+    /**
+     * Android Auto / Assistant browsing, headset buttons and playback resumption. The notification's own buttons and
+     * everything else keep the stock session behaviour.
+     */
     private final class BrowseCallback implements MediaLibrarySession.Callback {
         private final BrowseTree tree;
+        private final PlaybackStore store;
 
-        BrowseCallback(BrowseTree tree) {
+        BrowseCallback(BrowseTree tree, PlaybackStore store) {
             this.tree = tree;
+            this.store = store;
+        }
+
+        /**
+         * Headset / Bluetooth / wired keys (and the intent a stopped service is restarted with): handled by
+         * {@link HeadsetControls}. Keys from the media notification are left to the stock handler, which must not
+         * wait to count clicks.
+         */
+        @Override public boolean onMediaButtonEvent(MediaSession s, MediaSession.ControllerInfo controller, Intent intent) {
+            if (s.isMediaNotificationController(controller)) return false;
+            KeyEvent key = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_KEY_EVENT, KeyEvent.class);
+            return key != null && headset.onKeyEvent(key);
+        }
+
+        /**
+         * Play with an empty player (a headset PLAY after the queue was cleared, Assistant, the system's resume
+         * card): the saved queue at the saved position. Failing makes Media3 just call play().
+         */
+        @Override public ListenableFuture<MediaSession.MediaItemsWithStartPosition> onPlaybackResumption(
+                MediaSession s, MediaSession.ControllerInfo controller, boolean isForPlayback) {
+            return browseExecutor.submit(() -> {
+                MediaSession.MediaItemsWithStartPosition saved = store.resumption();
+                if (saved == null) throw new UnsupportedOperationException("no saved queue");
+                return saved;
+            });
         }
 
         @Override public ListenableFuture<LibraryResult<MediaItem>> onGetLibraryRoot(MediaLibrarySession s,

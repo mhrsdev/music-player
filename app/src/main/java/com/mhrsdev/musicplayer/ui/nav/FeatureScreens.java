@@ -23,6 +23,8 @@ public class FeatureScreens {
     public static final List<Entry> ALL = List.of(
             new Entry("com.mhrsdev.musicplayer.ui.sound.SoundFragment", "sound",
                     R.string.settings_feature_sound, R.string.settings_feature_sound_sub, R.drawable.settings_ic_equalizer),
+            new Entry("com.mhrsdev.musicplayer.ui.headset.HeadsetFragment", "headset",
+                    R.string.settings_feature_headset, R.string.settings_feature_headset_sub, R.drawable.settings_ic_headset),
             new Entry("com.mhrsdev.musicplayer.ui.backup.BackupFragment", "backup",
                     R.string.settings_feature_backup, R.string.settings_feature_backup_sub, R.drawable.settings_ic_backup),
             new Entry("com.mhrsdev.musicplayer.ui.update.UpdateFragment", "update",
