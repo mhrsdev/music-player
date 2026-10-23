@@ -30,6 +30,7 @@ _Last updated: 2026-10-23 — D8: parallel agents + ponytail skill + UI/RAM/batt
 | K13 | **Language: Java only, NO Kotlin** (D7, answers Q-J). Groovy `.gradle` build files | decided by owner |
 | K14 | UI = XML + custom Views (no Compose) → Wavy/Waveform/Bars seek bars are custom `View`s (D7) | consequence of K13 |
 | K15 | **No Room**: framework `SQLiteOpenHelper`/`SQLiteDatabase`, tidy query/DAO classes (D7) | decided by owner |
+| K17 | Gradle 9.0.0 + AGP 8.13.2 (forced: AGP 9 needs Gradle ≥ 9.1). Owner may allow Gradle 9.1+ later for AGP 9.x | accepted by supervisor, owner to confirm |
 | K16 | Clean code, proper package structure; **Gradle 9.0.0** (D7) | decided; AGP compatibility to be verified by build agent |
 | K9 | App name "Music Player" (placeholder; rename later) | default applied |
 | K3 | Lyrics via embedded/sidecar LRC + LRCLIB | open, legal API |
@@ -44,11 +45,12 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 ### In progress
 - 🔄 **T2b** [Opus] Design revision for Java/Views: less stock-Material/Google look, own identity, custom-drawn controls; update `docs/design/DESIGN.md` + re-render PNGs; show owner in chat and get OK. Branch `task/t2b-design-revision`.
 
-- 🔄 **T1b** [Sonnet + ponytail] Java re-scaffold (Gradle 9.0.0, framework SQLite, contracts + fakes). Worktree `../wt-t1b`, branch `task/t1b-java-scaffold`. Gates T5/T6/T7/T-W/T2 (they start in parallel once T1b contracts are merged).
 
 - 🔄 **T5** [Sonnet + ponytail] Data layer (SQLite DB + MediaStore scanner + repos + settings). Branch `task/t5-data-java`, worktree `../wt-t5`.
 - 🔄 **T6** [Sonnet + ponytail] Playback (Media3 service, PlayerController impl, queue, sleep timer, notification). Branch `task/t6-playback`, worktree `../wt-t6`.
 - 🔄 **T7** [Sonnet + ponytail] Lyrics (LRC parser/sidecar/embedded + LRCLIB + cache). Branch `task/t7-lyrics-java`, worktree `../wt-t7`.
+
+- 🔄 **T-W** [Sonnet + ponytail] Waveform extractor (`data/waveform`). Branch `task/tw-waveform-java`, worktree `../wt-tw`.
 
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
@@ -58,7 +60,6 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 - ⬜ **T5** [Sonnet] Data: MediaStore scanner, `SQLiteOpenHelper` DB (library, likes, playlists, history, waveform cache), tidy query/DAO classes, repositories, settings (SharedPreferences).
 - ⬜ **T6** [Sonnet] Playback: Media3 `MediaSessionService`, `PlayerController` impl, queue ops, sleep timer, notification; battery rules.
 - ⬜ **T7** [Sonnet] Lyrics: embedded/sidecar LRC parser + LRCLIB client + cache.
-- ⬜ **T-W** [Sonnet] Waveform extractor (MediaExtractor/MediaCodec → RMS → bars, LRU+disk cache).
 - ⬜ **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings (against fakes).
 - ⬜ **T4** [Opus] Player: mini-player → full player, lyrics view, queue sheet (drag, undo, sleep timer).
 - ⬜ **T8** [Sonnet] Wire UI ↔ real data/playback, instrumentation smoke tests, unit tests.
@@ -67,11 +68,13 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T1b** [Sonnet+ponytail] Java scaffold merged into the working branch. Gradle 9.0.0 + **AGP 8.13.2** (AGP 9.x needs Gradle ≥ 9.1; tried 9.0.1 → refused), compileSdk/targetSdk 37 (suppressUnsupportedCompileSdk), minSdk 26, Java records for models, LiveData contracts + `Callback<T>`, fakes (37 tracks / 7 artists / 8 albums), `AppContainer`, `DbHelper` skeleton, 24 JVM tests, R8 release builds. **Supervisor re-ran `:app:assembleDebug test lint` → green; 0 `.kt/.kts` files.** Not verified: device run, GitHub Actions.
 - ✅ **T2a** [Opus] Design phase: 17 PNG mockups in `docs/design/png/` + spec `docs/design/DESIGN.md` (sources in `docs/design/src/`). Sent to owner in chat. **Approved by owner (D4).** Not verified: nothing runs on Android (browser mockups); notification/lock-screen is approximate; Persian copy needs native check; not mocked: tablet, overflow menus, sleep-timer sheet, permission-denied state.
 - ✅ **T1** [Sonnet] Scaffold: Gradle 9.8.2/AGP 9.4.1, Kotlin 2.4.21, compile/target SDK 37, M3 1.5.0-beta02 (Expressive), Koin, Media3, Room; domain contracts + fakes (37 tracks); `assembleDebug`, `lint`, 23 unit tests pass (agent-reported; SDK at /opt/android-sdk, `ANDROID_HOME=/opt/android-sdk ./gradlew :app:assembleDebug`). NOT verified: device run, release/R8, GitHub Actions run.
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: T1b merged into ccr-b49e5e2a-53r8m3 (reviewed: build green, no Kotlin). T-W launched → 5 agents running (T2b, T5, T6, T7, T-W).
 - 2026-10-23: D11 archived: up to 5 parallel agents; design screenshots go to the owner in chat when T2b is complete. Launched T5, T6, T7 on top of T1b contracts (origin/task/t1b-java-scaffold).
 - 2026-10-23: D10 archived: ui-ux-pro-max skill installed + relayed to the UI agent.
 - 2026-10-23: D9 archived and relayed to T2b (god-tier UI/UX, reasonable battery).
