@@ -24,13 +24,23 @@ public final class SearchViewModel extends ViewModel {
     private record Request(String query, SearchFilter filter) { }
 
     private final PlayerController player;
+    private final RecentSearches recentStore;
+    private final MutableLiveData<List<String>> recent = new MutableLiveData<>();
+    private final LiveData<Boolean> libraryEmpty;
     private final MutableLiveData<String> query = new MutableLiveData<>("");
     private final MutableLiveData<SearchFilter> filter = new MutableLiveData<>(SearchFilter.ALL);
     private final LiveData<List<SearchResult>> results;
     private final MediatorLiveData<Mode> mode = new MediatorLiveData<>();
 
     SearchViewModel(LibraryRepository library, PlayerController player) {
+        this(library, player, new RecentSearches((android.content.SharedPreferences) null));
+    }
+
+    SearchViewModel(LibraryRepository library, PlayerController player, RecentSearches recentStore) {
         this.player = player;
+        this.recentStore = recentStore;
+        recent.setValue(recentStore.get());
+        libraryEmpty = Transformations.map(library.getAllTracks(), l -> l != null && l.isEmpty());
         MediatorLiveData<Request> request = new MediatorLiveData<>();
         request.addSource(query, q -> request.setValue(new Request(q, filter.getValue())));
         request.addSource(filter, f -> request.setValue(new Request(query.getValue(), f)));
@@ -52,6 +62,30 @@ public final class SearchViewModel extends ViewModel {
 
     public LiveData<Mode> getMode() { return mode; }
 
+    /** Recent searches, newest first (shown while the field is empty). */
+    public LiveData<List<String>> getRecent() { return recent; }
+
+    /** True when the library has no songs at all (search can only say "nothing here yet"). */
+    public LiveData<Boolean> isLibraryEmpty() { return libraryEmpty; }
+
+    /** Remembers the current query (IME search action or a result was opened). */
+    public void commitQuery() {
+        String q = query.getValue();
+        if (q == null || q.isBlank()) return;
+        recentStore.add(q);
+        recent.setValue(recentStore.get());
+    }
+
+    public void removeRecent(String q) {
+        recentStore.remove(q);
+        recent.setValue(recentStore.get());
+    }
+
+    public void clearRecent() {
+        recentStore.clear();
+        recent.setValue(recentStore.get());
+    }
+
     public void setQuery(String q) {
         if (!q.equals(query.getValue())) query.setValue(q);
     }
@@ -71,10 +105,11 @@ public final class SearchViewModel extends ViewModel {
         player.play(tracks, Math.max(0, tracks.indexOf(track)), query.getValue());
     }
 
-    public static ViewModelProvider.Factory factory(LibraryRepository library, PlayerController player) {
+    public static ViewModelProvider.Factory factory(LibraryRepository library, PlayerController player,
+            RecentSearches recent) {
         return new ViewModelProvider.Factory() {
             @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> c) {
-                return c.cast(new SearchViewModel(library, player));
+                return c.cast(new SearchViewModel(library, player, recent));
             }
         };
     }

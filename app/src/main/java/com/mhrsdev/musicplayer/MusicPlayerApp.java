@@ -24,9 +24,10 @@ public class MusicPlayerApp extends Application {
         // Cheap: one static write per change of the setting, no polling.
         container.settings().batterySaver().observeForever(mode -> MotionPolicy.setBatterySaverOverride(
                 mode == BatterySaverMode.AUTO ? null : mode == BatterySaverMode.ON));
+        container.settings().reduceMotion().observeForever(MotionPolicy::setAppReduceMotion);
         // Below API 33 AppCompat keeps the chosen locale only in memory: re-apply the stored choice on every start.
         if (Build.VERSION.SDK_INT < 33) ThemeApplier.applyLanguage(container.settings().language().getValue());
-        registerActivityLifecycleCallbacks(new FirstActivityStart());
+        registerActivityLifecycleCallbacks(new ActivityStart());
     }
 
     /** The UI is gone (app backgrounded): bitmaps are the biggest thing the UI process holds; playback keeps running. */
@@ -44,10 +45,9 @@ public class MusicPlayerApp extends Application {
         return container;
     }
 
-    /** Fires {@link AppContainer#onAppForeground()} for the first started activity, then removes itself. */
-    private final class FirstActivityStart implements ActivityLifecycleCallbacks {
+    /** Fires {@link AppContainer#onAppForeground()} on every activity start (its work is throttled and idempotent). */
+    private final class ActivityStart implements ActivityLifecycleCallbacks {
         @Override public void onActivityStarted(Activity activity) {
-            unregisterActivityLifecycleCallbacks(this);
             container.onAppForeground();
         }
 

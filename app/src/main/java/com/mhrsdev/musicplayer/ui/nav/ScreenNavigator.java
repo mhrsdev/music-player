@@ -8,15 +8,21 @@ import androidx.annotation.Nullable;
 public interface ScreenNavigator {
 
     /** What a track-list screen shows. */
-    enum TrackList { ALBUM, ARTIST, PLAYLIST, LIKED, HISTORY, RECENT }
+    enum TrackList { ALBUM, ARTIST, PLAYLIST, LIKED, HISTORY, RECENT, SONGS, MOST_PLAYED, NEVER_PLAYED, YEAR }
 
     /** What a collection grid shows. */
-    enum Collection { ALBUMS, ARTISTS, PLAYLISTS }
+    enum Collection { ALBUMS, ARTISTS, PLAYLISTS, YEARS }
 
-    /** {@code id} is the album/artist/playlist id, or null for LIKED / HISTORY / RECENT. */
+    /** {@code id} is the album/artist/playlist id or the year (YEAR), null for the other kinds. */
     void openTrackList(TrackList kind, @Nullable String id);
 
     void openCollection(Collection kind);
+
+    /**
+     * Pushes any screen (e.g. a feature screen from {@link FeatureScreens}) onto the back stack; back returns.
+     * {@code tag} identifies it so repeated taps do not stack duplicates.
+     */
+    void openFragment(androidx.fragment.app.Fragment fragment, String tag);
 
     /** Switches to a top-level tab (clears the back stack). */
     void openTab(Tab tab);

@@ -1,0 +1,50 @@
+<resources>
+    <string name="update_title">به‌روزرسانی برنامه</string>
+    <string name="update_current">نسخه‌ی نصب‌شده</string>
+    <string name="update_status_idle">بررسی به‌روزرسانی</string>
+    <string name="update_status_checking">در حال بررسی…</string>
+    <string name="update_status_up_to_date">برنامه به‌روز است</string>
+    <string name="update_status_available">نسخه‌ی %1$s آماده است</string>
+    <string name="update_status_downloading">در حال دانلود… %1$s</string>
+    <string name="update_status_verifying">در حال بررسی فایل دانلودشده…</string>
+    <string name="update_status_ready">آماده‌ی نصب</string>
+    <string name="update_sub_available">حجم دانلود: %1$s</string>
+    <string name="update_sub_prerelease">نسخه‌ی آزمایشی · حجم دانلود: %1$s</string>
+    <string name="update_sub_ready">نسخه‌ی %1$s دانلود و بررسی شد.</string>
+    <string name="update_btn_download">دانلود و نصب</string>
+    <string name="update_btn_install">نصب</string>
+    <string name="update_btn_retry">تلاش دوباره</string>
+    <string name="update_btn_check">بررسی کن</string>
+    <string name="update_btn_skip">رد کردن این نسخه</string>
+    <string name="update_notes_title">تازه‌ها</string>
+    <string name="update_settings">تنظیمات</string>
+    <string name="update_auto">بررسی خودکار</string>
+    <string name="update_auto_sub">حداکثر روزی یک بار، هنگام باز شدن برنامه. هیچ کاری در پس‌زمینه انجام نمی‌شود.</string>
+    <string name="update_pre">شامل نسخه‌های آزمایشی</string>
+    <string name="update_pre_sub">نسخه‌های آزمایشی اولیه. همه‌ی نسخه‌های ۰.x آزمایشی هستند؛ فعلاً روشن بماند.</string>
+    <string name="update_wifi">فقط با وای‌فای</string>
+    <string name="update_wifi_sub">بررسی خودکار با اینترنت همراه انجام نمی‌شود. بررسی دستی همیشه کار می‌کند.</string>
+    <string name="update_last_checked">آخرین بررسی: %1$s</string>
+    <string name="update_never_checked">هنوز بررسی نشده</string>
+    <string name="update_allow_installs">نصب از طرف پخش‌کننده را مجاز کنید و برگردید.</string>
+
+    <string name="update_err_network">اتصال به GitHub برقرار نشد</string>
+    <string name="update_err_network_sub">اینترنت خود را بررسی کنید و دوباره تلاش کنید.</string>
+    <string name="update_err_rate">GitHub شلوغ است</string>
+    <string name="update_err_rate_sub">درخواست‌ها زیاد بود. چند دقیقه‌ی دیگر دوباره تلاش کنید.</string>
+    <string name="update_err_bad">پاسخ غیرمنتظره از GitHub</string>
+    <string name="update_err_bad_sub">کمی بعد دوباره تلاش کنید.</string>
+    <string name="update_err_download">دانلود ناموفق بود</string>
+    <string name="update_err_download_sub">فایل کامل دریافت نشد. دوباره تلاش کنید.</string>
+    <string name="update_err_checksum">فایل دانلودشده با مقدار درستی‌سنجی نمی‌خواند</string>
+    <string name="update_err_checksum_sub">فایل پاک شد و نصب نخواهد شد. دوباره تلاش کنید.</string>
+    <string name="update_err_invalid">به‌روزرسانی معتبر نیست</string>
+    <string name="update_err_invalid_sub">فایل دانلودشده این برنامه نیست و پاک شد.</string>
+    <string name="update_err_signature">این نسخه با کلید دیگری امضا شده است</string>
+    <string name="update_err_signature_sub">اندروید فقط وقتی به‌روزرسانی را نصب می‌کند که با همان کلیدِ برنامه‌ی نصب‌شده امضا شده باشد؛ برای همین این نسخه جایگزین برنامه‌ی فعلی نمی‌شود. برای دریافت آن، یک بار پخش‌کننده را حذف و نسخه‌ی جدید را نصب کنید. فهرست‌ها، علاقه‌مندی‌ها و تاریخچه‌ی ذخیره‌شده در برنامه با حذف از بین می‌روند.</string>
+    <string name="update_err_install">نصب کامل نشد</string>
+    <string name="update_err_install_sub">اندروید نصب را متوقف کرد. می‌توانید دوباره تلاش کنید.</string>
+
+    <string name="update_banner">به‌روزرسانی موجود است: %1$s</string>
+    <string name="update_banner_dismiss">رد کردن این نسخه</string>
+</resources>

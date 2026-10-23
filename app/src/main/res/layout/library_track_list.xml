@@ -24,4 +24,86 @@
         android:contentDescription="@string/nav_back"
         android:src="@drawable/nav_ic_back"
         app:tint="?attr/mpOnSurface" />
+
+    <com.mhrsdev.musicplayer.ui.library.FastScrollerView
+        android:id="@+id/scroller"
+        android:layout_width="96dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:paddingTop="72dp"
+        android:paddingBottom="@dimen/scr_bottom_chrome" />
+
+    <!-- Multi-select contextual bar: count + select all, then the batch actions as labelled pills. -->
+    <LinearLayout
+        android:id="@+id/selection_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/u2_bar_bg"
+        android:clickable="true"
+        android:elevation="6dp"
+        android:orientation="vertical"
+        android:paddingBottom="12dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp">
+
+            <ImageButton
+                android:id="@+id/sel_close"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/u2_selection_done"
+                android:src="@drawable/ic_mp_close"
+                app:tint="?attr/mpOnSurface" />
+
+            <TextView
+                android:id="@+id/sel_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:accessibilityLiveRegion="polite"
+                android:fontFeatureSettings="tnum"
+                android:textAlignment="viewStart"
+                android:textColor="?attr/mpOnSurface"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/sel_all"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/u2_select_all"
+                android:src="@drawable/u2_ic_select_all"
+                app:tint="?attr/mpOnSurface" />
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingHorizontal="12dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView android:id="@+id/sel_play_next" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_play_next" android:text="@string/library_menu_play_next" />
+                <TextView android:id="@+id/sel_queue" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_queue" android:text="@string/library_menu_add_queue" />
+                <TextView android:id="@+id/sel_playlist" style="@style/U2.ActionPill" android:drawableStart="@drawable/library_ic_playlist" android:text="@string/library_menu_add_playlist" />
+                <TextView android:id="@+id/sel_like" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_heart" android:text="@string/library_menu_like" />
+                <TextView android:id="@+id/sel_remove" style="@style/U2.ActionPill" android:drawableStart="@drawable/ic_mp_close" android:text="@string/u2_remove_from_playlist" android:visibility="gone" />
+                <TextView android:id="@+id/sel_share" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_share" android:text="@string/u2_share" />
+                <TextView android:id="@+id/sel_delete" style="@style/U2.ActionPill" android:drawableStart="@drawable/u2_ic_delete" android:text="@string/u2_delete" />
+            </LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
 </FrameLayout>

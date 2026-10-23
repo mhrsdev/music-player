@@ -22,6 +22,9 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
 
     interface Listener {
         void onResultClick(SearchResult result);
+
+        /** Long-press: the track actions menu (play next / add to queue / like / add to playlist). */
+        void onResultLongClick(android.view.View anchor, SearchResult result);
     }
 
     static String key(SearchResult r) {
@@ -51,7 +54,9 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
 
     /** Changing the query re-binds visible rows so the highlight follows. */
     void setQuery(@Nullable String q) {
+        if (java.util.Objects.equals(query, q)) return;
         query = q;
+        if (getItemCount() > 0) notifyItemRangeChanged(0, getItemCount());
     }
 
     @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -94,7 +99,7 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
             }
         }
         com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, Highlight.apply(title, query));
-        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, sub);
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, track ? Highlight.apply(sub, query) : sub);
         h.b.explicit.setVisibility(track && r.track().explicit() ? View.VISIBLE : View.GONE);
         h.b.duration.setVisibility(track ? View.VISIBLE : View.GONE);
         h.b.more.setVisibility(track ? View.VISIBLE : View.GONE);
@@ -106,6 +111,15 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
             Art.bind(h.b.art, art, seed, 12, false);
         }
         h.itemView.setOnClickListener(v -> listener.onResultClick(r));
+        if (track) {
+            h.itemView.setOnLongClickListener(v -> {
+                listener.onResultLongClick(h.b.more, r);
+                return true;
+            });
+        } else {
+            h.itemView.setOnLongClickListener(null);
+            h.itemView.setLongClickable(false);
+        }
     }
 
     static final class Holder extends RecyclerView.ViewHolder {

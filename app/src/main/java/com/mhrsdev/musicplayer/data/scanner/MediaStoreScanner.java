@@ -21,8 +21,8 @@ import java.util.Set;
  * library untouched. Both methods block: call them from a low-priority background thread (the scan executor). Nothing here schedules itself (no polling).
  */
 public final class MediaStoreScanner {
-    /** Files shorter than this are ringtones, notifications, voice notes ... */
-    static final long MIN_DURATION_MS = 30_000;
+    /** Default minimum length; the user can change it (SettingsStore.minTrackSeconds). */
+    static final long MIN_DURATION_MS = SettingsStore.DEFAULT_MIN_TRACK_SECONDS * 1000L;
     /** Before API 30 there is no MediaStore generation counter, so re-scan at app start if the last scan is this old. */
     private static final long STALE_AFTER_MS = 6L * 60 * 60 * 1000;
 
@@ -65,6 +65,16 @@ public final class MediaStoreScanner {
         return System.currentTimeMillis() - lastScan > STALE_AFTER_MS;
     }
 
+    /** When the last completed scan finished (epoch ms), 0 if never. For the Settings screen. */
+    public static long lastScanAtMs(Context context) {
+        return context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_SCANNED_AT, 0);
+    }
+
+    private long minDurationMs() {
+        Integer s = settings.minTrackSeconds().getValue();
+        return s == null ? MIN_DURATION_MS : s * 1000L;
+    }
+
     public ScanResult scan() {
         long generation = currentGeneration(); // read first: changes during the scan make the next start re-scan
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -78,7 +88,7 @@ public final class MediaStoreScanner {
         int pending = 0;
         db.beginTransaction();
         try (Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, PROJECTION,
-                SELECTION, new String[] {String.valueOf(MIN_DURATION_MS)}, null)) {
+                SELECTION, new String[] {String.valueOf(minDurationMs())}, null)) {
             if (c == null) return ScanResult.FAILED;
             while (c.moveToNext()) {
                 ScannedAudio audio = read(c);
