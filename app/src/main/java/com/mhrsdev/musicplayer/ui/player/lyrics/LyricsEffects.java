@@ -10,7 +10,7 @@ import com.mhrsdev.musicplayer.data.settings.LyricsTextSize;
 import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
 
 /** Lyrics presentation policy: when blur may run, text sizes, the scroll anchor. */
-public final class LyricsEffects {
+public class LyricsEffects {
     /** The active line's top sits at this fraction of the list height. */
     public static final float ANCHOR = 0.36f;
 

@@ -9,7 +9,7 @@ import java.util.Locale;
  * Per-track lyrics timing offset (+ = lyrics later), ±{@link #STEP_MS} per tap, clamped to ±{@link #MAX_MS}. One tiny
  * preferences file, written only when the user nudges; 0 removes the entry.
  */
-public final class LyricsOffsetStore {
+public class LyricsOffsetStore {
     public static final long STEP_MS = 500, MAX_MS = 10_000;
     private final SharedPreferences prefs;
 

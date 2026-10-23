@@ -33,14 +33,14 @@ import java.util.List;
  * moves is done in {@link #onDraw} with reused objects (no allocation per frame):
  * <ul>
  *   <li>active line: unsung words dim, sung words full colour, the word being sung filled by a moving gradient edge
- *       (one {@link LinearGradient} per colour, only its local matrix changes), lifted a little with a soft glow;</li>
+ *       (one {@link LinearGradient} per colour, only its local matrix changes) and lifted a little while sung;</li>
  *   <li>other lines: alpha and (API 31+, when allowed) a cached blur {@link RenderEffect} by distance from the
  *       active line; scale 0.94 → 1 on the spring curve when a line becomes active.</li>
  * </ul>
  * Each line takes its own paragraph direction from its text (first strong character), so Persian lines run RTL and
  * align right even inside an English song, and mixed lines keep the bidi order of the layout.
  */
-public final class LyricLineView extends View {
+public class LyricLineView extends View {
     /** Shared playback clock: the interpolated position for this frame. */
     public interface Clock { long positionMs(); }
 
@@ -50,9 +50,8 @@ public final class LyricLineView extends View {
     private final Path sungPath = new Path();
     private final RectF word = new RectF();
     private final Matrix gradMatrix = new Matrix();
-    private final float padH, padV, rise, glow, maxContent;
+    private final float padH, padV, rise, maxContent;
     private LinearGradient sweep;
-    private int sweepColor;
 
     @Nullable private LyricLine line;
     @Nullable private StaticLayout layout;
@@ -76,7 +75,6 @@ public final class LyricLineView extends View {
         padH = 28 * d;
         padV = 9 * d;
         rise = 2.5f * d;
-        glow = 7 * d;
         maxContent = 560 * d;
         blurMaxPx = 7 * d;
         setFocusable(true);
@@ -121,13 +119,12 @@ public final class LyricLineView extends View {
     public void setTextColor(int c) {
         if (c == color && sweep != null) return;
         color = c;
-        sweepColor = c;
         // x 0..1: full colour, then transparent; CLAMP keeps colour before 0 and nothing after 1.
         sweep = new LinearGradient(0, 0, 1, 0, new int[]{c, c & 0x00FFFFFF}, null, Shader.TileMode.CLAMP);
         invalidate();
     }
 
-    /** Low-power mode: no blur, no glow/lift (battery saver, reduce motion, low-RAM device, API < 31). */
+    /** Low-power mode: no blur, no lift (battery saver, reduce motion, low-RAM device, API < 31). */
     public void setEffects(boolean blur, boolean decorativeMotion) {
         blurAllowed = blur && Build.VERSION.SDK_INT >= 31;
         decorative = decorativeMotion;
@@ -218,7 +215,6 @@ public final class LyricLineView extends View {
 
     private void drawPlain(Canvas c, StaticLayout l, int alpha) {
         paint.setShader(null);
-        paint.clearShadowLayer();
         paint.setColor(color);
         paint.setAlpha(alpha * (color >>> 24) / 255);
         l.draw(c);
@@ -272,17 +268,12 @@ public final class LyricLineView extends View {
         c.clipRect(word);
         paint.setShader(sweep);
         paint.setAlpha(Math.round(255 * emphasis));
-        if (decorative) {
-            float g = LyricsMotion.bell(p) * emphasis;
-            if (g > 0.05f) paint.setShadowLayer(glow * g, 0, 0, (sweepColor & 0x00FFFFFF) | ((int) (90 * g) << 24));
-        }
         l.draw(c);
         paint.setShader(null);
-        paint.clearShadowLayer();
         c.restoreToCount(save);
     }
 
-    /** Bounds of a word on its first layout line (taller than the line so lift and glow are not cut). */
+    /** Bounds of a word on its first layout line (taller than the line so the lift is not cut). */
     private boolean wordRect(StaticLayout l, LyricWord w, RectF out) {
         int len = l.getText().length();
         int s = Math.min(w.start(), len), e = Math.min(w.end(), len);
@@ -294,7 +285,7 @@ public final class LyricLineView extends View {
                 : (l.getParagraphDirection(ls) == Layout.DIR_RIGHT_TO_LEFT ? l.getLineLeft(ls) : l.getLineRight(ls));
         if (le == ls && e == l.getLineEnd(ls)) xe = l.getParagraphDirection(ls) == Layout.DIR_RIGHT_TO_LEFT
                 ? l.getLineLeft(ls) : l.getLineRight(ls);
-        float pad = glow * 0.6f;
+        float pad = rise * 2f;
         out.set(Math.min(xs, xe) - 1, l.getLineTop(ls) - pad, Math.max(xs, xe) + 1, l.getLineBottom(ls) + pad);
         return out.width() > 1;
     }

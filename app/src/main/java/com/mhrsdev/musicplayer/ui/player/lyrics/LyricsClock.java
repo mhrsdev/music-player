@@ -7,7 +7,7 @@ import android.os.SystemClock;
  * extrapolates with the uptime clock while playing (at most {@link #MAX_EXTRAPOLATE_MS}, so a stalled player never
  * runs ahead), then adds the per-track lyrics offset (+ = lyrics later).
  */
-public final class LyricsClock implements LyricLineView.Clock {
+public class LyricsClock implements LyricLineView.Clock {
     static final long MAX_EXTRAPOLATE_MS = 1_000;
     private long anchorPos, anchorAt;
     private boolean playing;

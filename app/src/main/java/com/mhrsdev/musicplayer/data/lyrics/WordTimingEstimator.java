@@ -22,7 +22,7 @@ import java.util.List;
  *   <li>the last word is held a little longer (singers stretch the line end).</li>
  * </ul>
  */
-public final class WordTimingEstimator {
+public class WordTimingEstimator {
     static final long MS_PER_SYLLABLE = 330;
     static final long LAST_LINE_MS = 4_000;
     static final long MIN_TAIL_MS = 120, MAX_TAIL_MS = 700;

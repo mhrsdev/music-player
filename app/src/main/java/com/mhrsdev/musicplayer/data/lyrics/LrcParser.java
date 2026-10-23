@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * Output is sorted by time (stable, so equal timestamps keep file order; exact duplicates are dropped).
  * Without any timestamp the text becomes unsynced lines.
  */
-public final class LrcParser {
+public class LrcParser {
     private static final Pattern WORD_TAG = Pattern.compile("<\\s*\\d+\\s*:\\s*\\d+(?:\\s*[.:,]\\s*\\d+)?\\s*>");
     private static final Pattern SHORT_TS = Pattern.compile("(\\d{1,5}):(\\d{1,2})(?:[.:,](\\d{1,3}))?");
     private static final Pattern LONG_TS = Pattern.compile("(\\d{1,4}):(\\d{1,2}):(\\d{1,2})[.,](\\d{1,3})");

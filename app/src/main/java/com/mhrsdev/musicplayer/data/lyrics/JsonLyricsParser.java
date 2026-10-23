@@ -15,7 +15,7 @@ import org.json.JSONTokener;
  * A line is {@code {"time"|"start"|"startMs": ms, "text": "...", "words": [{"start"|"startMs": ms, "end"|"endMs": ms,
  * "text": "..."}]}}; without "text" the words are joined with spaces. Times in milliseconds.
  */
-final class JsonLyricsParser {
+class JsonLyricsParser {
     private JsonLyricsParser() { }
 
     static boolean looksLikeJson(String raw) {

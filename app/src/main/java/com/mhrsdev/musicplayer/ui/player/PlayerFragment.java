@@ -355,6 +355,8 @@ public final class PlayerFragment extends Fragment {
     }
 
     @Override public void onStop() {
+        if (b != null) b.playerBackdrop.setAnimating(false); // screen off / app in background: no drift
+        if (lyricsTicker != null) lyricsTicker.stop();
         if (outputRoute != null) outputRoute.stop();
         outputRoute = null;
         super.onStop();
@@ -482,6 +484,7 @@ public final class PlayerFragment extends Fragment {
         seek.setDuration(s.durationMs());
         seek.setBuffered(s.durationMs());
         lyricsClock.update(s.positionMs(), s.playing());
+        b.playerBackdrop.setAnimating(s.playing()); // drift only while this (visible) player plays
         if (lyricsTicker != null) {
             lyricsTicker.poke();
             if (!s.playing()) { renderActiveLine(null); lyricsTicker.invalidateActive(); } // exact paused frame

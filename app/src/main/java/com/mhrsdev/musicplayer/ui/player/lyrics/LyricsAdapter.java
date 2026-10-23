@@ -16,7 +16,7 @@ import java.util.List;
  * lines whose distance changed are rebound, and the per-frame word sweep is driven by {@link LyricsTicker}, which
  * invalidates the active line's view alone. Tap = seek (synced lyrics).
  */
-public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Holder> {
+public class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Holder> {
     public interface OnLineClick { void onLine(LyricLine line); }
 
     /** Lines farther than this from the active one share the same look, so they are not rebound on line changes. */
@@ -116,7 +116,7 @@ public final class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Hold
 
     @Override public int getItemCount() { return lines.size(); }
 
-    static final class Holder extends RecyclerView.ViewHolder {
+    static class Holder extends RecyclerView.ViewHolder {
         final LyricLineView view;
         Holder(LyricLineView v) {
             super(v);

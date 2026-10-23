@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * active line (cheap binary search) and invalidates the active line's view only; nothing else redraws. Stops itself
  * the first frame any condition is false.
  */
-public final class LyricsTicker {
+public class LyricsTicker {
     public interface OnFrame { void onFrame(); }
 
     static final long FRAME_MS = 33;

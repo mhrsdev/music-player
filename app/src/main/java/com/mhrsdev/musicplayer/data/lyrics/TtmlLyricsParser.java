@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * through. A small tag scanner, no XML library: no DTD/entity expansion (XXE-safe) and it runs in JVM tests.
  * Times: {@code hh:mm:ss.fff}, {@code mm:ss.fff}, {@code ss.fff}, {@code 12.3s}, {@code 450ms}.
  */
-final class TtmlLyricsParser {
+class TtmlLyricsParser {
     private static final Pattern TAG = Pattern.compile("<(/?)([A-Za-z][\\w:.-]*)([^>]*?)(/?)>");
     private static final Pattern ATTR = Pattern.compile("([\\w:.-]+)\\s*=\\s*(\"([^\"]*)\"|'([^']*)')");
     private static final Pattern CLOCK = Pattern.compile("(?:(\\d+):)?(?:(\\d+):)?(\\d+(?:\\.\\d+)?)");

@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi;
  * only swaps a cached object on its own RenderNode, so the GPU blurs one short line, never the screen, and nothing
  * is allocated while scrolling or animating.
  */
-final class LyricsBlur {
+class LyricsBlur {
     private static final RenderEffect[] CACHE = new RenderEffect[33];
 
     private LyricsBlur() { }

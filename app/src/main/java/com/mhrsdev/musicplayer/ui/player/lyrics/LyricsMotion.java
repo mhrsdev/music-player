@@ -7,7 +7,7 @@ import android.view.animation.Interpolator;
  * emphasis and scrolling, and the distance → alpha / blur falloff. Local on purpose: the lyrics only need a fixed
  * curve, not a physics engine.
  */
-public final class LyricsMotion {
+public class LyricsMotion {
     private LyricsMotion() { }
 
     /** Spring step response (damping 0.82, ~1 overshoot of 1.5 %), normalised so f(0)=0 and f(1)=1. */

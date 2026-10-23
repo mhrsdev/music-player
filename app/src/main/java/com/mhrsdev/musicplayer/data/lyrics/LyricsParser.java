@@ -11,7 +11,7 @@ import java.util.List;
  * it, and adds emulated word timing ({@link WordTimingEstimator}) to synced lines that have none. Runs on the
  * loading thread, once per lyrics load; the UI only reads the result.
  */
-public final class LyricsParser {
+public class LyricsParser {
     private LyricsParser() { }
 
     /** @return the lyrics, or null when {@code raw} holds no lyric line */
