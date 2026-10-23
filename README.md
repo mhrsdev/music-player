@@ -1,12 +1,12 @@
 # Music Player (Android)
 
 Local-library music player: Kotlin, Jetpack Compose, Material 3 Expressive, Media3, Room, Koin.
-Package `com.mhrsdev.musicplayer`, minSdk 26, compile/target SDK 36. Project protocol: see `CLAUDE.md` and `docs/`.
+Package `com.mhrsdev.musicplayer`, minSdk 26, compile/target SDK 37, AGP 9.4.1. Project protocol: see `CLAUDE.md` and `docs/`.
 
 ## Prerequisites
 - JDK 17+ (built and tested with OpenJDK 21; bytecode target is 17).
-- Android SDK with `platforms;android-36`, `build-tools;36.0.0`, `platform-tools`.
-- Gradle is provided by the wrapper (`./gradlew`, Gradle 8.14.3).
+- Android SDK with `platforms;android-37.0`, `build-tools;37.0.0`, `platform-tools`.
+- Gradle is provided by the wrapper (`./gradlew`, Gradle 9.8.2).
 
 ### Installing the SDK (Linux, command line only)
 ```bash
@@ -16,7 +16,7 @@ unzip -q commandlinetools-linux-11076708_latest.zip
 mv cmdline-tools /opt/android-sdk/cmdline-tools/latest
 yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk --licenses
 /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
-  "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+  "platform-tools" "platforms;android-37.0" "build-tools;37.0.0"
 export ANDROID_HOME=/opt/android-sdk          # or put sdk.dir=/opt/android-sdk in local.properties (gitignored)
 ```
 Behind the Claude Code agent proxy this works unchanged (`dl.google.com`, `maven.google.com`, Maven Central and
