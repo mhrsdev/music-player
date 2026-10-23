@@ -49,6 +49,48 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+        <!-- Home-screen widgets (RemoteViews, redrawn on playback state changes only). -->
+        <receiver
+            android:name=".appwidget.CompactWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label_compact">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_compact" />
+        </receiver>
+
+        <receiver
+            android:name=".appwidget.SquareWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label_square">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_square" />
+        </receiver>
+
+        <receiver
+            android:name=".appwidget.WideWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label_wide">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_wide" />
+        </receiver>
+
+        <!-- Widget buttons. Not exported: only our own PendingIntents reach it. -->
+        <receiver
+            android:name=".appwidget.WidgetActionReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>
