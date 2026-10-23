@@ -111,6 +111,41 @@ public class U2RenderTest {
         save(a, null, "library-hub-dark");
     }
 
+    // ---- empty states (regression: the empty state used to overlap the header) ----
+
+    @Test @Config(sdk = 35, qualifiers = "fa-w360dp-h800dp-night-xhdpi")
+    public void emptyLikedFaLargeFont() throws Exception {
+        RuntimeEnvironment.setFontScale(1.3f);
+        emptyLiked("empty-liked-fa-360-font130-dark", 360, 800);
+    }
+
+    @Test @Config(sdk = 35, qualifiers = "w411dp-h891dp-notnight-xhdpi")
+    public void emptyLikedLight() throws Exception {
+        emptyLiked("empty-liked-411-light", 411, 891);
+    }
+
+    @Test @Config(sdk = 35, qualifiers = "w360dp-h800dp-night-xhdpi")
+    public void emptyPlaylist() throws Exception {
+        RuntimeEnvironment.setFontScale(1.3f);
+        MainActivity a = start();
+        String[] id = new String[1];
+        container(a).library.createPlaylist("Road trip", p -> id[0] = p.id());
+        settle();
+        a.openTrackList(ScreenNavigator.TrackList.PLAYLIST, id[0]);
+        settle();
+        save(a, null, "empty-playlist-360-font130-dark", 360 * 2, 800 * 2);
+    }
+
+    private void emptyLiked(String name, int wDp, int hDp) throws Exception {
+        MainActivity a = start();
+        com.mhrsdev.musicplayer.domain.repository.LibraryRepository lib = container(a).library;
+        for (Track t : new java.util.ArrayList<>(observe(lib.getLikedTracks()))) lib.toggleLike(t.id());
+        settle();
+        a.openTrackList(ScreenNavigator.TrackList.LIKED, null);
+        settle();
+        save(a, null, name, wDp * 2, hDp * 2);
+    }
+
     private static com.mhrsdev.musicplayer.di.AppContainer container(MainActivity a) {
         return ((MusicPlayerApp) a.getApplication()).getContainer();
     }
@@ -137,15 +172,23 @@ public class U2RenderTest {
     }
 
     private static void layout(MainActivity a) throws Exception {
+        layout(a, W, H);
+    }
+
+    private static void layout(MainActivity a, int w, int h) throws Exception {
         View root = a.getWindow().getDecorView();
-        root.measure(View.MeasureSpec.makeMeasureSpec(W, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(H, View.MeasureSpec.EXACTLY));
-        root.layout(0, 0, W, H);
+        root.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
+        root.layout(0, 0, w, h);
         settle();
     }
 
     private static void save(MainActivity a, String dialogTag, String name) throws Exception {
-        layout(a);
+        save(a, dialogTag, name, W, H);
+    }
+
+    private static void save(MainActivity a, String dialogTag, String name, int W, int H) throws Exception {
+        layout(a, W, H);
         Bitmap bmp = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
         c.drawColor(Tokens.color(a, R.attr.mpBackground));
