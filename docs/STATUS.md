@@ -44,11 +44,11 @@ _Last updated: 2026-10-23 — D16 phase 2 started (name Mowj/موج, logo, auto-
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
-- 🔄 **B2** [Opus] 5-6 new seek-bar styles + live-preview picker in Settings (D24). `task/b2-seekbars`.
+- ✅ **B2** [Opus] 6 new seek-bar styles + live-preview picker (D24); owner keeps all 6 (D27). Merged into ccr (local, push pending CI).
 - ✅ **E2** [Sonnet] Perf regression (shared PeriodicTick/FrameDriver, bucketed artwork decode) — merged into ccr.
 - ✅ **L2** [Opus] Lyrics junk filter, query normaliser, empty states/tools (D25) — merged into ccr (d57328b); also fixed 3 lint errors (Motion API33, ArtworkLoader thread, home_mix_card RTL) and M1ThemeRenderTest index.
 - 🔄 **P2** [Opus] Settings > Performance section (D26): presets + per-effect toggles, live effect. `task/q1-performance-settings`.
-- 🔄 **O1** [Sonnet] Headset buttons fix + settings + output devices. `task/o1-headset`.
+- ✅ **O1** [Sonnet] Headset buttons fix + settings + output devices + per-device profiles. Merged into ccr (local, push pending CI). Device-unverified: see docs/HEADSET_CHECKLIST.md.
 - 🔄 **G1** [Opus] Generated covers for tracks without art (deterministic generative art, UI + notification + widget). `task/g1-covers`.
 - 🔄 **U1b** [Opus] Full edge-to-edge/cutout/immersive + friend's-phone dock inset bug. `task/u1b-fullscreen`.
 - 🔄 **R2** [Sonnet] Realistic sample data (real CC tracks' metadata + public-domain/CC covers, debug-only assets, CREDITS.md) for renders/README. `task/r2-sample-data`.
