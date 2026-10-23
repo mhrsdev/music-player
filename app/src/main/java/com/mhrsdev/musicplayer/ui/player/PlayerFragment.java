@@ -207,7 +207,7 @@ public final class PlayerFragment extends Fragment {
         b.lyricsList.setItemAnimator(null);
         b.lyricsList.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
             int h = bt - t;
-            if (h != ob - ot) v.setPadding(0, (int) (h * 0.4f), 0, (int) (h * 0.5f));
+            if (h != ob - ot) v.post(() -> v.setPadding(0, (int) (h * 0.4f), 0, (int) (h * 0.5f)));
         });
         b.lyricsList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override public void onScrollStateChanged(@NonNull RecyclerView rv, int newState) {

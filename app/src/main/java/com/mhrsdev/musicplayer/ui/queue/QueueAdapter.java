@@ -52,7 +52,7 @@ public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder
 
     /** Live reorder during a drag (adapter positions). */
     void moveLocal(int from, int to) {
-        Collections.swap(upNext, from - 1, to - 1);
+        Collections.swap(upNext, toUpNext(from), toUpNext(to));
         notifyItemMoved(from, to);
     }
 
