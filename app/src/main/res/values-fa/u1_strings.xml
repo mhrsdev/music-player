@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_lang_sub">با انتخاب فارسی، کل برنامه راست‌به‌چپ می‌شود و اعداد فارسی نمایش داده می‌شوند.</string>
+    <string name="settings_player_lyrics">پخش‌کننده و متن ترانه</string>
+    <string name="settings_folders_only">فقط این پوشه‌ها جست‌وجو می‌شوند</string>
+    <string name="settings_folders_add">افزودن پوشه</string>
+    <string name="settings_folders_exclude">نادیده‌گرفتن یک پوشه</string>
+    <string name="settings_folders_exclude_sub">یادداشت‌های صوتی، زنگ‌ها یا دانلودها را از کتابخانه پنهان کنید</string>
+    <string name="settings_folder_skipped">نادیده گرفته می‌شود · %1$s</string>
+    <string name="settings_folder_remove">حذف %1$s</string>
+    <string name="settings_folder_internal">حافظهٔ داخلی</string>
+    <string name="settings_folder_added_f">%1$s اضافه شد. کتابخانه در حال به‌روزرسانی است…</string>
+    <string name="settings_folder_excluded_f">%1$s نادیده گرفته می‌شود. کتابخانه در حال به‌روزرسانی است…</string>
+    <string name="settings_folder_exists">این پوشه از قبل در فهرست هست</string>
+    <string name="settings_folders_no_picker">این گوشی انتخابگر پوشه ندارد</string>
+    <string name="settings_folders_unsupported_title">این پوشه قابل استفاده نیست</string>
+    <string name="settings_folders_unsupported">پوشه‌ای روی حافظهٔ گوشی یا کارت SD انتخاب کنید. پوشه‌های ابری و میان‌بُر «دانلودها» مسیری ندارند که کتابخانه بتواند بررسی کند.</string>
+    <string name="settings_rescan">بررسی دوبارهٔ کتابخانه</string>
+    <string name="settings_rescan_sub">%1$s · یافتن آهنگ‌های جدید و تغییرکرده</string>
+    <string name="settings_rescan_running">در حال بررسی آهنگ‌ها…</string>
+    <string name="settings_rescan_nochange">%1$s · به‌روز است</string>
+    <string name="settings_rescan_done">%1$s · %2$s جدید، %3$s به‌روز، %4$s حذف</string>
+    <string name="settings_rescan_failed">بررسی انجام نشد. دسترسی به موسیقی را بدهید و دوباره امتحان کنید.</string>
+    <plurals name="settings_songs">
+        <item quantity="one">%1$s آهنگ</item>
+        <item quantity="other">%1$s آهنگ</item>
+    </plurals>
+    <string name="settings_more">بیشتر</string>
+    <string name="settings_feature_sound">صدا و اکولایزر</string>
+    <string name="settings_feature_sound_sub">اکولایزر، تقویت بم، سرعت و بلندی صدا</string>
+    <string name="settings_feature_backup">پشتیبان‌گیری و بازیابی</string>
+    <string name="settings_feature_backup_sub">ذخیرهٔ فهرست‌های پخش و پسندها در یک فایل</string>
+    <string name="settings_feature_update">به‌روزرسانی‌ها</string>
+    <string name="settings_feature_update_sub">بررسی نسخهٔ جدیدتر در گیت‌هاب</string>
+    <string name="settings_feature_unavailable">این صفحه در این نسخه موجود نیست</string>
+    <string name="settings_license">مجوز</string>
+    <string name="settings_license_sub">MIT · رایگان و متن‌باز</string>
+    <string name="settings_source">کد منبع</string>
+
+    <string name="search_recent">جست‌وجوهای اخیر</string>
+    <string name="search_recent_clear">پاک کردن</string>
+    <string name="search_recent_clear_desc">پاک کردن جست‌وجوهای اخیر</string>
+    <string name="search_recent_remove">حذف %1$s از جست‌وجوهای اخیر</string>
+    <string name="search_no_results_body">املای آن را بررسی کنید یا کلمه‌های کمتری بنویسید.</string>
+    <string name="search_no_results_body_filtered">املای آن را بررسی کنید یا در همهٔ دسته‌ها جست‌وجو کنید.</string>
+    <string name="search_empty_library">هنوز آهنگی روی این گوشی نیست</string>
+    <string name="search_empty_library_body">آهنگ‌ها را به گوشی اضافه کنید یا در تنظیمات پوشه‌ها را انتخاب کنید، سپس اینجا جست‌وجو کنید.</string>
+    <string name="search_open_settings">انتخاب پوشه‌ها</string>
+    <string name="search_prompt_body">آهنگ‌ها، آلبوم‌ها، هنرمندان و فهرست‌های پخش این گوشی را جست‌وجو کنید. بدون اینترنت هم کار می‌کند.</string>
+    <string name="home_section_recent">تازه اضافه‌شده</string>
+    <string name="home_section_throwbacks">خاطره‌انگیزها</string>
+    <string name="home_section_playlists">فهرست‌های پخش شما</string>
+    <string name="home_section_quick_picks">انتخاب‌های سریع</string>
+    <string name="home_section_continue">ادامهٔ گوش دادن</string>
+    <string name="home_section_most_played">پرپخش‌ترین‌ها</string>
+    <string name="home_section_liked">آهنگ‌های پسندیده</string>
+</resources>

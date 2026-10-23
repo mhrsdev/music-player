@@ -85,5 +85,54 @@
         <include
             android:id="@+id/state"
             layout="@layout/library_state" />
+
+        <!-- Recent searches (shown while the field is empty and there are some). -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/recent_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/scr_bottom_chrome"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/recent_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:accessibilityHeading="true"
+                        android:text="@string/search_recent"
+                        android:textAlignment="viewStart"
+                        android:textColor="?attr/mpOnSurface"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/recent_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:contentDescription="@string/search_recent_clear_desc"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp"
+                        android:text="@string/search_recent_clear"
+                        android:textColor="?attr/mpPrimary"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 </LinearLayout>
