@@ -136,10 +136,13 @@ public final class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder
     public void setSelection(Set<String> ids) {
         Set<String> old = selected;
         selected = ids;
-        boolean modeChanged = old.isEmpty() != ids.isEmpty();
+        if (old.isEmpty() != ids.isEmpty()) { // entering / leaving the mode changes every row's trailing icons
+            notifyItemRangeChanged(0, items.size(), PAYLOAD_SELECTION);
+            return;
+        }
         for (int i = 0; i < items.size(); i++) {
             String id = items.get(i).id();
-            if (modeChanged || old.contains(id) != ids.contains(id)) notifyItemChanged(i, PAYLOAD_SELECTION);
+            if (old.contains(id) != ids.contains(id)) notifyItemChanged(i, PAYLOAD_SELECTION);
         }
     }
 

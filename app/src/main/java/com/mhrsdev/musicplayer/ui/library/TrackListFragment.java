@@ -118,6 +118,14 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
     }
 
     private void showEmpty() {
+        // keep the header (play / playlist options) usable: centre the empty state in the space below it
+        b.list.post(() -> {
+            if (b == null) return;
+            View first = b.list.getChildAt(0);
+            View root = b.state.stateRoot;
+            root.setPaddingRelative(root.getPaddingStart(), first == null ? 0 : first.getBottom(), root.getPaddingEnd(),
+                    root.getPaddingBottom());
+        });
         if (kind == TrackList.PLAYLIST) {
             StateView.empty(b.state, getString(R.string.library_playlist_empty), getString(R.string.u2_playlist_empty_body),
                     getString(R.string.u2_find_songs), v -> {

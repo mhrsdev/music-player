@@ -18,6 +18,7 @@ import java.util.List;
 public final class MosaicArtView extends ViewGroup {
     private final ArtworkView[] tiles = new ArtworkView[4];
     private float radiusPx;
+    private float radiusDp;
     private boolean mosaic;
 
     public MosaicArtView(Context context) {
@@ -42,7 +43,9 @@ public final class MosaicArtView extends ViewGroup {
     }
 
     public void setCornerRadiusDp(float dp) {
+        radiusDp = dp;
         radiusPx = dp * getResources().getDisplayMetrics().density;
+        tiles[0].setCornerRadiusDp(mosaic ? 0 : dp);
         invalidateOutline();
     }
 
@@ -51,6 +54,7 @@ public final class MosaicArtView extends ViewGroup {
         boolean m = uris.size() >= 4;
         if (m != mosaic) {
             mosaic = m;
+            tiles[0].setCornerRadiusDp(m ? 0 : radiusDp); // single cover rounds itself (no outline clip needed)
             requestLayout();
         }
         if (m) {

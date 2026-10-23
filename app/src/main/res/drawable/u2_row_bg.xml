@@ -4,7 +4,9 @@
     <item>
         <selector>
             <item android:state_activated="true">
-                <shape><corners android:radius="16dp" /><solid android:color="?attr/mpSecondaryContainer" /></shape>
+                <inset android:insetTop="2dp" android:insetBottom="2dp">
+                    <shape><corners android:radius="16dp" /><solid android:color="?attr/mpSecondaryContainer" /></shape>
+                </inset>
             </item>
             <item><color android:color="@android:color/transparent" /></item>
         </selector>

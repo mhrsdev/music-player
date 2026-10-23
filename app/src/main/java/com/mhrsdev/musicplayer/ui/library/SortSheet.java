@@ -44,7 +44,7 @@ public final class SortSheet extends ActionSheet {
         for (Field f : Field.values()) {
             // newest / longest / most played first is what people want when they pick those fields
             boolean naturalDesc = f == Field.DATE_ADDED || f == Field.DURATION || f == Field.MOST_PLAYED;
-            rows.add(new Row(R.drawable.u2_ic_sort, getString(label(f)), false, cur.field() == f,
+            rows.add(new Row(0, getString(label(f)), false, cur.field() == f,
                     () -> cb.onResult(new SortOrder(f, cur.field() == f ? cur.ascending() : !naturalDesc))));
         }
         rows.add(new Row(R.drawable.ic_mp_expand_down, getString(R.string.u2_sort_reverse), false, !cur.ascending(),

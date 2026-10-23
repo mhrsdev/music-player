@@ -27,7 +27,6 @@ import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
-import com.mhrsdev.musicplayer.ui.widget.ArtworkView;
 
 import java.util.List;
 
@@ -142,10 +141,10 @@ public final class AddToPlaylistSheet extends BottomSheetDialogFragment {
             row.setGravity(Gravity.CENTER_VERTICAL);
             row.setMinimumHeight(dp(64));
             row.setBackgroundResource(ripple.resourceId);
-            ArtworkView art = new ArtworkView(c, null);
+            com.mhrsdev.musicplayer.ui.library.MosaicArtView art = new com.mhrsdev.musicplayer.ui.library.MosaicArtView(c);
             art.setCornerRadiusDp(12);
             art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-            art.setArtwork(p.artworkUris().isEmpty() ? null : p.artworkUris().get(0), p.placeholderSeed());
+            art.setCovers(p.artworkUris(), p.placeholderSeed());
             LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(48), dp(48));
             alp.setMarginEnd(dp(16));
             row.addView(art, alp);

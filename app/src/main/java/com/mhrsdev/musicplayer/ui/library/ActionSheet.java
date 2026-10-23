@@ -88,7 +88,9 @@ public abstract class ActionSheet extends BottomSheetDialogFragment {
         int error = Tokens.color(requireContext(), R.attr.mpError);
         for (Row row : rows) {
             U2SheetRowBinding r = U2SheetRowBinding.inflate(inflater, b.sheetRows, false);
-            r.icon.setImageResource(row.icon());
+            if (row.icon() == 0) r.icon.setVisibility(View.GONE); else r.icon.setImageResource(row.icon());
+            if (row.icon() == 0) r.label.setPaddingRelative(0, 0, 0, 0);
+            if (row.checked()) r.label.setTextColor(Tokens.primary(requireContext()));
             r.label.setText(row.label());
             r.trailing.setVisibility(row.checked() ? View.VISIBLE : View.GONE);
             r.getRoot().setSelected(row.checked());
