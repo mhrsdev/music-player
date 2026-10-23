@@ -55,10 +55,10 @@ public class HeadsetButtonsTest {
         PlayerHolder.resetForTest();
         app = RuntimeEnvironment.getApplication();
         File wav = new File(app.getCacheDir(), "tone.wav");
-        writeSilentWav(wav);
+        writeSilentWav(wav); // 2 minutes: tracks must not end by themselves while a test runs (timing-dependent otherwise)
         tracks = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            tracks.add(new Track("t" + i, "Song " + i, "ar", "Artist", "al", "Album", 2_000L, null, 0,
+            tracks.add(new Track("t" + i, "Song " + i, "ar", "Artist", "al", "Album", 120_000L, null, 0,
                     android.net.Uri.fromFile(wav).toString(), false, false, 0, 0, 0L));
         }
         setConfig(HeadsetConfig.DEFAULT);
@@ -130,7 +130,8 @@ public class HeadsetButtonsTest {
         press(h, KeyEvent.KEYCODE_HEADSETHOOK);
         press(h, KeyEvent.KEYCODE_HEADSETHOOK);
         settle();
-        assertEquals("double = seek +10 s past a 2 s track = next", 1, player().getCurrentMediaItemIndex());
+        assertEquals("double = seek, not next", 0, player().getCurrentMediaItemIndex());
+        assertTrue("seeked about 10 s forward: " + player().getCurrentPosition(), player().getCurrentPosition() >= 10_000L);
     }
 
     @Test public void longPressRunsItsMappedActionOnly() {
@@ -176,15 +177,19 @@ public class HeadsetButtonsTest {
     }
 
     @Test public void fastForwardAndRewindSeekTenSeconds() {
-        ExoPlayerController controller = new ExoPlayerController(app, null, null);
-        controller.play(tracks, 0, null);
-        service = Robolectric.buildService(PlaybackService.class).create();
-        HeadsetControls h = service.get().headset();
-        h.seekBy(HeadsetControls.SEEK_STEP_MS);
-        settle();
-        assertEquals("seeking +10 s past a 2 s track moves on", 1, player().getCurrentMediaItemIndex());
+        HeadsetControls h = startPlaying(0);
+        press(h, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD);
+        long afterForward = player().getCurrentPosition();
+        assertEquals(0, player().getCurrentMediaItemIndex());
+        assertTrue("forward 10 s: " + afterForward, afterForward >= 10_000L);
         press(h, KeyEvent.KEYCODE_MEDIA_REWIND);
-        assertEquals(0, player().getCurrentPosition());
+        assertTrue("back 10 s: " + player().getCurrentPosition(), player().getCurrentPosition() < afterForward - 5_000L);
+    }
+
+    @Test public void seekingPastTheEndMovesOnToTheNextTrack() {
+        HeadsetControls h = startPlaying(0);
+        h.seekBy(10 * 120_000L);
+        assertEquals(1, player().getCurrentMediaItemIndex());
     }
 
     @Test public void nextOnTheLastTrackRestartsInsteadOfBeingDropped() {
@@ -192,7 +197,7 @@ public class HeadsetButtonsTest {
         assertFalse(player().hasNextMediaItem());
         press(h, KeyEvent.KEYCODE_MEDIA_NEXT);
         assertEquals(2, player().getCurrentMediaItemIndex());
-        assertEquals(0, player().getCurrentPosition());
+        assertTrue("restarted: " + player().getCurrentPosition(), player().getCurrentPosition() < 5_000L);
         assertTrue(player().getPlayWhenReady());
     }
 
@@ -304,7 +309,7 @@ public class HeadsetButtonsTest {
     }
 
     private static void writeSilentWav(File file) throws Exception {
-        int rate = 8000, samples = rate * 2;
+        int rate = 8000, samples = rate * 120;
         ByteBuffer b = ByteBuffer.allocate(44 + samples * 2).order(ByteOrder.LITTLE_ENDIAN);
         b.put("RIFF".getBytes()).putInt(36 + samples * 2).put("WAVEfmt ".getBytes()).putInt(16)
                 .putShort((short) 1).putShort((short) 1).putInt(rate).putInt(rate * 2).putShort((short) 2)

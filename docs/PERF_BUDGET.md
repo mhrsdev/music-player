@@ -29,10 +29,10 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 
 ## Background work
 
-* B1 No WorkManager, JobScheduler, AlarmManager, boot/connectivity receivers, extra wake locks, FCM, SyncAdapter (`PerfBudgetTest`). The only receivers are the media button, the three home-screen widgets (`updatePeriodMillis="0"`, redrawn from `NowPlayingBridge` on playback events) and two non-exported action/install-result receivers. Self-update (REQUEST_INSTALL_PACKAGES) runs only from the Update screen.
+* B1 No WorkManager, JobScheduler, AlarmManager, boot/connectivity receivers, extra wake locks, FCM, SyncAdapter (`PerfBudgetTest`). The only receivers are the media button (`MediaButtonRestartReceiver`: starts the service only when a queue is saved; replaces Media3's), the three home-screen widgets (`updatePeriodMillis="0"`, redrawn from `NowPlayingBridge` on playback events) and two non-exported action/install-result receivers. Self-update (REQUEST_INSTALL_PACKAGES) runs only from the Update screen.
 * B2 Network only on explicit user-driven need (lyrics view open + setting on). Never while only music plays.
-* B3 Timers (`postDelayed`) only in the reviewed list in `PerfBudgetTest` and each gated on playing, observed or visible.
-* B4 The foreground service stops 60 s after playback stops; the player's queue and position are already persisted.
+* B3 Timers (`postDelayed`) only in the reviewed list in `PerfBudgetTest` and each gated on playing, observed or visible. `HeadsetControls` posts one 350 ms click-window callback per headset button press (removed when it fires or on release; never repeats, no idle wakeups).
+* B4 The foreground service stops 60 s after playback stops (10 min when "resume when a headset connects" is on, so a reconnect finds it; no polling meanwhile; its `AudioDeviceCallback` lives only as long as the service); the player's queue and position are already persisted.
 * B5 A feature that keeps a native resource (audio effect, `AudioDeviceCallback`, sensor) releases it when its screen is hidden or playback ends.
 
 ## Animations

@@ -75,7 +75,7 @@ public class PerfBudgetTest {
         Matcher r = Pattern.compile("<receiver\\s+android:name=\"([^\"]+)\"").matcher(manifest);
         while (r.find()) receivers.add(r.group(1));
         assertEquals("new receiver: it must not wake the app on boot/connectivity/timers; update PERF_BUDGET.md",
-                new TreeSet<>(Arrays.asList(".data.update.InstallResultReceiver", "androidx.media3.session.MediaButtonReceiver",
+                new TreeSet<>(Arrays.asList(".data.update.InstallResultReceiver", ".playback.MediaButtonRestartReceiver",
                         ".appwidget.CompactWidgetProvider", ".appwidget.SquareWidgetProvider", ".appwidget.WideWidgetProvider",
                         ".appwidget.WidgetActionReceiver")), receivers);
         for (String wake : new String[] {"BOOT_COMPLETED", "CONNECTIVITY_CHANGE", "SCHEDULE_EXACT_ALARM", "USE_EXACT_ALARM",
@@ -103,6 +103,7 @@ public class PerfBudgetTest {
                 "java/com/mhrsdev/musicplayer/playback/ExoPlayerController.java", // tick only playing+observed; sleep; play count
                 "java/com/mhrsdev/musicplayer/playback/PlaybackService.java",     // idle stop after 60 s
                 "java/com/mhrsdev/musicplayer/playback/PlaybackStore.java",       // 1 s queue-save debounce
+                "java/com/mhrsdev/musicplayer/playback/HeadsetControls.java",     // one 350 ms click window per headset button press
                 "java/com/mhrsdev/musicplayer/ui/widget/SkeletonView.java",       // only while attached + visible + motion on
                 "java/com/mhrsdev/musicplayer/di/AppContainer.java",              // MediaStore-change scan debounce, removed in onAppBackground
                 "java/com/mhrsdev/musicplayer/playback/NowPlayingBridge.java",     // one coalesced widget push per playback event
