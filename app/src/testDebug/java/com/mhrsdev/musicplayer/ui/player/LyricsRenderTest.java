@@ -106,6 +106,34 @@ public class LyricsRenderTest {
         snap(a, "l1-nolyrics-fa-light");
     }
 
+    /** Shared ambient backdrop: SOFT header (static) from a two-tone cover, and FULL from a seed colour. */
+    @Test @Config(sdk = 35, qualifiers = DARK)
+    public void ambientBackdrop() throws Exception {
+        FragmentActivity a = Robolectric.buildActivity(WidgetGalleryActivity.class).setup().get();
+        android.widget.LinearLayout col = new android.widget.LinearLayout(a);
+        col.setOrientation(android.widget.LinearLayout.VERTICAL);
+        Bitmap cover = Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888);
+        Canvas cc = new Canvas(cover);
+        android.graphics.Paint pp = new android.graphics.Paint();
+        pp.setShader(new android.graphics.LinearGradient(0, 0, 32, 32, 0xFFE0592A, 0xFF5B3FA8,
+                android.graphics.Shader.TileMode.CLAMP));
+        cc.drawRect(0, 0, 32, 32, pp);
+        com.mhrsdev.musicplayer.ui.widget.AmbientBackdropView soft = new com.mhrsdev.musicplayer.ui.widget.AmbientBackdropView(a);
+        com.mhrsdev.musicplayer.ui.widget.AmbientBackdropView full = new com.mhrsdev.musicplayer.ui.widget.AmbientBackdropView(a);
+        col.addView(soft, new android.widget.LinearLayout.LayoutParams(-1, 0, 1f));
+        col.addView(full, new android.widget.LinearLayout.LayoutParams(-1, 0, 1f));
+        a.setContentView(col);
+        idle();
+        layout(col);
+        soft.setArtwork(cover, "test-cover", 0, false);
+        full.setMode(com.mhrsdev.musicplayer.ui.widget.AmbientBackdropView.Mode.FULL);
+        full.setSource(null, 0xFF2A9D8F, false);
+        layout(col);
+        Bitmap bmp = Bitmap.createBitmap(col.getWidth(), col.getHeight(), Bitmap.Config.ARGB_8888);
+        col.draw(new Canvas(bmp));
+        write(bmp, "l1-ambient-soft-full-dark");
+    }
+
     // ------------------------------------------------------------------ helpers
 
     private static FragmentActivity host(int index) throws Exception {

@@ -37,6 +37,16 @@ What runs, when, and how much it costs. The owner's hard rule: this must not und
 - **Colour field:** four unit-radius `RadialGradient`s in those colours drift on slow sine paths (periods 19–31 s, offsets ≤ 12 %/9 %) and breathe ±6 %. Only the local matrices change per frame. This sits over the existing tiny-art layer and under the radial glow and the guarded scrim. **ContrastGuard is unchanged and still decides the scrim.** The blobs are the cover's own average colours at 70 % layer alpha, so they do not move the measured luminance much. The ⚠ caveat is under "Unverified" below.
 - **When it moves:** at ≤ 15 fps (66 ms), only while the player is visible, playing, and decorative motion is allowed (`setAnimating` from the state observer; stopped in `onStop` and on detach). Otherwise one still frame is drawn. Track changes crossfade the layers (alpha only, 600 ms).
 
+## Shared ambient backdrop (`ui/widget/AmbientBackdropView`, owner: "the background should change with the song and the content")
+
+- **Engine:** `AmbientField`, the same four-blob engine the player uses.
+- **Colours:** `AmbientPalette` = ColorExtractor seed + quadrant averages of the 32x32 downscale. Cached per artwork key (LRU, 48 entries). Contrast guard: lightness is clamped (dark L ≤ 0.42, light L ≥ 0.72), so white/onSurface text keeps 4.5:1.
+- **Modes:** `SOFT` (headers, Home glow) is static and never animates except the one cross-fade on `setSource`. `FULL` (player) drifts at ≤ 15 fps only while `setAnimating(visible && playing)` is on, the view is shown, and motion is allowed.
+- **Cross-fade:** one `ObjectAnimator`, 600 ms, alpha only. None under reduce motion or battery saver.
+- **Settings:** "Colors from artwork" off gives the neutral accent from ThemeController.
+- **Artwork:** loaded at 96 px through the shared `ArtworkLoader` cache. The view keeps no bitmap.
+- **Render:** `docs/screens/l1-ambient-soft-full-dark.png` (top: SOFT from a two-tone cover; bottom: FULL from a seed colour).
+
 ## Frame cost reasoning
 
 | State | Work |
