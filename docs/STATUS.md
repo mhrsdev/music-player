@@ -49,7 +49,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 
 - 🔄 **T2** [Opus] UI foundation: theme/tokens, custom widgets (Wavy/Waveform/Bars seek bars, morph play button, floating nav, mini-player), image loader. Branch `task/t2-ui-foundation-java`, worktree `../wt-t2`. Owns `ui/theme`, `ui/widget`, `res/values`, drawables.
-- 🔄 **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings, nav shell. Branch `task/t3-screens`, worktree `../wt-t3`.
 
 - 🔄 **T8** [Sonnet+ponytail] Wiring: AppContainer → real Data/Playback/Waveform(/Lyrics) modules. Branch `task/t8-wiring`, worktree `../wt-t8`.
 
@@ -68,6 +67,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T3** [Opus] Screens merged (design v1): `ui/nav`+MainActivity shell (PlayerNavigator, ScreenNavigator, permission first-run), Home, Search, Library hub + detail lists + grids, Settings (PrefsSettingsStore), en+fa strings, VM tests. After merge supervisor re-ran `:app:assembleDebug test lint` → green. Gaps: liked-card collage, multi-browse carousel, plain play circles on Home/Library, system fonts, no skeletons/add-to-playlist dialog, folder picker not implemented; settings (battery-saver/seek-style/online-lyrics/sleep-default) not yet read by consumers → T8. Duplicate SettingsStore (ui vs data) → T8 reconciles.
 - ✅ **T4** [Opus] Player merged (retargeted to design v1): `ui/player` (PlayerFragment/ViewModel, cookie play, 3 seek bars from T2, 20px-backdrop + crossfade, swipe-down), `ui/player/lyrics` (centered, tap-to-seek, 3 s manual-scroll pause), `ui/queue` (sleep timer, drag, swipe-remove+Undo, shuffle+Undo), en+fa strings, VM tests. Branch also carried intermediate T2/T3 merges. Gaps: no light player (15), no word-sweep, no lyrics error/Retry state, no contrast guard, static output chip, not a true shared element, system bold instead of v1 type ramp. Lint: 32 errors outside T4 (18 MissingTranslation, 14 UseAppTint in T3 layouts) → assigned to T3. Not seen rendered anywhere.
 - ✅ **T7** [Sonnet+ponytail] Lyrics merged: `data/lyrics` (LrcParser, embedded ID3/FLAC/MP4 readers, sidecar .lrc/.txt, LrclibClient /get→/search, LyricsResolver with TTL cache 30d/3d/5min, LyricsRepositoryImpl observer-driven), `di/LyricsModule`, 118 JVM tests, supervisor re-ran `:app:assembleDebug test` after merge → green (all test XMLs pass). Not verified: real tagged files, MediaStore file locator, real Persian LRCLIB hits; LRCLIB /get returned 503s during agent checks. T8 must add INTERNET permission + bind LyricsCacheStore.
 - ✅ **T5** [Sonnet+ponytail] Data merged: `data/db` (DbHelper v2, contract/ + query/ classes, all SQL there), `data/scanner` (incremental MediaStore scanner), `data/repository` (SqliteLibraryRepository, LocalHomeFeedSource, SqliteWaveformStore), `data/settings/SettingsStore`, `di/DataModule`; 55 JVM tests (Robolectric 4.16 test-only dep for real SQLite), build+lint green (agent-reported). Not verified on device: MediaStore query, album-art URI (UI needs placeholder/loadThumbnail fallback). Extra repo methods outside the interface: rescan/scanIfStale/isScanning/renamePlaylist/deletePlaylist/removeFromPlaylist/moveInPlaylist → T8 exposes.
@@ -80,6 +80,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: T3, T4 merged; ccr green (build+test+lint, supervisor-run). T2 widget gallery PNGs rendered from real Android code (docs/screens/) and sent to owner.
 - 2026-10-23: Merged T5, T7 into ccr (supervisor fixed a conflict-marker slip from the T5 merge; one flaky T5 test `SqliteRepositoryTest.historyAndPlayCountsMoveToTheTop` (same-ms ties) passed on re-run; T8 told to make ordering deterministic).
 - 2026-10-23: D13: owner rejects v2, wants v1. docs/design restored to v1; T2/T3/T4 retargeted.
 - 2026-10-23: T2b done + merged; PNGs sent to owner in chat; owner feedback to be applied as follow-up to T2/T3/T4.
