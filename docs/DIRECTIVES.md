@@ -403,3 +403,19 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** "تو نسخه بعدی دیگه Pre-release نزن"
 
 **Summary:** From the next release (v0.3.0) on, GitHub Releases are normal (stable, "Latest") releases; pre-release only for versions with a `-suffix`. v0.2.0 was already published as pre-release (owner can ask to flip it). Release title becomes "Mowj vX.Y.Z". Implemented by R1 in `release.yml` (branch `task/r1-stable-release`).
+
+---
+
+## D24 — 2026-10-23/24 — Generated covers quality; notification bar; "create several new bars"
+
+**Original (verbatim, short messages in sequence):**
+
+> جلدی که میسازه مث مال این عکسه خوشگل باشه
+> لوگورو جای اینکه از فارسیش الهام بگیری با اینگلیسی ترکیبش تو فارسی کمک بگیر
+> با دکمه های هندزفری نمیشه کنترل کرد / توی نسخه بعدی بهینه شه واس دیوایسهای دیگه
+> نسبت به 0.1.0 خیلی رو موبایل دوستم لگی تر هستش / بجای کاهش افکت ها بهینه تر کن مصرفو / مصرف های همزمان بیخودو کاهش بده و توی جایی که لازم نیست چیزهای بیخود مصرف نداشته باشن
+> لوگوی برنامه هم خوب نیست و بهترش کن
+> نوار اینجاش قشنگ نیس / تو ستینگم اپشن انتخاب نوارو اضافه کن  (screenshot: One UI shade media card)
+> پس چنتا نوار جدیدم بساز
+
+**Summary:** (1) generated covers must match the reference beauty (G1 done, sheet shown); (2) logo = bilingual Latin M + Persian م (A: M2 recommended, awaiting owner's final pick); (3) headset buttons broken → O1; (4) v0.2.0 laggier than v0.1.0 on friend's phone → **optimise consumption, do NOT remove effects; cut redundant simultaneous work** → E; (5) the One UI media-card seek bar (system-drawn, from the MediaSession) cannot be restyled by apps on Android 13+ — explained to the owner; he answered "then create several NEW bars" → **B2: 5-6 new in-app seek-bar styles + a style picker with live previews in Settings > Playback**.

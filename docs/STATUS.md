@@ -44,6 +44,9 @@ _Last updated: 2026-10-23 — D16 phase 2 started (name Mowj/موج, logo, auto-
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
+- 🔄 **B2** [Opus] 5-6 new seek-bar styles + live-preview picker in Settings (D24). `task/b2-seekbars`.
+- 🔄 **E2** [Sonnet] Perf regression v0.2.0→ (optimise, don't cut effects) rebased on ccr; shared FrameDriver. `task/e2-perf-regression`.
+- 🔄 **O1** [Sonnet] Headset buttons fix + settings + output devices. `task/o1-headset`.
 - 🔄 **G1** [Opus] Generated covers for tracks without art (deterministic generative art, UI + notification + widget). `task/g1-covers`.
 - 🔄 **U1b** [Opus] Full edge-to-edge/cutout/immersive + friend's-phone dock inset bug. `task/u1b-fullscreen`.
 - 🔄 **R2** [Sonnet] Realistic sample data (real CC tracks' metadata + public-domain/CC covers, debug-only assets, CREDITS.md) for renders/README. `task/r2-sample-data`.
@@ -118,6 +121,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - **J1** (after all merges) mechanical refactor: remove `final class`, Java 17 idioms in touched code, drop redundant AppCompat-transitive deps from the version catalog; verify on GitHub CI (local builds OOM).
 
 ## Change log
+- 2026-10-24: ccr = everything except E2/O1/B2/(logo pick pending). Merged: N1, F1, R2, U1b, M1, U2, G1, H1, A(M2 logo), L1, S1, E1. CI red-causes triaged (flaky PlaybackNotificationTest, R2 index/collator tests, F1 DB lock) and fixed. R1: CI now `--continue` + failure summary. Real-device: notification card works on owner's phone.
 - 2026-10-23: **v0.2.0 published** (GitHub pre-release; supervisor verified the downloaded APK: signed with the owner's key — cert SHA-256 2E59CE52…18AACD, versionCode 2, label Mowj, sha256 matches the .sha256 asset; built from main 8d51b89). From v0.3.0 on releases are NOT pre-release (D23); release title becomes 'Mowj vX'.
 - 2026-10-23: **main = 8d51b89 (CI green), release v0.2.0 workflow dispatched** (signed with owner's key via secrets). D22: pause = option B, ambient backgrounds, generated covers (G1), fullscreen (U1b).
 - 2026-10-23: D21 archived (headphone/device features → O1 backlog; no `final` classes; Java 17; dependency tidy → J1). CLAUDE.md updated.
