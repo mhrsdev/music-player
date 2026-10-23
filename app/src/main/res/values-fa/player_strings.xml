@@ -43,4 +43,6 @@
     <string name="queue_sleep_end_of_track">پایان آهنگ</string>
     <string name="queue_sleep_preset">%1$s دقیقه</string>
     <string name="queue_sleep_chip_end">پایان آهنگ</string>
+    <string name="queue_now_playing">در حال پخش</string>
+    <string name="queue_sleep_preset_short">%1$s دقیقه</string>
 </resources>

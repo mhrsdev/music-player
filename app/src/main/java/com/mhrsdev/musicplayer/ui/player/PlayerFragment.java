@@ -1,0 +1,359 @@
+package com.mhrsdev.musicplayer.ui.player;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.util.DisplayMetrics;
+import android.view.GestureDetector;
+import android.view.HapticFeedbackConstants;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.mhrsdev.musicplayer.MusicPlayerApp;
+import com.mhrsdev.musicplayer.R;
+import com.mhrsdev.musicplayer.databinding.PlayerFragmentBinding;
+import com.mhrsdev.musicplayer.di.AppContainer;
+import com.mhrsdev.musicplayer.domain.model.Lyrics;
+import com.mhrsdev.musicplayer.domain.model.PlaybackState;
+import com.mhrsdev.musicplayer.domain.model.RepeatMode;
+import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
+import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsAdapter;
+import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsScrollPolicy;
+import com.mhrsdev.musicplayer.ui.queue.QueueSheetFragment;
+
+import java.util.Locale;
+
+/**
+ * Full player (design v1, 05/06/11/15): top row lyrics toggle · shuffle/repeat/queue pill group · heart; cover or
+ * synced lyrics; title/artist; seek (Wavy default / Waveform / Bars from the "seek_bar_style" setting); cookie
+ * play/pause between rounded prev/next; output chip. All observation uses the view lifecycle, so position ticks and
+ * animations stop when the player is not visible.
+ */
+public final class PlayerFragment extends Fragment {
+    /** Setting key shared with Settings (T3). Values: WAVY | WAVEFORM | BARS. */
+    public static final String PREFS = "settings";
+    public static final String KEY_SEEK_STYLE = "seek_bar_style";
+
+    private PlayerFragmentBinding b;
+    private PlayerViewModel vm;
+    private LyricsAdapter lyricsAdapter;
+    private final LyricsScrollPolicy scrollPolicy = new LyricsScrollPolicy();
+    private PlayerPalette palette = PlayerPalette.forSeed(0);
+    @Nullable private String paletteTrackId;
+    private boolean scrubbing;
+    private final Runnable resumeAutoScroll = this::onAutoScrollResume;
+
+    public static PlayerFragment newInstance() { return new PlayerFragment(); }
+
+    @Nullable @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle state) {
+        b = PlayerFragmentBinding.inflate(inflater, container, false);
+        return b.getRoot();
+    }
+
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        AppContainer c = ((MusicPlayerApp) requireActivity().getApplication()).getContainer();
+        vm = new ViewModelProvider(this, PlayerViewModel.factory(c.player, c.library, c.lyrics, c.waveform))
+                .get(PlayerViewModel.class);
+
+        ViewCompat.setOnApplyWindowInsetsListener(b.playerContent, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), bars.bottom + dp(12));
+            return insets;
+        });
+
+        b.playerSeek.setStyle(readSeekStyle(requireContext()));
+        setupControls();
+        setupLyrics();
+        setupSwipeToCollapse();
+
+        vm.getState().observe(getViewLifecycleOwner(), this::render);
+        vm.getCurrentTrack().observe(getViewLifecycleOwner(), this::renderTrack);
+        vm.getLiked().observe(getViewLifecycleOwner(), this::renderLiked);
+        vm.getWaveform().observe(getViewLifecycleOwner(), b.playerSeek::setWaveform);
+        vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
+        vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
+        vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
+
+        if (savedInstanceState == null && PlayerPalette.motionAllowed(requireContext())) playEnterTransition();
+    }
+
+    static PlayerSeekBar.Style readSeekStyle(Context ctx) {
+        SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        try {
+            return PlayerSeekBar.Style.valueOf(p.getString(KEY_SEEK_STYLE, "WAVY"));
+        } catch (IllegalArgumentException e) {
+            return PlayerSeekBar.Style.WAVY;
+        }
+    }
+
+    /** Cheap container-transform-like entry from the mini-player: rise + fade, cover scales up (no bitmap snapshot). */
+    private void playEnterTransition() {
+        View content = b.playerContent;
+        content.setAlpha(0f);
+        content.setTranslationY(dp(72));
+        content.animate().alpha(1f).translationY(0f).setDuration(380)
+                .setInterpolator(new DecelerateInterpolator(2.2f)).start();
+        b.playerArtwork.setScaleX(0.86f);
+        b.playerArtwork.setScaleY(0.86f);
+        b.playerArtwork.animate().scaleX(1f).scaleY(1f).setDuration(450)
+                .setInterpolator(new DecelerateInterpolator(2f)).start();
+    }
+
+    private void setupControls() {
+        b.playerPlay.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            vm.togglePlayPause();
+        });
+        b.playerNext.setOnClickListener(v -> vm.next());
+        b.playerPrev.setOnClickListener(v -> vm.previous());
+        b.playerShuffle.setOnClickListener(v -> vm.toggleShuffle());
+        b.playerRepeat.setOnClickListener(v -> vm.cycleRepeat());
+        b.playerLike.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            v.animate().scaleX(1.18f).scaleY(1.18f).setDuration(110)
+                    .withEndAction(() -> v.animate().scaleX(1f).scaleY(1f).setDuration(180).start()).start();
+            vm.toggleLike();
+        });
+        b.playerLyricsToggle.setOnClickListener(v -> vm.toggleLyrics());
+        b.playerQueue.setOnClickListener(v -> QueueSheetFragment.show(getParentFragmentManager()));
+        b.playerSeek.setListener(new PlayerSeekBar.Listener() {
+            @Override public void onScrub(float f) {
+                scrubbing = true;
+                PlaybackState s = vm.getState().getValue();
+                if (s != null) renderTimes((long) (f * s.durationMs()), s.durationMs());
+            }
+            @Override public void onSeek(float f) {
+                scrubbing = false;
+                vm.seekToFraction(f);
+            }
+            @Override public void onStep(int direction) { vm.seekBy(direction * 10_000L); }
+        });
+    }
+
+    private void setupLyrics() {
+        lyricsAdapter = new LyricsAdapter(line -> {
+            scrollPolicy.resume();
+            b.lyricsBackToCurrent.setVisibility(View.GONE);
+            vm.seekTo(line.timeMs());
+        });
+        b.lyricsList.setLayoutManager(new LinearLayoutManager(requireContext()));
+        b.lyricsList.setAdapter(lyricsAdapter);
+        b.lyricsList.setItemAnimator(null);
+        b.lyricsList.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
+            int h = bt - t;
+            if (h != ob - ot) v.setPadding(0, (int) (h * 0.4f), 0, (int) (h * 0.5f));
+        });
+        b.lyricsList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override public void onScrollStateChanged(@NonNull RecyclerView rv, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    scrollPolicy.onUserScroll(SystemClock.uptimeMillis());
+                    b.lyricsBackToCurrent.setVisibility(View.VISIBLE);
+                    rv.removeCallbacks(resumeAutoScroll);
+                    rv.postDelayed(resumeAutoScroll, LyricsScrollPolicy.PAUSE_MS);
+                }
+            }
+        });
+        b.lyricsBackToCurrent.setOnClickListener(v -> onAutoScrollResume());
+    }
+
+    private void onAutoScrollResume() {
+        if (b == null) return;
+        scrollPolicy.resume();
+        b.lyricsBackToCurrent.setVisibility(View.GONE);
+        scrollToLine(lyricsAdapter.getActive(), true);
+    }
+
+    @SuppressWarnings("ClickableViewAccessibility")
+    private void setupSwipeToCollapse() {
+        GestureDetector detector = new GestureDetector(requireContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override public boolean onDown(@NonNull MotionEvent e) { return true; }
+            @Override public boolean onFling(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float vx, float vy) {
+                if (vy > 1200 && Math.abs(vy) > Math.abs(vx) * 1.5f) { collapse(); return true; }
+                return false;
+            }
+        });
+        View.OnTouchListener l = (v, e) -> detector.onTouchEvent(e) || v.onTouchEvent(e);
+        b.playerArtwork.setOnTouchListener(l);
+        b.playerHandle.setOnTouchListener(l);
+        b.playerRoot.setOnTouchListener((v, e) -> detector.onTouchEvent(e));
+    }
+
+    private void collapse() {
+        PlayerNavigator nav = PlayerNavigator.from(requireContext());
+        if (nav != null) nav.closeFullPlayer();
+        else requireActivity().getOnBackPressedDispatcher().onBackPressed();
+    }
+
+    // ---------------------------------------------------------------- rendering
+
+    private void render(@Nullable PlaybackState s) {
+        if (s == null) s = PlaybackState.empty();
+        b.playerPlay.setPlaying(s.playing(), true);
+        b.playerSeek.setPlaying(s.playing());
+        b.playerSeek.setDuration(s.durationMs());
+        if (!scrubbing) {
+            b.playerSeek.setProgress(PlayerFormat.fraction(s.positionMs(), s.durationMs()));
+            renderTimes(s.positionMs(), s.durationMs());
+        }
+        b.playerNext.setEnabled(s.hasNext() || s.repeatMode() == RepeatMode.ALL);
+        b.playerNext.setAlpha(b.playerNext.isEnabled() ? 1f : 0.38f);
+        b.playerPlay.setEnabled(s.currentTrack() != null);
+
+        setToggle(b.playerShuffle, s.shuffleEnabled());
+        b.playerShuffle.setContentDescription(getString(s.shuffleEnabled()
+                ? R.string.player_shuffle_on : R.string.player_shuffle_off));
+        setToggle(b.playerRepeat, s.repeatMode() != RepeatMode.OFF);
+        b.playerRepeat.setImageResource(s.repeatMode() == RepeatMode.ONE
+                ? R.drawable.player_ic_repeat_one : R.drawable.player_ic_repeat);
+        b.playerRepeat.setContentDescription(getString(s.repeatMode() == RepeatMode.ONE ? R.string.player_repeat_one
+                : s.repeatMode() == RepeatMode.ALL ? R.string.player_repeat_all : R.string.player_repeat_off));
+        setToggle(b.playerQueue, false);
+    }
+
+    private void renderTimes(long pos, long dur) {
+        Locale loc = getResources().getConfiguration().getLocales().get(0);
+        b.playerElapsed.setText(PlayerFormat.time(pos, loc));
+        b.playerRemaining.setText(PlayerFormat.remaining(pos, dur, loc));
+    }
+
+    private void setToggle(ImageButton btn, boolean on) {
+        btn.setActivated(on);
+        btn.setBackgroundTintList(on ? ColorStateList.valueOf(palette.primary) : null);
+        btn.setImageTintList(ColorStateList.valueOf(on ? palette.onPrimary : 0xFFFFFFFF));
+    }
+
+    private void renderTrack(@Nullable Track t) {
+        if (t == null) {
+            b.playerTitle.setText(R.string.player_nothing_playing);
+            b.playerArtist.setText(null);
+            return;
+        }
+        b.playerTitle.setText(t.title());
+        b.playerTitle.setSelected(true); // one marquee pass for long titles
+        b.playerArtist.setText(t.artistName());
+        boolean changed = paletteTrackId != null && !paletteTrackId.equals(t.id());
+        paletteTrackId = t.id();
+        palette = PlayerPalette.forSeed(t.placeholderSeed());
+        b.playerBackdrop.setPalette(palette, changed);
+        b.playerArtwork.setPalette(palette);
+        b.playerPlay.setColors(palette.primary, palette.onPrimary);
+        b.playerSeek.setColor(palette.primary);
+        b.playerLike.setImageTintList(ColorStateList.valueOf(palette.primary));
+        if (changed && PlayerPalette.motionAllowed(requireContext())) {
+            View art = b.playerArtwork;
+            art.setAlpha(0.4f);
+            art.setTranslationX(dp(24));
+            art.animate().alpha(1f).translationX(0f).setDuration(320)
+                    .setInterpolator(new DecelerateInterpolator(2f)).start();
+        }
+        render(vm.getState().getValue());
+    }
+
+    private void renderLiked(Boolean liked) {
+        boolean on = Boolean.TRUE.equals(liked);
+        b.playerLike.setImageResource(on ? R.drawable.player_ic_favorite : R.drawable.player_ic_favorite_border);
+        b.playerLike.setContentDescription(getString(on ? R.string.player_unlike : R.string.player_like));
+    }
+
+    private void renderStage(Boolean showLyrics) {
+        boolean lyrics = Boolean.TRUE.equals(showLyrics);
+        crossfade(b.playerArtwork, !lyrics);
+        b.playerLyricsToggle.setContentDescription(getString(lyrics ? R.string.player_show_cover : R.string.player_show_lyrics));
+        b.playerLyricsToggle.setActivated(lyrics);
+        b.playerLyricsToggle.setAlpha(lyrics ? 1f : 0.82f);
+        renderLyrics(vm.getLyrics().getValue());
+    }
+
+    private void crossfade(View v, boolean show) {
+        if (show == (v.getVisibility() == View.VISIBLE)) return;
+        v.animate().cancel();
+        if (show) {
+            v.setAlpha(0f);
+            v.setVisibility(View.VISIBLE);
+            v.animate().alpha(1f).setDuration(200).start();
+        } else {
+            v.setVisibility(View.GONE);
+        }
+    }
+
+    private void renderLyrics(@Nullable Lyrics l) {
+        boolean showing = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
+        if (!showing) {
+            b.lyricsList.setVisibility(View.GONE);
+            b.lyricsMessage.setVisibility(View.GONE);
+            b.lyricsBackToCurrent.setVisibility(View.GONE);
+            return;
+        }
+        if (l == null || l.isEmpty()) {
+            b.lyricsList.setVisibility(View.GONE);
+            b.lyricsMessage.setVisibility(View.VISIBLE);
+            b.lyricsMessageTitle.setText(l == null ? R.string.lyrics_loading : R.string.lyrics_none);
+            b.lyricsMessageBody.setText(l == null ? null : getString(R.string.lyrics_none_hint));
+            return;
+        }
+        b.lyricsMessage.setVisibility(View.GONE);
+        if (b.lyricsList.getVisibility() != View.VISIBLE) crossfade(b.lyricsList, true);
+        if (b.lyricsList.getTag() != l) {
+            b.lyricsList.setTag(l);
+            lyricsAdapter.setLyrics(l);
+            Integer active = vm.getActiveLyricLine().getValue();
+            renderActiveLine(active);
+            if (!l.synced()) b.lyricsList.scrollToPosition(0);
+        }
+    }
+
+    private void renderActiveLine(@Nullable Integer index) {
+        int i = index == null ? -1 : index;
+        lyricsAdapter.setActive(i);
+        if (b.lyricsList.getVisibility() == View.VISIBLE && scrollPolicy.shouldAutoScroll(SystemClock.uptimeMillis())) {
+            scrollToLine(i, true);
+        }
+    }
+
+    private void scrollToLine(int index, boolean smooth) {
+        if (index < 0 || index >= lyricsAdapter.getItemCount()) return;
+        RecyclerView.LayoutManager lm = b.lyricsList.getLayoutManager();
+        if (lm == null) return;
+        if (!smooth || !PlayerPalette.motionAllowed(requireContext())) {
+            ((LinearLayoutManager) lm).scrollToPositionWithOffset(index, (int) (b.lyricsList.getHeight() * 0.4f)
+                    - b.lyricsList.getPaddingTop());
+            return;
+        }
+        LinearSmoothScroller s = new LinearSmoothScroller(requireContext()) {
+            @Override public int calculateDtToFit(int vs, int ve, int bs, int be, int pref) {
+                return (bs + (int) ((be - bs) * 0.4f)) - (vs + (ve - vs) / 2);
+            }
+            @Override protected float calculateSpeedPerPixel(DisplayMetrics dm) { return 90f / dm.densityDpi; }
+        };
+        s.setTargetPosition(index);
+        lm.startSmoothScroll(s);
+    }
+
+    private int dp(int v) { return Math.round(v * getResources().getDisplayMetrics().density); }
+
+    @Override public void onDestroyView() {
+        b.lyricsList.removeCallbacks(resumeAutoScroll);
+        b = null;
+        super.onDestroyView();
+    }
+}

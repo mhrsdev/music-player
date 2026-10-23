@@ -14,4 +14,10 @@
         <item name="android:scaleType">center</item>
         <item name="android:tint">#FFFFFF</item>
     </style>
+    <style name="Player.ToggleButton" parent="">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/player_toggle_bg</item>
+        <item name="android:scaleType">center</item>
+    </style>
 </resources>

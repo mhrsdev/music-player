@@ -43,4 +43,6 @@
     <string name="queue_sleep_end_of_track">End of track</string>
     <string name="queue_sleep_preset">%1$s minutes</string>
     <string name="queue_sleep_chip_end">End of track</string>
+    <string name="queue_now_playing">Now playing</string>
+    <string name="queue_sleep_preset_short">%1$s min</string>
 </resources>
