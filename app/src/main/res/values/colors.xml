@@ -30,5 +30,4 @@
     <color name="mp_black_secondary_container">#2B394A</color>
 
     <color name="window_background">@color/mp_background</color>
-    <color name="ic_launcher_background">#0F1216</color>
 </resources>

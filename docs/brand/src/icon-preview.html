@@ -1,0 +1,24 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="brand.css"><script src="brand.js"></script>
+<style>
+#shot{width:1360px;padding:48px 56px;box-sizing:border-box;background:#0F1216;color:#E2E2E9;font-family:GSF}
+h1{font-weight:600;font-size:34px;margin:0 0 4px} p{color:#BFC6D2;margin:0 0 32px;font-size:18px}
+.row{display:flex;gap:40px;align-items:flex-end;margin-bottom:28px;padding:28px;border-radius:28px}
+.dark{background:#171A1F}.light{background:#F1F3FA;color:#181C21}
+figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px}
+figcaption{font-size:15px;opacity:.75}
+.sizes{display:flex;gap:18px;align-items:flex-end}
+</style></head>
+<body data-out="launcher-icon-preview.png"><div id="shot">
+<h1>Mowj launcher icon</h1><p>Adaptive icon (108dp canvas, 72dp visible, mark inside the 66dp safe circle) under common launcher masks, themed monochrome, and small sizes.</p>
+<div class="row dark" id="r1"></div><div class="row light" id="r2"></div><div class="row dark" id="r3"></div></div>
+<script>
+const fig=(svg,cap)=>`<figure>${svg}<figcaption>${cap}</figcaption></figure>`;
+r1.innerHTML = fig(icon(180,'circle'),'Circle') + fig(icon(180,'squircle'),'Squircle') + fig(icon(180,'rounded'),'Rounded square') + fig(icon(180,'none',{guides:true}),'Full canvas + safe zone')
+ + fig(icon(180,'circle',{bg:'#1E4878',fg:'#D4E3FF'}),'Themed (dark)');
+r2.innerHTML = fig(icon(180,'circle'),'Circle') + fig(icon(180,'squircle'),'Squircle') + fig(icon(180,'rounded'),'Rounded square') + fig(icon(180,'circle',{bg:'#D4E3FF',fg:'#001C3A'}),'Themed (light)')
+ + fig(icon(180,'circle',{bg:'#9EF2E7',fg:'#00201D'}),'Themed (teal wallpaper)');
+const sz=[96,72,48,32,24];
+r3.innerHTML = fig(`<div class="sizes">${sz.map(s=>icon(s,'circle')).join('')}</div>`,'96 / 72 / 48 / 32 / 24 px')
+ + fig(`<div class="sizes">${[72,48,24,16].map(s=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}"><g transform="translate(1.64 5.94) scale(0.3188)"><path d="${MOWJ_D}" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`).join('')}</div>`,'Status-bar icon 72 / 48 / 24 / 16 px')
+ + fig(`<div class="sizes">${mark(60,'grad-dark')}${mark(30,'grad-dark')}${mark(15,'#E2E2E9')}</div>`,'Mark on dark');
+</script></body></html>

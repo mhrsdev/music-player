@@ -11,6 +11,7 @@ import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 import com.mhrsdev.musicplayer.data.update.UpdateModule;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
+import com.mhrsdev.musicplayer.domain.repository.AudioEffectsController;
 import com.mhrsdev.musicplayer.domain.repository.HomeFeedSource;
 import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
@@ -19,6 +20,7 @@ import com.mhrsdev.musicplayer.domain.repository.MusicSource;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 import com.mhrsdev.musicplayer.domain.repository.UpdateRepository;
 import com.mhrsdev.musicplayer.domain.repository.WaveformRepository;
+import com.mhrsdev.musicplayer.fake.FakeAudioEffects;
 import com.mhrsdev.musicplayer.fake.FakeHomeFeedSource;
 import com.mhrsdev.musicplayer.fake.FakeLibraryRepository;
 import com.mhrsdev.musicplayer.fake.FakeLyricsRepository;
@@ -58,6 +60,7 @@ public final class AppContainer {
     private final boolean useFakes;
     private final SettingsStore settings;
     private final LibraryAdmin libraryAdmin;
+    private final AudioEffectsController audioEffects;
     private final AtomicBoolean foregroundScanDone = new AtomicBoolean();
     private UpdateRepository updates;
 
@@ -80,6 +83,7 @@ public final class AppContainer {
             library = fake;
             libraryAdmin = fake;
             player = new FakePlayerController();
+            audioEffects = new FakeAudioEffects();
             lyrics = new FakeLyricsRepository();
             waveform = new FakeWaveformRepository();
             homeFeed = new FakeHomeFeedSource(library);
@@ -91,6 +95,7 @@ public final class AppContainer {
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
+            audioEffects = PlaybackModule.createAudioEffects(appContext);
             lyrics = LyricsModule.create(appContext, BuildConfig.VERSION_NAME,
                     new SqliteLyricsCacheStore(data.dbHelper, System::currentTimeMillis),
                     () -> !Boolean.FALSE.equals(settings.lyricsOnline().getValue()));
@@ -100,6 +105,11 @@ public final class AppContainer {
     /** Settings are real in both modes (SharedPreferences only). */
     public SettingsStore settings() {
         return settings;
+    }
+
+    /** Equalizer, bass boost, virtualizer and loudness (real effects on the player's audio session, or a fake). */
+    public AudioEffectsController audioEffects() {
+        return audioEffects;
     }
 
     /** Scanning and the extra playlist edits (rename, delete, remove, reorder). */

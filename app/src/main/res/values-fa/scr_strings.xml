@@ -80,7 +80,7 @@
     <string name="settings_battery_saver">صرفه‌جویی باتری</string>
     <string name="settings_battery_saver_sub">حرکت، محوشدگی و دانه را خاموش کن</string>
     <string name="settings_about">درباره</string>
-    <string name="settings_version">نسخه‌ی %1$s</string>
+    <string name="settings_version">موج · نسخه‌ی %1$s</string>
     <string name="library_menu_play_next">پخش بعدی</string>
     <string name="library_menu_add_queue">افزودن به صف</string>
     <string name="library_menu_add_playlist">افزودن به فهرست پخش</string>

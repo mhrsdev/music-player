@@ -272,3 +272,28 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 3. Add an **auto-update system** that automatically fetches the newest release from GitHub (checks GitHub Releases, downloads the APK, verifies, installs). Supervisor design: check only on app foreground ≤ 1×/day + manual button (no background polling → battery), SHA-256 + signing-certificate check, user confirms the system installer.
 
 **Supervisor risk note (owner decision pending):** an APK update only installs over the old app if both are signed with the SAME key. CI currently falls back to a throw-away debug key (different on every runner) → updates would fail. A fixed release keystore is required (owner asked: key as GitHub secrets vs. committed keystore).
+
+---
+
+## D17 — 2026-10-23 — Signing key decision + first real-device bug report
+
+**Signing key (answer to supervisor's question):** "کلید محرمانه توی Secrets (پیشنهاد من)" → the release keystore lives ONLY in GitHub Actions secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Supervisor generated the keystore (RSA 4096, alias `mowj`, validity 30 y, SHA-256 cert fingerprint `2E:59:CE:52:…:AA:CD`) and sent the files + instructions to the owner in chat; **nothing secret is committed**. Until the owner adds the secrets, release builds fall back to the debug key (updates then won't install). v0.1.0 was debug-signed → one-time uninstall/reinstall needed when moving to the first release-key build.
+
+**Bug report (owner, verbatim):** "باگ" + a real-device screenshot of the Home screen (Persian/RTL) running v0.1.0. First real-device evidence. Visible bugs: (1) mini-player play button drawn as a distorted irregular polygon; (2) floating nav + mini-player translucent, list content ('Quick picks', captions) shows through/behind and no bottom padding; (3) Home section titles in English ('Recently added', 'Throwbacks', 'Quick picks') in the Persian UI; (4) hero carousel: left neighbour is a squeezed narrow pill; (5) artwork missing (gradient placeholders) for many albums while others load. Routed: (1) U3, (2)(3)(4) U1, (5) E-perf — all as first, separately-pushed fixes.
+
+---
+
+## D18 — 2026-10-23 — More real-device bug reports (player, lock screen, shade, Bluetooth, end of list)
+
+**Original (verbatim, with 4 screenshots: full player, lock screen, notification shade, Home bottom):**
+
+> ببین تو منوی بالا و صفحه قفل چیزی نشون نمیده + قسمتی که زده بلوتوث جاش اسم دستگاه رو بزنه کنارش علامت لوتوث
+> این منوهم وقتی تا تهش میری اخرش باگه
+
+(Previous message, same session: "باگ" + Home screenshot; "مارجین کافی نداره" + light-theme mini-player/nav screenshot.)
+
+**Summary / findings:**
+1. **No media notification on the notification shade and nothing on the lock screen** while playing (only "Media output" button; no Mowj card). Routed to new agent N1 (suspected root cause: T6's in-process player never starts/binds `PlaybackService`, so no MediaSession notification/foreground service). Needs a Robolectric regression test + device checklist.
+2. **Output chip shows only "بلوتوث"** — owner wants the **device name** next to the Bluetooth icon (needs BLUETOOTH_CONNECT runtime permission on API 31+). Routed to U3.
+3. **Full-player title is huge and clipped** (only "no et orchestre)" visible, collides with the 3-dot menu). Routed to U3.
+4. **Bottom of scrolling screens is buggy** ("when you scroll to the very end"): last items hidden behind/through the translucent dock (nav + mini-player), no bottom padding. Routed to U1 (already queued as fix #1 there).

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Music Player</string>
+    <string name="app_name">Mowj</string>
     <string name="placeholder_sections">Home sections: %1$d</string>
     <!-- ui/widget (T2) -->
     <string name="mp_cd_seek">Seek</string>
