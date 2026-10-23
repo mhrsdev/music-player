@@ -44,6 +44,8 @@ _Last updated: 2026-10-23 — D16 phase 2 started (name Mowj/موج, logo, auto-
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
+- 🔄 **G1** [Opus] Generated covers for tracks without art (deterministic generative art, UI + notification + widget). `task/g1-covers`.
+- 🔄 **U1b** [Opus] Full edge-to-edge/cutout/immersive + friend's-phone dock inset bug. `task/u1b-fullscreen`.
 - 🔄 **R2** [Sonnet] Realistic sample data (real CC tracks' metadata + public-domain/CC covers, debug-only assets, CREDITS.md) for renders/README. `task/r2-sample-data`.
 - 🔄 **F2** [Sonnet] Library refresh bug (D20): rescan every foreground, observer while visible, force rescan. `task/f2-refresh`.
 **Wave 3 (D19):**
@@ -111,7 +113,14 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - System: home-screen widget (RemoteViews), Android Auto/MediaLibraryService browse tree, lock-screen/notification polish, backup/restore (playlists+likes export/import), app shortcuts, Quick Settings tile, tablet/landscape layouts, accessibility pass (TalkBack), predictive back, light-player verification.
 - Online (needs owner decision, K2): legal catalog provider.
 
+## Backlog v0.3.0 (D21)
+- **O1** Output devices: list connected outputs, show active one, switch via system output switcher, per-device volume, per-device sound profiles (EQ etc.), headset/earbud button mapping (single/double/triple press), auto-resume/pause on connect/disconnect, deep link to OEM dual-audio / audio-sharing. (True 2-device simultaneous playback has no public Android API.)
+- **J1** (after all merges) mechanical refactor: remove `final class`, Java 17 idioms in touched code, drop redundant AppCompat-transitive deps from the version catalog; verify on GitHub CI (local builds OOM).
+
 ## Change log
+- 2026-10-23: **v0.2.0 published** (GitHub pre-release; supervisor verified the downloaded APK: signed with the owner's key — cert SHA-256 2E59CE52…18AACD, versionCode 2, label Mowj, sha256 matches the .sha256 asset; built from main 8d51b89). From v0.3.0 on releases are NOT pre-release (D23); release title becomes 'Mowj vX'.
+- 2026-10-23: **main = 8d51b89 (CI green), release v0.2.0 workflow dispatched** (signed with owner's key via secrets). D22: pause = option B, ambient backgrounds, generated covers (G1), fullscreen (U1b).
+- 2026-10-23: D21 archived (headphone/device features → O1 backlog; no `final` classes; Java 17; dependency tidy → J1). CLAUDE.md updated.
 - 2026-10-23: D19 archived. GitHub signing secrets set by owner. Launched H1/L1/M1. U2 finished (merged); N1 root cause = missing `addSession` (merged). Merged to ccr: N1, U3 (partial), U2, E, S1(partial, conflicts resolved). Tag push is blocked (403) → releases via workflow_dispatch.
 - 2026-10-23: D-sound merged. Owner renamed the GitHub repo to `mhrsdev/music-player-mowj` (git push prints the move; MCP GitHub tools are still scoped to the old name `mhrsdev/music-player` which redirects) → B told to use a Gradle-property slug; README/docs links to be updated at release time. Supervisor mis-addressed some UI-bug messages to agents B/U3 and corrected them (U3 owns player/mini-player/title/BT chip; E owns ArtworkLoader fix).
 - 2026-10-23: D18: owner's 4 more real-device screenshots → N1 launched (notification/lock screen), U3 told (clipped title + BT device name), U1 (dock/bottom padding). A-brand merged.
