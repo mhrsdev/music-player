@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.os.Process;
 import androidx.core.content.ContextCompat;
 import com.mhrsdev.musicplayer.BuildConfig;
+import com.mhrsdev.musicplayer.appwidget.WidgetUpdater;
 import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 import com.mhrsdev.musicplayer.data.update.UpdateModule;
@@ -25,6 +26,7 @@ import com.mhrsdev.musicplayer.domain.repository.UpdateRepository;
 import com.mhrsdev.musicplayer.domain.repository.WaveformRepository;
 import com.mhrsdev.musicplayer.fake.FakeAudioEffects;
 import com.mhrsdev.musicplayer.fake.FakeBackupService;
+import com.mhrsdev.musicplayer.playback.NowPlayingBridge;
 import com.mhrsdev.musicplayer.fake.FakeHomeFeedSource;
 import com.mhrsdev.musicplayer.fake.FakeLibraryRepository;
 import com.mhrsdev.musicplayer.fake.FakeLyricsRepository;
@@ -112,6 +114,8 @@ public final class AppContainer {
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
+            // Home-screen widgets: redrawn on track / play-pause changes only, and only while this process lives.
+            NowPlayingBridge.attach(appContext, np -> WidgetUpdater.update(appContext, np, io));
             audioEffects = PlaybackModule.createAudioEffects(appContext);
             lyrics = LyricsModule.create(appContext, BuildConfig.VERSION_NAME,
                     new SqliteLyricsCacheStore(data.dbHelper, System::currentTimeMillis),
