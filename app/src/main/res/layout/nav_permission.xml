@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/mpBackground"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <ImageView
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/nav_perm_art" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:text="@string/nav_perm_title"
+        android:textColor="?attr/mpOnSurface"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.2"
+        android:text="@string/nav_perm_body"
+        android:textColor="?attr/mpOnSurfaceVariant"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/perm_denied"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="@string/nav_perm_denied"
+        android:textColor="?attr/mpError"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/perm_allow"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/nav_button_primary"
+        android:text="@string/nav_perm_allow"
+        android:textAllCaps="false"
+        android:textColor="?attr/mpOnPrimary"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/perm_folders"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/nav_perm_folders"
+        android:textAllCaps="false"
+        android:textColor="?attr/mpPrimary"
+        android:textSize="16sp" />
+</LinearLayout>

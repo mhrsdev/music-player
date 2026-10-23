@@ -1,0 +1,88 @@
+package com.mhrsdev.musicplayer.ui.home;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.mhrsdev.musicplayer.R;
+import com.mhrsdev.musicplayer.databinding.HomeFragmentBinding;
+import com.mhrsdev.musicplayer.di.AppContainer;
+import com.mhrsdev.musicplayer.domain.model.HomeItem;
+import com.mhrsdev.musicplayer.domain.model.HomeSection;
+import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.ui.library.StateView;
+import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
+import com.mhrsdev.musicplayer.ui.nav.Screens;
+import java.util.List;
+
+/** Home: Recently added hero carousel, Throwbacks carousel, Quick picks list (DESIGN.md 01). */
+public final class HomeFragment extends Fragment implements HomeAdapter.Listener {
+    private HomeFragmentBinding b;
+    private HomeViewModel vm;
+
+    @Override public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle state) {
+        b = HomeFragmentBinding.inflate(inflater, container, false);
+        return b.getRoot();
+    }
+
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
+        AppContainer c = Screens.container(this);
+        vm = new ViewModelProvider(this, HomeViewModel.factory(c.homeFeed, c.player)).get(HomeViewModel.class);
+        HomeAdapter adapter = new HomeAdapter(this);
+        b.list.setLayoutManager(new LinearLayoutManager(requireContext()));
+        b.list.setAdapter(adapter);
+        StateView.loading(b.state, R.string.home_loading);
+        vm.getSections().observe(getViewLifecycleOwner(), sections -> render(adapter, sections));
+    }
+
+    private void render(HomeAdapter adapter, @Nullable List<HomeSection> sections) {
+        if (sections == null) {
+            StateView.loading(b.state, R.string.home_loading);
+        } else if (sections.isEmpty()) {
+            StateView.empty(b.state, getString(R.string.home_empty_title), getString(R.string.home_empty_body),
+                    getString(R.string.nav_settings), v -> {
+                        ScreenNavigator nav = ScreenNavigator.from(requireContext());
+                        if (nav != null) nav.openTab(ScreenNavigator.Tab.SETTINGS);
+                    });
+        } else {
+            StateView.hide(b.state);
+        }
+        adapter.submitList(sections == null ? List.of() : HomeAdapter.flatten(sections));
+    }
+
+    @Override public void onItemClick(HomeItem item) {
+        switch (item.kind()) {
+            case TRACK -> {
+                List<HomeSection> all = vm.getSections().getValue();
+                if (all == null) return;
+                for (HomeSection s : all) {
+                    if (s.items().contains(item)) {
+                        vm.playFromSection(s, item.track());
+                        return;
+                    }
+                }
+            }
+            case ALBUM -> Screens.openTrackList(this, ScreenNavigator.TrackList.ALBUM, item.album().id());
+            case PLAYLIST -> Screens.openTrackList(this, ScreenNavigator.TrackList.PLAYLIST, item.playlist().id());
+        }
+    }
+
+    @Override public void onTrackClick(HomeSection section, Track track) {
+        vm.playFromSection(section, track);
+    }
+
+    @Override public void onShuffle(HomeSection section) {
+        vm.shuffleSection(section);
+    }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        b = null;
+    }
+}

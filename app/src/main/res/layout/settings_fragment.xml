@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="@dimen/scr_bottom_chrome">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView style="@style/Scr.PageTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_title" />
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_appearance" />
+        <TextView style="@style/Settings.RowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_theme" />
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="20dp" android:paddingBottom="12dp">
+            <TextView android:id="@+id/theme_system" style="@style/Search.Chip" android:text="@string/settings_theme_system" />
+            <TextView android:id="@+id/theme_light" style="@style/Search.Chip" android:text="@string/settings_theme_light" />
+            <TextView android:id="@+id/theme_dark" style="@style/Search.Chip" android:text="@string/settings_theme_dark" />
+            <TextView android:id="@+id/theme_black" style="@style/Search.Chip" android:text="@string/settings_theme_black" />
+        </LinearLayout>
+        </HorizontalScrollView>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/artwork_colors"
+            style="@style/Settings.Switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_artwork_colors" />
+        <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_artwork_colors_sub" />
+        <TextView style="@style/Settings.RowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_seek_style" />
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="20dp" android:paddingBottom="12dp">
+            <TextView android:id="@+id/seek_wavy" style="@style/Search.Chip" android:text="@string/settings_seek_wavy" />
+            <TextView android:id="@+id/seek_waveform" style="@style/Search.Chip" android:text="@string/settings_seek_waveform" />
+            <TextView android:id="@+id/seek_bars" style="@style/Search.Chip" android:text="@string/settings_seek_bars" />
+        </LinearLayout>
+        </HorizontalScrollView>
+        <TextView style="@style/Settings.RowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_language" />
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="20dp" android:paddingBottom="12dp">
+            <TextView android:id="@+id/lang_system" style="@style/Search.Chip" android:text="@string/settings_lang_system" />
+            <TextView android:id="@+id/lang_en" style="@style/Search.Chip" android:text="@string/settings_lang_en" />
+            <TextView android:id="@+id/lang_fa" style="@style/Search.Chip" android:text="@string/settings_lang_fa" />
+        </LinearLayout>
+        </HorizontalScrollView>
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_library" />
+        <LinearLayout android:id="@+id/folders" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="64dp" android:background="?attr/selectableItemBackground" android:clickable="true" android:focusable="true" android:orientation="vertical" android:gravity="center_vertical">
+            <TextView style="@style/Settings.RowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="0dp" android:text="@string/settings_folders" />
+            <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_folders_all" />
+        </LinearLayout>
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_lyrics" />
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/online_lyrics"
+            style="@style/Settings.Switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_lyrics_online" />
+        <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_lyrics_online_sub" />
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_playback" />
+        <TextView style="@style/Settings.RowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_sleep_default" />
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:id="@+id/sleep_row" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="20dp" android:paddingBottom="12dp" />
+        </HorizontalScrollView>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/battery_saver"
+            style="@style/Settings.Switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_battery_saver" />
+        <TextView style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_battery_saver_sub" />
+        <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_about" />
+        <TextView android:id="@+id/version" style="@style/Settings.RowSub" android:layout_width="match_parent" android:layout_height="wrap_content" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

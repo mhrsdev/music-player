@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><shape android:shape="oval"><gradient android:angle="315" android:startColor="?attr/mpPrimaryContainer" android:endColor="?attr/mpSecondaryContainer"/></shape></item>
+    <item android:drawable="@drawable/nav_ic_note" android:gravity="center" android:width="56dp" android:height="56dp"/>
+</layer-list>

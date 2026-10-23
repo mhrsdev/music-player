@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Debug-only widget gallery for owner / QA review (T2). -->
+        <activity
+            android:name=".ui.widget.WidgetGalleryActivity"
+            android:exported="true"
+            android:label="Widget gallery"
+            android:theme="@style/Theme.MusicPlayer">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

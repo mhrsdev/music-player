@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_play">پخش</string>
+    <string name="player_pause">توقف</string>
+    <string name="player_next">بعدی</string>
+    <string name="player_previous">قبلی</string>
+    <string name="player_more">گزینه‌های بیشتر</string>
+    <string name="player_like">پسندیدن</string>
+    <string name="player_unlike">حذف از آهنگ‌های پسندیده</string>
+    <string name="player_shuffle_on">پخش تصادفی، روشن</string>
+    <string name="player_shuffle_off">پخش تصادفی، خاموش</string>
+    <string name="player_repeat_off">تکرار، خاموش</string>
+    <string name="player_repeat_all">تکرار همه</string>
+    <string name="player_repeat_one">تکرار یک آهنگ</string>
+    <string name="player_show_lyrics">نمایش متن ترانه</string>
+    <string name="player_show_cover">نمایش کاور</string>
+    <string name="player_queue">صف پخش</string>
+    <string name="player_sleep_timer">زمان‌سنج خواب</string>
+    <string name="player_sleep_timer_min">زمان‌سنج خواب، %1$s دقیقه مانده</string>
+    <string name="player_output_device">همین گوشی</string>
+    <string name="player_nothing_playing">چیزی پخش نمی‌شود</string>
+    <string name="player_seek">جابه‌جایی</string>
+    <string name="lyrics_loading">در جست‌وجوی متن ترانه…</string>
+    <string name="lyrics_none">هنوز متنی برای این آهنگ نیست</string>
+    <string name="lyrics_none_hint">یک فایل ‎.lrc‎ کنار آهنگ بگذارید.</string>
+    <string name="lyrics_back_to_current">برگشت به خط فعلی</string>
+    <string name="queue_playing_from">در حال پخش از %1$s · %2$s دقیقه مانده</string>
+    <string name="queue_min_left">%1$s دقیقه مانده</string>
+    <string name="queue_shuffle">درهم‌کردن صف</string>
+    <string name="queue_shuffled">صف درهم شد</string>
+    <string name="queue_removed">%1$s حذف شد</string>
+    <string name="queue_undo">واگرد</string>
+    <string name="queue_empty">آهنگ بعدی‌ای نیست</string>
+    <string name="queue_reorder">جابه‌جایی %1$s</string>
+    <string name="queue_move_up">بالا بردن</string>
+    <string name="queue_move_down">پایین بردن</string>
+    <string name="queue_remove">حذف</string>
+    <string name="queue_sleep_off">خاموش</string>
+    <string name="queue_sleep_end_of_track">پایان آهنگ</string>
+    <string name="queue_sleep_preset">%1$s دقیقه</string>
+    <string name="queue_sleep_chip_end">پایان آهنگ</string>
+    <string name="queue_now_playing">در حال پخش</string>
+    <string name="queue_sleep_preset_short">%1$s دقیقه</string>
+</resources>

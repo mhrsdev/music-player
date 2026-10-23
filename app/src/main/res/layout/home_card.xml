@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="152dp"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:background="@drawable/library_row_bg"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <FrameLayout
+        android:id="@+id/art_frame"
+        android:layout_width="match_parent"
+        android:layout_height="144dp">
+
+        <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+            android:id="@+id/art"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no" />
+
+        <ImageButton
+            android:id="@+id/play"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="12dp"
+            android:background="@drawable/home_play_fab"
+            android:contentDescription="@string/nav_play"
+            android:elevation="6dp"
+            android:src="@drawable/nav_ic_play"
+            android:tint="?attr/mpOnPrimary"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAlignment="viewStart"
+        android:textDirection="anyRtl"
+        android:textColor="?attr/mpOnSurface"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAlignment="viewStart"
+        android:textDirection="anyRtl"
+        android:textColor="?attr/mpOnSurfaceVariant"
+        android:textSize="14sp" />
+</LinearLayout>

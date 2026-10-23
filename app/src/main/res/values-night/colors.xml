@@ -1,3 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="window_background">#141218</color>
+    <!-- Dark scheme (DESIGN.md 2.1), seed lapis, tertiary turquoise. -->
+    <color name="mp_background">#0F1216</color>
+    <color name="mp_surface_container_lowest">#0A0D10</color>
+    <color name="mp_surface_container_low">#171A1F</color>
+    <color name="mp_surface_container">#1B1F24</color>
+    <color name="mp_surface_container_high">#252A30</color>
+    <color name="mp_surface_container_highest">#30353C</color>
+    <color name="mp_on_surface">#E2E2E9</color>
+    <color name="mp_on_surface_variant">#BFC6D2</color>
+    <color name="mp_outline">#8A919C</color>
+    <color name="mp_outline_variant">#3F4650</color>
+    <color name="mp_primary">#A6C8FF</color>
+    <color name="mp_on_primary">#00315F</color>
+    <color name="mp_primary_container">#1E4878</color>
+    <color name="mp_on_primary_container">#D4E3FF</color>
+    <color name="mp_secondary_container">#364659</color>
+    <color name="mp_on_secondary_container">#D6E3F7</color>
+    <color name="mp_tertiary">#7FD6CB</color>
+    <color name="mp_error">#FFB4AB</color>
+    <color name="window_background">@color/mp_background</color>
 </resources>

@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="@dimen/scr_bottom_chrome">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Scr.PageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:accessibilityHeading="true"
+            android:text="@string/library_title" />
+
+        <!-- Liked songs hero card (DESIGN.md 03). -->
+        <FrameLayout
+            android:id="@+id/liked_card"
+            android:layout_width="match_parent"
+            android:layout_height="168dp"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/library_liked_bg"
+            android:clickable="true"
+            android:focusable="true">
+
+            <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+                android:id="@+id/liked_art"
+                android:layout_width="120dp"
+                android:layout_height="136dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:importantForAccessibility="no" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="152dp"
+                android:layout_marginEnd="88dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/nav_ic_heart"
+                    android:tint="@color/scr_liked" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/library_liked"
+                    android:textColor="?attr/mpOnSurface"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/liked_sub"
+                    style="@style/Scr.Body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/liked_play"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="16dp"
+                android:background="@drawable/library_liked_play"
+                android:contentDescription="@string/library_play_liked"
+                android:src="@drawable/nav_ic_play"
+                android:tint="#1A1300" />
+        </FrameLayout>
+
+        <Space android:layout_width="match_parent" android:layout_height="16dp" />
+
+            <LinearLayout
+                android:id="@+id/hub_albums"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/library_row_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/library_albums"
+                        android:textColor="?attr/mpOnSurface"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/hub_albums_sub"
+                        style="@style/Scr.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+                    android:id="@+id/hub_albums_peek"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:importantForAccessibility="no" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="center"
+                    android:src="@drawable/nav_ic_chevron"
+                    android:tint="?attr/mpOnSurfaceVariant" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/hub_playlists"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/library_row_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/library_playlists"
+                        android:textColor="?attr/mpOnSurface"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/hub_playlists_sub"
+                        style="@style/Scr.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+                    android:id="@+id/hub_playlists_peek"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:importantForAccessibility="no" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="center"
+                    android:src="@drawable/nav_ic_chevron"
+                    android:tint="?attr/mpOnSurfaceVariant" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/hub_artists"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/library_row_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/library_artists"
+                        android:textColor="?attr/mpOnSurface"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/hub_artists_sub"
+                        style="@style/Scr.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+                    android:id="@+id/hub_artists_peek"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:importantForAccessibility="no" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="center"
+                    android:src="@drawable/nav_ic_chevron"
+                    android:tint="?attr/mpOnSurfaceVariant" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/hub_history"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/library_row_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/library_history"
+                        android:textColor="?attr/mpOnSurface"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/hub_history_sub"
+                        style="@style/Scr.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/hub_history_peek"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="center"
+                    android:src="@drawable/nav_ic_history"
+                    android:tint="?attr/mpOnSurfaceVariant" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="center"
+                    android:src="@drawable/nav_ic_chevron"
+                    android:tint="?attr/mpOnSurfaceVariant" />
+            </LinearLayout>
+
+        <TextView
+            style="@style/Scr.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:accessibilityHeading="true"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="12dp"
+            android:text="@string/library_recently_saved" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:paddingHorizontal="12dp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

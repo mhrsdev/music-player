@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="56dp"
+    android:paddingBottom="16dp">
+
+    <com.mhrsdev.musicplayer.ui.widget.ArtworkView
+        android:id="@+id/art"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:importantForAccessibility="no" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:accessibilityHeading="true"
+        android:gravity="center"
+        android:textDirection="anyRtl"
+        android:textColor="?attr/mpOnSurface"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        style="@style/Scr.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textDirection="anyRtl" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:background="@drawable/nav_button_primary"
+            android:clickable="true"
+            android:drawablePadding="8dp"
+            android:drawableTint="?attr/mpOnPrimary"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingHorizontal="28dp"
+            android:text="@string/library_play_all"
+            android:textColor="?attr/mpOnPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shuffle"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/library_tonal_button"
+            android:clickable="true"
+            android:drawablePadding="8dp"
+            android:drawableTint="?attr/mpOnSecondaryContainer"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingHorizontal="24dp"
+            android:text="@string/library_shuffle"
+            android:textColor="?attr/mpOnSecondaryContainer"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

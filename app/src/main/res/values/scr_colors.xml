@@ -1,0 +1,4 @@
+<resources>
+    <!-- Liked-songs accent (warm gold heart / play, DESIGN.md 03). Everything else uses T2's ?attr/mp* tokens. -->
+    <color name="scr_liked">#B8860B</color>
+</resources>
