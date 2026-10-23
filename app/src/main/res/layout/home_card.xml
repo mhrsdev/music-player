@@ -19,17 +19,12 @@
             android:layout_height="match_parent"
             android:importantForAccessibility="no" />
 
-        <ImageButton
+        <com.mhrsdev.musicplayer.ui.widget.MorphPlayPauseView
             android:id="@+id/play"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_gravity="bottom|end"
             android:layout_margin="12dp"
-            android:background="@drawable/home_play_fab"
-            android:contentDescription="@string/nav_play"
-            android:elevation="6dp"
-            android:src="@drawable/nav_ic_play"
-            app:tint="?attr/mpOnPrimary"
             android:visibility="gone" />
     </FrameLayout>
 
@@ -43,8 +38,7 @@
         android:textAlignment="viewStart"
         android:textDirection="anyRtl"
         android:textColor="?attr/mpOnSurface"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.MusicPlayer.Title" />
 
     <TextView
         android:id="@+id/subtitle"
@@ -54,6 +48,5 @@
         android:maxLines="1"
         android:textAlignment="viewStart"
         android:textDirection="anyRtl"
-        android:textColor="?attr/mpOnSurfaceVariant"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance.MusicPlayer.Supporting" />
 </LinearLayout>

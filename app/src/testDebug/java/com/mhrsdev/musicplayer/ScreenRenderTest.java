@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 @RunWith(RobolectricTestRunner.class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @LooperMode(LooperMode.Mode.PAUSED)
+@Config(application = FakeRenderApp.class)
 public class ScreenRenderTest {
 
     private static final String DARK = "w412dp-h915dp-night-xhdpi";
