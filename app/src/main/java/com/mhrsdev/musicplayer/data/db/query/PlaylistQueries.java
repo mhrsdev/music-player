@@ -83,6 +83,19 @@ public final class PlaylistQueries {
                 new Object[] {playlistId, trackId, playlistId, playlistId});
     }
 
+    /** Appends the tracks not yet in the playlist, in order; returns how many were added. Run inside a transaction. */
+    public int addTracks(String playlistId, List<String> trackIds) {
+        List<String> present = orderedTrackIds(playlistId);
+        java.util.Set<String> seen = new java.util.HashSet<>(present);
+        int added = 0;
+        for (String id : trackIds) {
+            if (!seen.add(id)) continue;
+            addTrack(playlistId, id);
+            added++;
+        }
+        return byId(playlistId) == null ? 0 : added;
+    }
+
     public void removeTrack(String playlistId, String trackId) {
         db.delete(PT, PT_PLAYLIST + " = ? AND " + PT_TRACK + " = ?", new String[] {playlistId, trackId});
     }

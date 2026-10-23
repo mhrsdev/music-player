@@ -40,7 +40,7 @@ public final class PlayerViewModel extends ViewModel {
     private final MediatorLiveData<Integer> activeLyricLine = new MediatorLiveData<>();
     private final MutableLiveData<Boolean> showLyrics = new MutableLiveData<>(false);
     private final MediatorLiveData<LyricsAvailability> lyricsAvailability = new MediatorLiveData<>();
-    /** Re-emits the current track on {@link #retryLyrics()} so the repository is asked again. */
+    /** The current track whose lyrics are wanted; re-emitted by {@link #retryLyrics()}. */
     private final MediatorLiveData<Track> lyricsRequest = new MediatorLiveData<>();
     private Set<String> likedIds = new HashSet<>();
     private boolean likedLoaded;
@@ -55,8 +55,13 @@ public final class PlayerViewModel extends ViewModel {
             Track old = currentTrack.getValue();
             if (!sameId(old, t)) currentTrack.setValue(t);
         });
-        lyricsRequest.addSource(currentTrack, lyricsRequest::setValue);
-        lyrics = Transformations.switchMap(lyricsRequest, t -> t == null ? new MutableLiveData<>() : lyricsRepo.lyricsFor(t));
+        // Lyrics are requested for the CURRENT track only, and only while the player observes (its view lifecycle =
+        // full player visible): the answer decides whether the lyrics button is shown (owner, D21 request). Local
+        // tag/sidecar first; online only via the cache or one LRCLIB request with the setting on (LyricsResolver).
+        // Tracks in the queue are never looked up, and nothing runs while the player is hidden.
+        lyricsRequest.addSource(currentTrack, t -> updateLyricsRequest());
+        lyrics = Transformations.switchMap(lyricsRequest,
+                t -> t == null ? new MutableLiveData<Lyrics>(null) : lyricsRepo.lyricsFor(t)); // null clears stale lyrics
         waveform = Transformations.switchMap(currentTrack,
                 t -> t == null ? new MutableLiveData<>() : waveformRepo.waveformFor(t, WAVEFORM_BARS));
 
@@ -74,6 +79,11 @@ public final class PlayerViewModel extends ViewModel {
         lyricsAvailability.addSource(currentTrack, t -> updateAvailability());
         activeLyricLine.addSource(lyrics, l -> updateActiveLine());
         activeLyricLine.addSource(state, s -> updateActiveLine());
+    }
+
+    private void updateLyricsRequest() {
+        Track wanted = currentTrack.getValue();
+        if (!sameId(lyricsRequest.getValue(), wanted)) lyricsRequest.setValue(wanted);
     }
 
     private static boolean sameId(@Nullable Track a, @Nullable Track b) {

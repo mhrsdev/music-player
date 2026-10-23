@@ -475,11 +475,21 @@ public final class PlayerFragment extends Fragment {
 
     // ---------------------------------------------------------------- rendering
 
+    /** Last values pushed to the views by {@link #render}: it runs at 4 Hz, so only changes may touch a view. */
+    private boolean rPlaying, rBuffering, rNext, rHasTrack, rShuffle;
+    private RepeatMode rRepeat;
+    private long rElapsedSec = -1, rDuration = -1;
+    private boolean renderedOnce;
+
     private void render(@Nullable PlaybackState s) {
         if (s == null) s = PlaybackState.empty();
-        b.playerPlay.setPlaying(s.playing(), true);
-        b.playerPlay.setBuffering(s.buffering());
-        b.playerPlay.setContentDescription(getString(s.playing() ? R.string.player_pause : R.string.player_play));
+        boolean next = s.hasNext() || s.repeatMode() == RepeatMode.ALL;
+        boolean hasTrack = s.currentTrack() != null;
+        if (!renderedOnce || rPlaying != s.playing()) {
+            b.playerPlay.setPlaying(s.playing(), true);
+            b.playerPlay.setContentDescription(getString(s.playing() ? R.string.player_pause : R.string.player_play));
+        }
+        if (!renderedOnce || rBuffering != s.buffering()) b.playerPlay.setBuffering(s.buffering());
         seek.setPlaying(s.playing());
         seek.setDuration(s.durationMs());
         seek.setBuffered(s.durationMs());
@@ -491,22 +501,39 @@ public final class PlayerFragment extends Fragment {
         }
         if (!scrubbing && !seek.isDragging()) {
             seek.setPosition(s.positionMs());
-            renderTimes(s.positionMs(), s.durationMs());
+            long sec = s.positionMs() / 1000;
+            if (sec != rElapsedSec || s.durationMs() != rDuration) { // the labels only change once a second
+                rElapsedSec = sec;
+                rDuration = s.durationMs();
+                renderTimes(s.positionMs(), s.durationMs());
+            }
         }
         updateTitleMarquee(s.playing());
-        b.playerNext.setEnabled(s.hasNext() || s.repeatMode() == RepeatMode.ALL);
-        b.playerNext.setAlpha(b.playerNext.isEnabled() ? 1f : 0.38f);
-        b.playerPlay.setEnabled(s.currentTrack() != null);
-
-        setToggle(b.playerShuffle, s.shuffleEnabled());
-        b.playerShuffle.setContentDescription(getString(s.shuffleEnabled()
-                ? R.string.player_shuffle_on : R.string.player_shuffle_off));
-        setToggle(b.playerRepeat, s.repeatMode() != RepeatMode.OFF);
-        b.playerRepeat.setImageResource(s.repeatMode() == RepeatMode.ONE
-                ? R.drawable.player_ic_repeat_one : R.drawable.player_ic_repeat);
-        b.playerRepeat.setContentDescription(getString(s.repeatMode() == RepeatMode.ONE ? R.string.player_repeat_one
-                : s.repeatMode() == RepeatMode.ALL ? R.string.player_repeat_all : R.string.player_repeat_off));
-        setToggle(b.playerQueue, false);
+        if (!renderedOnce || rNext != next) {
+            b.playerNext.setEnabled(next);
+            b.playerNext.setAlpha(next ? 1f : 0.38f);
+        }
+        if (!renderedOnce || rHasTrack != hasTrack) b.playerPlay.setEnabled(hasTrack);
+        if (!renderedOnce || rShuffle != s.shuffleEnabled()) {
+            setToggle(b.playerShuffle, s.shuffleEnabled());
+            b.playerShuffle.setContentDescription(getString(s.shuffleEnabled()
+                    ? R.string.player_shuffle_on : R.string.player_shuffle_off));
+        }
+        if (!renderedOnce || rRepeat != s.repeatMode()) {
+            setToggle(b.playerRepeat, s.repeatMode() != RepeatMode.OFF);
+            b.playerRepeat.setImageResource(s.repeatMode() == RepeatMode.ONE
+                    ? R.drawable.player_ic_repeat_one : R.drawable.player_ic_repeat);
+            b.playerRepeat.setContentDescription(getString(s.repeatMode() == RepeatMode.ONE ? R.string.player_repeat_one
+                    : s.repeatMode() == RepeatMode.ALL ? R.string.player_repeat_all : R.string.player_repeat_off));
+        }
+        if (!renderedOnce) setToggle(b.playerQueue, false);
+        renderedOnce = true;
+        rPlaying = s.playing();
+        rBuffering = s.buffering();
+        rNext = next;
+        rHasTrack = hasTrack;
+        rShuffle = s.shuffleEnabled();
+        rRepeat = s.repeatMode();
     }
 
     private void renderTimes(long pos, long dur) {
@@ -558,6 +585,7 @@ public final class PlayerFragment extends Fragment {
         int accent = light ? p.glow : p.primary;
         seek.setColors(accent, light ? 0x3D181C21 : 0x47FFFFFF);
         b.playerLike.setImageTintList(ColorStateList.valueOf(accent));
+        renderedOnce = false; // the toggles' tint comes from the palette: repaint them once
         render(vm.getState().getValue());
     }
 
@@ -894,6 +922,8 @@ public final class PlayerFragment extends Fragment {
     @Override public void onDestroyView() {
         b.lyricsList.removeCallbacks(resumeAutoScroll);
         if (lyricsTicker != null) lyricsTicker.stop();
+        renderedOnce = false;
+        rElapsedSec = -1;
         b = null;
         seek = null;
         super.onDestroyView();

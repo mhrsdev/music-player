@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Grouped settings card (DESIGN.md 09): surface-container fill, 24dp corners. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/mpSurfaceContainer" />
+    <corners android:radius="24dp" />
+</shape>

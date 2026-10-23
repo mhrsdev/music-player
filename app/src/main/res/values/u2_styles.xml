@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compact labelled action pill (selection bar, sort / select tools). -->
+    <style name="U2.ActionPill" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:background">@drawable/u2_pill_bg</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">?attr/mpOnSurface</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+</resources>

@@ -13,6 +13,12 @@ import com.mhrsdev.musicplayer.domain.model.SearchResult;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.domain.repository.Callback;
 import com.mhrsdev.musicplayer.domain.repository.LibraryAdmin;
+import com.mhrsdev.musicplayer.domain.repository.LibraryBrowser;
+import com.mhrsdev.musicplayer.domain.model.TrackDetails;
+import com.mhrsdev.musicplayer.domain.model.YearCount;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.TreeMap;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,11 +30,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /** In-memory {@link LibraryRepository} seeded from {@link SampleData}. Main thread only; callbacks run inline. */
-public final class FakeLibraryRepository implements LibraryRepository, LibraryAdmin {
+public final class FakeLibraryRepository implements LibraryRepository, LibraryAdmin, LibraryBrowser {
     private final List<Track> tracks = new ArrayList<>();
     private final Map<String, Playlist> playlists = new LinkedHashMap<>();
     private final Map<String, List<String>> playlistTrackIds = new LinkedHashMap<>();
     private final List<String> historyIds = new ArrayList<>(SampleData.SEED_HISTORY_IDS);
+    /** Seeded so the history order is also the most-played order (first entry = most plays). */
+    private final Map<String, Integer> playCounts = new HashMap<>();
     private int nextPlaylist = 1;
     /** Bumped on every write; every query is derived from it. */
     private final MutableLiveData<Integer> version = new MutableLiveData<>(0);
@@ -39,6 +47,7 @@ public final class FakeLibraryRepository implements LibraryRepository, LibraryAd
             playlists.put(p.id(), p);
             playlistTrackIds.put(p.id(), new ArrayList<>(ids));
         });
+        for (int i = 0; i < historyIds.size(); i++) playCounts.put(historyIds.get(i), historyIds.size() - i);
     }
 
     private <T> LiveData<T> derive(Supplier<T> compute) {
@@ -176,6 +185,7 @@ public final class FakeLibraryRepository implements LibraryRepository, LibraryAd
     @Override public void recordPlay(String trackId) {
         historyIds.remove(trackId);
         historyIds.add(0, trackId);
+        playCounts.merge(trackId, 1, Integer::sum);
         changed();
     }
 
@@ -230,5 +240,73 @@ public final class FakeLibraryRepository implements LibraryRepository, LibraryAd
         if (ids == null || from < 0 || from >= ids.size() || to < 0 || to >= ids.size() || from == to) return;
         ids.add(to, ids.remove(from));
         changed();
+    }
+
+    // ---- LibraryBrowser ----
+
+    @Override public LiveData<List<Track>> getMostPlayed() {
+        return derive(() -> {
+            List<Track> out = filterTracks(t -> playCounts.getOrDefault(t.id(), 0) > 0);
+            out.sort((a, b) -> Integer.compare(playCounts.get(b.id()), playCounts.get(a.id())));
+            return out;
+        });
+    }
+
+    @Override public LiveData<List<Track>> getNeverPlayed() {
+        return derive(() -> {
+            List<Track> out = filterTracks(t -> playCounts.getOrDefault(t.id(), 0) == 0);
+            out.sort(Comparator.comparingLong(Track::addedAtMs).reversed());
+            return out;
+        });
+    }
+
+    @Override public LiveData<List<YearCount>> getYears() {
+        return derive(() -> {
+            TreeMap<Integer, Integer> counts = new TreeMap<>(Comparator.reverseOrder());
+            for (Track t : tracks) if (t.year() > 0) counts.merge(t.year(), 1, Integer::sum);
+            List<YearCount> out = new ArrayList<>();
+            counts.forEach((y, n) -> out.add(new YearCount(y, n)));
+            return out;
+        });
+    }
+
+    @Override public LiveData<List<Track>> getYearTracks(int year) {
+        return derive(() -> filterTracks(t -> t.year() == year));
+    }
+
+    @Override public LiveData<Map<String, Integer>> getPlayCounts() {
+        return derive(() -> new HashMap<>(playCounts));
+    }
+
+    @Override public void addAllToPlaylist(String playlistId, List<String> trackIds, @Nullable Callback<Integer> callback) {
+        List<String> ids = playlistTrackIds.get(playlistId);
+        int added = 0;
+        if (ids != null) {
+            for (String id : trackIds) {
+                if (ids.contains(id)) continue;
+                ids.add(id);
+                added++;
+            }
+        }
+        if (added > 0) changed();
+        if (callback != null) callback.onResult(added);
+    }
+
+    @Override public void restoreToPlaylist(String playlistId, String trackId, int index) {
+        List<String> ids = playlistTrackIds.get(playlistId);
+        if (ids == null || ids.contains(trackId)) return;
+        ids.add(Math.max(0, Math.min(index, ids.size())), trackId);
+        changed();
+    }
+
+    @Override public void loadDetails(Track track, Callback<TrackDetails> callback) {
+        int plays = playCounts.getOrDefault(track.id(), 0);
+        callback.onResult(new TrackDetails(track, plays, plays > 0 ? track.addedAtMs() + 86_400_000L : 0,
+                "/storage/emulated/0/Music/" + track.artistName() + "/" + track.title() + ".mp3",
+                track.durationMs() * 40, "audio/mpeg", 320));
+    }
+
+    @Override public void forgetTracks(Collection<String> trackIds) {
+        if (tracks.removeIf(t -> trackIds.contains(t.id()))) changed();
     }
 }

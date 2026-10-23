@@ -85,6 +85,27 @@ public class PlayerViewModelTest {
         assertFalse("cannot open lyrics that do not exist", vm.getShowLyrics().getValue());
     }
 
+    /** Lyrics are asked for the current track only (never the queue), once per track, while the player observes. */
+    @Test public void lyricsAreRequestedForTheCurrentTrackOnly() {
+        FakePlayerController c = new FakePlayerController(SampleData.TRACKS.subList(0, 4), 0);
+        java.util.List<String> asked = new java.util.ArrayList<>();
+        FakeLyricsRepository fake = new FakeLyricsRepository();
+        com.mhrsdev.musicplayer.domain.repository.LyricsRepository repo = t -> {
+            asked.add(t.id());
+            return fake.lyricsFor(t);
+        };
+        PlayerViewModel vm = new PlayerViewModel(c, new FakeLibraryRepository(), repo, new FakeWaveformRepository());
+        assertTrue("nobody observing: no request", asked.isEmpty());
+        vm.getCurrentTrack().observeForever(x -> {});
+        vm.getLyrics().observeForever(x -> {});
+        assertEquals(java.util.List.of("track-1"), asked);
+        vm.toggleLyrics();
+        vm.toggleLyrics();
+        assertEquals("toggling does not ask again", 1, asked.size());
+        c.next();
+        assertEquals(java.util.List.of("track-1", "track-2"), asked);
+    }
+
     @Test public void seekClampsAndSteps() {
         FakePlayerController c = new FakePlayerController(SampleData.TRACKS.subList(0, 4), 0);
         PlayerViewModel vm = vm(c);
