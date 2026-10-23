@@ -32,8 +32,8 @@ import java.util.Locale;
  * Now playing row, drag-to-reorder by handle, swipe end-to-start to remove (+ Undo snackbar).
  * Open with {@link #show(FragmentManager)} (T3's PlayerNavigator.openQueue should call it).
  */
-public final class QueueSheetFragment extends BottomSheetDialogFragment {
-    public static final String TAG = "queue_sheet";
+public final class QueueFragment extends BottomSheetDialogFragment {
+    public static final String TAG = "queue";
 
     private QueueSheetBinding b;
     private QueueViewModel vm;
@@ -44,7 +44,7 @@ public final class QueueSheetFragment extends BottomSheetDialogFragment {
     @Nullable private QueueViewModel.UiState pending;
 
     public static void show(FragmentManager fm) {
-        if (fm.findFragmentByTag(TAG) == null) new QueueSheetFragment().show(fm, TAG);
+        if (fm.findFragmentByTag(TAG) == null) new QueueFragment().show(fm, TAG);
     }
 
     @Nullable @Override

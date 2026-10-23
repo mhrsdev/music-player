@@ -38,7 +38,7 @@ import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsAdapter;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsScrollPolicy;
-import com.mhrsdev.musicplayer.ui.queue.QueueSheetFragment;
+import com.mhrsdev.musicplayer.ui.queue.QueueFragment;
 import com.mhrsdev.musicplayer.ui.widget.BarsSeekView;
 import com.mhrsdev.musicplayer.ui.widget.BaseSeekView;
 import com.mhrsdev.musicplayer.ui.widget.SeekBarView;
@@ -166,7 +166,11 @@ public final class PlayerFragment extends Fragment {
             vm.toggleLike();
         });
         b.playerLyricsToggle.setOnClickListener(v -> vm.toggleLyrics());
-        b.playerQueue.setOnClickListener(v -> QueueSheetFragment.show(getParentFragmentManager()));
+        b.playerQueue.setOnClickListener(v -> {
+            PlayerNavigator nav = PlayerNavigator.from(requireContext());
+            if (nav != null) nav.openQueue();
+            else QueueFragment.show(getParentFragmentManager());
+        });
         seek.setOnSeekListener(new SeekBarView.OnSeekListener() {
             @Override public void onSeekStart(long pos) { scrubbing = true; }
             @Override public void onSeek(long pos) { renderTimes(pos, seek.getDuration()); }
