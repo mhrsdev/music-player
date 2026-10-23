@@ -36,7 +36,6 @@ public final class Tokens {
     public static final long MOTION_MORPH = 350L;
     public static final long MOTION_COLOR = 600L;
     public static final long MOTION_COLOR_REDUCED = 150L;
-    public static final long COOKIE_TURN_MS = 24_000L;
     /** Decorative frame interval: 30 fps is enough for slow waves and halves the GPU work of 60 fps. */
     public static final long DECOR_FRAME_MS = 33L;
 

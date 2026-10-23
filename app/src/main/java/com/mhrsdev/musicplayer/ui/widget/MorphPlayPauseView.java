@@ -1,6 +1,5 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -10,44 +9,69 @@ import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.mhrsdev.musicplayer.R;
-import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
+import com.mhrsdev.musicplayer.ui.motion.Motion;
+import com.mhrsdev.musicplayer.ui.motion.ShapeMorph;
+import com.mhrsdev.musicplayer.ui.motion.Spring;
+import com.mhrsdev.musicplayer.ui.motion.SpringAnimator;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
 
 /**
- * Play/pause button whose container morphs from a squircle (paused) to a 10-lobe cookie (playing), with the
- * play triangle crossfading to pause bars in the first 40% of the morph. While playing it turns slowly
- * (1 turn / 24 s, 20 fps, only when visible and decorative motion is allowed). Buffering shows a small arc.
- * Square: size it with layout params (e.g. 88 dp in the player, 48 dp in the mini-player).
+ * Mowj play/pause button. PLAY (paused) is the soft squircle with the play triangle (the look the owner liked).
+ * PAUSE (playing) follows {@link #PAUSE_STYLE} (owner picked B; docs/screens/m1-pause-options.png): the container
+ * spring-morphs through {@link ShapeMorph} and the triangle's two halves morph point by point into the two bars
+ * (no crossfade, no clipping). Every state change plays the one Mowj jiggle (1 -> 0.92 -> ~1.03 -> 1) and a press
+ * squishes; both are drawn inside a 4% headroom so the silhouette never touches the bounds. Media icons never
+ * mirror in RTL.
+ *
+ * <p>Battery: frames run only while a spring moves (shared {@code FrameDriver}); nothing ticks at rest, not even
+ * while playing. Reduce motion / battery saver: instant state change, no jiggle.
  */
 public class MorphPlayPauseView extends View {
-    private static final int POINTS = 120;
-    private static final long SPIN_FRAME_MS = 50L;
+    /** Pause-state options shown to the owner. */
+    public enum PauseStyle {
+        /** A: same squircle, shorter bars with fully round caps. */
+        SQUIRCLE_ROUND_BARS,
+        /** B: the squircle melts into a circle, centred bars (recommended). */
+        CIRCLE,
+        /** D: the squircle firms into a rounded square, wider bars in a "held" stance. */
+        ROUNDED_SQUARE
+    }
+
+    /** The one switch: which pause look ships. Owner decision (D-M1): B, squircle <-> circle. */
+    public static final PauseStyle PAUSE_STYLE = PauseStyle.CIRCLE;
+
+    /** Scale headroom kept free for the jiggle rebound (max drawn scale). */
+    static final float HEADROOM = 1.04f;
 
     private final Paint containerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint arcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path shape = new Path();
-    private final Path playIcon = new Path();
-    private final Path pauseIcon = new Path();
+    private final Path icon = new Path();
     private final RectF arcRect = new RectF();
-    private final ValueAnimator morphAnim = ValueAnimator.ofFloat(0f, 1f);
+    // Icon outlines: two quads (8 points) for play and for pause, in units of u around the centre.
+    private final float[] playPts = new float[16];
+    private final float[] pausePts = new float[16];
+    private final float[] cur = new float[16];
     private final long origin = SystemClock.uptimeMillis();
+    private final SpringAnimator morphSpring;
+    private final SpringAnimator scaleSpring;
 
+    private PauseStyle style = PAUSE_STYLE;
+    private ShapeMorph morphShape;
+    private float morph; // 0 play/squircle .. 1 pause shape
+    private float scale = 1f; // jiggle / press, drawn inside the headroom
     private boolean playing;
     private boolean bound;
     private boolean buffering;
-    private float morph; // 0 squircle/play .. 1 cookie/pause
-    private float rotationDeg;
-    private long lastFrame;
     private boolean visibleToUser;
-    private boolean motionAllowed = true;
     @ColorInt private int containerColor;
     @ColorInt private int iconColor;
 
@@ -63,38 +87,52 @@ public class MorphPlayPauseView extends View {
         iconPaint.setStyle(Paint.Style.FILL);
         arcPaint.setStyle(Paint.Style.STROKE);
         arcPaint.setStrokeCap(Paint.Cap.ROUND);
-        morphAnim.setDuration(Tokens.MOTION_MORPH);
-        morphAnim.setInterpolator(new OvershootInterpolator(1.6f));
-        morphAnim.addUpdateListener(a -> {
-            morph = (float) a.getAnimatedValue();
-            invalidate();
-        });
+        morphSpring = new SpringAnimator(Spring.Preset.SNAPPY, v -> { morph = v; invalidate(); }, this);
+        scaleSpring = new SpringAnimator(Spring.Preset.JIGGLE, v -> { scale = v; invalidate(); }, this);
+        scaleSpring.snapTo(1f);
+        morphShape = new ShapeMorph(ShapeMorph.Shape.SQUIRCLE, pauseShape(style));
+        buildIcons();
         setColors(Tokens.primary(context), Tokens.color(context, R.attr.mpOnPrimary));
         updateDescription();
     }
 
+    /** For the owner's proposal sheet and tests; the app ships {@link #PAUSE_STYLE}. */
+    @VisibleForTesting
+    public void setPauseStyle(PauseStyle s) {
+        style = s;
+        morphShape = new ShapeMorph(ShapeMorph.Shape.SQUIRCLE, pauseShape(s));
+        buildIcons();
+        invalidate();
+    }
+
+    private static ShapeMorph.Shape pauseShape(PauseStyle s) {
+        return switch (s) {
+            case CIRCLE -> ShapeMorph.Shape.CIRCLE;
+            case ROUNDED_SQUARE -> ShapeMorph.Shape.ROUNDED_SQUARE;
+            default -> ShapeMorph.Shape.SQUIRCLE;
+        };
+    }
+
     /** Sets the state; {@code animate=false} jumps (use when binding a recycled view). */
     public void setPlaying(boolean playing, boolean animate) {
-        if (!bound) { // first bind: show the final shape at once, never a morph from the default state
+        if (!bound) { // first bind shows the final shape at once, never a morph from the default state
             bound = true;
             animate = false;
             this.playing = !playing;
         }
-        if (this.playing == playing && !morphAnim.isRunning()) {
-            if (!animate) setMorphNow(playing ? 1f : 0f);
+        if (this.playing == playing) {
+            if (!animate && !morphSpring.isRunning()) morphSpring.snapTo(playing ? 1f : 0f);
             return;
         }
         this.playing = playing;
-        motionAllowed = MotionPolicy.decorativeMotionEnabled(getContext());
         updateDescription();
-        morphAnim.cancel();
-        if (animate && motionAllowed && isLaidOut()) {
-            morphAnim.setFloatValues(morph, playing ? 1f : 0f);
-            morphAnim.start();
+        float target = playing ? 1f : 0f;
+        if (animate && isLaidOut()) {
+            morphSpring.animateTo(target); // snaps by itself when motion is off
+            Motion.jiggle(scaleSpring);
         } else {
-            setMorphNow(playing ? 1f : 0f);
+            morphSpring.snapTo(target);
         }
-        lastFrame = 0;
         invalidate();
     }
 
@@ -114,9 +152,11 @@ public class MorphPlayPauseView extends View {
         invalidate();
     }
 
-    private void setMorphNow(float m) {
-        morph = m;
-        invalidate();
+    /** Test hook: freeze a mid-morph / mid-jiggle frame. */
+    @VisibleForTesting
+    void setFrameForTest(float morph, float scale) {
+        morphSpring.snapTo(morph);
+        scaleSpring.snapTo(scale);
     }
 
     private void updateDescription() {
@@ -136,94 +176,124 @@ public class MorphPlayPauseView extends View {
         return Math.max(0f, inner / 2f - 1.5f);
     }
 
-    @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
-        super.onSizeChanged(w, h, ow, oh);
-        float s = 2f * outerRadius(w, h, getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom());
-        float cx = w / 2f, cy = h / 2f, u = s * 0.11f;
-        // Play: rounded-ish triangle, optically centred (+0.12u).
-        playIcon.rewind();
-        playIcon.moveTo(cx - u * 0.9f, cy - u * 1.25f);
-        playIcon.lineTo(cx + u * 1.35f, cy);
-        playIcon.lineTo(cx - u * 0.9f, cy + u * 1.25f);
-        playIcon.close();
-        pauseIcon.rewind();
-        float bw = u * 0.62f, bh = u * 1.2f, gap = u * 0.42f, r = bw * 0.45f;
-        pauseIcon.addRoundRect(cx - gap - bw, cy - bh, cx - gap, cy + bh, r, r, Path.Direction.CW);
-        pauseIcon.addRoundRect(cx + gap, cy - bh, cx + gap + bw, cy + bh, r, r, Path.Direction.CW);
-        arcPaint.setStrokeWidth(s * 0.045f);
-        arcRect.set(cx - u * 1.3f, cy - u * 1.3f, cx + u * 1.3f, cy + u * 1.3f);
+    /**
+     * Play triangle (left -0.9u, tip +1.35u, half height 1.25u; optically centred) split at its middle into two
+     * quads; pause = two bars. Point i of each quad maps to point i of the other, so the halves become the bars.
+     */
+    private void buildIcons() {
+        float x0 = -0.9f, tip = 1.35f, hh = 1.25f, mid = (x0 + tip) / 2f;
+        float yAtMid = hh * (tip - mid) / (tip - x0);
+        float eps = 0.02f; // keeps the tip quad non-degenerate
+        set(playPts, 0, x0, -hh, mid, -yAtMid, mid, yAtMid, x0, hh);
+        set(playPts, 8, mid, -yAtMid, tip, -eps, tip, eps, mid, yAtMid);
+        float bw, bh, gap;
+        switch (style) {
+            case SQUIRCLE_ROUND_BARS: bw = 0.7f; bh = 1.05f; gap = 0.4f; break;
+            case ROUNDED_SQUARE: bw = 0.78f; bh = 1.18f; gap = 0.36f; break;
+            case CIRCLE:
+            default: bw = 0.7f; bh = 1.2f; gap = 0.38f; break;
+        }
+        set(pausePts, 0, -gap - bw, -bh, -gap, -bh, -gap, bh, -gap - bw, bh);
+        set(pausePts, 8, gap, -bh, gap + bw, -bh, gap + bw, bh, gap, bh);
+    }
+
+    private static void set(float[] a, int off, float x0, float y0, float x1, float y1, float x2, float y2,
+                            float x3, float y3) {
+        a[off] = x0; a[off + 1] = y0; a[off + 2] = x1; a[off + 3] = y1;
+        a[off + 4] = x2; a[off + 5] = y2; a[off + 6] = x3; a[off + 7] = y3;
+    }
+
+    /** Bar corner radius in u per style (the play triangle uses 0.14u, its seam stays sharp). */
+    private float barCorner() {
+        return switch (style) {
+            case SQUIRCLE_ROUND_BARS -> 0.33f;
+            case ROUNDED_SQUARE -> 0.2f;
+            default -> 0.3f;
+        };
     }
 
     @Override public void onVisibilityAggregated(boolean isVisible) {
         super.onVisibilityAggregated(isVisible);
         visibleToUser = isVisible;
-        lastFrame = 0;
         if (isVisible) invalidate();
     }
 
-    @Override protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        motionAllowed = MotionPolicy.decorativeMotionEnabled(getContext());
-    }
-
     @Override protected void onDetachedFromWindow() {
-        morphAnim.cancel();
+        morphSpring.snapTo(playing ? 1f : 0f);
+        scaleSpring.snapTo(1f);
         super.onDetachedFromWindow();
     }
 
     @Override protected void onDraw(Canvas canvas) {
-        long now = SystemClock.uptimeMillis();
-        boolean spin = playing && motionAllowed && visibleToUser && isEnabled();
-        if (spin && lastFrame != 0) rotationDeg = (rotationDeg + 360f * (now - lastFrame) / Tokens.COOKIE_TURN_MS) % 360f;
-        lastFrame = now;
-
-        float w = getWidth(), h = getHeight(), cx = w / 2f, cy = h / 2f;
-        float r = outerRadius(w, h, getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom());
-        double rot = Math.toRadians(rotationDeg);
-        float m = Math.max(0f, Math.min(1f, morph)); // overshoot would push the edge past the bounds
-        shape.rewind();
-        for (int i = 0; i <= POINTS; i++) {
-            double t = WaveMath.TWO_PI * i / POINTS;
-            // Only the cookie turns; the squircle stays axis-aligned so its corners never leave the square.
-            float rr = r * ShapeMath.radiusRotated(t, rot, m);
-            float x = cx + rr * (float) Math.cos(t), y = cy + rr * (float) Math.sin(t);
-            if (i == 0) shape.moveTo(x, y); else shape.lineTo(x, y);
-        }
-        shape.close();
+        float w = getWidth(), h = getHeight();
+        float cx = getPaddingLeft() + (w - getPaddingLeft() - getPaddingRight()) / 2f;
+        float cy = getPaddingTop() + (h - getPaddingTop() - getPaddingBottom()) / 2f;
+        float s = Math.min(HEADROOM, Math.max(0.5f, scale));
+        float r = outerRadius(w, h, getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom())
+                / HEADROOM * s;
+        float m = Math.max(0f, Math.min(1f, morph));
+        morphShape.toPath(shape, m, cx, cy, r, r);
         containerPaint.setColor(isEnabled() ? containerColor : 0x1FFFFFFF & containerColor | 0x1F000000);
         canvas.drawPath(shape, containerPaint);
 
-        int iconAlphaBase = isEnabled() ? 255 : 97;
+        int alpha = isEnabled() ? 255 : 97;
+        float u = r * 0.235f;
+        boolean motion = visibleToUser && Motion.enabled(getContext());
         if (buffering) {
             arcPaint.setColor(iconColor);
-            arcPaint.setAlpha(iconAlphaBase);
-            float sweepStart = motionAllowed ? (now - origin) % 1000L * 0.36f : 0f;
-            canvas.drawArc(arcRect, sweepStart, 270f, false, arcPaint);
-            if (motionAllowed && visibleToUser) postInvalidateOnAnimation();
+            arcPaint.setAlpha(alpha);
+            arcPaint.setStrokeWidth(r * 0.09f);
+            arcRect.set(cx - u * 1.3f, cy - u * 1.3f, cx + u * 1.3f, cy + u * 1.3f);
+            float start = motion ? (SystemClock.uptimeMillis() - origin) % 1000L * 0.36f : 0f;
+            canvas.drawArc(arcRect, start, 270f, false, arcPaint);
+            if (motion) postInvalidateOnAnimation();
             return;
         }
-        // Icon crossfade happens in the first 40% of the morph.
-        float k = Math.max(0f, Math.min(1f, morph / 0.4f));
+        for (int i = 0; i < 16; i++) cur[i] = playPts[i] + (pausePts[i] - playPts[i]) * m;
+        icon.rewind();
+        float corner = (barCorner() * m + 0.14f * (1f - m)) * u;
+        addQuad(icon, cur, 0, cx, cy, u, u, corner, m, true);
+        addQuad(icon, cur, 8, cx, cy, u, u, corner, m, false);
         iconPaint.setColor(iconColor);
-        if (k < 1f) {
-            iconPaint.setAlpha(Math.round(iconAlphaBase * (1f - k)));
-            canvas.drawPath(playIcon, iconPaint);
+        iconPaint.setAlpha(alpha);
+        canvas.drawPath(icon, iconPaint);
+    }
+
+    /**
+     * Adds a rounded quad. Seam corners (where the triangle halves meet) round only as the morph progresses, so the
+     * play triangle stays one clean shape. No allocation: corners are cut and joined with quadTo.
+     */
+    private static void addQuad(Path p, float[] pts, int off, float cx, float cy, float ux, float uy, float radius,
+                                float m, boolean leftHalf) {
+        for (int k = 0; k <= 4; k++) {
+            int i = k % 4;
+            float px = cx + pts[off + 2 * i] * ux, py = cy + pts[off + 2 * i + 1] * uy;
+            int pi = (i + 3) % 4, ni = (i + 1) % 4;
+            float ax = cx + pts[off + 2 * pi] * ux, ay = cy + pts[off + 2 * pi + 1] * uy;
+            float bx = cx + pts[off + 2 * ni] * ux, by = cy + pts[off + 2 * ni + 1] * uy;
+            boolean seam = leftHalf ? (i == 1 || i == 2) : (i == 0 || i == 3);
+            float rr = seam ? radius * m : radius;
+            float la = (float) Math.hypot(ax - px, ay - py), lb = (float) Math.hypot(bx - px, by - py);
+            rr = Math.min(rr, Math.min(la, lb) / 2f);
+            float sx = la > 0 ? px + (ax - px) * rr / la : px, sy = la > 0 ? py + (ay - py) * rr / la : py;
+            float ex = lb > 0 ? px + (bx - px) * rr / lb : px, ey = lb > 0 ? py + (by - py) * rr / lb : py;
+            if (k == 0) {
+                p.moveTo(ex, ey);
+            } else {
+                p.lineTo(sx, sy);
+                p.quadTo(px, py, ex, ey);
+            }
         }
-        if (k > 0f) {
-            iconPaint.setAlpha(Math.round(iconAlphaBase * k));
-            canvas.drawPath(pauseIcon, iconPaint);
-        }
-        if (spin && !morphAnim.isRunning()) postInvalidateDelayed(SPIN_FRAME_MS);
+        p.close();
     }
 
     @Override public boolean onTouchEvent(MotionEvent e) {
-        if (isEnabled() && motionAllowed) {
+        if (isEnabled()) {
             int a = e.getActionMasked();
             if (a == MotionEvent.ACTION_DOWN) {
-                animate().scaleX(0.92f).scaleY(0.92f).setDuration(Tokens.MOTION_FAST).start();
+                scaleSpring.setPreset(Spring.Preset.SNAPPY).animateTo(Motion.PRESS_SCALE);
             } else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) {
-                animate().scaleX(1f).scaleY(1f).setDuration(Tokens.MOTION_MORPH)
-                        .setInterpolator(new OvershootInterpolator(2f)).start();
+                scaleSpring.setPreset(Spring.Preset.JIGGLE).animateTo(1f);
             }
         }
         return super.onTouchEvent(e);

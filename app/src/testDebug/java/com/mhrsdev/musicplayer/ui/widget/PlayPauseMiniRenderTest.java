@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 /**
- * Real-device bug: the cookie/squircle play button was clipped by its own bounds (flat cuts). Renders 40/56/72 dp
+ * Real-device bug: the old cookie/squircle play button was clipped by its own bounds (flat cuts). Renders 40/56/72 dp
  * (with and without the mini-player's 4 dp padding) in every state and asserts the shape stays inside the bounds
  * with a clear 1 px ring and is mirror-symmetric; also renders the mini-player (docs/screens/u3-playpause.png,
  * u3-mini-*.png).
@@ -50,9 +50,6 @@ public class PlayPauseMiniRenderTest {
                 int kind = state % 3;
                 v.setPlaying(kind == 1, false);
                 if (kind == 2) {
-                    java.lang.reflect.Field f = MorphPlayPauseView.class.getDeclaredField("rotationDeg");
-                    f.setAccessible(true);
-                    f.setFloat(v, 17f);
                     v.setPlaying(true, false);
                     v.setPlaying(false, false);
                 }
@@ -71,7 +68,7 @@ public class PlayPauseMiniRenderTest {
                         assertTrue(what + " right", Color.alpha(bmp.getPixel(px - 1 - k, i)) < 8);
                     }
                 }
-                if (kind != 2) { // the turned cookie is not mirror-symmetric by design; paused shapes are axis-aligned
+                if (kind != 2) { // kind 2 = paused after a play/pause round trip
                     int diff = 0;
                     for (int y = 0; y < px; y++) for (int x = 0; x < px; x++) {
                         int m = kind == 0 ? bmp.getPixel(px - 1 - x, y) : bmp.getPixel(x, px - 1 - y);

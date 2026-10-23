@@ -32,17 +32,16 @@ public final class SettingsStore {
     private static final String K_INCLUDE = "folders_include";
     private static final String K_EXCLUDE = "folders_exclude";
     private static final String K_NON_MUSIC = "include_non_music";
+    private static final String K_DYNAMIC_COLOR = "dynamic_color";
     private static final String K_MIN_TRACK_SECONDS = "min_track_seconds";
     private static final String K_REDUCE_MOTION = "reduce_motion";
     private static final String K_IMMERSIVE_PLAYER = "immersive_player";
-    /** Files shorter than this are skipped by the scanner (ringtones, notification sounds, voice notes). */
-    public static final int DEFAULT_MIN_TRACK_SECONDS = 30;
 
     private static final int MAX_BACKUP_STRING = 32;
     private static final Map<String, Class<?>> BACKUP_TYPES = Map.of(
             K_THEME, String.class, K_ARTWORK_COLORS, Boolean.class, K_SEEK_BAR, String.class, K_LANGUAGE, String.class,
             K_LYRICS_ONLINE, Boolean.class, K_LYRICS_SIZE, String.class, K_SLEEP_MINUTES, Integer.class,
-            K_BATTERY_SAVER, String.class);
+            K_BATTERY_SAVER, String.class, K_DYNAMIC_COLOR, Boolean.class);
 
     private final SharedPreferences prefs;
     private final MutableLiveData<ThemeMode> theme;
@@ -243,6 +242,15 @@ public final class SettingsStore {
     public void setImmersivePlayer(boolean value) {
         prefs.edit().putBoolean(K_IMMERSIVE_PLAYER, value).apply();
         publish(immersivePlayer, value);
+    }
+
+    /** Material You wallpaper colours (API 31+) instead of the lapis identity; default off. Read at activity start. */
+    public boolean isDynamicColor() {
+        return prefs.getBoolean(K_DYNAMIC_COLOR, false);
+    }
+
+    public void setDynamicColor(boolean value) {
+        prefs.edit().putBoolean(K_DYNAMIC_COLOR, value).apply();
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {

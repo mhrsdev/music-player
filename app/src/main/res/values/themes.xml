@@ -1,7 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Material Components is only an invisible foundation (DayNight + widget defaults); the look comes from mp* tokens. -->
-    <style name="Base.Theme.MusicPlayer" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- M1: Theme.Mowj = real Material 3 theming on top of the Mowj tokens: every M3 colour role, the shape
+         families and motion durations, so stock Material components look like Mowj. Light/dark via DayNight,
+         Black overrides the surfaces below. Dynamic colour (Material You) is opt-in: ThemeController. -->
+    <style name="Theme.Mowj" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/mp_primary</item>
+        <item name="colorOnPrimary">@color/mp_on_primary</item>
+        <item name="colorPrimaryContainer">@color/mp_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/mp_on_primary_container</item>
+        <item name="colorPrimaryInverse">@color/mp_inverse_primary</item>
+        <item name="colorSecondary">@color/mp_secondary</item>
+        <item name="colorOnSecondary">@color/mp_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/mp_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/mp_on_secondary_container</item>
+        <item name="colorTertiary">@color/mp_tertiary</item>
+        <item name="colorOnTertiary">@color/mp_on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/mp_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/mp_on_tertiary_container</item>
+        <item name="colorError">@color/mp_error</item>
+        <item name="colorOnError">@color/mp_on_error</item>
+        <item name="colorErrorContainer">@color/mp_error_container</item>
+        <item name="colorOnErrorContainer">@color/mp_on_error_container</item>
+        <item name="android:colorBackground">@color/mp_background</item>
+        <item name="colorOnBackground">@color/mp_on_surface</item>
+        <item name="colorSurface">@color/mp_background</item>
+        <item name="colorOnSurface">@color/mp_on_surface</item>
+        <item name="colorSurfaceVariant">@color/mp_surface_container_highest</item>
+        <item name="colorOnSurfaceVariant">@color/mp_on_surface_variant</item>
+        <item name="colorSurfaceContainerLowest">@color/mp_surface_container_lowest</item>
+        <item name="colorSurfaceContainerLow">@color/mp_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/mp_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/mp_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/mp_surface_container_highest</item>
+        <item name="colorSurfaceInverse">@color/mp_inverse_surface</item>
+        <item name="colorOnSurfaceInverse">@color/mp_inverse_on_surface</item>
+        <item name="colorOutline">@color/mp_outline</item>
+        <item name="colorOutlineVariant">@color/mp_outline_variant</item>
+        <item name="colorControlActivated">@color/mp_primary</item>
+        <item name="colorControlHighlight">@color/mp_state_layer</item>
+        <!-- Shape families, consistent with Tokens radii (row art 12, cards 24, cover/sheets 32). -->
+        <item name="shapeAppearanceCornerExtraSmall">@style/ShapeAppearance.Mowj.ExtraSmall</item>
+        <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.Mowj.Small</item>
+        <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.Mowj.Medium</item>
+        <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.Mowj.Large</item>
+        <item name="shapeAppearanceCornerExtraLarge">@style/ShapeAppearance.Mowj.ExtraLarge</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Mowj.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Mowj.Large</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Mowj.ExtraLarge</item>
+        <!-- Motion durations mirror ui/motion/Motion (springs have no duration). -->
+        <item name="motionDurationShort2">120</item>
+        <item name="motionDurationMedium2">240</item>
+        <item name="motionDurationMedium4">320</item>
+        <item name="motionDurationLong2">450</item>
+        <item name="snackbarStyle">@style/Widget.Mowj.Snackbar</item>
+        <item name="mpSurfaceFloating">@color/mp_surface_floating</item>
+        <item name="mpOnSurfaceFloating">@color/mp_on_surface_floating</item>
+    </style>
+
+    <style name="ShapeAppearance.Mowj.ExtraSmall" parent=""><item name="cornerFamily">rounded</item><item name="cornerSize">6dp</item></style>
+    <style name="ShapeAppearance.Mowj.Small" parent=""><item name="cornerFamily">rounded</item><item name="cornerSize">12dp</item></style>
+    <style name="ShapeAppearance.Mowj.Medium" parent=""><item name="cornerFamily">rounded</item><item name="cornerSize">16dp</item></style>
+    <style name="ShapeAppearance.Mowj.Large" parent=""><item name="cornerFamily">rounded</item><item name="cornerSize">24dp</item></style>
+    <style name="ShapeAppearance.Mowj.ExtraLarge" parent=""><item name="cornerFamily">rounded</item><item name="cornerSize">32dp</item></style>
+
+    <!-- Opaque inverse-surface snackbar, 16dp corners (DESIGN.md 4). -->
+    <style name="Widget.Mowj.Snackbar" parent="Widget.Material3.Snackbar">
+        <item name="backgroundTint">@color/mp_inverse_surface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Mowj.Medium</item>
+    </style>
+
+    <style name="Base.Theme.MusicPlayer" parent="Theme.Mowj">
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
@@ -60,5 +129,14 @@
         <item name="mpSurfaceContainerHighest">@color/mp_black_surface_container_highest</item>
         <item name="mpOutlineVariant">@color/mp_black_outline_variant</item>
         <item name="mpSecondaryContainer">@color/mp_black_secondary_container</item>
+        <item name="android:colorBackground">@color/mp_black_background</item>
+        <item name="colorSurfaceContainerLowest">@color/mp_black_background</item>
+        <item name="colorSurfaceContainerLow">@color/mp_black_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/mp_black_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/mp_black_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/mp_black_surface_container_highest</item>
+        <item name="colorOutlineVariant">@color/mp_black_outline_variant</item>
+        <item name="colorSecondaryContainer">@color/mp_black_secondary_container</item>
+        <item name="mpSurfaceFloating">@color/mp_black_surface_floating</item>
     </style>
 </resources>

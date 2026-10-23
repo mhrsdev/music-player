@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Variable font, one entry per weight used by the v1 type ramp (DESIGN.md section 3). -->
+<!-- Google Sans Flex subset (wght 400-800, ROND 0-100; tools/fonts/build_sans_subset.py). Body, supporting and list text: ROND 20 (a quiet hint of softness, best legibility).
+     Pick weights with android:textFontWeight / Typeface.create(family, weight); see ui/theme/TypeRoles. -->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android">
-    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="400" android:fontVariationSettings="'wght' 420" />
-    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="500" android:fontVariationSettings="'wght' 560" />
-    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="600" android:fontVariationSettings="'wght' 640" />
-    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="700" android:fontVariationSettings="'wght' 720" />
-    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="800" android:fontVariationSettings="'wght' 800" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="400" android:fontVariationSettings="'wght' 420, 'ROND' 20" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="500" android:fontVariationSettings="'wght' 560, 'ROND' 20" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="600" android:fontVariationSettings="'wght' 640, 'ROND' 20" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="700" android:fontVariationSettings="'wght' 720, 'ROND' 20" />
+    <font android:font="@font/google_sans_flex" android:fontStyle="normal" android:fontWeight="800" android:fontVariationSettings="'wght' 800, 'ROND' 20" />
 </font-family>

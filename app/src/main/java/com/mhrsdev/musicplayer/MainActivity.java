@@ -28,6 +28,7 @@ import com.mhrsdev.musicplayer.ui.home.HomeFragment;
 import com.mhrsdev.musicplayer.ui.library.CollectionFragment;
 import com.mhrsdev.musicplayer.ui.library.LibraryFragment;
 import com.mhrsdev.musicplayer.ui.library.TrackListFragment;
+import com.mhrsdev.musicplayer.ui.motion.PageTransitions;
 import com.mhrsdev.musicplayer.ui.nav.AudioPermission;
 import com.mhrsdev.musicplayer.ui.nav.BottomChrome;
 import com.mhrsdev.musicplayer.ui.nav.SystemBars;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity
         SettingsStore.Theme theme = new PrefsSettingsStore(this).getTheme();
         ThemeApplier.applyNightMode(theme);
         setTheme(ThemeApplier.themeRes(theme));
+        ThemeController.applyDynamicColor(this, theme == SettingsStore.Theme.BLACK);
         SystemBars.install(this); // edge-to-edge, transparent bars, no scrim, cutout area (all API levels)
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -356,9 +358,8 @@ public class MainActivity extends AppCompatActivity
             case LIBRARY -> new LibraryFragment();
             case SETTINGS -> new SettingsFragment();
         };
-        getSupportFragmentManager().beginTransaction()
+        PageTransitions.tab(getSupportFragmentManager().beginTransaction(), this)
                 .setReorderingAllowed(true)
-                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                 .replace(R.id.screen_container, f)
                 .commit();
         shell.selectTab(tab);
@@ -384,10 +385,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void push(Fragment f, @Nullable String tag) {
-        getSupportFragmentManager().beginTransaction()
+        PageTransitions.push(getSupportFragmentManager().beginTransaction(), this)
                 .setReorderingAllowed(true)
-                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out,
-                        android.R.animator.fade_in, android.R.animator.fade_out)
                 .replace(R.id.screen_container, f, tag)
                 .addToBackStack(tag)
                 .commit();

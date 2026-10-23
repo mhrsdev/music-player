@@ -13,7 +13,7 @@ import com.mhrsdev.musicplayer.databinding.HomeCardBinding;
 import com.mhrsdev.musicplayer.domain.model.HomeItem;
 import com.mhrsdev.musicplayer.ui.library.Art;
 
-/** Cards inside a Home carousel. The hero variant is the focused-card width of {@link HeroCarousel} with the cookie play on the cover. */
+/** Cards inside a Home carousel. The hero variant is the focused-card width of {@link HeroCarousel} with the play button on the cover. */
 final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
 
     interface Listener {
