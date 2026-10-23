@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /** Small bitmap helpers: decode a cover down to widget size, and draw rounded covers / the progress bar. */
-final class WidgetArt {
+class WidgetArt {
     private WidgetArt() { }
 
     /** Decodes the cover at roughly {@code maxPx} (power-of-two subsampling, RGB_565); null when it cannot be read. */

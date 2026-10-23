@@ -30,7 +30,7 @@ import java.util.function.Function;
  * {@link LibraryBrowser} on framework SQLite (same db, io executor and {@link ChangeNotifier} as
  * {@link SqliteLibraryRepository}). File facts for the details sheet come from MediaStore, read on demand only.
  */
-public final class SqliteLibraryBrowser implements LibraryBrowser {
+public class SqliteLibraryBrowser implements LibraryBrowser {
     private static final int SMART_LIMIT = 200;
 
     private final DbHelper helper;

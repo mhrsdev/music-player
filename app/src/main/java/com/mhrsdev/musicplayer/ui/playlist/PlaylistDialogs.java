@@ -14,7 +14,7 @@ import com.mhrsdev.musicplayer.domain.repository.Callback;
 import com.mhrsdev.musicplayer.domain.repository.LibraryRepository;
 
 /** Small dialogs for playlist management: name entry (create / rename) and delete confirmation. */
-public final class PlaylistDialogs {
+public class PlaylistDialogs {
     private PlaylistDialogs() { }
 
     /** Asks for a name and creates the playlist; {@code created} (may be null) receives it. */

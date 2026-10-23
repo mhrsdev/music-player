@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 /** Tab reselect: scrolls the screen's main (first vertical) list back to the top. */
-public final class ScrollToTop {
+public class ScrollToTop {
     private ScrollToTop() { }
 
     /** True if a scrolling container was found under {@code root}. */

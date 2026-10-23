@@ -13,7 +13,7 @@ import org.json.JSONException;
  * GitHub's rate limit), so a check costs almost nothing. The cache is keyed by URL, so switching "include
  * pre-releases" never reuses the other answer.
  */
-final class UpdateChecker {
+class UpdateChecker {
     private final UpdateHttp http;
     private final UpdateStore store;
     private final String latestUrl;

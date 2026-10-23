@@ -1,0 +1,8 @@
+<resources>
+    <string name="browse_recent">تازه اضافه‌شده</string>
+    <string name="browse_most_played">پرپخش‌ترین‌ها</string>
+    <string name="browse_liked">آهنگ‌های پسندیده</string>
+    <string name="browse_playlists">پلی‌لیست‌ها</string>
+    <string name="browse_albums">آلبوم‌ها</string>
+    <string name="browse_artists">خواننده‌ها</string>
+</resources>

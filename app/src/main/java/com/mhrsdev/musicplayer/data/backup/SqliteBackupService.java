@@ -23,7 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.function.LongSupplier;
 
 /** {@link BackupService} on the app database and settings; all work runs on the io executor. */
-public final class SqliteBackupService implements BackupService {
+public class SqliteBackupService implements BackupService {
     /** A backup of a very large library is a few MB; anything beyond this is not one of ours. */
     private static final int MAX_BYTES = 64 << 20;
 
