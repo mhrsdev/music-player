@@ -15,7 +15,7 @@ import java.util.List;
  * are fewer. Four plain ArtworkViews clipped by one rounded outline, so it shares the bitmap cache and costs nothing
  * per frame.
  */
-public final class MosaicArtView extends ViewGroup {
+public class MosaicArtView extends ViewGroup {
     private final ArtworkView[] tiles = new ArtworkView[4];
     private float radiusPx;
     private float radiusDp;

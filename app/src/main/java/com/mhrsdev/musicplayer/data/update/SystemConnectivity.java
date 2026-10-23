@@ -5,7 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 
 /** {@link Connectivity} on {@link ConnectivityManager} (ACCESS_NETWORK_STATE is already declared). */
-final class SystemConnectivity implements Connectivity {
+class SystemConnectivity implements Connectivity {
     private final ConnectivityManager cm;
 
     SystemConnectivity(Context context) {

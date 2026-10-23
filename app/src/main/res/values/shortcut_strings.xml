@@ -1,0 +1,9 @@
+<resources>
+    <string name="shortcut_shuffle_all">Shuffle all</string>
+    <string name="shortcut_shuffle_all_long">Shuffle all songs</string>
+    <string name="shortcut_liked">Liked songs</string>
+    <string name="shortcut_liked_long">Open liked songs</string>
+    <string name="shortcut_search">Search</string>
+    <string name="shortcut_search_long">Search your music</string>
+    <string name="shortcut_shuffle_playing_from">Shuffle all</string>
+</resources>

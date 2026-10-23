@@ -16,7 +16,7 @@ import java.util.List;
  * The one track context menu of the app: play next, add to queue / playlist, like, go to album / artist,
  * remove from this playlist, details, share, delete from device.
  */
-public final class TrackMenuSheet extends ActionSheet {
+public class TrackMenuSheet extends ActionSheet {
     private static final String TAG = "track_menu";
 
     @Nullable private Track track;

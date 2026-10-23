@@ -12,7 +12,7 @@ import java.util.function.IntConsumer;
  * Receives the install session's status. {@code STATUS_PENDING_USER_ACTION} opens the system confirmation; every other
  * status is passed to the repository when the process has one listening (the app is replaced on success anyway).
  */
-public final class InstallResultReceiver extends BroadcastReceiver {
+public class InstallResultReceiver extends BroadcastReceiver {
     /** Set by {@link UpdateRepositoryImpl}; receives {@code PackageInstaller.STATUS_*}. Null in a fresh process. */
     @Nullable static volatile IntConsumer listener;
 

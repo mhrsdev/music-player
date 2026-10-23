@@ -20,7 +20,7 @@ import com.mhrsdev.musicplayer.R;
  * {@code paddingBottom="@dimen/scr_bottom_chrome"}; the shell replaces that placeholder with the real dock height
  * (it changes when the mini-player appears/disappears, with insets and font scale) so the last item always clears it.
  */
-public final class BottomChrome {
+public class BottomChrome {
     private BottomChrome() { }
 
     /** Sets the bottom padding of every marked view under {@code root} to {@code bottomPx}. */

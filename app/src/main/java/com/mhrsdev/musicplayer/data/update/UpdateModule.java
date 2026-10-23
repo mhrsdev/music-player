@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /** Builds the real {@link UpdateRepository}. Construction does no I/O beyond opening the preferences file. */
-public final class UpdateModule {
+public class UpdateModule {
     private UpdateModule() { }
 
     /**

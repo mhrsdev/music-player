@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator.TrackList;
 
 /** Remembers the chosen {@link SortOrder} per kind of list (own small prefs file, read once per screen). */
-public final class SortPrefs {
+public class SortPrefs {
     private static final String FILE = "library_sort";
     private final SharedPreferences prefs;
 

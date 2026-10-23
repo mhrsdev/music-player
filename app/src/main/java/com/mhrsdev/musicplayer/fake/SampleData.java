@@ -2,6 +2,8 @@ package com.mhrsdev.musicplayer.fake;
 
 import com.mhrsdev.musicplayer.domain.model.Album;
 import com.mhrsdev.musicplayer.domain.model.Artist;
+import com.mhrsdev.musicplayer.data.lyrics.LyricsParser;
+import com.mhrsdev.musicplayer.data.lyrics.WordTimingEstimator;
 import com.mhrsdev.musicplayer.domain.model.LyricLine;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
 import com.mhrsdev.musicplayer.domain.model.Playlist;
@@ -130,9 +132,25 @@ public final class SampleData {
         return out;
     }
 
+    /** Real word timing (enhanced LRC) for track-1 / track-34; the other synced tracks get emulated word timing. */
+    private static final String ENGLISH_ENHANCED = "[00:12.00]<00:12.00>Street<00:12.45>lights <00:13.10>flick<00:13.50>er "
+            + "<00:13.95>on <00:14.30>the <00:14.60>a<00:14.90>ve<00:15.20>nue<00:16.40>\n"
+            + "[00:17.50]<00:17.50>I <00:17.80>car<00:18.10>ry <00:18.50>the <00:18.80>weight <00:19.60>and <00:19.90>I "
+            + "<00:20.20>car<00:20.50>ry <00:20.90>the <00:21.20>view<00:22.40>\n"
+            + "[00:23.00]<00:23.00>Every <00:23.60>step <00:24.10>is <00:24.40>a <00:24.60>promise <00:25.40>I "
+            + "<00:25.70>make <00:26.20>to <00:26.50>myself<00:27.60>\n"
+            + "[00:28.50]<00:28.50>Nobody's <00:29.40>counting <00:30.20>but <00:30.50>I <00:30.80>still <00:31.30>keep "
+            + "<00:31.80>score<00:33.20>\n";
+    private static final String PERSIAN_ENHANCED = "[00:10.00]<00:10.00>شب‌های <00:11.20>تهران <00:12.40>بوی "
+            + "<00:13.20>باران <00:14.60>می‌دهد<00:16.80>\n"
+            + "[00:18.00]<00:18.00>کوچه‌ها <00:19.40>آرام <00:20.60>و <00:21.00>چراغ‌ها <00:22.60>بیدار<00:24.80>\n"
+            + "[00:26.00]<00:26.00>من <00:26.60>هنوز <00:27.60>اینجا <00:28.60>منتظر <00:30.00>صبحم<00:32.40>\n"
+            + "[00:34.00]<00:34.00>با <00:34.50>دلی <00:35.40>که <00:35.80>هیچ‌وقت <00:37.20>خسته <00:38.40>نمی‌شود<00:41.00>\n"
+            + "[00:44.00]\n";
+
     /**
-     * track-3 has plain (unsynced) lyrics, track-4 has none, Persian tracks (34-37) have synced Persian lyrics,
-     * every other track has synced English lyrics.
+     * track-3 has plain (unsynced) lyrics, track-4 has none, track-1 and track-34 have real word timing, the other
+     * Persian tracks (35-37) and every other track have line-synced lyrics with emulated word timing.
      */
     public static Lyrics lyricsFor(String trackId) {
         switch (trackId) {
@@ -140,11 +158,25 @@ public final class SampleData {
                 return Lyrics.none(trackId);
             case "track-3":
                 return new Lyrics(trackId, lines(ENGLISH_TIMES_AND_LINES, false, true), false, "Embedded");
-            case "track-34": case "track-35": case "track-36": case "track-37":
-                return new Lyrics(trackId, lines(PERSIAN_TIMES_AND_LINES, true, false), true, "LRC file");
+            case "track-34":
+                return LyricsParser.toLyrics(trackId, PERSIAN_ENHANCED, "LRC file");
+            case "track-35": case "track-36": case "track-37":
+                return estimated(trackId, lines(PERSIAN_TIMES_AND_LINES, true, false), "LRC file");
+            case "track-1": {
+                List<LyricLine> all = new ArrayList<>(lines(ENGLISH_TIMES_AND_LINES, true, false));
+                List<LyricLine> head = LyricsParser.toLyrics(trackId, ENGLISH_ENHANCED, "LRC file").lines();
+                for (int i = 0; i < all.size(); i++) {
+                    for (LyricLine h : head) if (h.timeMs() == all.get(i).timeMs()) all.set(i, h);
+                }
+                return estimated(trackId, all, "LRC file");
+            }
             default:
-                return new Lyrics(trackId, lines(ENGLISH_TIMES_AND_LINES, true, false), true, "LRCLIB");
+                return estimated(trackId, lines(ENGLISH_TIMES_AND_LINES, true, false), "LRCLIB");
         }
+    }
+
+    private static Lyrics estimated(String trackId, List<LyricLine> lines, String source) {
+        return new Lyrics(trackId, WordTimingEstimator.apply(lines), true, source);
     }
 
     private SampleData() { }

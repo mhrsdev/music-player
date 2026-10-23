@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher shortcut icon: the launcher does not know our theme, so colors are fixed (lapis disc, white glyph). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp" android:height="48dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#2F5F95" android:pathData="M12,0a12,12 0,1 0,0 24a12,12 0,1 0,0 -24z" />
+    <group android:scaleX="0.6" android:scaleY="0.6" android:translateX="4.8" android:translateY="4.8">
+        <path android:fillColor="#FFFFFF" android:pathData="M12,20.3c-0.3,0 -0.5,-0.1 -0.7,-0.2C6.4,16.6 3,13.5 3,9.6C3,6.8 5.2,4.5 8,4.5c1.6,0 3,0.7 4,1.9c1,-1.2 2.4,-1.9 4,-1.9c2.8,0 5,2.3 5,5.1c0,3.9 -3.4,7 -8.3,10.5C12.5,20.2 12.3,20.3 12,20.3z" />
+    </group>
+</vector>
