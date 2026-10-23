@@ -54,6 +54,8 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - 🔄 **P1** [Opus] Polish: fonts (Vazirmatn + v1 Latin), liked-card collage, multi-browse carousel, morph play buttons, skeletons; render screens to PNG. Branch `task/p1-polish-home`, worktree `../wt-p1`.
 - 🔄 **P2** [Opus] Polish: light player + contrast guard, lyrics offline/Retry, shared-element-like transition, real output chip, add-to-playlist sheet; render player PNGs. Branch `task/p2-polish-player`, worktree `../wt-p2`.
 
+- 🔄 **R1** [Sonnet+ponytail] Release engineering: signing config, tag-triggered release workflow, README (en+fa) + CHANGELOG, APK build/verify. Branch `task/r1-release`, worktree `../wt-r1`.
+
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
 Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room), tidy query classes, clean packages, Gradle 9.0.0 (CLAUDE.md "Hard code rules").
@@ -83,6 +85,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D14: owner wants a GitHub release now + README OK + main fully updated; then full-featured version. Release agent R1 launched (signing, release workflow, README/CHANGELOG, APK build).
 - 2026-10-23: T2 merged; P1/P2 polish agents launched (deadline ~19:28 UTC). Remaining: T8 finish, T9 QA (after T8), merge to main.
 - 2026-10-23: T3, T4 merged; ccr green (build+test+lint, supervisor-run). T2 widget gallery PNGs rendered from real Android code (docs/screens/) and sent to owner.
 - 2026-10-23: Merged T5, T7 into ccr (supervisor fixed a conflict-marker slip from the T5 merge; one flaky T5 test `SqliteRepositoryTest.historyAndPlayCountsMoveToTheTop` (same-ms ties) passed on re-run; T8 told to make ordering deterministic).
