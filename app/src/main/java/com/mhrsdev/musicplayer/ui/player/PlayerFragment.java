@@ -198,6 +198,15 @@ public final class PlayerFragment extends Fragment {
     }
 
     private void setupControls() {
+        b.playerPlay.setOnLongClickListener(v -> { // long-press = stop (pause and back to the start)
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            vm.stop();
+            android.widget.Toast.makeText(requireContext(), R.string.player_stopped, android.widget.Toast.LENGTH_SHORT).show();
+            return true;
+        });
+        ViewCompat.replaceAccessibilityAction(b.playerPlay,
+                androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK,
+                getString(R.string.player_stop), null);
         b.playerPlay.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             vm.togglePlayPause();
@@ -224,11 +233,15 @@ public final class PlayerFragment extends Fragment {
             menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
             Track current = vm.getCurrentTrack().getValue();
             if (current != null) menu.getMenu().add(0, 4, 3, R.string.player_add_to_playlist);
+            if (current != null) menu.getMenu().add(0, 5, 4, R.string.player_share);
+            if (soundFragmentClass() != null) menu.getMenu().add(0, 6, 5, R.string.player_sound);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) vm.toggleLyrics();
                 else if (item.getItemId() == 4 && current != null)
                     com.mhrsdev.musicplayer.ui.playlist.AddToPlaylistSheet.show(getParentFragmentManager(), current);
                 else if (item.getItemId() == 3) com.mhrsdev.musicplayer.ui.queue.SleepTimerSheet.show(getParentFragmentManager());
+                else if (item.getItemId() == 5 && current != null) share(current);
+                else if (item.getItemId() == 6) openSound();
                 else b.playerQueue.performClick();
                 return true;
             });
@@ -399,7 +412,7 @@ public final class PlayerFragment extends Fragment {
                         vt[0] = null;
                     }
                     if (!tracking[0]) {
-                        if (e.getActionMasked() == MotionEvent.ACTION_UP && v != b.playerRoot) v.performClick();
+                        if (e.getActionMasked() == MotionEvent.ACTION_UP && v != b.playerRoot && v != b.playerArtwork) v.performClick();
                         return true;
                     }
                     boolean close = root.getTranslationY() > root.getHeight() * 0.22f || vy > 1200;
@@ -417,7 +430,11 @@ public final class PlayerFragment extends Fragment {
                     return false;
             }
         };
-        b.playerArtwork.setOnTouchListener(l);
+        android.view.GestureDetector cover = new android.view.GestureDetector(requireContext(), new CoverGestures());
+        b.playerArtwork.setOnTouchListener((v, e) -> {
+            cover.onTouchEvent(e);
+            return l.onTouch(v, e); // vertical drag still collapses the player
+        });
         b.playerHandle.setOnTouchListener(l);
         b.playerRoot.setOnTouchListener(l);
     }
@@ -635,6 +652,89 @@ public final class PlayerFragment extends Fragment {
         };
         s.setTargetPosition(index);
         lm.startSmoothScroll(s);
+    }
+
+    // ---------------------------------------------------------------- cover gestures, share, sound
+
+    /** Tap = lyrics, double-tap left/right half = -10/+10 s (tape direction, also in RTL), horizontal fling = skip. */
+    private final class CoverGestures extends android.view.GestureDetector.SimpleOnGestureListener {
+        @Override public boolean onDown(@NonNull MotionEvent e) { return true; }
+
+        @Override public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+            vm.toggleLyrics();
+            return true;
+        }
+
+        @Override public boolean onDoubleTap(@NonNull MotionEvent e) {
+            boolean forward = e.getX() > b.playerArtwork.getWidth() / 2f;
+            vm.seekBy(forward ? SEEK_STEP_MS : -SEEK_STEP_MS);
+            b.playerArtwork.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            showSeekHint(forward);
+            return true;
+        }
+
+        @Override public boolean onFling(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float vx, float vy) {
+            if (e1 == null || Math.abs(vx) < 2f * Math.abs(vy) || Math.abs(vx) < 600f) return false;
+            if (Math.abs(e2.getRawX() - e1.getRawX()) < dp(48)) return false;
+            b.playerArtwork.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            if (vx < 0) vm.next(); else vm.previous(); // tape direction: swipe left = next
+            return true;
+        }
+    }
+
+    static final long SEEK_STEP_MS = 10_000L;
+    @Nullable private TextView seekHint;
+
+    private void showSeekHint(boolean forward) {
+        if (seekHint == null) {
+            seekHint = new TextView(requireContext());
+            seekHint.setBackgroundResource(R.drawable.player_chip_bg);
+            seekHint.setTextColor(0xFFFFFFFF);
+            seekHint.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            seekHint.setTypeface(seekHint.getTypeface(), android.graphics.Typeface.BOLD);
+            seekHint.setPadding(dp(16), dp(8), dp(16), dp(8));
+            seekHint.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            b.playerStage.addView(seekHint, new android.widget.FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        android.widget.FrameLayout.LayoutParams lp = (android.widget.FrameLayout.LayoutParams) seekHint.getLayoutParams();
+        // absolute left/right: the seek direction is tape direction in every locale
+        lp.gravity = android.view.Gravity.CENTER_VERTICAL | (forward ? android.view.Gravity.RIGHT : android.view.Gravity.LEFT);
+        lp.leftMargin = lp.rightMargin = dp(28);
+        seekHint.setLayoutParams(lp);
+        seekHint.setText(forward ? R.string.player_hint_forward_10 : R.string.player_hint_back_10);
+        seekHint.setTranslationZ(dp(24));
+        seekHint.animate().cancel();
+        seekHint.setAlpha(1f);
+        seekHint.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
+    }
+
+    private void share(Track t) {
+        android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(android.content.Intent.EXTRA_TEXT, t.title() + " \u2014 " + t.artistName());
+        startActivity(android.content.Intent.createChooser(send, getString(R.string.player_share_chooser)));
+    }
+
+    @Nullable static Class<?> soundFragmentClass() {
+        try {
+            return Class.forName("com.mhrsdev.musicplayer.ui.sound.SoundFragment");
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    /** Opens the Sound screen (equalizer, speed) by class name over everything; back closes it. */
+    private void openSound() {
+        Class<?> c = soundFragmentClass();
+        if (c == null) return;
+        try {
+            Fragment f = (Fragment) c.getDeclaredConstructor().newInstance();
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .add(android.R.id.content, f, "sound").addToBackStack("sound").commit();
+        } catch (ReflectiveOperationException | ClassCastException ignored) {
+            // no Sound screen in this build
+        }
     }
 
     // ---------------------------------------------------------------- title fitting
