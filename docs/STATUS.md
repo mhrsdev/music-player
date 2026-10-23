@@ -20,13 +20,19 @@ _Last updated: 2026-10-23 — D2 (design skill) received_
 ## Open questions for the owner
 1. Online catalog (Home "New releases", search of songs not on device): keep Phase 1 local-only, or the owner picks a legal provider/API (e.g. own backend, Jamendo, Audius)? Default until answered: local-only + pluggable interface.
 
+## Open design decisions for the owner (from T2a)
+1. RTL playback controls: keep seek bar + prev/next LTR (Material guidance, as mocked) or mirror (Samsung style)?
+2. Default seek bar: Wavy (reference) or Waveform (Melodiha; needs one-time audio scan)? Both mocked; can be a setting.
+3. App name & icon (placeholder "Music Player").
+4. Profile avatar removed from nav (local app has no account) — OK?
+5. Lyrics alignment: centered (as mocked) or left?
+
 ## Task board
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
 
 ### Todo
-- 🔄 **T2a** [Opus] Design phase: hi-fi mockups (PNG) of all key screens + media notification/widget + design spec; owner reviews in chat BEFORE implementation T2–T4.
 - ~~T1~~ (done) Scaffold Gradle project (app module, version catalog, Compose + M3 Expressive, Media3, Room, DI), Android SDK setup, `./gradlew assembleDebug` works, domain models/interfaces per ARCHITECTURE.md, in-memory fakes with sample data, CI workflow (GitHub Actions build + lint + unit tests).
 - ⬜ **T2** [Opus] UI foundation: theme (M3 Expressive, dynamic color from artwork, dark/light/AMOLED), shared components (floating pill nav, wavy slider, morphing play button, hero carousel, track row, artwork w/ placeholder), navigation shell.
 - ⬜ **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings (against fakes).
@@ -39,10 +45,12 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - ⬜ **T10** Supervisor: merge everything into `main`, verify `main` builds.
 
 ### Done
+- ✅ **T2a** [Opus] Design phase: 17 PNG mockups in `docs/design/png/` + spec `docs/design/DESIGN.md` (sources in `docs/design/src/`). Sent to owner in chat. **Awaiting owner approval before T2–T4.** Not verified: nothing runs on Android (browser mockups); notification/lock-screen is approximate; Persian copy needs native check; not mocked: tablet, overflow menus, sleep-timer sheet, permission-denied state.
 - ✅ **T1** [Sonnet] Scaffold: Gradle 9.8.2/AGP 9.4.1, Kotlin 2.4.21, compile/target SDK 37, M3 1.5.0-beta02 (Expressive), Koin, Media3, Room; domain contracts + fakes (37 tracks); `assembleDebug`, `lint`, 23 unit tests pass (agent-reported; SDK at /opt/android-sdk, `ANDROID_HOME=/opt/android-sdk ./gradlew :app:assembleDebug`). NOT verified: device run, release/R8, GitHub Actions run.
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: T2a done; mockups delivered in chat; waiting for owner feedback/approval, then T2–T4 (Opus) + T5–T7 (Sonnet) start.
 - 2026-10-23: T1 completed (see Done). Note: scaffold landed inside commit b9b7e4c (shared working tree) — harmless.
 - 2026-10-23: D3 archived (Melodiha refs saved). Design phase T2a launched (Opus); mockups to be shown to owner in chat before UI implementation.
 - 2026-10-23: D2 archived: design-atelier skill installed in `.claude/skills/`; T2–T4 briefs must cite it and the "similar to reference, but prettier" target.
