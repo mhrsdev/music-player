@@ -46,4 +46,9 @@
     <string name="lyrics_offset_value">%1$s ثانیه</string>
     <string name="lyrics_offset_cd">زمان‌بندی متن %1$s ثانیه. برای بازنشانی دو بار بزنید</string>
     <string name="lyrics_copied">خط کپی شد</string>
+    <string name="player_bt_title">نمایش نام دستگاه شما</string>
+    <string name="player_bt_rationale">با اجازهٔ «دستگاه‌های اطراف» این دکمه نشان می‌دهد صدا از کدام اسپیکر یا هدفون بلوتوثی پخش می‌شود. برای کار دیگری استفاده نمی‌شود.</string>
+    <string name="player_bt_allow">اجازه</string>
+    <string name="player_bt_settings">باز کردن تنظیمات</string>
+    <string name="player_bt_snack">نام دستگاه بلوتوث اینجا نشان داده شود؟</string>
 </resources>

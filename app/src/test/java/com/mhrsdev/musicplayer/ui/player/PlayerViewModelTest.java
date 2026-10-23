@@ -120,4 +120,11 @@ public class PlayerViewModelTest {
         assertEquals(0.6f, LyricsScrollPolicy.alphaFor(4, 3, true), 0);
         assertEquals(1f, LyricsScrollPolicy.alphaFor(4, 3, false), 0);
     }
+
+    @org.junit.Test public void titleFitsLargestSizeThenFloorsAtMin() {
+        // width grows 10 px per sp: 300 px available -> 30 sp fits; 250 -> 24 sp; 100 -> floor 20 sp
+        org.junit.Assert.assertEquals(30f, PlayerFragment.fitTextSize(300f, 30f, 20f, sp -> sp * 10), 0f);
+        org.junit.Assert.assertEquals(24f, PlayerFragment.fitTextSize(250f, 30f, 20f, sp -> sp * 10), 0f);
+        org.junit.Assert.assertEquals(20f, PlayerFragment.fitTextSize(100f, 30f, 20f, sp -> sp * 10), 0f);
+    }
 }

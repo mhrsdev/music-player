@@ -99,6 +99,37 @@ public class PlayerRenderTest {
         snap(content(a), "u3-player-lyrics-font130-dark");
     }
 
+    private static final com.mhrsdev.musicplayer.domain.model.Track LONG_EN = new com.mhrsdev.musicplayer.domain.model.Track(
+            "long-en", "Concerto pour piano no. 2 en ut mineur, op. 18: II. Adagio sostenuto (Piano et orchestre)",
+            "a-x", "Orchestre philharmonique de Radio France, Mikko Franck", "al-x", "Rachmaninov", 683_000L, null, 77,
+            null, false, false, 2020, 2, 0L);
+    private static final com.mhrsdev.musicplayer.domain.model.Track LONG_FA = new com.mhrsdev.musicplayer.domain.model.Track(
+            "long-fa", "آهنگ خیلی بلند با نامی طولانی برای آزمایش نمایش عنوان در پخش‌کننده‌ی موج", "a-y",
+            "گروه موسیقی سهراب نوری و دوستان", "al-y", "آلبوم", 245_000L, null, 12, null, false, false, 2019, 1, 0L);
+
+    @Test @Config(sdk = 35, qualifiers = "w360dp-h800dp-night-xhdpi", fontScale = 1.3f)
+    public void longTitle360() throws Exception { longTitles("360", 360, 800); }
+
+    @Test @Config(sdk = 35, qualifiers = "w411dp-h915dp-notnight-xhdpi", fontScale = 1.3f)
+    public void longTitle411() throws Exception { longTitles("411", 411, 915); }
+
+    @Test @Config(sdk = 35, qualifiers = "fa-ldrtl-w360dp-h800dp-night-xhdpi", fontScale = 1.3f)
+    public void longTitleFa360() throws Exception { longTitles("fa-360", 360, 800); }
+
+    private void longTitles(String tag, int wDp, int hDp) throws Exception {
+        FragmentActivity a = host(SettingsStore.SeekStyle.WAVY, 0);
+        AppContainer c = ((MusicPlayerApp) a.getApplication()).getContainer();
+        c.player.play(java.util.List.of(LONG_EN, LONG_FA), 0, null);
+        c.player.pause();
+        idle();
+        player(a);
+        snap(content(a), "u3-title-en-" + tag, wDp, hDp);
+        c.player.next();
+        c.player.pause();
+        idle();
+        snap(content(a), "u3-title-fa-" + tag, wDp, hDp);
+    }
+
     /** Host activity with a fake-backed container and a loaded queue starting at {@code index}. */
     private static FragmentActivity host(SettingsStore.SeekStyle style, int index) throws Exception {
         FragmentActivity a = Robolectric.buildActivity(WidgetGalleryActivity.class).setup().get();
@@ -136,8 +167,10 @@ public class PlayerRenderTest {
 
     private static void idle() { ShadowLooper.idleMainLooper(3, java.util.concurrent.TimeUnit.SECONDS); }
 
-    private static void snap(View v, String name) throws Exception {
-        int w = 412 * 2, h = 915 * 2;
+    private static void snap(View v, String name) throws Exception { snap(v, name, 412, 915); }
+
+    private static void snap(View v, String name, int wDp, int hDp) throws Exception {
+        int w = wDp * 2, h = hDp * 2;
         for (int i = 0; i < 2; i++) {
             v.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));

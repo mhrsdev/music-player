@@ -67,6 +67,11 @@ public final class PlayerFragment extends Fragment {
     private final Runnable resumeAutoScroll = this::onAutoScrollResume;
     @Nullable private OutputRoute outputRoute;
     private boolean light;
+    private boolean btNameNeedsPermission;
+    private static final String PREFS = "player_ui", K_BT_ASKED = "bt_name_asked";
+    private final androidx.activity.result.ActivityResultLauncher<String> btPermission = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+            granted -> { if (outputRoute != null) outputRoute.refresh(); });
 
     public static PlayerFragment newInstance() { return new PlayerFragment(); }
 
@@ -231,6 +236,7 @@ public final class PlayerFragment extends Fragment {
             if (nav != null) nav.openQueue();
             else QueueFragment.show(getParentFragmentManager());
         });
+        b.playerOutput.setOnClickListener(v -> { if (btNameNeedsPermission) explainBluetoothName(); });
         seek.setOnSeekListener(new SeekBarView.OnSeekListener() {
             @Override public void onSeekStart(long pos) { scrubbing = true; }
             @Override public void onSeek(long pos) { renderTimes(pos, seek.getDuration()); }
@@ -327,6 +333,9 @@ public final class PlayerFragment extends Fragment {
         }
         b.playerOutput.setText(label);
         b.playerOutput.setContentDescription(getString(R.string.player_output_cd, label));
+        btNameNeedsPermission = r.nameNeedsPermission();
+        b.playerOutput.setClickable(btNameNeedsPermission);
+        if (btNameNeedsPermission) maybeOfferBluetoothName();
         b.playerOutput.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
     }
 
@@ -445,6 +454,7 @@ public final class PlayerFragment extends Fragment {
                 renderTimes(s.positionMs(), s.durationMs());
             }
         }
+        updateTitleMarquee(s.playing());
         if (!renderedOnce || rNext != next) {
             b.playerNext.setEnabled(next);
             b.playerNext.setAlpha(next ? 1f : 0.38f);
@@ -492,8 +502,10 @@ public final class PlayerFragment extends Fragment {
             return;
         }
         b.playerTitle.setText(t.title());
-        b.playerTitle.setSelected(true); // one marquee pass for long titles
         b.playerArtist.setText(t.artistName());
+        fitTitle();
+        b.playerTitle.setContentDescription(null);
+        b.playerTitleBlock.setContentDescription(getString(R.string.player_now_playing_cd, t.title(), t.artistName()));
         boolean changed = paletteTrackId != null && !paletteTrackId.equals(t.id());
         paletteTrackId = t.id();
         boolean artColors = new com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore(requireContext()).isArtworkColors();
@@ -624,6 +636,100 @@ public final class PlayerFragment extends Fragment {
         };
         s.setTargetPosition(index);
         lm.startSmoothScroll(s);
+    }
+
+    // ---------------------------------------------------------------- title fitting
+
+    static final float TITLE_MAX_SP = 30f, TITLE_MIN_SP = 20f;
+
+    /** Largest size in [min, max] (2 sp steps) at which {@code textWidthAt(size)} fits {@code avail}; min when none. */
+    static float fitTextSize(float avail, float maxSp, float minSp, java.util.function.DoubleUnaryOperator widthAt) {
+        for (float sp = maxSp; sp > minSp; sp -= 2f) if (widthAt.applyAsDouble(sp) <= avail) return sp;
+        return minSp;
+    }
+
+    /** Once per bind: shrink long titles from 30 sp down to 20 sp, then ellipsize (no per-frame work). */
+    private void fitTitle() {
+        TextView t = b.playerTitle;
+        if (t.getWidth() == 0) { // not laid out yet: once, on the next layout
+            t.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override public void onLayoutChange(View v, int l, int tp, int r, int bt, int ol, int ot, int or, int ob) {
+                    v.removeOnLayoutChangeListener(this);
+                    if (b != null && v.getWidth() > 0) v.post(() -> { if (b != null) fitTitle(); });
+                }
+            });
+            return;
+        }
+        CharSequence text = t.getText();
+        float avail = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
+        android.text.TextPaint p = new android.text.TextPaint(t.getPaint());
+        android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+        float sp = fitTextSize(avail, TITLE_MAX_SP, TITLE_MIN_SP, size -> {
+            p.setTextSize(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, (float) size, dm));
+            return p.measureText(text, 0, text.length());
+        });
+        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, sp);
+        // An ellipsized RTL line inside an LTR layout (or the reverse) is clipped at its start when aligned to the
+        // view start; such a line fills the width anyway, so align it to its own text start instead.
+        p.setTextSize(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, sp, dm));
+        alignOverflowing(t, p.measureText(text, 0, text.length()) > avail);
+        CharSequence artist = b.playerArtist.getText();
+        if (artist != null) alignOverflowing(b.playerArtist, b.playerArtist.getPaint().measureText(artist, 0, artist.length())
+                > b.playerArtist.getWidth() - b.playerArtist.getTotalPaddingLeft() - b.playerArtist.getTotalPaddingRight());
+        PlaybackState st = vm.getState().getValue();
+        updateTitleMarquee(st != null && st.playing());
+    }
+
+    private static void alignOverflowing(TextView t, boolean overflows) {
+        int want = overflows ? View.TEXT_ALIGNMENT_TEXT_START : View.TEXT_ALIGNMENT_VIEW_START;
+        if (t.getTextAlignment() != want) t.setTextAlignment(want);
+    }
+
+    /** Ellipsis by default; one cheap marquee pass only while playing with motion allowed (not in battery saver). */
+    private void updateTitleMarquee(boolean playing) {
+        TextView t = b.playerTitle;
+        boolean marquee = playing && PlayerPalette.motionAllowed(requireContext());
+        android.text.TextUtils.TruncateAt want = marquee ? android.text.TextUtils.TruncateAt.MARQUEE
+                : android.text.TextUtils.TruncateAt.END;
+        if (t.getEllipsize() != want) t.setEllipsize(want);
+        if (t.isSelected() != marquee) t.setSelected(marquee);
+    }
+
+    // ---------------------------------------------------------------- Bluetooth device name (API 31+)
+
+    private android.content.SharedPreferences uiPrefs() {
+        return requireContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    }
+
+    /** First Bluetooth output seen without the permission: one unobtrusive offer, never again automatically. */
+    private void maybeOfferBluetoothName() {
+        if (android.os.Build.VERSION.SDK_INT < 31 || uiPrefs().getBoolean(K_BT_ASKED, false)) return;
+        uiPrefs().edit().putBoolean(K_BT_ASKED, true).apply();
+        com.google.android.material.snackbar.Snackbar.make(b.playerRoot, R.string.player_bt_snack,
+                        com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                .setAction(R.string.player_bt_allow, v -> btPermission.launch(android.Manifest.permission.BLUETOOTH_CONNECT))
+                .show();
+    }
+
+    /** Tap on the generic "Bluetooth" chip: explain, then ask again (or open settings if the system no longer asks). */
+    private void explainBluetoothName() {
+        if (android.os.Build.VERSION.SDK_INT < 31) return;
+        boolean systemWillAsk = !uiPrefs().getBoolean(K_BT_ASKED, false)
+                || shouldShowRequestPermissionRationale(android.Manifest.permission.BLUETOOTH_CONNECT);
+        uiPrefs().edit().putBoolean(K_BT_ASKED, true).apply();
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.player_bt_title)
+                .setMessage(R.string.player_bt_rationale)
+                .setNegativeButton(R.string.queue_cancel, null)
+                .setPositiveButton(systemWillAsk ? R.string.player_bt_allow : R.string.player_bt_settings, (d, w) -> {
+                    if (systemWillAsk) {
+                        btPermission.launch(android.Manifest.permission.BLUETOOTH_CONNECT);
+                    } else {
+                        startActivity(new android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                android.net.Uri.fromParts("package", requireContext().getPackageName(), null)));
+                    }
+                })
+                .show();
     }
 
     private int dp(int v) { return Math.round(v * getResources().getDisplayMetrics().density); }
