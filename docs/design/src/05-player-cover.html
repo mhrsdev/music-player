@@ -1,54 +1,46 @@
 <!doctype html>
-<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Player</title><link rel="stylesheet" href="base.css">
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Player</title><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="player.css">
 <style>
-  .screen { --dyn-primary: #A9D4F5; --dyn-on-primary: #00344D; --dyn-container: #1A4B66; --dyn-on-container: #CDE8FF; --dyn-glow: 31,95,134; color: #fff; --sb: #fff; --gh: #fff; }
-  .scrim { background: linear-gradient(180deg, rgba(4,14,24,.30) 0%, rgba(4,14,24,.22) 38%, rgba(4,14,24,.62) 66%, rgba(4,14,24,.82) 100%); }
-  .tint { position: absolute; inset: 0; z-index: 1; background: rgb(var(--dyn-glow)); mix-blend-mode: soft-light; opacity: .55; }
-  .handle { position: absolute; top: 44px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 4px; background: rgba(255,255,255,.4); }
-  .top { position: absolute; top: 58px; left: 12px; right: 12px; display: flex; align-items: center; justify-content: space-between; }
-  .cover { position: absolute; top: 136px; left: 24px; width: 364px; height: 364px; box-shadow: 0 30px 70px rgba(0,8,20,.55), 0 0 0 1px rgba(255,255,255,.06); }
-  .meta { position: absolute; top: 528px; left: 24px; right: 16px; display: flex; align-items: flex-end; justify-content: space-between; }
-  .meta .t-display { color: #fff; }
-  .meta .artist { font-size: 18px; font-weight: 500; color: rgba(255,255,255,.72); margin-top: 2px; }
-  .seekwrap { position: absolute; top: 612px; left: 24px; width: 364px; color: var(--dyn-primary); }
-  .seekwrap .times { margin-top: 6px; color: #fff; }
-  .transport { position: absolute; top: 704px; left: 0; right: 0; }
-  .device { position: absolute; top: 826px; left: 50%; transform: translateX(-50%); height: 40px; padding: 0 16px 0 12px; border-radius: 99px; display: flex; gap: 8px; align-items: center;
-    background: rgba(255,255,255,.1); font-size: 14px; font-weight: 560; color: var(--dyn-on-container); white-space: nowrap; }
+  .screen { --dyn: #A9D4F5; --on-dyn: #00344D; --dyn-shadow: rgba(20,90,140,.75); --tintc: #1f5f86; }
+  .scrim { background: linear-gradient(180deg, rgba(4,14,26,.34) 0%, rgba(4,14,26,.18) 34%, rgba(4,14,26,.58) 58%, rgba(4,14,26,.86) 100%); }
 </style></head>
-<body><div class="screen theme-dark">
+<body><div class="screen theme-dark pl">
   <div class="backdrop"><div class="art" data-art="without-you"></div></div>
-  <div class="tint"></div>
-  <div class="backdrop-scrim scrim"></div>
-  <div class="grain"></div>
+  <div class="tint"></div><div class="backdrop-scrim scrim"></div><div class="grain"></div>
   <div class="layer">
     <div class="statusbar"></div>
-    <div class="handle"></div>
     <div class="top">
-      <div class="iconbtn" style="color:#fff"><i class="ic">lyrics</i></div>
-      <div class="togglegroup">
-        <div class="tg on"><i class="ic">shuffle</i></div>
-        <div class="tg on"><i class="ic">repeat_one</i></div>
-        <div class="tg"><i class="ic">queue_music</i></div>
-      </div>
-      <div class="iconbtn" style="color:var(--dyn-primary)"><i class="ic f">favorite</i></div>
+      <div class="ib"><i class="g" data-g="chevd"></i></div>
+      <div class="from"><div class="a">Playing from artist</div><div class="b">NEFFEX</div></div>
+      <div class="ib"><i class="g" data-g="more"></i></div>
     </div>
-    <div class="cover art r32" data-art="without-you"></div>
+    <div class="cover-glow" style="left:56px;top:150px;width:300px;height:330px"><div class="art" data-art="without-you"></div></div>
+    <div class="cover art sl20 edge" data-art="without-you"></div>
     <div class="meta">
-      <div style="min-width:0"><div class="t-display ell">Without You</div><div class="artist">NEFFEX</div></div>
-      <div class="iconbtn" style="color:rgba(255,255,255,.8);margin-bottom:-4px"><i class="ic">more_vert</i></div>
+      <div style="min-width:0;flex:1"><div class="t-display ell">Without You</div><div class="artist">NEFFEX</div></div>
+      <div class="ib" style="color:var(--dyn)"><i class="g s28" data-g="heart.f"></i></div>
     </div>
     <div class="seekwrap">
-      <div class="seek" data-w="364" data-h="56" data-p=".29" data-style="waveform" data-c="#A9D4F5" data-t="rgba(255,255,255,.22)" data-thumb="44" data-seed="8"></div>
-      <div class="times"><span>0:52</span><span>−2:09</span></div>
+      <div class="seek" data-w="364" data-h="54" data-p=".36" data-style="waveform" data-c="#A9D4F5" data-t="rgba(255,255,255,.11)" data-seed="8"></div>
+      <div class="times"><span>1:05</span><span>−1:56</span></div>
     </div>
     <div class="transport">
-      <div class="side"><i class="ic f s32">skip_previous</i></div>
-      <div class="cookie" data-size="100" data-n="10" data-k=".075" data-c="#A9D4F5" data-rot="6"><i class="ic f s36" style="color:#00344D">pause</i></div>
-      <div class="side"><i class="ic f s32">skip_next</i></div>
+      <div class="ib lit" style="--lit:var(--dyn)"><i class="g" data-g="shuffle"></i></div>
+      <div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="prev"></i></div>
+      <div class="disc play" style="width:88px;height:88px"><span class="glyph" data-t="1" data-s="34" data-c="#00344D"></span></div>
+      <div class="disc glass" style="width:64px;height:64px"><i class="g s28" data-g="next"></i></div>
+      <div class="ib lit" style="--lit:var(--dyn)"><i class="g" data-g="repeat1"></i></div>
     </div>
-    <div class="device"><i class="ic s20">speaker</i>JBL Charge 6</div>
+    <div class="actions">
+      <div class="capsule"><i class="g s20" data-g="speaker"></i>JBL Charge 6</div>
+      <div style="display:flex;gap:4px"><div class="ib"><i class="g" data-g="moon"></i></div><div class="ib"><i class="g" data-g="lyrics"></i></div></div>
+    </div>
+    <div class="upnext">
+      <div class="art sl8" data-art="grateful" style="width:36px;height:36px"></div>
+      <div class="tx"><div class="a">Up next</div><div class="b ell">Grateful · NEFFEX</div></div>
+      <i class="g s20" data-g="chevu" style="opacity:.7"></i>
+    </div>
   </div>
-  <div class="gesture"></div>
+  <div class="gesture" style="--gh:#fff"></div>
 </div>
 <script src="lib.js"></script><script>buildMock()</script></body></html>
