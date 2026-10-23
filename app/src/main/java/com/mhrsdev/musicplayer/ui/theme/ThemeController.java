@@ -34,11 +34,14 @@ public final class ThemeController {
     private AccentScheme from;
     private AccentScheme to;
     private boolean artworkColors = true;
+    private boolean dark;
+    @Nullable private Integer lastSeed;
     @Nullable private String currentKey;
 
     private ThemeController(Context context) {
         app = context.getApplicationContext();
-        AccentScheme base = AccentScheme.base(Tokens.isDark(app));
+        dark = Tokens.isDark(app);
+        AccentScheme base = AccentScheme.base(dark);
         accent.setValue(base);
         from = base;
         to = base;
@@ -49,6 +52,7 @@ public final class ThemeController {
     @MainThread
     public static ThemeController get(Context context) {
         if (instance == null) instance = new ThemeController(context);
+        else instance.checkUiMode(context);
         return instance;
     }
 
@@ -75,6 +79,7 @@ public final class ThemeController {
         if (key != null && key.equals(currentKey)) return;
         currentKey = key;
         if (!artworkColors || artwork == null) {
+            lastSeed = null;
             animateTo(AccentScheme.base(Tokens.isDark(app)));
             return;
         }
@@ -91,7 +96,21 @@ public final class ThemeController {
     }
 
     private void setSeed(int seed) {
+        lastSeed = seed;
         animateTo(AccentScheme.fromSeed(seed, Tokens.isDark(app)));
+    }
+
+    /** Light/dark switched (theme setting or system): re-derive the roles from the same seed, no animation. */
+    private void checkUiMode(Context context) {
+        boolean nowDark = Tokens.isDark(context);
+        if (nowDark == dark) return;
+        dark = nowDark;
+        animator.cancel();
+        AccentScheme s = lastSeed != null && artworkColors
+                ? AccentScheme.fromSeed(lastSeed, nowDark) : AccentScheme.base(nowDark);
+        from = s;
+        to = s;
+        accent.setValue(s);
     }
 
     /** Seed color of a bitmap; safe to call from a background thread (does not touch shared scratch). */
