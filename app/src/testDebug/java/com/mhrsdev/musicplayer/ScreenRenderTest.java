@@ -24,7 +24,7 @@ import java.io.FileOutputStream;
 
 
 /**
- * Debug-only visual check: renders the real shell (fake data) per tab to docs/screens/p1-*.png with native graphics,
+ * Debug-only visual check: renders the real shell (fake data) per tab to docs/screens/p3-*.png with native graphics,
  * so screens can be compared against docs/design/png without a device.
  */
 @RunWith(RobolectricTestRunner.class)
@@ -51,7 +51,14 @@ public class ScreenRenderTest {
     @Test @Config(sdk = 35, qualifiers = "fa-" + DARK)
     public void homeFaDark() throws Exception { render(ScreenNavigator.Tab.HOME, "home-fa-dark"); }
 
+    @Test @Config(sdk = 35, qualifiers = DARK)
+    public void artistsDark() throws Exception { render(ScreenNavigator.Tab.LIBRARY, "artists-dark", R.id.hub_artists); }
+
     private void render(ScreenNavigator.Tab tab, String name) throws Exception {
+        render(tab, name, 0);
+    }
+
+    private void render(ScreenNavigator.Tab tab, String name, int clickId) throws Exception {
         android.app.Application app = org.robolectric.RuntimeEnvironment.getApplication();
         org.robolectric.shadows.ShadowApplication sa = org.robolectric.shadow.api.Shadow.extract(app);
         sa.grantPermissions(android.Manifest.permission.READ_MEDIA_AUDIO,
@@ -62,6 +69,10 @@ public class ScreenRenderTest {
         settle();
         if (tab != ScreenNavigator.Tab.HOME) {
             a.openTab(tab);
+            settle();
+        }
+        if (clickId != 0) {
+            a.findViewById(clickId).performClick();
             settle();
         }
         View root = a.getWindow().getDecorView();
@@ -76,7 +87,7 @@ public class ScreenRenderTest {
         root.draw(c);
         File dir = new File("../docs/screens");
         if (!dir.isDirectory()) dir = new File("build");
-        File out = new File(dir, "p1-" + name + ".png");
+        File out = new File(dir, "p3-" + name + ".png");
         try (FileOutputStream fos = new FileOutputStream(out)) {
             bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
         }

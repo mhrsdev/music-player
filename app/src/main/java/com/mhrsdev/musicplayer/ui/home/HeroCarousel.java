@@ -59,7 +59,7 @@ final class HeroCarousel {
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext(), RecyclerView.HORIZONTAL, false) {
             // Lay out one extra screen at the end so the narrow tail cards (translated in) exist.
             @Override protected void calculateExtraLayoutSpace(@NonNull RecyclerView.State state, @NonNull int[] extra) {
-                extra[0] = 0;
+                extra[0] = getWidth(); // RTL lays the tail out on the "before" side
                 extra[1] = getWidth();
             }
         });
@@ -114,7 +114,12 @@ final class HeroCarousel {
         View art = c.findViewById(R.id.art_frame);
         int artH = art == null ? c.getHeight() : art.getBottom();
         int h = textAlpha > 0.01f ? c.getHeight() : artH;
-        if (m.update(Math.round(left), Math.round(left + width), h)) c.invalidateOutline();
+        if (m.update(Math.round(left), Math.round(left + width), h)) {
+            // Rect clip works in software rendering too; the outline adds the rounded corners on HW layers.
+            m.rect.set(m.l, 0, m.r, h);
+            c.setClipBounds(m.rect);
+            c.invalidateOutline();
+        }
         View title = c.findViewById(R.id.title), sub = c.findViewById(R.id.subtitle);
         if (title != null) title.setAlpha(textAlpha);
         if (sub != null) sub.setAlpha(textAlpha);
@@ -122,6 +127,7 @@ final class HeroCarousel {
 
     private static final class Mask extends ViewOutlineProvider {
         final float radius;
+        final android.graphics.Rect rect = new android.graphics.Rect();
         int l, r, h;
 
         Mask(float radius) {
