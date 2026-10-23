@@ -50,7 +50,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - 🔄 **T6** [Sonnet + ponytail] Playback (Media3 service, PlayerController impl, queue, sleep timer, notification). Branch `task/t6-playback`, worktree `../wt-t6`.
 - 🔄 **T7** [Sonnet + ponytail] Lyrics (LRC parser/sidecar/embedded + LRCLIB + cache). Branch `task/t7-lyrics-java`, worktree `../wt-t7`.
 
-- 🔄 **T-W** [Sonnet + ponytail] Waveform extractor (`data/waveform`). Branch `task/tw-waveform-java`, worktree `../wt-tw`.
 
 - 🔄 **T2** [Opus] UI foundation: theme/tokens, custom widgets (Wavy/Waveform/Bars seek bars, morph play button, floating nav, mini-player), image loader. Branch `task/t2-ui-foundation-java`, worktree `../wt-t2`. Owns `ui/theme`, `ui/widget`, `res/values`, drawables.
 - 🔄 **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings, nav shell. Branch `task/t3-screens`, worktree `../wt-t3`.
@@ -72,6 +71,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T-W** [Sonnet+ponytail] Waveform extractor merged: `data/waveform` (WaveformMath, SamplingPlan sparse windows ~25% decode, EnvelopeBuilder, WaveformExtractor MediaCodec glue, WaveformStore + in-memory/file impls, WaveformRepositoryImpl with lazy/observer-driven work + battery-saver skip, `di/WaveformModule`), 45 JVM tests, build green (agent-reported). NOT verified: MediaCodec decode on a real device. T8 should bind `WaveformStore` to SQLite and call `prefetch(next track)`.
 - ✅ **T1b** [Sonnet+ponytail] Java scaffold merged into the working branch. Gradle 9.0.0 + **AGP 8.13.2** (AGP 9.x needs Gradle ≥ 9.1; tried 9.0.1 → refused), compileSdk/targetSdk 37 (suppressUnsupportedCompileSdk), minSdk 26, Java records for models, LiveData contracts + `Callback<T>`, fakes (37 tracks / 7 artists / 8 albums), `AppContainer`, `DbHelper` skeleton, 24 JVM tests, R8 release builds. **Supervisor re-ran `:app:assembleDebug test lint` → green; 0 `.kt/.kts` files.** Not verified: device run, GitHub Actions.
 - ✅ **T2a** [Opus] Design phase: 17 PNG mockups in `docs/design/png/` + spec `docs/design/DESIGN.md` (sources in `docs/design/src/`). Sent to owner in chat. **Approved by owner (D4).** Not verified: nothing runs on Android (browser mockups); notification/lock-screen is approximate; Persian copy needs native check; not mocked: tablet, overflow menus, sleep-timer sheet, permission-denied state.
 - ✅ **T1** [Sonnet] Scaffold: Gradle 9.8.2/AGP 9.4.1, Kotlin 2.4.21, compile/target SDK 37, M3 1.5.0-beta02 (Expressive), Koin, Media3, Room; domain contracts + fakes (37 tracks); `assembleDebug`, `lint`, 23 unit tests pass (agent-reported; SDK at /opt/android-sdk, `ANDROID_HOME=/opt/android-sdk ./gradlew :app:assembleDebug`). NOT verified: device run, release/R8, GitHub Actions run.
