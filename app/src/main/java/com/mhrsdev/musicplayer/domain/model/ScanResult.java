@@ -1,4 +1,4 @@
-package com.mhrsdev.musicplayer.data.scanner;
+package com.mhrsdev.musicplayer.domain.model;
 
 /** Outcome of one scan. {@code ok == false} means nothing was changed (e.g. permission missing). */
 public record ScanResult(boolean ok, int added, int updated, int removed) {

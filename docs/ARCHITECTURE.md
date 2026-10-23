@@ -41,7 +41,8 @@ data/settings       SharedPreferences-backed settings
 playback            ExoPlayerController (real PlayerController), PlaybackService (MediaSessionService + notification), PlayerHolder
                     (one in-process ExoPlayer shared by both), PlaybackStore (queue/position persistence), pure logic
                     (SleepTimerLogic, PlayCountTracker, QueueShuffler); di/PlaybackModule.createController(ctx, playCountListener)
-di                  AppContainer (hand-written DI, today bound to fakes)
+di                  AppContainer (hand-written DI, real implementations; fakes behind one switch), DataModule, PlaybackModule,
+                    WaveformModule
 fake                in-memory implementations + SampleData (UI development and tests)
 ui/theme  ui/widget  ui/nav  ui/home  ui/search  ui/library  ui/player  ui/queue  ui/settings
                     (owned by the UI agent; ui/home/HomeViewModel is the ViewModel example)
@@ -113,12 +114,32 @@ Model notes:
   `SearchResult.of(x)`. `HomeSection(id, title, subtitle, style = HERO_CAROUSEL | CAROUSEL | LIST, items)`.
 - `SearchFilter = ALL, SONGS, ALBUMS, ARTISTS, PLAYLISTS` (no VIDEOS in Phase 1).
 
-## Fakes (`fake/`, bound in `di/AppContainer`)
+## Wiring (`di/`)
+- `MusicPlayerApp.onCreate` builds `AppContainer` once. **Real implementations are the default**; the single switch is
+  `AppContainer.USE_FAKES` (default `false`), and `new AppContainer(ctx, true)` gives a fake-backed container for the debug
+  gallery and tests. `musicSource` is always the fake (no online catalog in Phase 1).
+- Container accessors for the UI: fields `library`, `player`, `lyrics`, `waveform`, `homeFeed`, `musicSource`, `ioExecutor`,
+  plus `settings()` (`SettingsStore`, real in both modes) and `libraryAdmin()` (`domain/repository/LibraryAdmin`: `isScanning()`,
+  `rescan(cb)`, `scanIfStale()`, rename/delete/remove/move playlist). `LibraryAdmin` is implemented by `SqliteLibraryRepository`
+  and `FakeLibraryRepository`; `LibraryRepository` itself stays unchanged.
+- Startup is cheap: no DB, MediaStore or network access until something is observed or called. The player is created eagerly in
+  `onCreate` (the process may be started by a media button); `MusicPlayerApp.onCreate` is wrapped in a `Trace` section.
+- Scanning: the UI calls `container.onAudioPermissionGranted()` after the permission grant (first scan); the first started
+  activity of a process triggers `onAppForeground()` which runs `scanIfStale()` once, only if the permission is held.
+- Playback: `PlaybackModule.createController(ctx, library::recordPlay, waveform::prefetch)`. The next-track callback is
+  event-driven inside `ExoPlayerController` (only while playing, only when the next queued track changes); no observer or timer.
+- Lyrics: `LyricsModule.create(ctx, BuildConfig.VERSION_NAME, SqliteLyricsCacheStore, onlineAllowed)`; order embedded -> sidecar ->
+  (valid cache entry, else LRCLIB). `onlineAllowed` is `SettingsStore.lyricsOnline()`: off = no request and nothing cached, local files and
+  already-cached lyrics still show. `lyrics_cache` (DB v3) stores `content/source/expires_at`; each put prunes expired rows.
+- Waveform: `SqliteWaveformStore` implements `WaveformStore` directly over `WaveformQueries` (256-bucket master envelope, same
+  byte codec as `WaveformMath`; validity = the track's `modified_ms`; empty blob = negative cache), passed to `WaveformModule`.
+
+## Fakes (`fake/`, bound in `di/AppContainer` when `useFakes`)
 `SampleData` (37 tracks, 7 artists incl. NEFFEX and Persian artist "سهراب نوری", 8 albums, 3 playlists, seeded likes/history,
 sample lyrics: track-3 plain, track-4 none, track-34..37 Persian synced, rest synced English),
 `FakePlayerController` (Handler ticker, 250 ms, runs only while playing; starts paused mid-track in a 12-item queue),
 `FakeLibraryRepository`, `FakeLyricsRepository`, `FakeWaveformRepository`, `FakeHomeFeedSource`, `FakeMusicSource`.
-Later tasks swap the assignments in `AppContainer`; the UI must not notice.
+The UI must not notice which set is bound.
 
 ## UI requirements
 See `docs/design/DESIGN.md`, `docs/design-reference/` and `docs/DIRECTIVES.md`. Seek bars (Wavy, Waveform, Bars) are custom

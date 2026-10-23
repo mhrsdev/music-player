@@ -1,50 +1,53 @@
 package com.mhrsdev.musicplayer.ui.settings;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import com.mhrsdev.musicplayer.data.settings.BatterySaverMode;
+import com.mhrsdev.musicplayer.data.settings.SeekBarStyle;
+import com.mhrsdev.musicplayer.data.settings.ThemeMode;
+import com.mhrsdev.musicplayer.ui.nav.Screens;
 
-/** SharedPreferences-backed {@link SettingsStore}. Cheap to construct; reads are in-memory after first load. */
+/**
+ * The UI's {@link SettingsStore} view of the app's single settings store ({@code AppContainer.settings()}, the
+ * SharedPreferences-backed {@code data.settings.SettingsStore} that the player, lyrics and scanner read too).
+ * Holds no state of its own, so any number of instances stay consistent.
+ */
 public final class PrefsSettingsStore implements SettingsStore {
-    private static final String FILE = "settings";
-    private final SharedPreferences prefs;
+    private final com.mhrsdev.musicplayer.data.settings.SettingsStore data;
 
     public PrefsSettingsStore(Context context) {
-        prefs = context.getApplicationContext().getSharedPreferences(FILE, Context.MODE_PRIVATE);
+        this(Screens.container(context).settings());
     }
 
-    private <E extends Enum<E>> E readEnum(String key, Class<E> type, E fallback) {
-        try {
-            return Enum.valueOf(type, prefs.getString(key, fallback.name()));
-        } catch (IllegalArgumentException e) {
-            return fallback;
-        }
+    PrefsSettingsStore(com.mhrsdev.musicplayer.data.settings.SettingsStore data) {
+        this.data = data;
     }
 
-    @Override public Theme getTheme() { return readEnum("theme", Theme.class, Theme.SYSTEM); }
+    @Override public Theme getTheme() { return Theme.valueOf(data.theme().getValue().name()); }
 
-    @Override public void setTheme(Theme theme) { prefs.edit().putString("theme", theme.name()).apply(); }
+    @Override public void setTheme(Theme theme) { data.setTheme(ThemeMode.valueOf(theme.name())); }
 
-    @Override public boolean isArtworkColors() { return prefs.getBoolean("artwork_colors", true); }
+    @Override public boolean isArtworkColors() { return data.artworkColors().getValue(); }
 
-    @Override public void setArtworkColors(boolean on) { prefs.edit().putBoolean("artwork_colors", on).apply(); }
+    @Override public void setArtworkColors(boolean on) { data.setArtworkColors(on); }
 
-    @Override public SeekStyle getSeekStyle() { return readEnum("seek_style", SeekStyle.class, SeekStyle.WAVY); }
+    @Override public SeekStyle getSeekStyle() { return SeekStyle.valueOf(data.seekBarStyle().getValue().name()); }
 
-    @Override public void setSeekStyle(SeekStyle s) { prefs.edit().putString("seek_style", s.name()).apply(); }
+    @Override public void setSeekStyle(SeekStyle s) { data.setSeekBarStyle(SeekBarStyle.valueOf(s.name())); }
 
-    @Override public String getLanguage() { return prefs.getString("language", LANG_SYSTEM); }
+    @Override public String getLanguage() { return data.language().getValue(); }
 
-    @Override public void setLanguage(String tag) { prefs.edit().putString("language", tag).apply(); }
+    @Override public void setLanguage(String tag) { data.setLanguage(tag); }
 
-    @Override public boolean isOnlineLyrics() { return prefs.getBoolean("online_lyrics", true); }
+    @Override public boolean isOnlineLyrics() { return data.lyricsOnline().getValue(); }
 
-    @Override public void setOnlineLyrics(boolean on) { prefs.edit().putBoolean("online_lyrics", on).apply(); }
+    @Override public void setOnlineLyrics(boolean on) { data.setLyricsOnline(on); }
 
-    @Override public int getSleepDefaultMinutes() { return prefs.getInt("sleep_default", 30); }
+    @Override public int getSleepDefaultMinutes() { return data.sleepTimerMinutes().getValue(); }
 
-    @Override public void setSleepDefaultMinutes(int m) { prefs.edit().putInt("sleep_default", m).apply(); }
+    @Override public void setSleepDefaultMinutes(int m) { data.setSleepTimerMinutes(m); }
 
-    @Override public boolean isBatterySaver() { return prefs.getBoolean("battery_saver", false); }
+    /** The single switch means "force on"; off returns to AUTO (follow the system's battery saver). */
+    @Override public boolean isBatterySaver() { return data.batterySaver().getValue() == BatterySaverMode.ON; }
 
-    @Override public void setBatterySaver(boolean on) { prefs.edit().putBoolean("battery_saver", on).apply(); }
+    @Override public void setBatterySaver(boolean on) { data.setBatterySaver(on ? BatterySaverMode.ON : BatterySaverMode.AUTO); }
 }

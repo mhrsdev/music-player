@@ -225,17 +225,19 @@ public class DbQueriesTest {
         assertNull(w.get("1", 50));
     }
 
-    @Test public void lyricsCacheRoundTrips() {
+    @Test public void lyricsCacheRoundTripsAndDropsExpiredRows() {
         LyricsCacheQueries lyrics = new LyricsCacheQueries(db);
         assertNull(lyrics.get("1"));
-        lyrics.put("1", new LyricsCacheQueries.Entry("[00:01.00]hi", true, "lrclib", 5));
+        lyrics.put("1", new LyricsCacheQueries.Entry("[00:01.00]hi", "lrclib", 50));
         LyricsCacheQueries.Entry e = lyrics.get("1");
         assertNotNull(e);
-        assertTrue(e.synced());
+        assertEquals("[00:01.00]hi", e.content());
         assertEquals("lrclib", e.source());
-        assertFalse(e.isNegative());
-        lyrics.put("1", new LyricsCacheQueries.Entry("", false, "none", 6));
-        assertTrue(lyrics.get("1").isNegative());
+        lyrics.put("2", new LyricsCacheQueries.Entry(null, null, 10)); // negative result
+        assertNull(lyrics.get("2").content());
+        lyrics.deleteExpired(10);
+        assertNull(lyrics.get("2"));
+        assertNotNull(lyrics.get("1"));
         lyrics.delete("1");
         assertNull(lyrics.get("1"));
     }

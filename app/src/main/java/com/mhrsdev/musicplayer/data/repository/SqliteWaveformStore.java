@@ -3,28 +3,29 @@ package com.mhrsdev.musicplayer.data.repository;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.data.db.DbHelper;
 import com.mhrsdev.musicplayer.data.db.query.WaveformQueries;
-import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.data.waveform.WaveformMath;
+import com.mhrsdev.musicplayer.data.waveform.WaveformStore;
 
 /**
- * Storage side of {@code WaveformRepository}: the waveform task's extractor reads the cache here first and stores what
- * it computed. Both methods block on the database: call them from a background thread. A stored envelope is valid only
- * while the audio file's modified time is unchanged, so edited files are re-extracted automatically.
+ * SQLite-backed {@link WaveformStore}: one 256-bucket master envelope per track (row key = track id +
+ * {@link WaveformMath#MASTER_BUCKETS}). The blob codec is identical to {@code WaveformMath.encode}, so the bytes pass
+ * through untouched; an empty blob is the negative cache. Validity is judged in SQL against the track's current
+ * {@code modified_ms} (a rescan that sees an edited file invalidates the row), so the {@code fingerprint} argument is
+ * not stored. Blocks on the database: background thread only.
  */
-public final class SqliteWaveformStore {
+public final class SqliteWaveformStore implements WaveformStore {
     private final DbHelper helper;
 
     public SqliteWaveformStore(DbHelper helper) {
         this.helper = helper;
     }
 
-    /** The cached envelope with {@code bars} values in [0, 1], or null (never extracted, file changed, or track unknown). */
-    @Nullable public float[] get(Track track, int bars) {
-        byte[] data = new WaveformQueries(helper.getWritableDatabase()).get(track.id(), bars);
-        return data == null ? null : WaveformCodec.decode(data);
+    @Nullable @Override public byte[] get(String trackId, String fingerprint) {
+        return new WaveformQueries(helper.getWritableDatabase()).get(trackId, WaveformMath.MASTER_BUCKETS);
     }
 
-    /** Stores {@code values} (clamped to [0, 1]) for the track. Ignored if the track is not in the library. */
-    public void put(Track track, int bars, float[] values) {
-        new WaveformQueries(helper.getWritableDatabase()).put(track.id(), bars, WaveformCodec.encode(values));
+    /** Ignored if the track is not in the library (the SQL inserts only for known tracks). */
+    @Override public void put(String trackId, String fingerprint, byte[] blob) {
+        new WaveformQueries(helper.getWritableDatabase()).put(trackId, WaveformMath.MASTER_BUCKETS, blob);
     }
 }

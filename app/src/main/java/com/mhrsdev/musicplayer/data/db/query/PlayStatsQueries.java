@@ -15,14 +15,18 @@ public final class PlayStatsQueries {
         this.db = db;
     }
 
-    /** Counts one play and moves the track to the top of the history. (No UPSERT: SQLite on API 26 is 3.18.) */
+    /**
+     * Counts one play and moves the track to the top of the history. The stored time is forced strictly above every
+     * existing one, so plays within the same millisecond keep their order. (No UPSERT: SQLite on API 26 is 3.18.)
+     */
     public void recordPlay(String trackId, long nowMs) {
         db.beginTransaction();
         try {
             db.execSQL("INSERT OR IGNORE INTO " + TABLE + " (" + COL_TRACK_ID + ", " + COL_PLAY_COUNT + ", "
                     + COL_LAST_PLAYED_AT + ") VALUES (?, 0, ?)", new Object[] {trackId, nowMs});
             db.execSQL("UPDATE " + TABLE + " SET " + COL_PLAY_COUNT + " = " + COL_PLAY_COUNT + " + 1, "
-                    + COL_LAST_PLAYED_AT + " = ? WHERE " + COL_TRACK_ID + " = ?", new Object[] {nowMs, trackId});
+                    + COL_LAST_PLAYED_AT + " = MAX(?, (SELECT MAX(" + COL_LAST_PLAYED_AT + ") FROM " + TABLE
+                    + ") + 1) WHERE " + COL_TRACK_ID + " = ?", new Object[] {nowMs, trackId});
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

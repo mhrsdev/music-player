@@ -2,6 +2,7 @@ package com.mhrsdev.musicplayer.fake;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -75,5 +76,25 @@ public class FakeLibraryRepositoryTest {
         List<HomeSection> sections = value(new FakeHomeFeedSource(repo).getSections());
         assertEquals("new-releases", sections.get(0).id());
         assertTrue(sections.stream().noneMatch(s -> s.items().isEmpty()));
+    }
+
+    @Test public void libraryAdminEditsPlaylists() {
+        FakeLibraryRepository repo = new FakeLibraryRepository();
+        String[] created = new String[1];
+        repo.createPlaylist("Mix", p -> created[0] = p.id());
+        repo.addToPlaylist(created[0], "track-1");
+        repo.addToPlaylist(created[0], "track-2");
+        repo.moveInPlaylist(created[0], 0, 1);
+        assertEquals("track-2", value(repo.getPlaylistTracks(created[0])).get(0).id());
+        repo.removeFromPlaylist(created[0], "track-2");
+        assertEquals(1, value(repo.getPlaylistTracks(created[0])).size());
+        repo.renamePlaylist(created[0], " Renamed ");
+        assertEquals("Renamed", value(repo.getPlaylist(created[0])).name());
+        repo.deletePlaylist(created[0]);
+        assertNull(value(repo.getPlaylist(created[0])));
+        boolean[] done = new boolean[1];
+        repo.rescan(r -> done[0] = r.ok());
+        assertTrue(done[0]);
+        assertFalse(value(repo.isScanning()));
     }
 }
