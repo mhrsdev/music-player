@@ -9,7 +9,7 @@ import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 
 /** Shell state: the selected tab and the playback snapshot that drives the mini-player. */
-public final class ShellViewModel extends ViewModel {
+public class ShellViewModel extends ViewModel {
     private final PlayerController player;
     private final MutableLiveData<ScreenNavigator.Tab> tab = new MutableLiveData<>(ScreenNavigator.Tab.HOME);
 

@@ -18,7 +18,7 @@ import com.mhrsdev.musicplayer.ui.library.Highlight;
 import com.mhrsdev.musicplayer.ui.library.TrackMenu;
 
 /** One row per result; tracks show duration + overflow, albums/artists/playlists show their kind. */
-final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.Holder> {
+class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.Holder> {
 
     interface Listener {
         void onResultClick(SearchResult result);
@@ -122,7 +122,7 @@ final class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAd
         }
     }
 
-    static final class Holder extends RecyclerView.ViewHolder {
+    static class Holder extends RecyclerView.ViewHolder {
         final LibraryRowTrackBinding b;
 
         Holder(LibraryRowTrackBinding b) {

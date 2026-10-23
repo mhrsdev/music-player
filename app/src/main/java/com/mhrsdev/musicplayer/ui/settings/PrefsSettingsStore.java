@@ -11,7 +11,7 @@ import com.mhrsdev.musicplayer.ui.nav.Screens;
  * SharedPreferences-backed {@code data.settings.SettingsStore} that the player, lyrics and scanner read too).
  * Holds no state of its own, so any number of instances stay consistent.
  */
-public final class PrefsSettingsStore implements SettingsStore {
+public class PrefsSettingsStore implements SettingsStore {
     private final com.mhrsdev.musicplayer.data.settings.SettingsStore data;
 
     public PrefsSettingsStore(Context context) {

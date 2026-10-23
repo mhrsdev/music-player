@@ -42,6 +42,10 @@ public class DeviceSettingsViewModel extends ViewModel {
 
     public void setReduceMotion(boolean on) { settings.setReduceMotion(on); }
 
+    public LiveData<Boolean> getImmersivePlayer() { return settings.immersivePlayer(); }
+
+    public void setImmersivePlayer(boolean on) { settings.setImmersivePlayer(on); }
+
     public LiveData<Sizes> getSizes() { return sizes; }
 
     public void refreshSizes() {

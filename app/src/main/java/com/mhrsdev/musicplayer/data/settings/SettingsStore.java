@@ -34,6 +34,9 @@ public final class SettingsStore {
     private static final String K_NON_MUSIC = "include_non_music";
     private static final String K_MIN_TRACK_SECONDS = "min_track_seconds";
     private static final String K_REDUCE_MOTION = "reduce_motion";
+    private static final String K_IMMERSIVE_PLAYER = "immersive_player";
+    /** Files shorter than this are skipped by the scanner (ringtones, notification sounds, voice notes). */
+    public static final int DEFAULT_MIN_TRACK_SECONDS = 30;
 
     private static final int MAX_BACKUP_STRING = 32;
     private static final Map<String, Class<?>> BACKUP_TYPES = Map.of(
@@ -55,6 +58,7 @@ public final class SettingsStore {
     private final MutableLiveData<Boolean> includeNonMusic;
     private final MutableLiveData<Integer> minTrackSeconds;
     private final MutableLiveData<Boolean> reduceMotion;
+    private final MutableLiveData<Boolean> immersivePlayer;
 
     public SettingsStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -71,6 +75,7 @@ public final class SettingsStore {
         includeNonMusic = new MutableLiveData<>(prefs.getBoolean(K_NON_MUSIC, false));
         minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_TRACK_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
         reduceMotion = new MutableLiveData<>(prefs.getBoolean(K_REDUCE_MOTION, false));
+        immersivePlayer = new MutableLiveData<>(prefs.getBoolean(K_IMMERSIVE_PLAYER, false));
     }
 
     public LiveData<ThemeMode> theme() {
@@ -228,6 +233,16 @@ public final class SettingsStore {
     public void setReduceMotion(boolean value) {
         prefs.edit().putBoolean(K_REDUCE_MOTION, value).apply();
         publish(reduceMotion, value);
+    }
+
+    /** Hide the status bar while the full player is open (swipe from the top shows it briefly). */
+    public LiveData<Boolean> immersivePlayer() {
+        return immersivePlayer;
+    }
+
+    public void setImmersivePlayer(boolean value) {
+        prefs.edit().putBoolean(K_IMMERSIVE_PLAYER, value).apply();
+        publish(immersivePlayer, value);
     }
 
     private <E extends Enum<E>> E readEnum(String key, E fallback) {

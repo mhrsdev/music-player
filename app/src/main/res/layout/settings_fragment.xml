@@ -35,6 +35,8 @@
             <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_artwork_colors_sub" />
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/reduce_motion" style="@style/Settings.CardSwitch" android:text="@string/settings_reduce_motion" />
             <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_reduce_motion_sub" />
+            <androidx.appcompat.widget.SwitchCompat android:id="@+id/immersive_player" style="@style/Settings.CardSwitch" android:text="@string/settings_immersive_player" />
+            <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_immersive_player_sub" />
         </LinearLayout>
 
         <!-- Language -->
