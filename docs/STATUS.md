@@ -50,12 +50,9 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 
 
-- 🔄 **P2** [Opus] Polish: light player + contrast guard, lyrics offline/Retry, shared-element-like transition, real output chip, add-to-playlist sheet; render player PNGs. Branch `task/p2-polish-player`, worktree `../wt-p2`.
-
-- 🔄 **R1** [Sonnet+ponytail] Release engineering: signing config, tag-triggered release workflow, README (en+fa) + CHANGELOG, APK build/verify. Branch `task/r1-release`, worktree `../wt-r1`.
 
 
-- 🔄 **P3** [Opus] Library/Home layout gaps (collage, 2×2 grid, snap carousel, skeletons, search/artists, per-script font). Branch `task/p3-polish-library`, worktree `../wt-p3`.
+
 
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
@@ -72,6 +69,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **R1/P2/P3 + all earlier** merged into ccr; **supervisor-run full build green**: `:app:assembleDebug test lint :app:assembleRelease` (0 test failures, lint clean, release APK 3.17 MB, 0 `.kt/.kts`). R1: release signing (env keystore, debug-key fallback), `.github/workflows/release.yml` (tag `v*` → build → GitHub pre-release with APK + sha256), README.md/README.fa.md/CHANGELOG, MIT LICENSE. P2: contrast guard + light player, lyrics offline Retry, cover-flight transition, output chip, Add-to-playlist sheet, real queue artwork. P3: liked collage, 2×2 library grid, keyline hero carousel, skeletons, ScriptFont. Missing: search/empty-state polish, queue-sheet render, word-sweep, loaded-track renders, device run.
 - ✅ **F1** [Sonnet+ponytail] Integration audit merged. Fixed: first scan after permission grant (FirstRunFlowTest), Home scanning/empty states + action, POST_NOTIFICATIONS requested on first play (API 33+), language re-applied on API 26–32, nav tab restored after process death, waveform requested only for Waveform/Bars styles, Add-to-playlist in track menu (create/pick). Verified only by reading/Robolectric (no device).
 - ✅ **P1** [Opus] Polish merged: bundled fonts (Google Sans Flex subset 110 KB + Vazirmatn 114 KB, OFL notices in assets/licenses), v1 type ramp, morph play buttons on Home/Library, Persian-in-English subtitle fix, Robolectric screen renders (`docs/screens/p1-*.png`, `ScreenRenderTest` + `FakeRenderApp`). Not done (→ P3): liked collage, 2×2 library grid, carousel snap, skeletons, search/artist polish, per-script font.
 - ✅ **T8** [Sonnet+ponytail] Wiring merged: `AppContainer` real impls by default (`USE_FAKES` switch), `LibraryAdmin`, SqliteWaveformStore as WaveformStore, SqliteLyricsCacheStore (DB v3), single SettingsStore (battery-saver/sleep-default/seek-style/online-lyrics now consumed), deterministic history order (fixes flaky test), manifest perms (READ_MEDIA_AUDIO, READ_EXTERNAL_STORAGE ≤32, INTERNET), debug+release+test+lint green (agent-reported). **Supervisor found a gap:** nothing calls `AppContainer.onAudioPermissionGranted()` → first scan after in-app permission grant never runs → F1.
@@ -98,6 +96,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - Online (needs owner decision, K2): legal catalog provider.
 
 ## Change log
+- 2026-10-23: everything merged into ccr (green full build). Next: ccr → main (fast-forward), tag v0.1.0 (pre-release via Actions), APK sent to owner. Then phase 2 (backlog above).
 - 2026-10-23: D15: MIT license added (LICENSE); README license section to say MIT.
 - 2026-10-23: D14: owner wants a GitHub release now + README OK + main fully updated; then full-featured version. Release agent R1 launched (signing, release workflow, README/CHANGELOG, APK build).
 - 2026-10-23: T2 merged; P1/P2 polish agents launched (deadline ~19:28 UTC). Remaining: T8 finish, T9 QA (after T8), merge to main.
