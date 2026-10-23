@@ -66,7 +66,8 @@ public final class ArtworkLoader {
     ArtworkLoader(ArtworkResolver resolver) {
         this.resolver = resolver;
         for (int i = 0; i < probeLocks.length; i++) probeLocks[i] = new Object();
-        int max = (int) Math.min(16L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 16);
+        // 1/16 of the heap, but never below two hero covers (a 128 MB heap would give 8 MB and thrash on every scroll).
+        int max = (int) Math.max(6L * 1024 * 1024, Math.min(16L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 16));
         cache = new LruCache<String, Bitmap>(max) {
             @Override protected int sizeOf(String key, Bitmap value) {
                 return value.getAllocationByteCount();

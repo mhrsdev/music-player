@@ -131,7 +131,7 @@ public class PerfBudgetTest {
                 + "|BitmapShader|PorterDuffXfermode|ColorMatrix|ColorMatrixColorFilter|float\\[|int\\[|String\\[|"
                 + "StringBuilder|ArrayList|HashMap)\\b|String\\.format|createBitmap\\(");
         List<String> violations = new ArrayList<>();
-        Pattern head = Pattern.compile("(void\\s+(onDraw|dispatchDraw|draw|drawChild|onDrawForeground)\\s*\\([^)]*\\)\\s*\\{)");
+        Pattern head = Pattern.compile("(void\\s+(onDraw|dispatchDraw|draw|drawChild|onDrawForeground|onScrolled)\\s*\\([^)]*\\)\\s*\\{)");
         for (Path p : javaFiles()) {
             String src = read(p);
             Matcher h = head.matcher(src);

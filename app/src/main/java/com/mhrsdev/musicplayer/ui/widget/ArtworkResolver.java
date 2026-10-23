@@ -159,11 +159,13 @@ public final class ArtworkResolver {
         }
     }
 
-    /** Downsample to about {@code sizePx}; RGB_565 for opaque JPEG at row/card sizes (half the memory). */
+    /** Downsample to about {@code sizePx}; RGB_565 for opaque JPEG up to hero size (half the memory). */
     private static void prepare(BitmapFactory.Options o, int sizePx) {
         o.inSampleSize = ArtworkLoader.sampleSize(o.outWidth, o.outHeight, sizePx);
         boolean opaque = "image/jpeg".equals(o.outMimeType);
-        o.inPreferredConfig = sizePx <= 320 && opaque || sizePx <= 160 ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;
+        // A hero cover is ~1000 px: 4 MB in ARGB_8888, more than half of the whole cache on a 128 MB heap, so every
+        // scroll re-decoded it. Opaque JPEG has no alpha to lose; 565 (dithered by the decoder) halves it.
+        o.inPreferredConfig = sizePx <= 1100 && opaque || sizePx <= 160 ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;
         o.inJustDecodeBounds = false;
     }
 }

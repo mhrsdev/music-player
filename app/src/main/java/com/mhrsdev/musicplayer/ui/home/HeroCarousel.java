@@ -38,10 +38,13 @@ final class HeroCarousel {
         rv.setPaddingRelative(start, rv.getPaddingTop(), start, rv.getPaddingBottom());
         rv.setClipToPadding(false);
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext(), RecyclerView.HORIZONTAL, false) {
-            // Lay out one extra screen at the end so the narrow tail cards (translated in) exist.
+            // The peeking neighbour sits in the padding zone (clipToPadding is off), which the layout does not fill by
+            // itself. Reserve exactly that zone: a whole extra screen on each side (the old value) bound and decoded a
+            // full-size cover for 2-3 cards nobody can see, on every hero scroll.
             @Override protected void calculateExtraLayoutSpace(@NonNull RecyclerView.State state, @NonNull int[] extra) {
-                extra[0] = getWidth(); // RTL lays the tail out on the "before" side
-                extra[1] = getWidth();
+                int zone = Math.max(getPaddingStart(), getPaddingEnd()) + Math.round(GAP_DP * d);
+                extra[0] = zone; // layout-direction terms: RTL swaps the sides by itself
+                extra[1] = zone;
             }
         });
         new StartSnap().attachToRecyclerView(rv);
@@ -58,7 +61,14 @@ final class HeroCarousel {
             if (rv.getPaddingEnd() != end) {
                 rv.setPaddingRelative(start, rv.getPaddingTop(), end, rv.getPaddingBottom());
             }
-            rv.post(() -> apply(rv));
+            // One pending pass however many layouts happen before the next frame (no lambda per layout).
+            Runnable pending = (Runnable) rv.getTag(R.id.home_hero_mask);
+            if (pending == null) {
+                pending = () -> apply(rv);
+                rv.setTag(R.id.home_hero_mask, pending);
+            }
+            rv.removeCallbacks(pending);
+            rv.post(pending);
         });
     }
 
@@ -81,17 +91,41 @@ final class HeroCarousel {
             boolean after = o >= 0;
             // Edge facing the focused card: the start edge for cards after it, the end edge for cards before it.
             boolean pivotLeft = after != rtl;
-            View art = c.findViewById(R.id.art_frame);
-            c.setPivotX(pivotLeft ? 0f : full);
-            c.setPivotY(art == null ? c.getHeight() / 2f : art.getTop() + art.getHeight() / 2f);
-            c.setScaleX(s);
-            c.setScaleY(s);
+            // Child lookups are cached on the card: apply() runs on every scroll frame for every attached card.
+            Parts parts = c.getTag(R.id.home_hero_mask) instanceof Parts t ? t : null;
+            if (parts == null) {
+                parts = new Parts(c.findViewById(R.id.art_frame), c.findViewById(R.id.title), c.findViewById(R.id.subtitle));
+                c.setTag(R.id.home_hero_mask, parts);
+            }
+            float pivotX = pivotLeft ? 0f : full;
+            float pivotY = parts.art == null ? c.getHeight() / 2f : parts.art.getTop() + parts.art.getHeight() / 2f;
+            if (c.getPivotX() != pivotX) c.setPivotX(pivotX);
+            if (c.getPivotY() != pivotY) c.setPivotY(pivotY);
+            if (c.getScaleX() != s) {
+                c.setScaleX(s);
+                c.setScaleY(s);
+            }
             float textAlpha = Math.max(0f, 1f - Math.abs(o) * 2.5f);
-            View title = c.findViewById(R.id.title), sub = c.findViewById(R.id.subtitle);
-            if (title != null) title.setAlpha(textAlpha);
-            if (sub != null) sub.setAlpha(textAlpha);
-            c.setImportantForAccessibility(textAlpha > 0.5f || Math.abs(o) < 1.5f
-                    ? View.IMPORTANT_FOR_ACCESSIBILITY_AUTO : View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+            if (parts.title != null && parts.title.getAlpha() != textAlpha) parts.title.setAlpha(textAlpha);
+            if (parts.sub != null && parts.sub.getAlpha() != textAlpha) parts.sub.setAlpha(textAlpha);
+            int important = textAlpha > 0.5f || Math.abs(o) < 1.5f
+                    ? View.IMPORTANT_FOR_ACCESSIBILITY_AUTO : View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS;
+            if (parts.important != important) {
+                parts.important = important;
+                c.setImportantForAccessibility(important);
+            }
+        }
+    }
+
+    /** The views of a hero card that {@link #apply} touches. */
+    private static class Parts {
+        final View art, title, sub;
+        int important = -1; // last accessibility mode set (getImportantForAccessibility() resolves AUTO, so it can't be compared)
+
+        Parts(@Nullable View art, @Nullable View title, @Nullable View sub) {
+            this.art = art;
+            this.title = title;
+            this.sub = sub;
         }
     }
 
