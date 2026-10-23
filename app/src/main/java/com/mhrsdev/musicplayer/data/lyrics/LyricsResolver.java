@@ -121,6 +121,7 @@ public final class LyricsResolver {
     private static Lyrics parse(Track track, @Nullable LyricsSource.Found found) {
         if (found == null) return null;
         Lyrics l = LyricsParser.toLyrics(track.id(), found.text(), found.source());
+        if (UserLyricsStore.LABEL.equals(found.source())) return l == null || l.isEmpty() ? null : l; // user's choice
         Lyrics clean = LyricsJunkFilter.clean(l, track.artistName(), track.title());
         return clean == null || clean.isEmpty() ? null : clean;
     }

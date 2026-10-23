@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lyrics_not_found">متن ترانه پیدا نشد</string>
+    <string name="lyrics_not_found_hint">دوباره جست‌وجو کنید، فایل متن ترانه را انتخاب کنید یا با نام خواننده و آهنگ بگردید.</string>
+    <string name="lyrics_failed">ارتباط با سرویس متن ترانه برقرار نشد</string>
+    <string name="lyrics_failed_hint">اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.</string>
+    <string name="lyrics_search_again">جست‌وجوی دوباره</string>
+    <string name="lyrics_search_again_wait">چند ثانیه صبر کنید و دوباره جست‌وجو کنید</string>
+    <string name="lyrics_add_file">افزودن فایل متن ترانه</string>
+    <string name="lyrics_search_manually">جست‌وجوی دستی</string>
+    <string name="lyrics_find">یافتن متن ترانه</string>
+    <string name="lyrics_field_title">نام آهنگ</string>
+    <string name="lyrics_field_artist">خواننده</string>
+    <string name="lyrics_search">جست‌وجو</string>
+    <string name="lyrics_search_failed">جست‌وجو انجام نشد. اتصال اینترنت را بررسی کنید.</string>
+    <string name="lyrics_search_empty">چیزی پیدا نشد. نام کوتاه‌تری امتحان کنید.</string>
+    <string name="lyrics_synced">همگام</string>
+    <string name="lyrics_plain">متن ساده</string>
+</resources>

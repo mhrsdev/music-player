@@ -159,6 +159,46 @@
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/lyrics_search_again"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/player_chip_bg"
+                    android:gravity="center"
+                    android:minWidth="160dp"
+                    android:paddingHorizontal="20dp"
+                    android:text="@string/lyrics_search_again"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
+                <TextView
+                    android:id="@+id/lyrics_add_file"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/player_chip_bg"
+                    android:gravity="center"
+                    android:minWidth="160dp"
+                    android:paddingHorizontal="20dp"
+                    android:text="@string/lyrics_add_file"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
+                <TextView
+                    android:id="@+id/lyrics_search_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/player_chip_bg"
+                    android:gravity="center"
+                    android:minWidth="160dp"
+                    android:paddingHorizontal="20dp"
+                    android:text="@string/lyrics_search_manually"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <TextView
