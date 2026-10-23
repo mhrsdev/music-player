@@ -1,7 +1,6 @@
 package com.mhrsdev.musicplayer.ui.player;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -54,9 +53,6 @@ import java.util.Locale;
  * animations stop when the player is not visible.
  */
 public final class PlayerFragment extends Fragment {
-    /** Setting key shared with Settings (T3). Values: WAVY | WAVEFORM | BARS. */
-    public static final String PREFS = "settings";
-    public static final String KEY_SEEK_STYLE = "seek_bar_style";
 
     /** Seek-bar styles (D4): Wavy default, Waveform, Bars (voice-memo). */
     public enum SeekStyle { WAVY, WAVEFORM, BARS }
@@ -120,11 +116,11 @@ public final class PlayerFragment extends Fragment {
         if (savedInstanceState == null && PlayerPalette.motionAllowed(requireContext())) playEnterTransition();
     }
 
+    /** Reads the Settings screen's choice (T3's SettingsStore, file "settings"); Wavy when unset or unknown. */
     static SeekStyle readSeekStyle(Context ctx) {
-        SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         try {
-            return SeekStyle.valueOf(p.getString(KEY_SEEK_STYLE, "WAVY"));
-        } catch (IllegalArgumentException | ClassCastException e) {
+            return SeekStyle.valueOf(new com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore(ctx).getSeekStyle().name());
+        } catch (RuntimeException e) {
             return SeekStyle.WAVY;
         }
     }
@@ -326,6 +322,7 @@ public final class PlayerFragment extends Fragment {
     /** Real artwork arrived (ArtworkView decodes off-thread, downsampled): derive colors + tiny blurred backdrop once. */
     private void onArtwork(@Nullable android.graphics.Bitmap cover) {
         if (b == null || cover == null) return;
+        if (!new com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore(requireContext()).isArtworkColors()) return;
         android.graphics.Bitmap tiny = PlayerBackdropView.prepare(cover);
         if (tiny == null) return;
         int[] px = new int[tiny.getWidth() * tiny.getHeight()];
