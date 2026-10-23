@@ -78,3 +78,17 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 1. Design in `docs/design/` is **approved**. Start implementation (T2–T9).
 2. Add **one more seek-bar style** next to Wavy and Waveform: vertical **bars whose heights follow the song's actual loudness**, like the voice-message/voice-recording waveform ("Bars"). Played part highlighted, tap/drag to seek. Needs real amplitude extraction per track (cached).
 3. The owner did not answer the 5 open design questions; supervisor applied the recommended defaults (see STATUS → Decisions K5–K9). Owner can change them anytime.
+
+---
+
+## D5 — 2026-10-23 — Stop parallel agents; one sub-agent per section; be ready for chat switch
+
+**Original (verbatim):**
+
+> ساب هارو متوقف کن هر بخش فقط یه ساب
+> و اماده باش هر لحظه چتو عوض کنم
+
+**Summary:**
+1. **Stop all running sub-agents** (done: all 5 wave-1 agents killed).
+2. From now on **one sub-agent per section, and only ONE sub-agent running at a time** (sequential, no parallel fan-out). Interpreted conservatively; owner can relax it.
+3. Keep `docs/STATUS.md` always resume-ready: the owner may switch chats at any moment, and the next agent must continue without explanation.
