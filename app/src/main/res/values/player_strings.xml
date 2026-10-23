@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_play">Play</string>
+    <string name="player_pause">Pause</string>
+    <string name="player_next">Next</string>
+    <string name="player_previous">Previous</string>
+    <string name="player_collapse">Collapse player</string>
+    <string name="player_more">More options</string>
+    <string name="player_like">Like</string>
+    <string name="player_unlike">Remove from liked songs</string>
+    <string name="player_shuffle_on">Shuffle, on</string>
+    <string name="player_shuffle_off">Shuffle, off</string>
+    <string name="player_repeat_off">Repeat, off</string>
+    <string name="player_repeat_all">Repeat all</string>
+    <string name="player_repeat_one">Repeat one</string>
+    <string name="player_show_lyrics">Show lyrics</string>
+    <string name="player_show_cover">Show cover</string>
+    <string name="player_queue">Queue</string>
+    <string name="player_sleep_timer">Sleep timer</string>
+    <string name="player_sleep_timer_min">Sleep timer, %1$s min left</string>
+    <string name="player_output_device">This phone</string>
+    <string name="player_playing_from">Playing from</string>
+    <string name="player_nothing_playing">Nothing playing</string>
+    <string name="player_seek">Seek</string>
+    <string name="lyrics_loading">Finding lyrics…</string>
+    <string name="lyrics_none">No lyrics for this song yet</string>
+    <string name="lyrics_none_hint">Put a .lrc file next to the song to add them.</string>
+    <string name="lyrics_back_to_current">Back to current line</string>
+    <string name="lyrics_unsynced">Lyrics aren\'t synced to this song</string>
+    <string name="queue_up_next">Up next</string>
+    <string name="queue_playing_from">Playing from %1$s · %2$s min left</string>
+    <string name="queue_min_left">%1$s min left</string>
+    <string name="queue_shuffle">Shuffle queue</string>
+    <string name="queue_shuffled">Queue shuffled</string>
+    <string name="queue_removed">Removed %1$s</string>
+    <string name="queue_undo">Undo</string>
+    <string name="queue_empty">Nothing up next</string>
+    <string name="queue_reorder">Reorder %1$s</string>
+    <string name="queue_move_up">Move up</string>
+    <string name="queue_move_down">Move down</string>
+    <string name="queue_remove">Remove</string>
+    <string name="queue_sleep_off">Off</string>
+    <string name="queue_sleep_end_of_track">End of track</string>
+    <string name="queue_sleep_preset">%1$s minutes</string>
+    <string name="queue_sleep_chip_end">End of track</string>
+</resources>
