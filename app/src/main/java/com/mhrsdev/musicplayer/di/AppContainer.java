@@ -99,6 +99,7 @@ public final class AppContainer {
             WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
+            PlaybackModule.setLibraryBrowser(data.browser);
             // Home-screen widgets: redrawn on track / play-pause changes only, and only while this process lives.
             NowPlayingBridge.attach(appContext, np -> WidgetUpdater.update(appContext, np, io));
             audioEffects = PlaybackModule.createAudioEffects(appContext);

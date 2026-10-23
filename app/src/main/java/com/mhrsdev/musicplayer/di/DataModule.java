@@ -6,6 +6,7 @@ import com.mhrsdev.musicplayer.data.backup.SqliteBackupService;
 import com.mhrsdev.musicplayer.data.db.DbHelper;
 import com.mhrsdev.musicplayer.data.repository.ChangeNotifier;
 import com.mhrsdev.musicplayer.data.repository.LocalHomeFeedSource;
+import com.mhrsdev.musicplayer.data.repository.SqliteLibraryBrowser;
 import com.mhrsdev.musicplayer.data.repository.SqliteLibraryRepository;
 import com.mhrsdev.musicplayer.data.repository.SqliteWaveformStore;
 import com.mhrsdev.musicplayer.data.scanner.MediaStoreScanner;
@@ -30,6 +31,9 @@ public final class DataModule {
     /** User-data export / import over the same database and settings. */
     public final SqliteBackupService backup;
 
+    /** Blocking library reads for Android Auto / external browsing. */
+    public final SqliteLibraryBrowser browser;
+
     private DataModule(Context context, Executor io, SettingsStore settings) {
         dbHelper = new DbHelper(context);
         this.settings = settings;
@@ -38,6 +42,7 @@ public final class DataModule {
         library = new SqliteLibraryRepository(dbHelper, io, notifier, scanner);
         homeFeed = new LocalHomeFeedSource(dbHelper, io, notifier);
         waveformStore = new SqliteWaveformStore(dbHelper);
+        browser = new SqliteLibraryBrowser(dbHelper);
         backup = new SqliteBackupService(dbHelper, io, notifier, settings, BuildConfig.VERSION_NAME, System::currentTimeMillis);
     }
 

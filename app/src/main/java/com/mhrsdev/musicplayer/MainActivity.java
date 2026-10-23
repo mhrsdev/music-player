@@ -1,6 +1,7 @@
 package com.mhrsdev.musicplayer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.mhrsdev.musicplayer.ui.nav.PermissionFragment;
 import com.mhrsdev.musicplayer.ui.nav.PlayerNavigator;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
 import com.mhrsdev.musicplayer.ui.nav.ShellViewModel;
+import com.mhrsdev.musicplayer.ui.nav.ShortcutIntents;
 import com.mhrsdev.musicplayer.ui.search.SearchFragment;
 import com.mhrsdev.musicplayer.ui.settings.PrefsSettingsStore;
 import com.mhrsdev.musicplayer.ui.settings.SettingsFragment;
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             if (AudioPermission.granted(this) || PermissionPrefs.skipped(this)) {
                 showTab(Tab.HOME);
+                runShortcut(getIntent());
             } else {
                 permissionFlow = true;
                 getSupportFragmentManager().beginTransaction()
@@ -101,6 +104,17 @@ public class MainActivity extends AppCompatActivity
         }
         binding.chrome.setVisibility(permissionFlow ? View.GONE : View.VISIBLE);
         binding.bottomScrim.setVisibility(permissionFlow ? View.GONE : View.VISIBLE);
+    }
+
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (!permissionFlow) runShortcut(intent);
+    }
+
+    /** Launcher shortcuts (Shuffle all / Liked songs / Search). */
+    private void runShortcut(Intent intent) {
+        ShortcutIntents.handle(this, intent, ((MusicPlayerApp) getApplication()).getContainer(), this);
     }
 
     @Override protected void onSaveInstanceState(Bundle out) {

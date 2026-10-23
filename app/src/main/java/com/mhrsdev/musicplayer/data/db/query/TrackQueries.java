@@ -70,6 +70,12 @@ public final class TrackQueries {
                 + " ORDER BY ps." + PlayStatsContract.COL_LAST_PLAYED_AT + " DESC LIMIT " + limit);
     }
 
+    /** Null when the id is unknown. */
+    public Track byId(String id) {
+        List<Track> found = run(" WHERE t." + COL_ID + " = ?", id);
+        return found.isEmpty() ? null : found.get(0);
+    }
+
     public List<Track> recentlySaved(int limit) {
         return run(" ORDER BY t." + COL_ADDED_AT_MS + " DESC LIMIT " + limit);
     }
