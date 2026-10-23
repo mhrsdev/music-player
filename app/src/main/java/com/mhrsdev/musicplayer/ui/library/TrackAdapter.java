@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.library;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
@@ -171,7 +173,7 @@ public final class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder
         h.b.explicit.setVisibility(t.explicit() ? View.VISIBLE : View.GONE);
         h.b.more.setContentDescription(h.itemView.getContext().getString(R.string.library_more, t.title()));
         h.b.drag.setVisibility(reorderable ? View.VISIBLE : View.GONE);
-        Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 12, false);
+        Art.bind(h.b.art, t.artworkUri(), t.placeholderSeed(), 12, false, CoverSpec.forTrack(t));
         bindSelection(h, t);
     }
 

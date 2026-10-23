@@ -4,51 +4,52 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
+import java.util.Objects;
 
 /**
- * Rounded (or circular) artwork with a seeded gradient placeholder plus note glyph or monogram.
- * Loads through {@link ArtworkLoader} at the view's own size; stale results from recycled rows are ignored.
- * One BitmapShader per bitmap, no allocation in onDraw. Crossfades 150 ms from placeholder to art.
+ * Rounded (or circular) artwork. Loads through {@link ArtworkLoader} at the view's own size; stale results from
+ * recycled rows are ignored. Three states: <b>loading</b> (a quiet surface tone, no glyph), <b>art</b>, and
+ * <b>no art</b>, which shows Mowj's generated cover for the bound {@link CoverSpec} (album-level for tracks, an
+ * initial for artists, a text-less scene when only the seed is known). One BitmapShader per bitmap, no allocation
+ * in onDraw. Crossfades 150 ms from loading to the cover.
  */
 public class ArtworkView extends View {
     private final Paint artPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     private final Paint placeholderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint monogramPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF bounds = new RectF();
     private final Matrix shaderMatrix = new Matrix();
-    private final Drawable note;
 
     private float cornerRadius;
     private boolean circle;
     private float zoom = 1f;
     private int seed;
     @Nullable private String uri;
+    @Nullable private CoverSpec spec;
+    /** The bitmap shown is a generated cover (zoom does not apply; an artist avatar is already composed). */
+    private boolean generated;
     @Nullable private String wantedKey;
     /** In-flight request (cancelled when the view is rebound to another cover or detached, e.g. a recycled row). */
     @Nullable private ArtworkLoader.Callback inFlight;
     @Nullable private Bitmap bitmap;
-    @Nullable private String monogram;
     private float fade = 1f;
     private long fadeStart;
-    private int[] placeholder = PlaceholderArt.colors(0);
     @Nullable private Listener listener;
 
-    /** Notified when real artwork arrives (e.g. the player feeds it to ThemeController). */
+    /** Notified when the cover arrives, real or generated (e.g. the player feeds it to its colour extraction). */
     public interface Listener {
         void onArtwork(@Nullable Bitmap bitmap);
     }
@@ -60,11 +61,7 @@ public class ArtworkView extends View {
     public ArtworkView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         cornerRadius = Tokens.dp(context, Tokens.RADIUS_ROW_ART);
-        note = ContextCompat.getDrawable(context, R.drawable.ic_mp_note);
-        if (note != null) note.mutate().setTint(0xE6FFFFFF);
-        monogramPaint.setColor(0xF2FFFFFF);
-        monogramPaint.setTextAlign(Paint.Align.CENTER);
-        monogramPaint.setFakeBoldText(true);
+        placeholderPaint.setColor(Tokens.color(context, R.attr.mpSurfaceContainerHigh));
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
 
@@ -90,34 +87,44 @@ public class ArtworkView extends View {
         listener = l;
     }
 
+    /** A track: its art, else the generated cover of its album (or of the track itself when it has no album). */
     public void bind(Track track) {
-        setArtwork(track.artworkUri(), track.placeholderSeed());
+        setArtwork(track.artworkUri(), track.placeholderSeed(), CoverSpec.forTrack(track));
     }
 
-    /** Artwork URI (nullable) + placeholder seed. Monogram is cleared. */
+    /** Artwork URI (nullable) + seed; without art a text-less generated scene for the seed is shown. */
     public void setArtwork(@Nullable String artworkUri, int placeholderSeed) {
-        monogram = null;
-        if (seed != placeholderSeed || placeholderPaint.getShader() == null) {
-            seed = placeholderSeed;
-            placeholder = PlaceholderArt.colors(placeholderSeed);
-            updatePlaceholderShader();
-        }
-        if (artworkUri != null && artworkUri.equals(uri) && bitmap != null) return;
+        setArtwork(artworkUri, placeholderSeed, null);
+    }
+
+    /** Artwork URI (nullable) + the generated cover to show when there is no art. */
+    public void setArtwork(@Nullable String artworkUri, int placeholderSeed, @Nullable CoverSpec coverSpec) {
+        boolean same = Objects.equals(artworkUri, uri) && placeholderSeed == seed && Objects.equals(coverSpec, spec);
+        seed = placeholderSeed;
+        spec = coverSpec;
+        if (same && bitmap != null) return;
         uri = artworkUri;
-        setBitmap(null, false);
+        setBitmap(null, false, false);
         requestLoad();
     }
 
-    /** Artist without art: first letter on the seeded gradient. */
+    /** Artist without art: generated avatar (the scene of the name with its initial). */
     public void setMonogram(@Nullable String name, int placeholderSeed) {
-        setArtwork(null, placeholderSeed);
-        monogram = name == null || name.isEmpty() ? null : name.substring(0, name.offsetByCodePoints(0, 1));
-        invalidate();
+        setArtwork(null, placeholderSeed, name == null || name.isEmpty() ? null : CoverSpec.forArtist(name));
     }
 
     @Nullable
     public Bitmap getBitmap() {
         return bitmap;
+    }
+
+    /** True when the shown bitmap is a generated cover (no artwork was found). */
+    public boolean isGenerated() {
+        return generated && bitmap != null;
+    }
+
+    private CoverSpec coverSpec() {
+        return spec != null ? spec : CoverSpec.fromSeed(seed);
     }
 
     private void cancelInFlight() {
@@ -132,13 +139,17 @@ public class ArtworkView extends View {
 
     @Override protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (bitmap == null && uri != null && inFlight == null) requestLoad();
+        if (bitmap == null && inFlight == null) requestLoad();
     }
 
     private void requestLoad() {
         cancelInFlight();
-        if (uri == null || getWidth() == 0) {
+        if (getWidth() == 0) {
             wantedKey = null;
+            return;
+        }
+        if (uri == null) {
+            requestGenerated();
             return;
         }
         int size = Math.max(getWidth(), getHeight());
@@ -148,41 +159,60 @@ public class ArtworkView extends View {
         ArtworkLoader loader = ArtworkLoader.get(getContext());
         Bitmap hit = loader.cached(u, size);
         if (hit != null) {
-            setBitmap(hit, false);
+            setBitmap(hit, false, false);
             return;
         }
-        if (loader.isKnownMiss(u)) { // no art for this cover: placeholder, no request
-            if (listener != null) listener.onArtwork(null);
+        if (loader.isKnownMiss(u)) { // no art for this cover: generated cover, no decode
+            requestGenerated();
             return;
         }
         ArtworkLoader.Callback cb = new ArtworkLoader.Callback() {
             @Override public void onLoaded(String key, @Nullable Bitmap bmp) {
                 if (inFlight == this) inFlight = null;
-                if (key.equals(wantedKey)) setBitmap(bmp, true);
+                if (!key.equals(wantedKey)) return;
+                if (bmp != null) setBitmap(bmp, true, false); else requestGenerated();
             }
         };
         inFlight = cb;
         loader.load(u, size, cb);
     }
 
-    private void setBitmap(@Nullable Bitmap b, boolean animate) {
+    /** No art: the generated cover from the cache, rendered now when tiny, else on the loader's worker thread. */
+    private void requestGenerated() {
+        cancelInFlight();
+        CoverSpec s = coverSpec();
+        int size = Math.max(getWidth(), getHeight());
+        ArtworkLoader loader = ArtworkLoader.get(getContext());
+        wantedKey = ArtworkLoader.generatedKey(s, size);
+        Bitmap hit = loader.generatedNow(s, size);
+        if (hit != null) {
+            setBitmap(hit, false, true);
+            return;
+        }
+        ArtworkLoader.Callback cb = new ArtworkLoader.Callback() {
+            @Override public void onLoaded(String key, @Nullable Bitmap bmp) {
+                if (inFlight == this) inFlight = null;
+                if (!key.equals(wantedKey)) return;
+                if (bmp != null) setBitmap(bmp, true, true);
+                else if (listener != null) listener.onArtwork(null);
+            }
+        };
+        inFlight = cb;
+        loader.loadGenerated(s, size, cb);
+    }
+
+    private void setBitmap(@Nullable Bitmap b, boolean animate, boolean isGenerated) {
         bitmap = b;
+        generated = isGenerated;
         if (b != null) {
             artPaint.setShader(new BitmapShader(b, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
             updateShader();
             fade = animate ? 0f : 1f;
             fadeStart = android.os.SystemClock.uptimeMillis();
+            if (listener != null) listener.onArtwork(b);
         } else {
             artPaint.setShader(null);
         }
-        if (listener != null && (b != null || uri == null)) listener.onArtwork(b);
-        invalidate();
-    }
-
-    private void updatePlaceholderShader() {
-        if (getWidth() == 0) return;
-        placeholderPaint.setShader(new LinearGradient(0, 0, getWidth(), getHeight(),
-                placeholder[0], placeholder[1], Shader.TileMode.CLAMP));
         invalidate();
     }
 
@@ -190,7 +220,8 @@ public class ArtworkView extends View {
         Bitmap b = bitmap;
         Shader s = artPaint.getShader();
         if (b == null || s == null || getWidth() == 0) return;
-        float scale = Math.max(getWidth() / (float) b.getWidth(), getHeight() / (float) b.getHeight()) * zoom;
+        float z = generated ? 1f : zoom;
+        float scale = Math.max(getWidth() / (float) b.getWidth(), getHeight() / (float) b.getHeight()) * z;
         shaderMatrix.setScale(scale, scale);
         shaderMatrix.postTranslate((getWidth() - b.getWidth() * scale) / 2f, (getHeight() - b.getHeight() * scale) / 2f);
         s.setLocalMatrix(shaderMatrix);
@@ -199,27 +230,14 @@ public class ArtworkView extends View {
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
         bounds.set(0, 0, w, h);
-        updatePlaceholderShader();
-        monogramPaint.setTextSize(Math.min(w, h) * 0.42f);
-        int ns = (int) (Math.min(w, h) * 0.42f);
-        if (note != null) note.setBounds((w - ns) / 2, (h - ns) / 2, (w + ns) / 2, (h + ns) / 2);
-        if (bitmap == null) requestLoad(); else updateShader();
+        boolean rebucket = generated && bitmap != null && ArtworkLoader.bucket(Math.max(w, h)) != bitmap.getWidth();
+        if (bitmap == null || rebucket) requestLoad(); else updateShader();
     }
 
     @Override protected void onDraw(Canvas canvas) {
         float r = circle ? Math.min(getWidth(), getHeight()) / 2f : cornerRadius;
         boolean showArt = bitmap != null;
-        if (!showArt || fade < 1f) {
-            canvas.drawRoundRect(bounds, r, r, placeholderPaint);
-            if (!showArt) {
-                if (monogram != null) {
-                    float y = getHeight() / 2f - (monogramPaint.descent() + monogramPaint.ascent()) / 2f;
-                    canvas.drawText(monogram, getWidth() / 2f, y, monogramPaint);
-                } else if (note != null && uri == null) {
-                    note.draw(canvas);
-                }
-            }
-        }
+        if (!showArt || fade < 1f) canvas.drawRoundRect(bounds, r, r, placeholderPaint);
         if (showArt) {
             if (fade < 1f) {
                 fade = Math.min(1f, (android.os.SystemClock.uptimeMillis() - fadeStart) / 150f);

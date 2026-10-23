@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.library;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -76,7 +78,8 @@ public final class LibraryFragment extends Fragment {
             ArtworkView[] peeks = {b.hubAlbumsPeek, b.hubAlbumsPeek2, b.hubAlbumsPeek3};
             for (int i = 0; i < peeks.length; i++) {
                 peeks[i].setVisibility(i < n ? View.VISIBLE : View.GONE);
-                if (i < n) Art.bind(peeks[i], list.get(i).artworkUri(), list.get(i).placeholderSeed(), 8, false);
+                if (i < n) Art.bind(peeks[i], list.get(i).artworkUri(), list.get(i).placeholderSeed(), 8, false,
+                        CoverSpec.forAlbum(list.get(i)));
             }
         });
         vm.getPlaylists().observe(getViewLifecycleOwner(), list -> {
@@ -87,7 +90,8 @@ public final class LibraryFragment extends Fragment {
                 peeks[i].setVisibility(i < n ? View.VISIBLE : View.GONE);
                 if (i < n) {
                     List<String> art = list.get(i).artworkUris();
-                    Art.bind(peeks[i], art.isEmpty() ? null : art.get(0), list.get(i).placeholderSeed(), 8, false);
+                    Art.bind(peeks[i], art.isEmpty() ? null : art.get(0), list.get(i).placeholderSeed(), 8, false,
+                            CoverSpec.forPlaylist(list.get(i).id(), list.get(i).name()));
                 }
             }
         });

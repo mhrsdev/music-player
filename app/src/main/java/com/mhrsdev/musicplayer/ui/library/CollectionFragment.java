@@ -1,5 +1,7 @@
 package com.mhrsdev.musicplayer.ui.library;
 
+import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
+
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -210,7 +212,8 @@ public final class CollectionFragment extends Fragment {
             } else if (cell.circle()) {
                 Art.artist(h.b.art, cell.art(), cell.title(), cell.seed());
             } else {
-                Art.bind(h.b.art, cell.art(), cell.seed(), 24, false);
+                Art.bind(h.b.art, cell.art(), cell.seed(), 24, false,
+                        CoverSpec.forAlbum(cell.id(), cell.title(), cell.subtitle()));
             }
             h.itemView.setContentDescription(cell.title() + ", " + cell.subtitle());
             h.itemView.setOnClickListener(v -> listener.onClick(cell));

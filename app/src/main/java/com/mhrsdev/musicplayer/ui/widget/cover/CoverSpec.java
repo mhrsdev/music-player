@@ -66,6 +66,12 @@ public record CoverSpec(Kind kind, String identity, long seed, String title, @Nu
         return forArtist(a.name());
     }
 
+    /** A playlist without covers: its name on a scene of its own. */
+    public static CoverSpec forPlaylist(String playlistId, String name) {
+        String id = "playlist:" + playlistId;
+        return new CoverSpec(Kind.ALBUM, id, CoverRandom.hash(id), name == null ? "" : name.trim(), null);
+    }
+
     /** Text-less spec from an int seed only (call sites that know nothing but {@code placeholderSeed}). */
     public static CoverSpec fromSeed(int seed) {
         String id = "seed:" + seed;
