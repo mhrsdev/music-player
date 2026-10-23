@@ -33,8 +33,6 @@
             <TextView android:id="@+id/dynamic_color_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:visibility="gone" android:text="@string/settings_dynamic_color_sub" />
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/artwork_colors" style="@style/Settings.CardSwitch" android:text="@string/settings_artwork_colors" />
             <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_artwork_colors_sub" />
-            <androidx.appcompat.widget.SwitchCompat android:id="@+id/reduce_motion" style="@style/Settings.CardSwitch" android:text="@string/settings_reduce_motion" />
-            <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_reduce_motion_sub" />
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/immersive_player" style="@style/Settings.CardSwitch" android:text="@string/settings_immersive_player" />
             <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_immersive_player_sub" />
         </LinearLayout>
@@ -111,6 +109,9 @@
             </HorizontalScrollView>
             <TextView android:id="@+id/battery_sub" style="@style/Settings.CardSub" />
         </LinearLayout>
+
+        <!-- Performance (D26): presets + effect switches; own layout + PerformanceSection. "Reduce motion" lives here. -->
+        <include android:id="@+id/performance" layout="@layout/settings_performance" />
 
         <!-- Storage -->
         <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_storage" />

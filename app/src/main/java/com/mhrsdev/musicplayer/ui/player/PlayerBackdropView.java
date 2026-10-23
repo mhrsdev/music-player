@@ -173,9 +173,9 @@ public class PlayerBackdropView extends View {
         l.field.setColors(ap.blobs());
     }
 
-    /** Player visible and playing: drift (if motion is allowed). Otherwise one still frame. */
+    /** Player visible and playing: drift (if motion and Settings &gt; Performance "Moving background" allow). Otherwise one still frame. */
     public void setAnimating(boolean on) {
-        boolean run = on && PlayerPalette.motionAllowed(getContext());
+        boolean run = on && com.mhrsdev.musicplayer.ui.theme.MotionPolicy.backdropMotionEnabled(getContext());
         if (run == animating) return;
         animating = run;
         if (run) ticker.start(); else ticker.stop();

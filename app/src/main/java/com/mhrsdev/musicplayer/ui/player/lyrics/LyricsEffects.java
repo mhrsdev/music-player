@@ -18,11 +18,12 @@ public class LyricsEffects {
 
     /**
      * Per-line blur only on API 31+ (RenderEffect on the line's own RenderNode), and never in battery saver, with
-     * reduced motion / animator scale 0, or on a low-RAM device: those get alpha + scale falloff only.
+     * reduced motion / animator scale 0, with Settings &gt; Performance "Lyrics blur" off, or on a low-RAM device:
+     * those get alpha + scale falloff only.
      */
     public static boolean blurAllowed(Context c) {
         if (Build.VERSION.SDK_INT < 31) return false;
-        if (!MotionPolicy.decorativeMotionEnabled(c)) return false;
+        if (!MotionPolicy.lyricsBlurEnabled(c)) return false;
         ActivityManager am = (ActivityManager) c.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
         return am == null || !am.isLowRamDevice();
     }

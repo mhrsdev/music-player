@@ -29,7 +29,7 @@ public class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Holder> {
     private final LyricLineView.Clock clock;
     private int textColor = 0xFFFFFFFF;
     private float textSp = 26f;
-    private boolean blur, decorative = true;
+    private boolean blur, decorative = true, words = true;
 
     public LyricsAdapter(OnLineClick click, LyricLineView.Clock clock) {
         this.click = click;
@@ -76,12 +76,16 @@ public class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Holder> {
         notifyDataSetChanged();
     }
 
-    /** Blur (API 31+, not in battery saver / reduce motion / low RAM) and decorative lift/glow. */
+    /**
+     * Blur (API 31+, not in battery saver / reduce motion / low RAM), decorative lift/glow, and the word-by-word sweep
+     * (off = the active line lights up as a whole).
+     */
     @android.annotation.SuppressLint("NotifyDataSetChanged")
-    public void setEffects(boolean blur, boolean decorative) {
-        if (this.blur == blur && this.decorative == decorative) return;
+    public void setEffects(boolean blur, boolean decorative, boolean words) {
+        if (this.blur == blur && this.decorative == decorative && this.words == words) return;
         this.blur = blur;
         this.decorative = decorative;
+        this.words = words;
         notifyDataSetChanged();
     }
 
@@ -100,7 +104,7 @@ public class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.Holder> {
     @Override public void onBindViewHolder(@NonNull Holder h, int position) {
         LyricLine line = lines.get(position);
         h.view.bind(line, textSp, textColor, clock);
-        h.view.setEffects(blur && synced, decorative);
+        h.view.setEffects(blur && synced, decorative, words);
         h.view.setOnClickListener(synced ? v -> click.onLine(line) : null);
         h.view.setClickable(synced);
         h.view.setDistance(distance(position), false);

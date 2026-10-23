@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Settings > Performance (owner D26), bound by ui/settings/PerformanceSection. Order follows the decision a person
+  makes: pick a level (presets), the accessibility override (reduce motion), the single effects, the frame rate,
+  then tips. Defaults = Full (D24: every effect on; this is an opt-in escape hatch).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:text="@string/settings_perf" />
+
+    <!-- Presets: one radio group of rows, each with its one-line promise. "Custom" appears only when it is true. -->
+    <LinearLayout android:id="@+id/perf_presets" style="@style/Settings.Card" android:paddingVertical="8dp">
+        <LinearLayout android:id="@+id/perf_full" style="@style/Settings.PerfPreset">
+            <ImageView style="@style/Settings.PerfPresetIcon" android:contentDescription="@null" android:src="@drawable/perf_ic_wave_full" />
+            <LinearLayout style="@style/Settings.PerfPresetText" android:duplicateParentState="true">
+                <TextView style="@style/Settings.PerfPresetTitle" android:text="@string/settings_perf_full" />
+                <TextView style="@style/Settings.PerfPresetSub" android:text="@string/settings_perf_full_sub" />
+            </LinearLayout>
+            <ImageView style="@style/Settings.PerfPresetMark" android:contentDescription="@null" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/perf_balanced" style="@style/Settings.PerfPreset">
+            <ImageView style="@style/Settings.PerfPresetIcon" android:contentDescription="@null" android:src="@drawable/perf_ic_wave_balanced" />
+            <LinearLayout style="@style/Settings.PerfPresetText" android:duplicateParentState="true">
+                <TextView style="@style/Settings.PerfPresetTitle" android:text="@string/settings_perf_balanced" />
+                <TextView style="@style/Settings.PerfPresetSub" android:text="@string/settings_perf_balanced_sub" />
+            </LinearLayout>
+            <ImageView style="@style/Settings.PerfPresetMark" android:contentDescription="@null" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/perf_light" style="@style/Settings.PerfPreset">
+            <ImageView style="@style/Settings.PerfPresetIcon" android:contentDescription="@null" android:src="@drawable/perf_ic_wave_light" />
+            <LinearLayout style="@style/Settings.PerfPresetText" android:duplicateParentState="true">
+                <TextView style="@style/Settings.PerfPresetTitle" android:text="@string/settings_perf_light" />
+                <TextView style="@style/Settings.PerfPresetSub" android:text="@string/settings_perf_light_sub" />
+            </LinearLayout>
+            <ImageView style="@style/Settings.PerfPresetMark" android:contentDescription="@null" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/perf_custom" style="@style/Settings.PerfPreset" android:visibility="gone">
+            <ImageView style="@style/Settings.PerfPresetIcon" android:contentDescription="@null" android:src="@drawable/perf_ic_custom" />
+            <LinearLayout style="@style/Settings.PerfPresetText" android:duplicateParentState="true">
+                <TextView style="@style/Settings.PerfPresetTitle" android:text="@string/settings_perf_custom" />
+                <TextView style="@style/Settings.PerfPresetSub" android:text="@string/settings_perf_custom_sub" />
+            </LinearLayout>
+            <ImageView style="@style/Settings.PerfPresetMark" android:contentDescription="@null" />
+        </LinearLayout>
+        <!-- Shown only while the phone itself holds motion back (Remove animations / Battery Saver). -->
+        <TextView android:id="@+id/perf_system_note" style="@style/Settings.CardSub" android:paddingTop="8dp" android:paddingBottom="8dp" android:textColor="?attr/mpPrimary" android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- The accessibility override, apart from the effect switches because its polarity is the opposite. -->
+    <LinearLayout style="@style/Settings.Card">
+        <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_reduce_motion" style="@style/Settings.CardSwitch" android:text="@string/settings_reduce_motion" />
+        <TextView style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_perf_reduce_motion_sub" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/Settings.Card">
+        <TextView style="@style/Settings.CardTitle" android:accessibilityHeading="true" android:text="@string/settings_perf_effects" />
+        <TextView android:id="@+id/perf_effects_paused" style="@style/Settings.CardSub" android:paddingBottom="4dp" android:text="@string/settings_perf_effects_paused" android:visibility="gone" />
+        <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_transitions" style="@style/Settings.CardSwitch" android:text="@string/settings_perf_transitions" />
+        <TextView android:id="@+id/perf_transitions_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_perf_transitions_sub" />
+        <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_bounce" style="@style/Settings.CardSwitch" android:text="@string/settings_perf_bounce" />
+        <TextView android:id="@+id/perf_bounce_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_perf_bounce_sub" />
+        <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_backdrop" style="@style/Settings.CardSwitch" android:text="@string/settings_perf_backdrop" />
+        <TextView android:id="@+id/perf_backdrop_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_perf_backdrop_sub" />
+        <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_lyrics_blur" style="@style/Settings.CardSwitch" android:text="@string/settings_perf_lyrics_blur" />
+        <TextView android:id="@+id/perf_lyrics_blur_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_perf_lyrics_blur_sub" />
+        <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_lyrics_words" style="@style/Settings.CardSwitch" android:text="@string/settings_perf_lyrics_words" />
+        <TextView android:id="@+id/perf_lyrics_words_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_perf_lyrics_words_sub" />
+        <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_seek" style="@style/Settings.CardSwitch" android:text="@string/settings_perf_seek" />
+        <TextView android:id="@+id/perf_seek_sub" style="@style/Settings.CardSub" android:importantForAccessibility="no" android:text="@string/settings_perf_seek_sub" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/Settings.Card">
+        <TextView style="@style/Settings.CardTitle" android:accessibilityHeading="true" android:text="@string/settings_perf_fps" />
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+            <LinearLayout style="@style/Settings.ChipStrip" android:paddingBottom="4dp">
+                <TextView android:id="@+id/perf_fps_screen" style="@style/Search.Chip" android:text="@string/settings_perf_fps_screen" />
+                <TextView android:id="@+id/perf_fps_60" style="@style/Search.Chip" android:text="@string/settings_perf_fps_60" />
+                <TextView android:id="@+id/perf_fps_30" style="@style/Search.Chip" android:text="@string/settings_perf_fps_30" />
+            </LinearLayout>
+        </HorizontalScrollView>
+        <TextView android:id="@+id/perf_fps_sub" style="@style/Settings.CardSub" />
+    </LinearLayout>
+
+    <!-- Tips for slower phones: an outlined note, not a control. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/perf_tips_bg"
+        android:focusable="true"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp">
+        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:layout_marginTop="1dp" android:layout_marginEnd="12dp" android:importantForAccessibility="no" android:src="@drawable/settings_ic_info" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings_perf_tips_title" android:textAlignment="viewStart" android:textColor="?attr/mpOnSurface" android:textSize="15sp" android:textStyle="bold" />
+            <!-- Filled by PerformanceSection: one bullet paragraph per tip, wrapped lines hang under the text (BulletSpan). -->
+            <TextView android:id="@+id/perf_tips" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:lineSpacingMultiplier="1.25" android:textAlignment="viewStart" android:textColor="?attr/mpOnSurfaceVariant" android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

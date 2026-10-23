@@ -51,6 +51,7 @@ public class SettingsFragment extends Fragment {
     private SettingsViewModel vm;
     private LibrarySettingsViewModel library;
     private DeviceSettingsViewModel device;
+    private PerformanceSection performance;
     private SettingsRowBinding notifRow;
     private SettingsRowBinding cacheRow;
     private SettingsRowBinding dbRow;
@@ -90,6 +91,9 @@ public class SettingsFragment extends Fragment {
         bindFeatures();
         bindNotifications();
         bindBattery();
+        performance = new PerformanceSection(this, b.performance, new ViewModelProvider(this,
+                PerformanceViewModel.factory(c.settings())).get(PerformanceViewModel.class));
+        performance.bind();
         bindStorage();
         bindAbout();
     }
@@ -98,18 +102,15 @@ public class SettingsFragment extends Fragment {
         super.onResume();
         renderNotifications(); // the person may come back from the system settings page
         device.refreshSizes();
+        if (performance != null) performance.onResume();
     }
 
-    // ---- motion, dynamic color ----
+    // ---- immersive player, dynamic color (reduce motion lives in PerformanceSection) ----
 
     private void bindMotionAndColor() {
-        b.reduceMotion.setOnCheckedChangeListener((v, on) -> device.setReduceMotion(on));
         b.immersivePlayer.setOnCheckedChangeListener((v, on) -> device.setImmersivePlayer(on));
         device.getImmersivePlayer().observe(getViewLifecycleOwner(), on -> {
             if (b.immersivePlayer.isChecked() != Boolean.TRUE.equals(on)) b.immersivePlayer.setChecked(Boolean.TRUE.equals(on));
-        });
-        device.getReduceMotion().observe(getViewLifecycleOwner(), on -> {
-            if (b.reduceMotion.isChecked() != Boolean.TRUE.equals(on)) b.reduceMotion.setChecked(Boolean.TRUE.equals(on));
         });
         DynamicColor dc = DynamicColor.lookup(requireContext());
         if (dc == null) return; // shown only when the theme layer supports it on this phone
@@ -561,5 +562,6 @@ public class SettingsFragment extends Fragment {
         notifRow = null;
         cacheRow = null;
         dbRow = null;
+        performance = null;
     }
 }

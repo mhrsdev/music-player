@@ -57,7 +57,6 @@
     <string name="settings_dynamic_color">Dynamic color (Material You)</string>
     <string name="settings_dynamic_color_sub">Use your wallpaper’s colors for the rest of the app</string>
     <string name="settings_reduce_motion">Reduce motion</string>
-    <string name="settings_reduce_motion_sub">Turn off decorative animation. Your phone’s “Remove animations” does this too.</string>
     <string name="settings_min_length">Skip short audio</string>
     <string name="settings_min_length_sub">Hide files shorter than this, like voice notes and ringtones. The library updates right away.</string>
     <string name="settings_min_length_all">Keep all</string>

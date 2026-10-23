@@ -135,7 +135,7 @@ public class AmbientBackdropView extends View {
 
     /** FULL mode only: drift while {@code on} (caller: visible + playing) and motion is allowed. */
     public void setAnimating(boolean on) {
-        boolean run = on && mode == Mode.FULL && MotionPolicy.decorativeMotionEnabled(getContext());
+        boolean run = on && mode == Mode.FULL && MotionPolicy.backdropMotionEnabled(getContext());
         if (run == animating) return;
         animating = run;
         if (run) ticker.start(); else ticker.stop();

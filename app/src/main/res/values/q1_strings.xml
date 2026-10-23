@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Q1 (owner D26): Settings > Performance. -->
+<resources>
+    <string name="settings_perf">Performance</string>
+    <string name="settings_perf_presets_cd">Effects level</string>
+    <string name="settings_perf_full">Full</string>
+    <string name="settings_perf_full_sub">Every effect, as designed.</string>
+    <string name="settings_perf_balanced">Balanced</string>
+    <string name="settings_perf_balanced_sub">Motion stays; still background, no lyrics blur. Up to 60 fps.</string>
+    <string name="settings_perf_light">Light</string>
+    <string name="settings_perf_light_sub">Still background and seek bar, no blur or bounce. Up to 30 fps.</string>
+    <string name="settings_perf_custom">Custom</string>
+    <string name="settings_perf_custom_sub">Your own mix of the switches below.</string>
+    <string name="settings_perf_reduce_motion_sub">Stops every decorative animation, like your phone’s “Remove animations”. Overrides the effects below.</string>
+    <string name="settings_perf_effects">Effects</string>
+    <string name="settings_perf_effects_paused">Paused while Reduce motion is on.</string>
+    <string name="settings_perf_transitions">Screen transitions</string>
+    <string name="settings_perf_transitions_sub">Pages slide and fade; the cover glides into place when the player opens or the song changes.</string>
+    <string name="settings_perf_bounce">Bouncy buttons</string>
+    <string name="settings_perf_bounce_sub">Buttons spring back with a small bounce; play and pause wobble when they switch.</string>
+    <string name="settings_perf_backdrop">Moving background</string>
+    <string name="settings_perf_backdrop_sub">The player’s colors drift slowly. Off: the same colors, standing still.</string>
+    <string name="settings_perf_lyrics_blur">Lyrics blur</string>
+    <string name="settings_perf_lyrics_blur_sub">Lines far from the one being sung go soft (Android 12 and later).</string>
+    <string name="settings_perf_lyrics_words">Word-by-word lyrics</string>
+    <string name="settings_perf_lyrics_words_sub">The sung line fills in word by word. Off: the whole line lights up at once.</string>
+    <string name="settings_perf_seek">Moving seek bar</string>
+    <string name="settings_perf_seek_sub">The wavy bar flows while music plays. Off: the wave stays still.</string>
+    <string name="settings_perf_fps">Animation frame rate</string>
+    <string name="settings_perf_fps_screen">Match screen</string>
+    <string name="settings_perf_fps_60">60 fps</string>
+    <string name="settings_perf_fps_30">30 fps</string>
+    <string name="settings_perf_fps_screen_sub">Animations follow your screen, up to 120 frames a second.</string>
+    <string name="settings_perf_fps_60_sub">At most 60 frames a second. Saves work on 90 and 120 Hz screens.</string>
+    <string name="settings_perf_fps_30_sub">At most 30 frames a second: half the drawing, a little less fluid.</string>
+    <string name="settings_perf_note_system">Your phone’s “Remove animations” is on, so Mowj stays still whatever you choose here.</string>
+    <string name="settings_perf_note_saver">Battery saving is on right now, so motion and blur are paused.</string>
+    <string name="settings_perf_tips_title">On a slower phone</string>
+    <string-array name="settings_perf_tips">
+        <item>Try Balanced first: it turns off only the two heaviest layers.</item>
+        <item>Still stuttering? Light also stills the seek bar and word-by-word lyrics.</item>
+        <item>Battery saving and your phone’s “Remove animations” turn effects off too.</item>
+        <item>None of this changes how your music sounds.</item>
+    </string-array>
+</resources>

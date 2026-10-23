@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Q1 (owner D26): تنظیمات > عملکرد. -->
+<resources>
+    <string name="settings_perf">عملکرد</string>
+    <string name="settings_perf_presets_cd">سطح جلوه‌ها</string>
+    <string name="settings_perf_full">کامل</string>
+    <string name="settings_perf_full_sub">همهٔ جلوه‌ها، همان‌طور که طراحی شده‌اند.</string>
+    <string name="settings_perf_balanced">متعادل</string>
+    <string name="settings_perf_balanced_sub">حرکت می‌ماند؛ پس‌زمینه ثابت و متن ترانه بدون محوشدن. تا ۶۰ فریم.</string>
+    <string name="settings_perf_light">سبک</string>
+    <string name="settings_perf_light_sub">پس‌زمینه و نوار پخش ثابت، بدون محوشدن و جهش. تا ۳۰ فریم.</string>
+    <string name="settings_perf_custom">دلخواه</string>
+    <string name="settings_perf_custom_sub">ترکیبی که خودتان با کلیدهای پایین ساخته‌اید.</string>
+    <string name="settings_perf_reduce_motion_sub">همهٔ انیمیشن‌های تزئینی را متوقف می‌کند، مثل «حذف انیمیشن‌ها»ی گوشی. جلوه‌های پایین را هم کنار می‌گذارد.</string>
+    <string name="settings_perf_effects">جلوه‌ها</string>
+    <string name="settings_perf_effects_paused">تا وقتی «کاهش حرکت» روشن است، متوقف‌اند.</string>
+    <string name="settings_perf_transitions">جابه‌جایی صفحه‌ها</string>
+    <string name="settings_perf_transitions_sub">صفحه‌ها نرم می‌لغزند و محو می‌شوند؛ کاور با باز شدن پخش‌کننده یا عوض شدن آهنگ آرام سر جایش می‌نشیند.</string>
+    <string name="settings_perf_bounce">دکمه‌های فنری</string>
+    <string name="settings_perf_bounce_sub">دکمه‌ها با کمی جهش برمی‌گردند و دکمهٔ پخش و توقف موقع عوض شدن کمی تکان می‌خورد.</string>
+    <string name="settings_perf_backdrop">پس‌زمینهٔ متحرک</string>
+    <string name="settings_perf_backdrop_sub">رنگ‌های پخش‌کننده آرام جابه‌جا می‌شوند. خاموش: همان رنگ‌ها، ثابت.</string>
+    <string name="settings_perf_lyrics_blur">محوشدن متن ترانه</string>
+    <string name="settings_perf_lyrics_blur_sub">سطرهای دور از سطری که خوانده می‌شود محو می‌شوند (اندروید ۱۲ به بالا).</string>
+    <string name="settings_perf_lyrics_words">ترانهٔ کلمه‌به‌کلمه</string>
+    <string name="settings_perf_lyrics_words_sub">سطری که خوانده می‌شود کلمه‌به‌کلمه پر می‌شود. خاموش: کل سطر یک‌جا روشن می‌شود.</string>
+    <string name="settings_perf_seek">نوار پخش متحرک</string>
+    <string name="settings_perf_seek_sub">موج نوار هنگام پخش روان حرکت می‌کند. خاموش: موج ثابت می‌ماند.</string>
+    <string name="settings_perf_fps">نرخ فریم انیمیشن</string>
+    <string name="settings_perf_fps_screen">هم‌پای صفحه</string>
+    <string name="settings_perf_fps_60">۶۰ فریم</string>
+    <string name="settings_perf_fps_30">۳۰ فریم</string>
+    <string name="settings_perf_fps_screen_sub">انیمیشن‌ها با صفحهٔ گوشی هماهنگ‌اند، تا ۱۲۰ فریم در ثانیه.</string>
+    <string name="settings_perf_fps_60_sub">حداکثر ۶۰ فریم در ثانیه. روی صفحه‌های ۹۰ و ۱۲۰ هرتز کار کمتری دارد.</string>
+    <string name="settings_perf_fps_30_sub">حداکثر ۳۰ فریم در ثانیه: نصف کار رسم، کمی کم‌روان‌تر.</string>
+    <string name="settings_perf_note_system">«حذف انیمیشن‌ها»ی گوشی روشن است؛ پس هر چه اینجا انتخاب کنید، موج ثابت می‌ماند.</string>
+    <string name="settings_perf_note_saver">صرفه‌جویی باتری الان روشن است؛ حرکت و محوشدن فعلاً متوقف‌اند.</string>
+    <string name="settings_perf_tips_title">روی گوشی‌های کندتر</string>
+    <string-array name="settings_perf_tips">
+        <item>اول «متعادل» را امتحان کنید: فقط دو لایهٔ سنگین‌تر را خاموش می‌کند.</item>
+        <item>هنوز گیر می‌کند؟ «سبک» نوار پخش و ترانهٔ کلمه‌به‌کلمه را هم ثابت می‌کند.</item>
+        <item>صرفه‌جویی باتری و «حذف انیمیشن‌ها»ی گوشی هم جلوه‌ها را خاموش می‌کنند.</item>
+        <item>هیچ‌کدام از این‌ها صدای موسیقی را تغییر نمی‌دهد.</item>
+    </string-array>
+</resources>

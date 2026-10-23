@@ -105,7 +105,12 @@ public abstract class BaseSeekView extends View implements SeekBarView {
     @Override public void setPlaying(boolean playing) {
         if (this.playing == playing) return;
         this.playing = playing;
-        motionAllowed = MotionPolicy.decorativeMotionEnabled(getContext());
+        refreshMotion();
+    }
+
+    /** Re-reads the motion policy (Settings &gt; Performance "Animated seek bar", reduce motion, battery saver). */
+    public void refreshMotion() {
+        motionAllowed = MotionPolicy.seekMotionEnabled(getContext());
         lastFrameMs = 0;
         invalidate();
     }
@@ -150,7 +155,7 @@ public abstract class BaseSeekView extends View implements SeekBarView {
 
     @Override protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        motionAllowed = MotionPolicy.decorativeMotionEnabled(getContext());
+        motionAllowed = MotionPolicy.seekMotionEnabled(getContext());
     }
 
     @Override protected void onDetachedFromWindow() {

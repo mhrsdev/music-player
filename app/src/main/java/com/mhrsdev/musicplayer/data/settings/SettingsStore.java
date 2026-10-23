@@ -34,7 +34,6 @@ public final class SettingsStore {
     private static final String K_NON_MUSIC = "include_non_music";
     private static final String K_DYNAMIC_COLOR = "dynamic_color";
     private static final String K_MIN_TRACK_SECONDS = "min_track_seconds";
-    private static final String K_REDUCE_MOTION = "reduce_motion";
     private static final String K_IMMERSIVE_PLAYER = "immersive_player";
 
     private static final int MAX_BACKUP_STRING = 32;
@@ -56,8 +55,8 @@ public final class SettingsStore {
     private final MutableLiveData<Set<String>> excludedFolders;
     private final MutableLiveData<Boolean> includeNonMusic;
     private final MutableLiveData<Integer> minTrackSeconds;
-    private final MutableLiveData<Boolean> reduceMotion;
     private final MutableLiveData<Boolean> immersivePlayer;
+    private final MutableLiveData<PerformanceProfile> performance;
 
     public SettingsStore(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -73,8 +72,8 @@ public final class SettingsStore {
         excludedFolders = new MutableLiveData<>(readSet(K_EXCLUDE));
         includeNonMusic = new MutableLiveData<>(prefs.getBoolean(K_NON_MUSIC, false));
         minTrackSeconds = new MutableLiveData<>(prefs.getInt(K_MIN_TRACK_SECONDS, DEFAULT_MIN_TRACK_SECONDS));
-        reduceMotion = new MutableLiveData<>(prefs.getBoolean(K_REDUCE_MOTION, false));
         immersivePlayer = new MutableLiveData<>(prefs.getBoolean(K_IMMERSIVE_PLAYER, false));
+        performance = new MutableLiveData<>(PerformancePrefs.read(prefs));
     }
 
     public LiveData<ThemeMode> theme() {
@@ -186,7 +185,7 @@ public final class SettingsStore {
     /** The settings a backup carries (folder lists are device paths, so they stay out), by key. */
     public Map<String, Object> exportBackup() {
         Map<String, Object> all = new HashMap<>(prefs.getAll());
-        all.keySet().retainAll(BACKUP_TYPES.keySet());
+        all.keySet().removeIf(k -> !BACKUP_TYPES.containsKey(k) && !PerformancePrefs.BACKUP_TYPES.containsKey(k));
         return all;
     }
 
@@ -194,7 +193,9 @@ public final class SettingsStore {
     public int importBackup(Map<String, Object> values) {
         SharedPreferences.Editor edit = prefs.edit();
         int applied = 0;
-        for (Map.Entry<String, Class<?>> type : BACKUP_TYPES.entrySet()) {
+        Map<String, Class<?>> types = new HashMap<>(BACKUP_TYPES);
+        types.putAll(PerformancePrefs.BACKUP_TYPES);
+        for (Map.Entry<String, Class<?>> type : types.entrySet()) {
             Object v = values.get(type.getKey());
             if (v == null || !type.getValue().isInstance(v)) continue;
             if (v instanceof String s) edit.putString(type.getKey(), s.length() <= MAX_BACKUP_STRING ? s : "");
@@ -211,6 +212,7 @@ public final class SettingsStore {
         publish(lyricsTextSize, readEnum(K_LYRICS_SIZE, LyricsTextSize.MEDIUM));
         publish(sleepTimerMinutes, prefs.getInt(K_SLEEP_MINUTES, DEFAULT_SLEEP_TIMER_MINUTES));
         publish(batterySaver, readEnum(K_BATTERY_SAVER, BatterySaverMode.AUTO));
+        publish(performance, PerformancePrefs.read(prefs));
         return applied;
     }
 
@@ -224,14 +226,19 @@ public final class SettingsStore {
         publish(minTrackSeconds, Math.max(0, seconds));
     }
 
-    /** App-level "reduce motion": decorative animation off regardless of the system setting. */
-    public LiveData<Boolean> reduceMotion() {
-        return reduceMotion;
+    /**
+     * Settings &gt; Performance: every effect switch and the frame-rate cap, including the app-level "reduce motion"
+     * (decorative animation off regardless of the system setting).
+     */
+    public LiveData<PerformanceProfile> performance() {
+        return performance;
     }
 
-    public void setReduceMotion(boolean value) {
-        prefs.edit().putBoolean(K_REDUCE_MOTION, value).apply();
-        publish(reduceMotion, value);
+    public void setPerformance(PerformanceProfile value) {
+        SharedPreferences.Editor e = prefs.edit();
+        PerformancePrefs.write(e, value);
+        e.apply();
+        publish(performance, value);
     }
 
     /** Hide the status bar while the full player is open (swipe from the top shows it briefly). */
