@@ -6,11 +6,23 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <com.mhrsdev.musicplayer.ui.library.SquareArtworkView
-        android:id="@+id/art"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:importantForAccessibility="no" />
+        android:layout_height="wrap_content">
+
+        <com.mhrsdev.musicplayer.ui.library.SquareArtworkView
+            android:id="@+id/art"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no" />
+
+        <com.mhrsdev.musicplayer.ui.library.MosaicArtView
+            android:id="@+id/mosaic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/title"

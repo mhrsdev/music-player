@@ -39,6 +39,8 @@ public class ArtworkView extends View {
     private int seed;
     @Nullable private String uri;
     @Nullable private String wantedKey;
+    /** In-flight request (cancelled when the view is rebound to another cover or detached, e.g. a recycled row). */
+    @Nullable private ArtworkLoader.Callback inFlight;
     @Nullable private Bitmap bitmap;
     @Nullable private String monogram;
     private float fade = 1f;
@@ -118,7 +120,23 @@ public class ArtworkView extends View {
         return bitmap;
     }
 
+    private void cancelInFlight() {
+        if (inFlight != null && wantedKey != null) ArtworkLoader.get(getContext()).cancel(wantedKey, inFlight);
+        inFlight = null;
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        cancelInFlight();
+        super.onDetachedFromWindow();
+    }
+
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (bitmap == null && uri != null && inFlight == null) requestLoad();
+    }
+
     private void requestLoad() {
+        cancelInFlight();
         if (uri == null || getWidth() == 0) {
             wantedKey = null;
             return;
@@ -133,9 +151,18 @@ public class ArtworkView extends View {
             setBitmap(hit, false);
             return;
         }
-        loader.load(u, size, (key, bmp) -> {
-            if (key.equals(wantedKey)) setBitmap(bmp, true);
-        });
+        if (loader.isKnownMiss(u)) { // no art for this cover: placeholder, no request
+            if (listener != null) listener.onArtwork(null);
+            return;
+        }
+        ArtworkLoader.Callback cb = new ArtworkLoader.Callback() {
+            @Override public void onLoaded(String key, @Nullable Bitmap bmp) {
+                if (inFlight == this) inFlight = null;
+                if (key.equals(wantedKey)) setBitmap(bmp, true);
+            }
+        };
+        inFlight = cb;
+        loader.load(u, size, cb);
     }
 
     private void setBitmap(@Nullable Bitmap b, boolean animate) {

@@ -87,4 +87,40 @@ public class QueueViewModelTest {
         long total = c.getState().getValue().remainingQueueMs();
         assertEquals((int) ((total + 59_999) / 60_000), vm.getUi().getValue().minutesLeft());
     }
+
+    @Test public void duplicatesAfterCurrentAreFoundHighestFirst() {
+        Track a = tracks.get(0), b = tracks.get(1), c = tracks.get(2);
+        // queue: a b [a]=current c b a  -> later repeats of a (5), b (4); index 0/1 are before current and stay
+        List<Track> q = List.of(a, b, a, c, b, a);
+        assertEquals(List.of(5, 4), QueueViewModel.duplicateIndices(q, 2));
+        assertEquals(List.of(), QueueViewModel.duplicateIndices(List.of(a, b, c), 0));
+    }
+
+    @Test public void removeDuplicatesAndUndo() {
+        Track a = tracks.get(0), b = tracks.get(1), c = tracks.get(2);
+        FakePlayerController p = new FakePlayerController(List.of(a, b, c, a, b), 0);
+        QueueViewModel vm = vm(p);
+        List<QueueViewModel.Removed> r = vm.removeDuplicates();
+        assertEquals(2, r.size());
+        assertEquals(List.of(a, b, c), p.getState().getValue().queue());
+        vm.undoRemoveAll(r);
+        assertEquals(List.of(a, b, c, a, b), p.getState().getValue().queue());
+    }
+
+    @Test public void clearUpNextKeepsCurrentAndUndoRestoresOrder() {
+        FakePlayerController p = new FakePlayerController(tracks, 2);
+        QueueViewModel vm = vm(p);
+        List<QueueViewModel.Removed> r = vm.clearUpNext();
+        assertEquals(3, r.size());
+        assertEquals(tracks.subList(0, 3), p.getState().getValue().queue());
+        assertEquals(tracks.get(2), p.getState().getValue().currentTrack());
+        vm.undoRemoveAll(r);
+        assertEquals(tracks, p.getState().getValue().queue());
+    }
+
+    @Test public void sleepCustomIsClamped() {
+        assertEquals(SleepTimerSheet.CUSTOM_MIN, SleepTimerSheet.clampCustom(0));
+        assertEquals(SleepTimerSheet.CUSTOM_MAX, SleepTimerSheet.clampCustom(999));
+        assertEquals(25, SleepTimerSheet.clampCustom(25));
+    }
 }

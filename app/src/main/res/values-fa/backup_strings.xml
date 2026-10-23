@@ -1,0 +1,30 @@
+<resources>
+    <string name="backup_title">پشتیبان‌گیری و بازیابی</string>
+    <string name="backup_intro">علاقه‌مندی‌ها، پلی‌لیست‌ها، تاریخچه‌ی پخش و تنظیمات در یک فایل که خودتان نگه می‌دارید. فایل‌های موسیقی و حافظه‌ی پنهان شامل نمی‌شوند.</string>
+    <string name="backup_export_group">خروجی</string>
+    <string name="backup_export_body">یک نسخه روی گوشی، فضای ابری یا هر برنامه‌ای که فایل نگه می‌دارد ذخیره کنید.</string>
+    <string name="backup_export_action">ذخیره‌ی پشتیبان</string>
+    <string name="backup_restore_group">بازیابی</string>
+    <string name="backup_restore_body">یک فایل پشتیبان انتخاب کنید. پیش از هر تغییری، محتوای آن را می‌بینید.</string>
+    <string name="backup_choose_action">انتخاب فایل پشتیبان</string>
+    <string name="backup_in_file">محتوای این فایل</string>
+    <string name="backup_row_playlists">پلی‌لیست‌ها</string>
+    <string name="backup_row_likes">آهنگ‌های پسندیده</string>
+    <string name="backup_row_plays">آهنگ‌های پخش‌شده</string>
+    <string name="backup_row_settings">تنظیمات</string>
+    <string name="backup_row_unmatched">یافت‌نشده در کتابخانه</string>
+    <string name="backup_unmatched_sub">این آهنگ‌ها نادیده گرفته می‌شوند. اگر تازه موسیقی را اینجا کپی کرده‌اید، ابتدا کتابخانه را دوباره اسکن کنید.</string>
+    <string name="backup_mode_label">روش بازیابی</string>
+    <string name="backup_mode_merge">ادغام</string>
+    <string name="backup_mode_replace">جایگزینی</string>
+    <string name="backup_mode_merge_sub">موارد جاافتاده را اضافه می‌کند و چیزهای فعلی را نگه می‌دارد.</string>
+    <string name="backup_mode_replace_sub">ابتدا علاقه‌مندی‌ها، پلی‌لیست‌ها و تاریخچه‌ی فعلی را پاک می‌کند.</string>
+    <string name="backup_restore_action">بازیابی</string>
+    <string name="backup_working">در حال انجام…</string>
+    <string name="backup_done_export">پشتیبان ذخیره شد: %1$s پلی‌لیست، %2$s آهنگ پسندیده، %3$s آهنگ پخش‌شده.</string>
+    <string name="backup_done_restore">بازیابی شد: %1$s پلی‌لیست، %2$s آهنگ پسندیده، %3$s آهنگ پخش‌شده.</string>
+    <string name="backup_err_corrupt">این فایل یک پشتیبان معتبر نیست.</string>
+    <string name="backup_err_newer">این پشتیبان از نسخه‌ی جدیدتری از برنامه است. برنامه را به‌روز کنید و دوباره امتحان کنید.</string>
+    <string name="backup_err_io">خواندن یا نوشتن فایل ممکن نشد.</string>
+    <string name="backup_err_expired">فایل پشتیبان را دوباره انتخاب کنید.</string>
+</resources>

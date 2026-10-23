@@ -70,6 +70,30 @@ public class PlayerViewModelTest {
         assertEquals(!before, vm.getLiked().getValue());
     }
 
+    /** F1(c): lyrics (disk + network) are asked for only while the lyrics view is shown, once per track. */
+    @Test public void lyricsAreRequestedOnlyWhileTheLyricsViewIsShown() {
+        FakePlayerController c = new FakePlayerController(SampleData.TRACKS.subList(0, 4), 0);
+        java.util.List<String> asked = new java.util.ArrayList<>();
+        FakeLyricsRepository fake = new FakeLyricsRepository();
+        com.mhrsdev.musicplayer.domain.repository.LyricsRepository repo = t -> {
+            asked.add(t.id());
+            return fake.lyricsFor(t);
+        };
+        PlayerViewModel vm = new PlayerViewModel(c, new FakeLibraryRepository(), repo, new FakeWaveformRepository());
+        vm.getCurrentTrack().observeForever(x -> {});
+        vm.getLyrics().observeForever(x -> {});
+        c.next();
+        c.next();
+        assertTrue("hidden lyrics view: no request", asked.isEmpty());
+        vm.toggleLyrics();
+        assertEquals(1, asked.size());
+        c.next();
+        assertEquals(2, asked.size());
+        vm.toggleLyrics();
+        c.next();
+        assertEquals("hidden again: no request", 2, asked.size());
+    }
+
     @Test public void seekClampsAndSteps() {
         FakePlayerController c = new FakePlayerController(SampleData.TRACKS.subList(0, 4), 0);
         PlayerViewModel vm = vm(c);
@@ -95,5 +119,12 @@ public class PlayerViewModelTest {
         assertEquals(0.5f, LyricsScrollPolicy.alphaFor(2, 3, true), 0);
         assertEquals(0.6f, LyricsScrollPolicy.alphaFor(4, 3, true), 0);
         assertEquals(1f, LyricsScrollPolicy.alphaFor(4, 3, false), 0);
+    }
+
+    @org.junit.Test public void titleFitsLargestSizeThenFloorsAtMin() {
+        // width grows 10 px per sp: 300 px available -> 30 sp fits; 250 -> 24 sp; 100 -> floor 20 sp
+        org.junit.Assert.assertEquals(30f, PlayerFragment.fitTextSize(300f, 30f, 20f, sp -> sp * 10), 0f);
+        org.junit.Assert.assertEquals(24f, PlayerFragment.fitTextSize(250f, 30f, 20f, sp -> sp * 10), 0f);
+        org.junit.Assert.assertEquals(20f, PlayerFragment.fitTextSize(100f, 30f, 20f, sp -> sp * 10), 0f);
     }
 }
