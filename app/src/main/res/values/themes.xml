@@ -1,6 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material Components is only an invisible foundation (DayNight + widget defaults); the UI agent owns the look. -->
-    <style name="Theme.MusicPlayer" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Material Components is only an invisible foundation (DayNight + widget defaults); the look comes from mp* tokens. -->
+    <style name="Base.Theme.MusicPlayer" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">@color/mp_primary</item>
+        <item name="colorOnPrimary">@color/mp_on_primary</item>
+        <item name="colorSurface">@color/mp_background</item>
+        <item name="colorOnSurface">@color/mp_on_surface</item>
+        <item name="android:textColorPrimary">@color/mp_on_surface</item>
+        <item name="android:textColorSecondary">@color/mp_on_surface_variant</item>
+        <item name="mpBackground">@color/mp_background</item>
+        <item name="mpSurfaceContainerLow">@color/mp_surface_container_low</item>
+        <item name="mpSurfaceContainer">@color/mp_surface_container</item>
+        <item name="mpSurfaceContainerHigh">@color/mp_surface_container_high</item>
+        <item name="mpSurfaceContainerHighest">@color/mp_surface_container_highest</item>
+        <item name="mpOnSurface">@color/mp_on_surface</item>
+        <item name="mpOnSurfaceVariant">@color/mp_on_surface_variant</item>
+        <item name="mpOutline">@color/mp_outline</item>
+        <item name="mpOutlineVariant">@color/mp_outline_variant</item>
+        <item name="mpPrimary">@color/mp_primary</item>
+        <item name="mpOnPrimary">@color/mp_on_primary</item>
+        <item name="mpPrimaryContainer">@color/mp_primary_container</item>
+        <item name="mpOnPrimaryContainer">@color/mp_on_primary_container</item>
+        <item name="mpSecondaryContainer">@color/mp_secondary_container</item>
+        <item name="mpOnSecondaryContainer">@color/mp_on_secondary_container</item>
+        <item name="mpTertiary">@color/mp_tertiary</item>
+        <item name="mpError">@color/mp_error</item>
+    </style>
+
+    <!-- System / Light / Dark: DayNight follows AppCompatDelegate.setDefaultNightMode (ThemeController.applyMode). -->
+    <style name="Theme.MusicPlayer" parent="Base.Theme.MusicPlayer" />
+
+    <!-- Black (AMOLED): dark scheme with black background + surface containers. Applied via ThemeController.themeResFor. -->
+    <style name="Theme.MusicPlayer.Black" parent="Base.Theme.MusicPlayer">
+        <item name="android:windowBackground">@color/mp_black_background</item>
+        <item name="colorSurface">@color/mp_black_background</item>
+        <item name="mpBackground">@color/mp_black_background</item>
+        <item name="mpSurfaceContainerLow">@color/mp_black_surface_container_low</item>
+        <item name="mpSurfaceContainer">@color/mp_black_surface_container</item>
+        <item name="mpSurfaceContainerHigh">@color/mp_black_surface_container_high</item>
+        <item name="mpSurfaceContainerHighest">@color/mp_black_surface_container_highest</item>
+        <item name="mpOutlineVariant">@color/mp_black_outline_variant</item>
+        <item name="mpSecondaryContainer">@color/mp_black_secondary_container</item>
     </style>
 </resources>

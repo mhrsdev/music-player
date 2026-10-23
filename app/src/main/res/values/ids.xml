@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="mp_nav_home" type="id" />
+    <item name="mp_nav_search" type="id" />
+    <item name="mp_nav_library" type="id" />
+    <item name="mp_nav_settings" type="id" />
+</resources>

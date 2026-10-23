@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="mp_window_margin">16dp</dimen>
+    <dimen name="mp_section_inset">20dp</dimen>
+    <dimen name="mp_touch_target">48dp</dimen>
+    <dimen name="mp_row_height">72dp</dimen>
+    <dimen name="mp_row_art">52dp</dimen>
+    <dimen name="mp_radius_row_art">12dp</dimen>
+    <dimen name="mp_radius_group_outer">22dp</dimen>
+    <dimen name="mp_radius_group_inner">6dp</dimen>
+    <dimen name="mp_group_gap">3dp</dimen>
+    <dimen name="mp_radius_card">24dp</dimen>
+    <dimen name="mp_radius_hero">28dp</dimen>
+    <dimen name="mp_radius_player_cover">32dp</dimen>
+    <dimen name="mp_radius_chip">12dp</dimen>
+    <dimen name="mp_radius_sheet">32dp</dimen>
+    <dimen name="mp_nav_height">68dp</dimen>
+    <dimen name="mp_nav_bottom_gap">24dp</dimen>
+    <dimen name="mp_mini_player_height">76dp</dimen>
+    <dimen name="mp_mini_player_radius">24dp</dimen>
+    <dimen name="mp_mini_player_side">12dp</dimen>
+    <dimen name="mp_seek_height">48dp</dimen>
+    <dimen name="mp_play_button_large">88dp</dimen>
+    <dimen name="mp_play_button_small">48dp</dimen>
+    <dimen name="mp_text_display">34sp</dimen>
+    <dimen name="mp_text_headline">26sp</dimen>
+    <dimen name="mp_text_lyrics">26sp</dimen>
+    <dimen name="mp_text_title">17sp</dimen>
+    <dimen name="mp_text_body">15sp</dimen>
+    <dimen name="mp_text_supporting">14sp</dimen>
+    <dimen name="mp_text_label">13sp</dimen>
+</resources>
