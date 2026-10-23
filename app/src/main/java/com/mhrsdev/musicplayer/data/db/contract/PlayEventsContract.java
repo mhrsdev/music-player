@@ -5,7 +5,7 @@ package com.mhrsdev.musicplayer.data.db.contract;
  * monthly stats. Bounded: rows older than {@link #KEEP_MS} are pruned on every insert. No foreign key on purpose
  * (a rescan may drop and re-add a track); reads join on {@code tracks}.
  */
-public final class PlayEventsContract {
+public class PlayEventsContract {
     public static final String TABLE = "play_events";
     public static final String COL_TRACK_ID = "track_id";
     public static final String COL_PLAYED_AT = "played_at";

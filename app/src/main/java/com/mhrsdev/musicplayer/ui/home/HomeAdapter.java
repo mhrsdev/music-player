@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 /** Flattens Home sections into header / row / track rows so every row recycles individually. */
-final class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> {
+class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> {
 
     interface Listener extends HomeCardAdapter.Listener {
         void onTrackClick(HomeSection section, Track track);

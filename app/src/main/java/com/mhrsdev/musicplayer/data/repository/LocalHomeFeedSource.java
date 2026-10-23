@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * not observed. Section order and mixes are seeded by the local day; random picks by a per-launch seed that
  * {@link #refresh()} advances.
  */
-public final class LocalHomeFeedSource implements HomeFeedSource {
+public class LocalHomeFeedSource implements HomeFeedSource {
     /** Bounds the history read: a year of heavy listening stays a few hundred KB. */
     private static final int EVENT_LIMIT = 20_000;
 

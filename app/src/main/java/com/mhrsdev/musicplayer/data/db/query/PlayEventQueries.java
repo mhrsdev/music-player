@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** All SQL touching {@code play_events}. Callers run inside {@link PlayStatsQueries#recordPlay}'s transaction. */
-public final class PlayEventQueries {
+public class PlayEventQueries {
     /** One counted play. */
     public record PlayEvent(String trackId, long playedAtMs) { }
 

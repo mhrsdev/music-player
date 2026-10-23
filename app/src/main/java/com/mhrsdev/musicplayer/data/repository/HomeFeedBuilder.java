@@ -39,7 +39,7 @@ import java.util.function.Function;
  * ({@code daySeed}), then a fixed tail (browse chips, stats). Random album picks use {@code discoverySeed}, which changes on
  * every launch and pull-to-refresh.
  */
-public final class HomeFeedBuilder {
+public class HomeFeedBuilder {
     static final long DAY_MS = 24L * 60 * 60 * 1000;
     static final long FORGOTTEN_MS = 60 * DAY_MS;
     static final int ROW_MAX = 50;

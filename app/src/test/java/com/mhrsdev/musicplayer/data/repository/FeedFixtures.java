@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /** Synthetic libraries + listening history of any size, deterministic per seed (JVM tests and the Home renders). */
-public final class FeedFixtures {
+public class FeedFixtures {
     public static final ZoneId ZONE = ZoneId.of("UTC");
     /** 2026-10-23 12:00 UTC. */
     public static final long NOW = 1_792_756_800_000L;

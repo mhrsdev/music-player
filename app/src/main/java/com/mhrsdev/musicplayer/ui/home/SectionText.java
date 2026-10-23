@@ -8,7 +8,7 @@ import com.mhrsdev.musicplayer.domain.model.HomeMix;
 import com.mhrsdev.musicplayer.domain.model.HomeSection;
 
 /** Localized copy for Home: the feed returns section ids + parameters, this maps them to resource strings. */
-final class SectionText {
+class SectionText {
     private SectionText() { }
 
     static String title(Context c, HomeSection s) {

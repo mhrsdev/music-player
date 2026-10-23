@@ -26,7 +26,7 @@ import com.mhrsdev.musicplayer.ui.widget.ScriptFont;
  * one {@link RecyclerView.RecycledViewPool}: cover cards, the hero card ({@link HeroCarousel} width + cookie play), mix
  * cards (label over the cover), round artist avatars and pills (decades / genres / folders).
  */
-final class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
+class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
 
     interface Listener {
         void onItemClick(HomeItem item);

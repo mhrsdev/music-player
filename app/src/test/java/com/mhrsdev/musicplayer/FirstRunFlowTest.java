@@ -41,8 +41,9 @@ public class FirstRunFlowTest {
 
         @Override public Cursor query(Uri uri, String[] projection, String selection, String[] args, String order) {
             MatrixCursor c = new MatrixCursor(projection);
-            c.addRow(new Object[] {42L, "Song", "song.mp3", "Artist", 7L, "Album", 9L, 180_000L, 1, 2020, 1000L, 2000L,
-                    "/storage/emulated/0/Music/song.mp3"});
+            Object[] base = {42L, "Song", "song.mp3", "Artist", 7L, "Album", 9L, 180_000L, 1, 2020, 1000L, 2000L,
+                    "/storage/emulated/0/Music/song.mp3", "Pop"}; // GENRE is only projected on API 30+
+            c.addRow(java.util.Arrays.copyOf(base, projection.length));
             return c;
         }
 

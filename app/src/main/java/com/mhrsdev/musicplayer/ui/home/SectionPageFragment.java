@@ -35,7 +35,7 @@ import java.util.List;
  * "See all" for a Home section, or one mix / decade / genre / folder: a header plus either the full track list or a
  * grid of the section's cards. Reads the already-built feed (no extra query); pushed with {@link #open}.
  */
-public final class SectionPageFragment extends Fragment implements TrackAdapter.Listener, HomeCardAdapter.Listener {
+public class SectionPageFragment extends Fragment implements TrackAdapter.Listener, HomeCardAdapter.Listener {
     private static final String ARG_SECTION = "section";
     private static final String ARG_MIX = "mix";
 

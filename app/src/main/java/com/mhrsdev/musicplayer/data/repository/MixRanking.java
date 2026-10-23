@@ -20,7 +20,7 @@ import java.util.Set;
  * Pure "Made for you" rules, built only from the local library and play history (no network, no tags beyond MediaStore).
  * Deterministic for a given seed: tests pass a fixed seed, production passes the day number so mixes stay stable all day.
  */
-final class MixRanking {
+class MixRanking {
     /** A mix needs at least this many tracks, otherwise it is skipped (small libraries just get fewer mixes). */
     static final int MIX_MIN = 8;
     static final int MIX_MAX = 30;
