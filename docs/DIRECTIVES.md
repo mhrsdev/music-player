@@ -395,3 +395,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 2. **Backgrounds must change with the song and the content** (player/lyrics, Home glow from focused hero/current track, album/artist/playlist headers from their covers) via a reusable `AmbientBackdropView` (FULL animated only in player; SOFT static elsewhere). → L1 engine, H1, U2.
 3. **Songs without a cover get an app-generated one** (deterministic generative art, album-shared, Persian-capable, cached, used in UI + notification/widget) → agent G1.
 4. **Fully full-screen (edge-to-edge, cutouts, optional immersive player)** and the **dock/bottom-inset bug on the friend's phone** → U1 (task/u1b-fullscreen).
+
+---
+
+## D23 — 2026-10-23 — Next release must not be a Pre-release
+
+**Original (verbatim):** "تو نسخه بعدی دیگه Pre-release نزن"
+
+**Summary:** From the next release (v0.3.0) on, GitHub Releases are normal (stable, "Latest") releases; pre-release only for versions with a `-suffix`. v0.2.0 was already published as pre-release (owner can ask to flip it). Release title becomes "Mowj vX.Y.Z". Implemented by R1 in `release.yml` (branch `task/r1-stable-release`).
