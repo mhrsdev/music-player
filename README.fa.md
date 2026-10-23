@@ -121,7 +121,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 1. push کردن یک tag به شکل `vX.Y.Z`.
 2. اجرای دستی: GitHub > Actions > *Release* > *Run workflow*، انتخاب branch (معمولاً `main`) و وارد کردن نسخه (مثلاً `0.1.0`). GitHub خودش tag با نام `v<version>` را روی آخرین commit آن branch می‌سازد.
 
-workflow ابتدا unit testها و `assembleRelease` را اجرا می‌کند و سپس یک GitHub Release شامل `MusicPlayer-vX.Y.Z.apk`، فایل `.sha256` و بخش مربوط از `CHANGELOG.md`. tagهایی که با `v0.` شروع شوند یا `-` داشته باشند pre-release علامت می‌خورند. برای امضای واقعی secretهای اختیاری مخزن: `ANDROID_KEYSTORE_BASE64`، `ANDROID_KEYSTORE_PASSWORD`، `ANDROID_KEY_ALIAS`، `ANDROID_KEY_PASSWORD`.
+workflow ابتدا unit testها و `assembleRelease` را اجرا می‌کند و سپس یک GitHub Release شامل `MusicPlayer-vX.Y.Z.apk`، فایل `.sha256` و بخش مربوط از `CHANGELOG.md`. هر release یک release معمولی (stable و «latest») است، مگر اینکه نسخه پسوند `-` داشته باشد (مثلاً `v1.0.0-rc.1`) که pre-release علامت می‌خورد. (`v0.1.0` و `v0.2.0` به‌صورت pre-release منتشر شدند؛ از `v0.3.0` به بعد release معمولی‌اند.) برای امضای واقعی secretهای اختیاری مخزن: `ANDROID_KEYSTORE_BASE64`، `ANDROID_KEYSTORE_PASSWORD`، `ANDROID_KEY_ALIAS`، `ANDROID_KEY_PASSWORD`.
 
 ## تست‌ها
 
