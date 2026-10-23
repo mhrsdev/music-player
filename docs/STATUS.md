@@ -52,6 +52,10 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 - 🔄 **T-W** [Sonnet + ponytail] Waveform extractor (`data/waveform`). Branch `task/tw-waveform-java`, worktree `../wt-tw`.
 
+- 🔄 **T2** [Opus] UI foundation: theme/tokens, custom widgets (Wavy/Waveform/Bars seek bars, morph play button, floating nav, mini-player), image loader. Branch `task/t2-ui-foundation-java`, worktree `../wt-t2`. Owns `ui/theme`, `ui/widget`, `res/values`, drawables.
+- 🔄 **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings, nav shell. Branch `task/t3-screens`, worktree `../wt-t3`.
+- 🔄 **T4** [Opus] Player: full player, lyrics view, queue sheet, mini-player wiring. Branch `task/t4-player`, worktree `../wt-t4`.
+
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
 Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room), tidy query classes, clean packages, Gradle 9.0.0 (CLAUDE.md "Hard code rules").
@@ -74,6 +78,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D12 archived: 1-hour budget, up to 8 agents. Launched T2/T3/T4 (Opus) in parallel on WIP design v2; T2b asked to wrap up and report.
 - 2026-10-23: T1b merged into ccr-b49e5e2a-53r8m3 (reviewed: build green, no Kotlin). T-W launched → 5 agents running (T2b, T5, T6, T7, T-W).
 - 2026-10-23: D11 archived: up to 5 parallel agents; design screenshots go to the owner in chat when T2b is complete. Launched T5, T6, T7 on top of T1b contracts (origin/task/t1b-java-scaffold).
 - 2026-10-23: D10 archived: ui-ux-pro-max skill installed + relayed to the UI agent.
