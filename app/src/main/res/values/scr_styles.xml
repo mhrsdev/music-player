@@ -13,10 +13,22 @@
     <style name="Scr.SectionTitle" parent="">
         <item name="android:textSize">@dimen/mp_text_headline</item>
         <item name="android:fontFamily">@font/mp_sans</item>
-        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textFontWeight" tools:targetApi="28">400</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
         <item name="android:textAlignment">viewStart</item>
+    </style>
+    <style name="Library.TileTitle" parent="">
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+    <style name="Library.LikedTitle" parent="Library.TileTitle">
+        <item name="android:textSize">30sp</item>
     </style>
     <style name="Scr.Body" parent="">
         <item name="android:textSize">15sp</item>

@@ -10,11 +10,13 @@
     android:paddingBottom="@dimen/scr_bottom_chrome"
     android:visibility="gone">
 
-    <ProgressBar
+    <!-- Loading skeleton instead of a spinner; fills the screen (StateView.loading switches the root to top-aligned). -->
+    <com.mhrsdev.musicplayer.ui.widget.SkeletonView
         android:id="@+id/state_progress"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:indeterminateTint="?attr/mpPrimary" />
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="-40dp" />
 
     <ImageView
         android:id="@+id/state_icon"

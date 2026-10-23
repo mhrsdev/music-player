@@ -136,8 +136,8 @@ public final class CollectionFragment extends Fragment {
 
         @Override public void onBindViewHolder(@NonNull Holder h, int position) {
             Cell cell = getItem(position);
-            h.b.title.setText(cell.title());
-            h.b.subtitle.setText(cell.subtitle());
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, cell.title());
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, cell.subtitle());
             int gravity = cell.circle() ? Gravity.CENTER_HORIZONTAL : Gravity.START;
             h.b.title.setGravity(gravity);
             h.b.subtitle.setGravity(gravity);

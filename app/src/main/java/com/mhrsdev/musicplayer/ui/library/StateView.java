@@ -16,7 +16,9 @@ public final class StateView {
     public static void loading(LibraryStateBinding s, @StringRes int title) {
         s.stateRoot.setVisibility(View.VISIBLE);
         s.stateProgress.setVisibility(View.VISIBLE);
+        s.stateProgress.setContentDescription(s.getRoot().getContext().getString(title));
         s.stateIcon.setVisibility(View.GONE);
+        s.stateTitle.setVisibility(View.GONE);
         s.stateTitle.setText(title);
         s.stateBody.setVisibility(View.GONE);
         s.stateAction.setVisibility(View.GONE);
@@ -27,6 +29,7 @@ public final class StateView {
         s.stateRoot.setVisibility(View.VISIBLE);
         s.stateProgress.setVisibility(View.GONE);
         s.stateIcon.setVisibility(View.VISIBLE);
+        s.stateTitle.setVisibility(View.VISIBLE);
         s.stateTitle.setText(title);
         s.stateBody.setVisibility(body == null ? View.GONE : View.VISIBLE);
         s.stateBody.setText(body);

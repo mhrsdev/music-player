@@ -17,6 +17,9 @@ import com.mhrsdev.musicplayer.di.AppContainer;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator.Collection;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator.TrackList;
 import com.mhrsdev.musicplayer.ui.nav.Screens;
+import com.mhrsdev.musicplayer.ui.widget.ArtworkView;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Library hub (DESIGN.md 03). */
 public final class LibraryFragment extends Fragment {
@@ -35,7 +38,6 @@ public final class LibraryFragment extends Fragment {
         Resources r = getResources();
         String likedLabel = getString(R.string.library_liked);
 
-        Art.bind(b.likedArt, null, 1, 24, false);
         b.likedCard.setOnClickListener(v -> Screens.openTrackList(this, TrackList.LIKED, null));
         b.likedPlay.setOnClickListener(v -> vm.playLiked(likedLabel));
         vm.getLiked().observe(getViewLifecycleOwner(), liked -> {
@@ -45,7 +47,13 @@ public final class LibraryFragment extends Fragment {
                     + Format.duration(LibraryViewModel.totalMs(liked), r.getConfiguration().getLocales().get(0)));
             b.likedPlay.setEnabled(n > 0);
             b.likedPlay.setAlpha(n > 0 ? 1f : 0.38f);
-            if (n > 0) Art.bind(b.likedArt, liked.get(0).artworkUri(), liked.get(0).placeholderSeed(), 24, false);
+            List<String> uris = new ArrayList<>(3);
+            List<Integer> seeds = new ArrayList<>(3);
+            for (int i = 0; i < Math.min(3, n); i++) {
+                uris.add(liked.get(i).artworkUri());
+                seeds.add(liked.get(i).placeholderSeed());
+            }
+            b.likedBg.setCovers(uris, seeds);
         });
 
         b.hubAlbums.setOnClickListener(v -> Screens.openCollection(this, Collection.ALBUMS));
@@ -56,18 +64,32 @@ public final class LibraryFragment extends Fragment {
         vm.getAlbums().observe(getViewLifecycleOwner(), list -> {
             int n = list.size();
             b.hubAlbumsSub.setText(r.getQuantityString(R.plurals.library_albums_count, n, n));
-            Art.bind(b.hubAlbumsPeek, n > 0 ? list.get(0).artworkUri() : null, n > 0 ? list.get(0).placeholderSeed() : 0, 16, false);
+            ArtworkView[] peeks = {b.hubAlbumsPeek, b.hubAlbumsPeek2, b.hubAlbumsPeek3};
+            for (int i = 0; i < peeks.length; i++) {
+                peeks[i].setVisibility(i < n ? View.VISIBLE : View.GONE);
+                if (i < n) Art.bind(peeks[i], list.get(i).artworkUri(), list.get(i).placeholderSeed(), 8, false);
+            }
         });
         vm.getPlaylists().observe(getViewLifecycleOwner(), list -> {
             int n = list.size();
             b.hubPlaylistsSub.setText(r.getQuantityString(R.plurals.library_playlists_count, n, n));
-            Art.bind(b.hubPlaylistsPeek, n > 0 && !list.get(0).artworkUris().isEmpty() ? list.get(0).artworkUris().get(0) : null,
-                    n > 0 ? list.get(0).placeholderSeed() : 2, 16, false);
+            ArtworkView[] peeks = {b.hubPlaylistsPeek, b.hubPlaylistsPeek2, b.hubPlaylistsPeek3};
+            for (int i = 0; i < peeks.length; i++) {
+                peeks[i].setVisibility(i < n ? View.VISIBLE : View.GONE);
+                if (i < n) {
+                    List<String> art = list.get(i).artworkUris();
+                    Art.bind(peeks[i], art.isEmpty() ? null : art.get(0), list.get(i).placeholderSeed(), 8, false);
+                }
+            }
         });
         vm.getArtists().observe(getViewLifecycleOwner(), list -> {
             int n = list.size();
             b.hubArtistsSub.setText(r.getQuantityString(R.plurals.library_artists_count, n, n));
-            if (n > 0) Art.artist(b.hubArtistsPeek, list.get(0).imageUri(), list.get(0).name(), list.get(0).placeholderSeed());
+            ArtworkView[] peeks = {b.hubArtistsPeek, b.hubArtistsPeek2, b.hubArtistsPeek3};
+            for (int i = 0; i < peeks.length; i++) {
+                peeks[i].setVisibility(i < n ? View.VISIBLE : View.GONE);
+                if (i < n) Art.artist(peeks[i], list.get(i).imageUri(), list.get(i).name(), list.get(i).placeholderSeed());
+            }
         });
         vm.getHistory().observe(getViewLifecycleOwner(), list -> b.hubHistorySub.setText(list.isEmpty()
                 ? getString(R.string.library_history_empty) : list.get(0).title()));

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="script_font_base" type="id" />
+    <item name="home_hero_mask" type="id" />
+</resources>

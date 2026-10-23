@@ -131,11 +131,11 @@ public final class TrackListFragment extends Fragment implements TrackAdapter.Li
         }
 
         @Override public void onBindViewHolder(@NonNull Holder h, int position) {
-            h.b.title.setText(title);
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, title);
             String songs = getResources().getQuantityString(R.plurals.library_songs, count, count)
                     + " · " + Format.duration(totalMs, getResources().getConfiguration().getLocales().get(0));
             String sub = header != null && header.subtitle() != null ? header.subtitle() + " · " + songs : songs;
-            h.b.subtitle.setText(sub);
+            com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, sub);
             Art.bind(h.b.art, null, header == null ? 0 : header.seed(), 32, header != null && header.circle());
             h.b.play.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.nav_ic_play, 0, 0, 0);
             h.b.shuffle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.nav_ic_shuffle, 0, 0, 0);

@@ -49,8 +49,8 @@ public final class TrackAdapter extends ListAdapter<Track, TrackAdapter.Holder> 
     @Override public void onBindViewHolder(@NonNull Holder h, int position) {
         Track t = getItem(position);
         Locale locale = h.itemView.getResources().getConfiguration().getLocales().get(0);
-        h.b.title.setText(Highlight.apply(t.title(), highlight));
-        h.b.subtitle.setText(t.artistName());
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.title, Highlight.apply(t.title(), highlight));
+        com.mhrsdev.musicplayer.ui.widget.ScriptFont.setText(h.b.subtitle, t.artistName());
         h.b.duration.setText(Format.duration(t.durationMs(), locale));
         h.b.explicit.setVisibility(t.explicit() ? View.VISIBLE : View.GONE);
         h.b.more.setContentDescription(h.itemView.getContext().getString(R.string.library_more, t.title()));
