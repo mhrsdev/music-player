@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     private static final String PLAYER_TAG = "player";
     private static final String QUEUE_TAG = "queue";
     private static final String STATE_PERMISSION = "permission_flow";
+    private static final String STATE_TAB = "tab";
 
     private ActivityMainBinding binding;
     private ShellViewModel shell;
@@ -95,6 +96,8 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             permissionFlow = savedInstanceState.getBoolean(STATE_PERMISSION);
+            // The restored fragment survives process death, the ViewModel's tab does not.
+            shell.selectTab(Tab.values()[savedInstanceState.getInt(STATE_TAB, 0)]);
         }
         binding.chrome.setVisibility(permissionFlow ? View.GONE : View.VISIBLE);
         binding.bottomScrim.setVisibility(permissionFlow ? View.GONE : View.VISIBLE);
@@ -103,6 +106,7 @@ public class MainActivity extends AppCompatActivity
     @Override protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
         out.putBoolean(STATE_PERMISSION, permissionFlow);
+        out.putInt(STATE_TAB, shell.getTab().getValue().ordinal());
     }
 
     private void applyInsets() {

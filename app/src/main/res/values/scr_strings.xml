@@ -13,7 +13,8 @@
     <string name="home_see_all">See all</string>
     <string name="home_shuffle">Shuffle</string>
     <string name="home_empty_title">Your library is empty</string>
-    <string name="home_empty_body">Add music to your phone, or choose the folders to scan in Settings.</string>
+    <string name="home_empty_body">Add music to your phone, then scan again.</string>
+    <string name="home_empty_rescan">Scan again</string>
     <string name="home_loading">Scanning your library…</string>
 
     <string name="search_hint">Songs, albums, artists</string>
