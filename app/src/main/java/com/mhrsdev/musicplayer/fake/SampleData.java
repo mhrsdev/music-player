@@ -48,8 +48,8 @@ public final class SampleData {
                     "My Always Mood|189|2", "Day Bird|223|3"),
             new AlbumSpec("Kevin MacLeod", "Royalty Free", 2010, "royalty-free.jpg", "Sneaky Snitch|137|0",
                     "Carefree|205|0", "Wallpaper|220|0"),
-            new AlbumSpec("آریا طبیب‌زاده", "دختران قوچان", 2023, "dokhtaran-quchan.jpg", "دختران قوچان|180|0"),
-            new AlbumSpec("روح‌الله خالقی", "ای ایران", 2017, "ey-iran.jpg", "ای ایران (سنتور)|120|0"));
+            new AlbumSpec("آریا طبیب‌زاده", "دختران قوچان", 2023, "dokhtaran-quchan.jpg", "دختران قوچان|409|0"),
+            new AlbumSpec("روح‌الله خالقی", "ای ایران", 2017, "ey-iran.jpg", "ای ایران (سنتور)|105|0"));
 
     public static final List<Artist> ARTISTS;
     public static final List<Album> ALBUMS;

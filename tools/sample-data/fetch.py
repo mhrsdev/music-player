@@ -12,7 +12,8 @@ import hashlib, json, os, subprocess, sys, time, urllib.error, urllib.parse, url
 
 IA = "https://archive.org/download/"
 CM = "https://upload.wikimedia.org/wikipedia/commons/"
-# key, url, expected duration (s, +-2), sha256 of the file as fetched (None until pinned)
+# key, url, expected duration (s, +-2), checksum of the file as fetched (SHA-256; the two Commons files use the SHA-1
+# that the Commons API reports, because Wikimedia rate-limited the download when this list was written)
 FILES = [
     ("reject-texas", IA + "reject-bin/Reject%20Bin/1%2001.%20Texas.mp3", 260, "a42c56648032a81fd59f4a287f63cc2dc061b9aa01a5f3449fae71ffd2b2aa56"),
     ("reject-1000-words", IA + "reject-bin/Reject%20Bin/1%2002.%201000%20Words.mp3", 193, "ea554ccb8072f2457ef4552ad40e4c5a1f6a45a00ce5a2cd055db47fcdcf7186"),
@@ -38,8 +39,8 @@ FILES = [
     ("km-sneaky-snitch", "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Sneaky%20Snitch.mp3", 137, "db1710333d68a215277f77e4e17e1a64bf4ed38f87c70f8d0f56b16b6aa4f884"),
     ("km-carefree", "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3", 205, "8433b770a630d9b1594fd484442c677907ece899a4d149954cd2e74fd733e311"),
     ("km-wallpaper", "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Wallpaper.mp3", 220, "9fa810e5193c88f1b360537366f210f16c2588106d5292f0659e9957fa274f96"),
-    ("fa-dokhtaran-quchan", CM + "e/ea/Dokhtaran-e_Quchan-_%D8%AF%D8%AE%D8%AA%D8%B1%D8%A7%D9%86_%D9%82%D9%88%DA%86%D8%A7%D9%86.ogg", 0, None),
-    ("fa-ey-iran", CM + "8/87/Ey_Iran_%28santoor%29_by_Ruhollah_Khaleghi.ogg", 0, None),
+    ("fa-dokhtaran-quchan", CM + "e/ea/Dokhtaran-e_Quchan-_%D8%AF%D8%AE%D8%AA%D8%B1%D8%A7%D9%86_%D9%82%D9%88%DA%86%D8%A7%D9%86.ogg", 409, "bc9ca0b71ec3599961e62bc1e4746f1a92e2b9e0"),
+    ("fa-ey-iran", CM + "8/87/Ey_Iran_%28santoor%29_by_Ruhollah_Khaleghi.ogg", 105, "76283d4f7289083c106a958447438e2404378747"),
 ]
 
 
@@ -80,7 +81,8 @@ def main():
     bad = 0
     for key, url, secs, sha in FILES:
         path = fetch(key, url, out)
-        h = hashlib.sha256(open(path, "rb").read()).hexdigest()
+        data = open(path, "rb").read()
+        h = hashlib.sha1(data).hexdigest() if sha and len(sha) == 40 else hashlib.sha256(data).hexdigest()
         if only_hash:
             print(f'    ("{key}", {h!r}),')
             continue
