@@ -37,6 +37,7 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 
 ## Animations
 
+* A0 Every looping animation runs through `ui/motion/PeriodicTick` or a `FrameDriver.Tick` (one Choreographer callback for the app); no private `postInvalidateDelayed` / `postOnAnimationDelayed` / Handler loops (`PerfBudgetTest`).
 * A1 Looping / infinite animations only while the view is attached, visible and `MotionPolicy.decorativeMotionEnabled` (off in battery saver and reduce-motion). Skeleton shimmer <= 15 fps.
 * A2 Transitions are one-shot (<= 800 ms); none runs while the app is backgrounded; `animate()` / `ValueAnimator` are cancelled in `onDestroyView`/`onDetachedFromWindow`.
 * A3 No live blur: blur once into a tiny bitmap off the main thread (`BackdropBlur`, `CollageBlurView`).

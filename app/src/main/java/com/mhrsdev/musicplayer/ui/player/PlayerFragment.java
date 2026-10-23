@@ -75,6 +75,10 @@ public final class PlayerFragment extends Fragment {
     private boolean light;
     private boolean btNameNeedsPermission;
     private static final String PREFS = "player_ui", K_BT_ASKED = "bt_name_asked";
+    /** "Add lyrics file": the system document picker; the file is copied into app storage by the repository. */
+    private final androidx.activity.result.ActivityResultLauncher<String[]> pickLyricsFile = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
+            uri -> { if (uri != null && vm != null) vm.importLyricsFile(uri.toString()); });
     private final androidx.activity.result.ActivityResultLauncher<String> btPermission = registerForActivityResult(
             new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
             granted -> { if (outputRoute != null) outputRoute.refresh(); });
@@ -261,8 +265,11 @@ public final class PlayerFragment extends Fragment {
         b.playerMore.setOnClickListener(v -> {
             android.widget.PopupMenu menu = new android.widget.PopupMenu(requireContext(), v);
             boolean lyrics = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
-            if (lyrics || vm.getLyricsAvailability().getValue() == LyricsAvailability.AVAILABLE) {
+            LyricsAvailability av = vm.getLyricsAvailability().getValue();
+            if (lyrics || av == LyricsAvailability.AVAILABLE) {
                 menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
+            } else if (av == LyricsAvailability.NONE) {
+                menu.getMenu().add(0, 15, 0, R.string.lyrics_find); // empty state with Search again / file / manual
             }
             menu.getMenu().add(0, 2, 1, R.string.player_queue);
             menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
@@ -280,6 +287,7 @@ public final class PlayerFragment extends Fragment {
             if (soundFragmentClass() != null) menu.getMenu().add(0, 6, 5, R.string.player_sound);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) vm.toggleLyrics();
+                else if (item.getItemId() == 15) vm.openLyricsTools();
                 else if (item.getItemId() == 11) stepLyricsSize(1);
                 else if (item.getItemId() == 12) stepLyricsSize(-1);
                 else if (item.getItemId() == 13) nudgeLyrics(-LyricsOffsetStore.STEP_MS);
@@ -324,19 +332,44 @@ public final class PlayerFragment extends Fragment {
             @Override public void onScrollStateChanged(@NonNull RecyclerView rv, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
                     scrollPolicy.onUserScroll(SystemClock.uptimeMillis());
-                    b.lyricsBackToCurrent.setVisibility(View.VISIBLE);
                     rv.removeCallbacks(resumeAutoScroll);
                     rv.postDelayed(resumeAutoScroll, LyricsScrollPolicy.PAUSE_MS);
                 }
+                if (newState != RecyclerView.SCROLL_STATE_SETTLING) updateBackChip(rv);
             }
         });
         b.lyricsBackToCurrent.setOnClickListener(v -> onAutoScrollResume());
-        b.lyricsRetry.setOnClickListener(v -> {
-            b.lyricsRetry.setVisibility(View.GONE);
-            b.lyricsMessageTitle.setText(R.string.lyrics_loading);
-            b.lyricsMessageBody.setText(null);
-            vm.retryLyrics();
+        b.lyricsRetry.setOnClickListener(v -> searchAgain());
+        b.lyricsSearchAgain.setOnClickListener(v -> searchAgain());
+        b.lyricsAddFile.setOnClickListener(v -> {
+            try {
+                pickLyricsFile.launch(new String[]{"text/*", "application/xml", "application/ttml+xml",
+                        "application/json", "application/octet-stream"});
+            } catch (android.content.ActivityNotFoundException e) {
+                android.widget.Toast.makeText(requireContext(), R.string.lyrics_add_file, android.widget.Toast.LENGTH_SHORT).show();
+            }
         });
+        b.lyricsSearchManual.setOnClickListener(v -> {
+            String[] q = vm.manualSearchPrefill();
+            com.mhrsdev.musicplayer.ui.player.lyrics.LyricsSearchSheet.show(this, q[0], q[1]);
+        });
+    }
+
+    private void searchAgain() {
+        if (!vm.searchAgain()) {
+            android.widget.Toast.makeText(requireContext(), R.string.lyrics_search_again_wait,
+                    android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /** "Back to current line": only after a manual scroll, with 4+ lines, while the active line is off screen. */
+    private void updateBackChip(RecyclerView rv) {
+        if (b == null) return;
+        LinearLayoutManager lm = (LinearLayoutManager) rv.getLayoutManager();
+        boolean show = lm != null && !scrollPolicy.shouldAutoScroll(SystemClock.uptimeMillis())
+                && LyricsScrollPolicy.showBackChip(lyricsAdapter.getItemCount(), lyricsAdapter.getActive(),
+                        lm.findFirstCompletelyVisibleItemPosition(), lm.findLastCompletelyVisibleItemPosition());
+        b.lyricsBackToCurrent.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     /** Dark (05) or light (15) player: text/icon colors over the backdrop; the backdrop's guard keeps the contrast. */
@@ -353,6 +386,9 @@ public final class PlayerFragment extends Fragment {
         b.lyricsMessageBody.setTextColor(rgb | 0xB8000000);
         b.lyricsBackToCurrent.setTextColor(text);
         b.lyricsRetry.setTextColor(text);
+        b.lyricsSearchAgain.setTextColor(text);
+        b.lyricsAddFile.setTextColor(text);
+        b.lyricsSearchManual.setTextColor(text);
         b.playerOutput.setTextColor(text);
         androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(b.playerOutput, ColorStateList.valueOf(text));
         ColorStateList icon = ColorStateList.valueOf(text);
@@ -687,16 +723,12 @@ public final class PlayerFragment extends Fragment {
         }
         if (l == null || l.isEmpty()) {
             b.lyricsList.setVisibility(View.GONE);
+            b.lyricsBackToCurrent.setVisibility(View.GONE);
             b.lyricsMessage.setVisibility(View.VISIBLE);
-            boolean offline = PlayerViewModel.showOfflineRetry(l, isOnline());
-            b.lyricsRetry.setVisibility(offline ? View.VISIBLE : View.GONE);
-            b.lyricsMessageTitle.setText(l == null ? R.string.lyrics_loading
-                    : offline ? R.string.lyrics_offline : R.string.lyrics_none);
-            b.lyricsMessageBody.setText(l == null ? null
-                    : getString(offline ? R.string.lyrics_offline_hint : R.string.lyrics_none_hint));
+            renderLyricsMessage(LyricsEmptyState.of(l, isOnline()));
             return;
         }
-        b.lyricsRetry.setVisibility(View.GONE);
+        renderLyricsMessage(LyricsEmptyState.CONTENT);
         b.lyricsMessage.setVisibility(View.GONE);
         boolean appearing = b.lyricsList.getVisibility() != View.VISIBLE;
         if (appearing) crossfade(b.lyricsList, true);
@@ -713,6 +745,33 @@ public final class PlayerFragment extends Fragment {
         if ((appearing || fresh) && l.synced()) {
             b.lyricsList.post(() -> { if (b != null) scrollToLine(lyricsAdapter.getActive(), false); });
         }
+    }
+
+    /** Loading / not found / failed: title, hint and which action chips show (no fake one-line lyric). */
+    private void renderLyricsMessage(LyricsEmptyState st) {
+        b.lyricsRetry.setVisibility(st == LyricsEmptyState.FAILED || st == LyricsEmptyState.OFFLINE ? View.VISIBLE : View.GONE);
+        b.lyricsSearchAgain.setVisibility(st == LyricsEmptyState.NOT_FOUND ? View.VISIBLE : View.GONE);
+        boolean tools = st == LyricsEmptyState.NOT_FOUND || st == LyricsEmptyState.FAILED || st == LyricsEmptyState.OFFLINE;
+        b.lyricsAddFile.setVisibility(tools ? View.VISIBLE : View.GONE);
+        b.lyricsSearchManual.setVisibility(st == LyricsEmptyState.NOT_FOUND || st == LyricsEmptyState.FAILED
+                ? View.VISIBLE : View.GONE);
+        switch (st) {
+            case LOADING -> { b.lyricsMessageTitle.setText(R.string.lyrics_loading); b.lyricsMessageBody.setText(null); }
+            case OFFLINE -> {
+                b.lyricsMessageTitle.setText(R.string.lyrics_offline);
+                b.lyricsMessageBody.setText(R.string.lyrics_offline_hint);
+            }
+            case FAILED -> {
+                b.lyricsMessageTitle.setText(R.string.lyrics_failed);
+                b.lyricsMessageBody.setText(R.string.lyrics_failed_hint);
+            }
+            case NOT_FOUND -> {
+                b.lyricsMessageTitle.setText(R.string.lyrics_not_found);
+                b.lyricsMessageBody.setText(R.string.lyrics_not_found_hint);
+            }
+            default -> { }
+        }
+        b.lyricsMessageBody.setVisibility(st == LyricsEmptyState.LOADING ? View.GONE : View.VISIBLE);
     }
 
     /** Active line from the smooth clock (includes the per-track offset); the VM's 4 Hz index is only the trigger. */

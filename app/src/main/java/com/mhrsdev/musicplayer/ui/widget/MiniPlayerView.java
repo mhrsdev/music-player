@@ -62,6 +62,9 @@ public class MiniPlayerView extends LinearLayout {
     private long duration;
     private boolean playing;
     private int progressInset, progressBottom;
+    private boolean playingSet;
+    /** The wave path is rebuilt only when the progress end moved (its phase is static, so same x = same path). */
+    private float waveX = Float.NaN;
     @Nullable private Listener listener;
 
     public MiniPlayerView(Context context) {
@@ -177,9 +180,13 @@ public class MiniPlayerView extends LinearLayout {
         subtitle.setText(text);
     }
 
+    /** Called with every 4 Hz state tick: does nothing unless the value changed. */
     public void setPlaying(boolean playing) {
+        if (this.playing == playing && playingSet) return;
+        playingSet = true;
         this.playing = playing;
         playPause.setPlaying(playing, true);
+        waveX = Float.NaN; // static line <-> wave: rebuild
         invalidate();
     }
 
@@ -188,12 +195,18 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     public void setProgress(long positionMs, long durationMs) {
-        // Only redraw when the visible progress moves at least ~1 px worth.
+        // Only redraw when the visible progress moves at least ~1 px worth, and then only the progress strip: the pill
+        // (gradient, shadow, art, texts) is not touched.
         long old = position;
         position = positionMs;
         duration = durationMs;
         float w = getWidth() - 2f * progressInset;
-        if (w <= 0 || durationMs <= 0 || Math.abs(positionMs - old) * w / durationMs >= 1f) invalidate();
+        if (w <= 0 || durationMs <= 0) {
+            invalidate();
+        } else if (Math.abs(positionMs - old) * w / durationMs >= 1f) {
+            int y = Math.round(getHeight() - progressBottom), r = Math.round(4 * d) + 2;
+            invalidate(0, y - r, getWidth(), y + r);
+        }
     }
 
     /** Colors from the artwork: background = container, text = onContainer, button = primary. */
@@ -231,6 +244,7 @@ public class MiniPlayerView extends LinearLayout {
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
         bounds.set(0, 0, w, h);
+        waveX = Float.NaN;
         updateBackground();
     }
 
@@ -242,10 +256,13 @@ public class MiniPlayerView extends LinearLayout {
         canvas.drawLine(Math.min(right, x + 4 * d), y, right, y, trackPaint);
         if (x > left) {
             if (playing) {
-                wave.rewind();
-                float wl = 18 * d, a = 2 * d;
-                wave.moveTo(left, y);
-                for (float px = left + 2 * d; px < x; px += 2 * d) wave.lineTo(px, y + WaveMath.y(px - left, wl, a, 0f));
+                if (waveX != x) {
+                    waveX = x;
+                    wave.rewind();
+                    float wl = 18 * d, a = 2 * d;
+                    wave.moveTo(left, y);
+                    for (float px = left + 2 * d; px < x; px += 2 * d) wave.lineTo(px, y + WaveMath.y(px - left, wl, a, 0f));
+                }
                 canvas.drawPath(wave, progressPaint);
             } else {
                 canvas.drawLine(left, y, x, y, progressPaint);

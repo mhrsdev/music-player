@@ -1,11 +1,12 @@
 package com.mhrsdev.musicplayer.ui.player.lyrics;
 
+import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
- * The one frame loop of the lyrics: {@code postOnAnimationDelayed} at ~30 fps, running only while the lyrics list is
+ * The one frame loop of the lyrics: a {@link PeriodicTick} (shared FrameDriver) at ~30 fps, running only while the lyrics list is
  * shown, attached, the player is playing and the active line has word timing. Each frame it lets the owner move the
  * active line (cheap binary search) and invalidates the active line's view only; nothing else redraws. Stops itself
  * the first frame any condition is false.
@@ -19,7 +20,7 @@ public class LyricsTicker {
     private final OnFrame onFrame;
     private boolean running;
     private boolean enabled;
-    private final Runnable frame = this::frame;
+    private final PeriodicTick ticker = new PeriodicTick(FRAME_MS, this::frame);
 
     public LyricsTicker(RecyclerView list, LyricsClock clock, OnFrame onFrame) {
         this.list = list;
@@ -37,7 +38,7 @@ public class LyricsTicker {
     public void poke() {
         if (shouldRun() && !running) {
             running = true;
-            list.postOnAnimation(frame);
+            ticker.start();
         } else if (!shouldRun()) {
             stop();
         }
@@ -45,7 +46,7 @@ public class LyricsTicker {
 
     public void stop() {
         running = false;
-        list.removeCallbacks(frame);
+        ticker.stop();
     }
 
     public boolean isRunning() { return running; }
@@ -55,12 +56,12 @@ public class LyricsTicker {
                 && list.getWindowVisibility() == View.VISIBLE;
     }
 
-    private void frame() {
-        if (!running) return;
-        if (!shouldRun()) { running = false; return; }
+    private boolean frame() {
+        if (!running) return false;
+        if (!shouldRun()) { running = false; return false; }
         onFrame.onFrame();
         invalidateActive();
-        list.postOnAnimationDelayed(frame, FRAME_MS);
+        return true;
     }
 
     /** Draws the current word state once (also used after a seek while paused). */

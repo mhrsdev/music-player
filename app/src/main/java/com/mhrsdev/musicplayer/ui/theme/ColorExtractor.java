@@ -12,7 +12,27 @@ public final class ColorExtractor {
 
     private ColorExtractor() {}
 
+    /** Seeds of the last few covers: Home tint, mini-player, player, widget and notification all ask for the same cover. */
+    private static final android.util.LruCache<Long, Integer> SEEDS = new android.util.LruCache<>(24);
+
+    /** Same result as {@link #compute}, computed once per distinct pixel content (hash of the downscaled pixels). */
     public static int extractSeed(int[] pixels, int count) {
+        long h = 0xcbf29ce484222325L; // FNV-1a over the pixels: cheap (<= 1k ints) next to the HSL histogram
+        for (int i = 0; i < count; i++) h = (h ^ pixels[i]) * 0x100000001b3L;
+        Long key = h ^ count;
+        Integer known;
+        synchronized (SEEDS) {
+            known = SEEDS.get(key);
+        }
+        if (known != null) return known;
+        int seed = compute(pixels, count);
+        synchronized (SEEDS) {
+            SEEDS.put(key, seed);
+        }
+        return seed;
+    }
+
+    static int compute(int[] pixels, int count) {
         double[] w = new double[BINS];
         double[] rs = new double[BINS], gs = new double[BINS], bs = new double[BINS];
         float[] hsl = new float[3];

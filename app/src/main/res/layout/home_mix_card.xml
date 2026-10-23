@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:ellipsize="end"
+            android:gravity="start"
             android:maxLines="2"
             android:paddingHorizontal="12dp"
             android:paddingBottom="12dp"

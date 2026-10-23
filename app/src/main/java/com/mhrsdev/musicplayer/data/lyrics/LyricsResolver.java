@@ -31,6 +31,8 @@ public final class LyricsResolver {
     private final LyricsCacheStore cache;
     private final LongSupplier clock;
     private final BooleanSupplier remoteEnabled;
+    /** The online step of the current resolve failed (IOException: offline, HTTP error, timeout). Lyrics thread only. */
+    private boolean lastError;
 
     public LyricsResolver(List<LyricsSource> local, LyricsSource remote, LyricsCacheStore cache, LongSupplier clock) {
         this(local, remote, cache, clock, () -> true);
@@ -49,6 +51,16 @@ public final class LyricsResolver {
     /** @return the lyrics or {@link Lyrics#none}; null if {@code cancel} fired */
     @Nullable
     public Lyrics resolve(Track track, CancelToken cancel) {
+        return resolve(track, cancel, false);
+    }
+
+    /**
+     * @param fresh "Search again": skip the cached online answer (also a negative one) and ask LRCLIB once more
+     *              (still only when online lyrics are enabled)
+     */
+    @Nullable
+    public Lyrics resolve(Track track, CancelToken cancel, boolean fresh) {
+        lastError = false;
         Lyrics plainFallback = null;
         for (LyricsSource source : local) {
             if (cancel.isCancelled()) return null;
@@ -58,30 +70,38 @@ public final class LyricsResolver {
             if (plainFallback == null) plainFallback = found;
         }
         if (cancel.isCancelled()) return null;
-        Lyrics fromRemote = viaCache(track, cancel);
+        Lyrics fromRemote = viaCache(track, cancel, fresh);
         if (cancel.isCancelled()) return null;
         if (fromRemote != null && (fromRemote.synced() || plainFallback == null)) return fromRemote;
-        return plainFallback != null ? plainFallback : Lyrics.none(track.id());
+        if (plainFallback != null) return plainFallback;
+        return lastError ? Lyrics.failed(track.id()) : Lyrics.none(track.id());
     }
 
+    /**
+     * Online answers are cached per CLEANED artist/title/duration ({@link #cacheKey}), so the same song in two files
+     * (or with a site watermark in its tags) shares one lookup, including "not found".
+     */
     @Nullable
-    private Lyrics viaCache(Track track, CancelToken cancel) {
+    private Lyrics viaCache(Track track, CancelToken cancel, boolean fresh) {
         long now = clock.getAsLong();
-        LyricsCacheStore.Entry cached = cache.get(track.id());
+        String key = cacheKey(track);
+        if (key == null) return null; // no usable title: never ask LRCLIB
+        LyricsCacheStore.Entry cached = fresh ? null : cache.get(key);
         if (cached != null && cached.expiresAtMs() > now) {
-            return cached.text() == null ? null : LyricsParser.toLyrics(track.id(), cached.text(), cached.source());
+            return cached.text() == null ? null : parse(track, new LyricsSource.Found(cached.text(), cached.source()));
         }
         if (!remoteEnabled.getAsBoolean()) return null;
         try {
             LyricsSource.Found found = remote.load(track, cancel);
             if (cancel.isCancelled()) return null;
-            Lyrics lyrics = found == null ? null : LyricsParser.toLyrics(track.id(), found.text(), found.source());
-            cache.put(track.id(), lyrics == null
+            Lyrics lyrics = parse(track, found);
+            cache.put(key, lyrics == null
                     ? new LyricsCacheStore.Entry(null, null, now + NOT_FOUND_TTL_MS)
                     : new LyricsCacheStore.Entry(found.text(), found.source(), now + FOUND_TTL_MS));
             return lyrics;
         } catch (IOException e) {
-            if (!cancel.isCancelled()) cache.put(track.id(), new LyricsCacheStore.Entry(null, null, now + ERROR_TTL_MS));
+            if (!cancel.isCancelled()) cache.put(key, new LyricsCacheStore.Entry(null, null, now + ERROR_TTL_MS));
+            lastError = !cancel.isCancelled();
             return null;
         }
     }
@@ -96,8 +116,22 @@ public final class LyricsResolver {
         }
     }
 
+    /** Parses and drops junk (site watermark, advert, title-only...): junk counts as "nothing from this source". */
     @Nullable
     private static Lyrics parse(Track track, @Nullable LyricsSource.Found found) {
-        return found == null ? null : LyricsParser.toLyrics(track.id(), found.text(), found.source());
+        if (found == null) return null;
+        Lyrics l = LyricsParser.toLyrics(track.id(), found.text(), found.source());
+        if (UserLyricsStore.LABEL.equals(found.source())) return l == null || l.isEmpty() ? null : l; // user's choice
+        Lyrics clean = LyricsJunkFilter.clean(l, track.artistName(), track.title());
+        return clean == null || clean.isEmpty() ? null : clean;
+    }
+
+    /** Cache key of the online lookup: cleaned artist + title + duration (2 s buckets); null without a title. */
+    @Nullable
+    static String cacheKey(Track track) {
+        String title = LyricsQueryNormalizer.key(LyricsQueryNormalizer.title(track.title()));
+        if (title.isEmpty()) return null;
+        String artist = LyricsQueryNormalizer.key(LyricsQueryNormalizer.artist(track.artistName()));
+        return "q:" + artist + "\u0001" + title + "\u0001" + Math.round(track.durationMs() / 2000.0);
     }
 }

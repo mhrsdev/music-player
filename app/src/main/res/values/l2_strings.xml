@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lyrics_not_found">No lyrics found</string>
+    <string name="lyrics_not_found_hint">Search again, pick a lyrics file, or search by artist and title.</string>
+    <string name="lyrics_failed">Couldn\'t reach the lyrics service</string>
+    <string name="lyrics_failed_hint">Check your connection and try again.</string>
+    <string name="lyrics_search_again">Search again</string>
+    <string name="lyrics_search_again_wait">Please wait a few seconds before searching again</string>
+    <string name="lyrics_add_file">Add lyrics file</string>
+    <string name="lyrics_search_manually">Search manually</string>
+    <string name="lyrics_find">Find lyrics</string>
+    <string name="lyrics_field_title">Title</string>
+    <string name="lyrics_field_artist">Artist</string>
+    <string name="lyrics_search">Search</string>
+    <string name="lyrics_search_failed">Search failed. Check your connection.</string>
+    <string name="lyrics_search_empty">Nothing found. Try a shorter title.</string>
+    <string name="lyrics_synced">synced</string>
+    <string name="lyrics_plain">plain text</string>
+</resources>

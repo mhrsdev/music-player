@@ -58,7 +58,7 @@ public class LyricsResolverTest {
         assertTrue(l.synced());
         assertEquals(0, sidecar.calls);
         assertEquals(0, remote.calls);
-        assertNull(cache.get(track.id())); // local results are not cached
+        assertNull(cache.get(LyricsResolver.cacheKey(track))); // local results are not cached
     }
 
     @Test public void sidecarIsUsedWhenEmbeddedIsMissing() {
@@ -143,11 +143,11 @@ public class LyricsResolverTest {
     @Test public void emptyRemoteTextCountsAsNotFound() {
         remote.text = "  \n [ti:x] ";
         assertTrue(resolve().isEmpty());
-        assertNull(cache.get(track.id()).text());
+        assertNull(cache.get(LyricsResolver.cacheKey(track)).text());
     }
 
     @Test public void cachedPositiveEntryIsSkippedWhenExpired() {
-        cache.put(track.id(), new LyricsCacheStore.Entry(SYNCED, "LRCLIB", now - 1));
+        cache.put(LyricsResolver.cacheKey(track), new LyricsCacheStore.Entry(SYNCED, "LRCLIB", now - 1));
         remote.text = "[00:09.00]fresh";
         assertEquals(9_000, resolve().lines().get(0).timeMs());
     }
@@ -157,11 +157,11 @@ public class LyricsResolverTest {
         remote.text = SYNCED;
         assertTrue(offline.resolve(track, new CancelToken()).isEmpty());
         assertEquals(0, remote.calls);
-        assertNull(cache.get(track.id())); // nothing cached, so turning the setting on works at once
+        assertNull(cache.get(LyricsResolver.cacheKey(track))); // nothing cached, so turning the setting on works at once
         sidecar.text = PLAIN;
         assertEquals("LRC file", offline.resolve(track, new CancelToken()).source());
         sidecar.text = null;
-        cache.put(track.id(), new LyricsCacheStore.Entry(SYNCED, "LRCLIB", now + 1));
+        cache.put(LyricsResolver.cacheKey(track), new LyricsCacheStore.Entry(SYNCED, "LRCLIB", now + 1));
         assertEquals("LRCLIB", offline.resolve(track, new CancelToken()).source());
         assertEquals(0, remote.calls);
     }
@@ -198,7 +198,7 @@ public class LyricsResolverTest {
         List<LyricsSource> none = Collections.emptyList();
         LyricsResolver r = new LyricsResolver(none, cancelling, cache, () -> now);
         assertNull(r.resolve(track, token));
-        assertNull(cache.get(track.id()));
+        assertNull(cache.get(LyricsResolver.cacheKey(track)));
     }
 
     @Test public void cancelledFailureIsNotCachedAsError() {
@@ -209,7 +209,7 @@ public class LyricsResolverTest {
         };
         LyricsResolver r = new LyricsResolver(Collections.emptyList(), failing, cache, () -> now);
         assertNull(r.resolve(track, token));
-        assertNull(cache.get(track.id()));
+        assertNull(cache.get(LyricsResolver.cacheKey(track)));
     }
 
     @Test public void persianSidecarSurvivesTheWholePipeline() {

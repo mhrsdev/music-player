@@ -14,7 +14,7 @@ import android.graphics.SweepGradient;
 import android.graphics.Typeface;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.WorkerThread;
+import androidx.annotation.AnyThread;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.mhrsdev.musicplayer.R;
@@ -79,13 +79,18 @@ public class GeneratedCover {
         }
     }
 
-    /** A square cover bitmap. Opaque, so RGB_565 (half the memory; gradients are dithered). */
-    @WorkerThread
+    /**
+     * A square cover bitmap. Opaque, so RGB_565 (half the memory; gradients are dithered). Pure canvas drawing with
+     * no shared state, so it is safe on any thread; callers keep main-thread renders tiny
+     * ({@code ArtworkLoader.generatedNow} only up to {@code SYNC_MAX_PX} = 96 px, to avoid a placeholder flash) and
+     * render everything larger on the loader's worker.
+     */
+    @AnyThread
     public Bitmap render(CoverSpec spec, int sizePx) {
         return render(spec, sizePx, Bitmap.Config.RGB_565);
     }
 
-    @WorkerThread
+    @AnyThread
     public Bitmap render(CoverSpec spec, int sizePx, Bitmap.Config config) {
         int s = Math.max(1, sizePx);
         Bitmap b = Bitmap.createBitmap(s, s, config);
