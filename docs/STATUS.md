@@ -47,7 +47,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 
 - 🔄 **T5** [Sonnet + ponytail] Data layer (SQLite DB + MediaStore scanner + repos + settings). Branch `task/t5-data-java`, worktree `../wt-t5`.
-- 🔄 **T6** [Sonnet + ponytail] Playback (Media3 service, PlayerController impl, queue, sleep timer, notification). Branch `task/t6-playback`, worktree `../wt-t6`.
 - 🔄 **T7** [Sonnet + ponytail] Lyrics (LRC parser/sidecar/embedded + LRCLIB + cache). Branch `task/t7-lyrics-java`, worktree `../wt-t7`.
 
 
@@ -71,6 +70,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T6** [Sonnet+ponytail] Playback merged: `playback/` (PlayerHolder single ExoPlayer, ExoPlayerController, PlaybackService MediaSessionService stops 60 s after pause, PlaybackStore, SleepTimerLogic w/ fade, PlayCountListener), `di/PlaybackModule`, 18 JVM tests, build green (agent-reported). T8: create controller in `MusicPlayerApp.onCreate` via `PlaybackModule.createController(ctx, library::recordPlay)`. Not verified on device: notification, Bluetooth, FGS start on Android 14+; audio offload not enabled; fakes without mediaUri are unplayable.
 - ✅ **T2b** [Opus] Design v2 merged: `docs/design/DESIGN.md` v2 + 18 PNGs (new `17-player-bars.png`). Own identity (Readex Pro + Vazirmatn, 42 custom icons, Persian arch/tile language, 'Deck' = mini-player+nav, lamp controls, 3 real-loudness seek bars, 'Still' low-power mode, 64px pre-blurred backdrop, ≤30 fps wave only while playing+visible). Screenshots sent to owner in chat. Not verified: any Android run; not mocked: tablet/landscape, overflow menus, sleep-timer sheet, permission-denied states. **Open owner questions D-A..D-F** (see below).
 - ✅ **T-W** [Sonnet+ponytail] Waveform extractor merged: `data/waveform` (WaveformMath, SamplingPlan sparse windows ~25% decode, EnvelopeBuilder, WaveformExtractor MediaCodec glue, WaveformStore + in-memory/file impls, WaveformRepositoryImpl with lazy/observer-driven work + battery-saver skip, `di/WaveformModule`), 45 JVM tests, build green (agent-reported). NOT verified: MediaCodec decode on a real device. T8 should bind `WaveformStore` to SQLite and call `prefetch(next track)`.
 - ✅ **T1b** [Sonnet+ponytail] Java scaffold merged into the working branch. Gradle 9.0.0 + **AGP 8.13.2** (AGP 9.x needs Gradle ≥ 9.1; tried 9.0.1 → refused), compileSdk/targetSdk 37 (suppressUnsupportedCompileSdk), minSdk 26, Java records for models, LiveData contracts + `Callback<T>`, fakes (37 tracks / 7 artists / 8 albums), `AppContainer`, `DbHelper` skeleton, 24 JVM tests, R8 release builds. **Supervisor re-ran `:app:assembleDebug test lint` → green; 0 `.kt/.kts` files.** Not verified: device run, GitHub Actions.
