@@ -5,7 +5,9 @@ import android.os.Looper;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import com.mhrsdev.musicplayer.domain.model.PlaybackOptions;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
+import com.mhrsdev.musicplayer.domain.model.ReplayGainMode;
 import com.mhrsdev.musicplayer.domain.model.RepeatMode;
 import com.mhrsdev.musicplayer.domain.model.SleepTimer;
 import com.mhrsdev.musicplayer.domain.model.Track;
@@ -24,6 +26,7 @@ public final class FakePlayerController implements PlayerController {
     static final long TICK_MS = 250L;
 
     private final MutableLiveData<PlaybackState> state = new MutableLiveData<>();
+    private final MutableLiveData<PlaybackOptions> options = new MutableLiveData<>(PlaybackOptions.DEFAULT);
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable tickTask = this::onTick;
     private final Random random = new Random(42);
@@ -281,5 +284,31 @@ public final class FakePlayerController implements PlayerController {
     @Override public void cancelSleepTimer() {
         sleepTimer = SleepTimer.OFF;
         publish();
+    }
+
+    // --- playback options ---------------------------------------------------------------------
+
+    @Override public LiveData<PlaybackOptions> getOptions() {
+        return options;
+    }
+
+    @Override public void setPlaybackSpeed(float speed) {
+        PlaybackOptions o = options.getValue();
+        options.setValue(new PlaybackOptions(PlaybackOptions.snap(speed), o.pitch(), o.skipSilence(), o.replayGain()));
+    }
+
+    @Override public void setPlaybackPitch(float pitch) {
+        PlaybackOptions o = options.getValue();
+        options.setValue(new PlaybackOptions(o.speed(), PlaybackOptions.snap(pitch), o.skipSilence(), o.replayGain()));
+    }
+
+    @Override public void setSkipSilence(boolean enabled) {
+        PlaybackOptions o = options.getValue();
+        options.setValue(new PlaybackOptions(o.speed(), o.pitch(), enabled, o.replayGain()));
+    }
+
+    @Override public void setReplayGainMode(ReplayGainMode mode) {
+        PlaybackOptions o = options.getValue();
+        options.setValue(new PlaybackOptions(o.speed(), o.pitch(), o.skipSilence(), mode));
     }
 }
