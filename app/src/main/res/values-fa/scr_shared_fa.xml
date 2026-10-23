@@ -1,0 +1,21 @@
+<resources>
+    <!-- Persian for strings owned by other modules (added by T3 together with values-fa; move into each owner's file later). -->
+    <string name="app_name">پخش‌کننده‌ی موسیقی</string>
+    <string name="placeholder_sections">بخش‌های خانه: %1$d</string>
+    <string name="mp_cd_seek">جابه‌جایی</string>
+    <string name="mp_seek_state">%1$s از %2$s</string>
+    <string name="mp_cd_play">پخش</string>
+    <string name="mp_cd_pause">مکث</string>
+    <string name="mp_cd_next">بعدی</string>
+    <string name="mp_cd_previous">قبلی</string>
+    <string name="mp_cd_more">گزینه‌های بیشتر</string>
+    <string name="mp_cd_explicit">صریح</string>
+    <string name="mp_cd_now_playing">در حال پخش</string>
+    <string name="mp_cd_open_player">باز کردن پخش‌کننده</string>
+    <string name="mp_nav_home">خانه</string>
+    <string name="mp_nav_search">جستجو</string>
+    <string name="mp_nav_library">کتابخانه</string>
+    <string name="mp_nav_settings">تنظیمات</string>
+    <string name="mp_track_missing">فایل پیدا نشد · برای حذف بزنید</string>
+    <string name="playback_channel_name">در حال پخش</string>
+</resources>
