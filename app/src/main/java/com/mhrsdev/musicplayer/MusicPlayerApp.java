@@ -2,10 +2,12 @@ package com.mhrsdev.musicplayer;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Trace;
 import com.mhrsdev.musicplayer.data.settings.BatterySaverMode;
 import com.mhrsdev.musicplayer.di.AppContainer;
+import com.mhrsdev.musicplayer.ui.settings.ThemeApplier;
 import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
 
 public class MusicPlayerApp extends Application {
@@ -19,6 +21,8 @@ public class MusicPlayerApp extends Application {
         // Cheap: one static write per change of the setting, no polling.
         container.settings().batterySaver().observeForever(mode -> MotionPolicy.setBatterySaverOverride(
                 mode == BatterySaverMode.AUTO ? null : mode == BatterySaverMode.ON));
+        // Below API 33 AppCompat keeps the chosen locale only in memory: re-apply the stored choice on every start.
+        if (Build.VERSION.SDK_INT < 33) ThemeApplier.applyLanguage(container.settings().language().getValue());
         registerActivityLifecycleCallbacks(new FirstActivityStart());
     }
 

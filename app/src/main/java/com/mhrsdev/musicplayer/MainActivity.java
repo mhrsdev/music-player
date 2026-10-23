@@ -1,10 +1,15 @@
 package com.mhrsdev.musicplayer;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -164,9 +169,23 @@ public class MainActivity extends AppCompatActivity
             miniTrackId = t.id();
             binding.mini.bind(t);
         }
+        if (s.playing()) askNotificationsOnce();
         binding.mini.setPlaying(s.playing());
         binding.mini.setBuffering(s.buffering());
         binding.mini.setProgress(s.positionMs(), s.durationMs());
+    }
+
+    private final ActivityResultLauncher<String> notificationPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> { });
+
+    /** Android 13+: the media notification needs it. Asked once, on the first play; playback works if denied. */
+    private void askNotificationsOnce() {
+        if (Build.VERSION.SDK_INT < 33 || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED || PermissionPrefs.notificationsAsked(this)) {
+            return;
+        }
+        PermissionPrefs.markNotificationsAsked(this);
+        notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
     }
 
     // ---- ScreenNavigator ----
@@ -266,6 +285,8 @@ public class MainActivity extends AppCompatActivity
         if (!permissionFlow) return;
         permissionFlow = false;
         PermissionPrefs.markSkipped(this);
+        // "Choose folders" also ends the flow without the grant: only scan when access really exists.
+        if (AudioPermission.granted(this)) ((MusicPlayerApp) getApplication()).getContainer().onAudioPermissionGranted();
         binding.chrome.setVisibility(View.VISIBLE);
         binding.bottomScrim.setVisibility(View.VISIBLE);
         showTab(Tab.HOME);
@@ -275,6 +296,14 @@ public class MainActivity extends AppCompatActivity
     private static final class PermissionPrefs {
         static boolean skipped(android.content.Context c) {
             return c.getSharedPreferences("nav", MODE_PRIVATE).getBoolean("perm_done", false);
+        }
+
+        static boolean notificationsAsked(android.content.Context c) {
+            return c.getSharedPreferences("nav", MODE_PRIVATE).getBoolean("notif_asked", false);
+        }
+
+        static void markNotificationsAsked(android.content.Context c) {
+            c.getSharedPreferences("nav", MODE_PRIVATE).edit().putBoolean("notif_asked", true).apply();
         }
 
         static void markSkipped(android.content.Context c) {
