@@ -27,6 +27,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - 🔄 **T1** [Sonnet] Scaffold project — agent launched 2026-10-23 (on branch `ccr-b49e5e2a-53r8m3`).
 
 ### Todo
+- 🔄 **T2a** [Opus] Design phase: hi-fi mockups (PNG) of all key screens + media notification/widget + design spec; owner reviews in chat BEFORE implementation T2–T4.
 - ~~T1~~ (moved to In progress) Scaffold Gradle project (app module, version catalog, Compose + M3 Expressive, Media3, Room, DI), Android SDK setup, `./gradlew assembleDebug` works, domain models/interfaces per ARCHITECTURE.md, in-memory fakes with sample data, CI workflow (GitHub Actions build + lint + unit tests).
 - ⬜ **T2** [Opus] UI foundation: theme (M3 Expressive, dynamic color from artwork, dark/light/AMOLED), shared components (floating pill nav, wavy slider, morphing play button, hero carousel, track row, artwork w/ placeholder), navigation shell.
 - ⬜ **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings (against fakes).
@@ -42,6 +43,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D3 archived (Melodiha refs saved). Design phase T2a launched (Opus); mockups to be shown to owner in chat before UI implementation.
 - 2026-10-23: D2 archived: design-atelier skill installed in `.claude/skills/`; T2–T4 briefs must cite it and the "similar to reference, but prettier" target.
 - 2026-10-23: T0 bootstrap committed to `main` + working branch; directive D1 archived.
 - 2026-10-23: T1 delegated to Sonnet sub-agent. T2–T4 (UI, Opus) start after T1 lands contracts; T5–T7 (Sonnet) can run in parallel with UI once contracts exist.

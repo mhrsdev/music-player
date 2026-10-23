@@ -48,3 +48,19 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Summary:**
 1. Use the attached **design-atelier** skill for all design work → installed at `.claude/skills/design-atelier/`.
 2. The built UI must be **similar to the reference screenshots, but more beautiful** (same structure/language, higher polish — not a different design).
+
+---
+
+## D3 — 2026-10-23 — Second reference (Melodiha) + design deliverable in chat
+
+**Original (verbatim):**
+
+> (2 screenshots attached) این مثلا ملودیغای هستش
+> ببین چه دیزاین باحالی داره
+> میخوام مال من معرکه باشه
+> دیزاین انجام شد عکسهاشو تو چت برام بزار
+
+**Summary:**
+1. Screenshots are of the app **"Melodiha"** (Persian music app): media notification in the shade (artwork-tinted deep-red card, **waveform-style progress** with thumb, round prev/pause/next buttons, device name) and the lock-screen media pill (waveform at the bottom edge). Saved as `docs/design-reference/07-*.jpg`, `08-*.jpg`. Persian/RTL is first-class.
+2. Owner finds this design very cool and wants **ours to be outstanding ("معرکه")**.
+3. **Do the design phase now and show the design images in the chat** (owner reviews visually before implementation).
