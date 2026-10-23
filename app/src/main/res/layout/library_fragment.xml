@@ -67,16 +67,12 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <ImageButton
+            <com.mhrsdev.musicplayer.ui.widget.MorphPlayPauseView
                 android:id="@+id/liked_play"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
                 android:layout_gravity="end|bottom"
-                android:layout_margin="16dp"
-                android:background="@drawable/library_liked_play"
-                android:contentDescription="@string/library_play_liked"
-                android:src="@drawable/nav_ic_play"
-                app:tint="#1A1300" />
+                android:layout_margin="16dp" />
         </FrameLayout>
 
         <Space android:layout_width="match_parent" android:layout_height="16dp" />

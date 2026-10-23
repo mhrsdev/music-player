@@ -50,12 +50,13 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 
 
-- 🔄 **P1** [Opus] Polish: fonts (Vazirmatn + v1 Latin), liked-card collage, multi-browse carousel, morph play buttons, skeletons; render screens to PNG. Branch `task/p1-polish-home`, worktree `../wt-p1`.
 - 🔄 **P2** [Opus] Polish: light player + contrast guard, lyrics offline/Retry, shared-element-like transition, real output chip, add-to-playlist sheet; render player PNGs. Branch `task/p2-polish-player`, worktree `../wt-p2`.
 
 - 🔄 **R1** [Sonnet+ponytail] Release engineering: signing config, tag-triggered release workflow, README (en+fa) + CHANGELOG, APK build/verify. Branch `task/r1-release`, worktree `../wt-r1`.
 
 - 🔄 **F1** [Sonnet+ponytail] Functional integration audit of the critical user flows (first-run permission→scan, notification permission, play from every list, mini→full player, restore, settings) + fixes. Branch `task/f1-flows`, worktree `../wt-f1`.
+
+- 🔄 **P3** [Opus] Library/Home layout gaps (collage, 2×2 grid, snap carousel, skeletons, search/artists, per-script font). Branch `task/p3-polish-library`, worktree `../wt-p3`.
 
 ### Todo
 **Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
@@ -72,6 +73,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **P1** [Opus] Polish merged: bundled fonts (Google Sans Flex subset 110 KB + Vazirmatn 114 KB, OFL notices in assets/licenses), v1 type ramp, morph play buttons on Home/Library, Persian-in-English subtitle fix, Robolectric screen renders (`docs/screens/p1-*.png`, `ScreenRenderTest` + `FakeRenderApp`). Not done (→ P3): liked collage, 2×2 library grid, carousel snap, skeletons, search/artist polish, per-script font.
 - ✅ **T8** [Sonnet+ponytail] Wiring merged: `AppContainer` real impls by default (`USE_FAKES` switch), `LibraryAdmin`, SqliteWaveformStore as WaveformStore, SqliteLyricsCacheStore (DB v3), single SettingsStore (battery-saver/sleep-default/seek-style/online-lyrics now consumed), deterministic history order (fixes flaky test), manifest perms (READ_MEDIA_AUDIO, READ_EXTERNAL_STORAGE ≤32, INTERNET), debug+release+test+lint green (agent-reported). **Supervisor found a gap:** nothing calls `AppContainer.onAudioPermissionGranted()` → first scan after in-app permission grant never runs → F1.
 - ✅ **T2** [Opus] UI foundation merged (design v1 tokens): `ui/theme` (Tokens, ThemeController, AccentScheme w/ 4.5:1 guard, ColorExtractor, MotionPolicy), `ui/widget` (SeekBarView + Wavy/Waveform/Bars, MorphPlayPauseView, FloatingNavView, MiniPlayerView, ArtworkView/Loader, BackdropBlur, ChipView, SectionHeaderView, TrackRowView), 26 icons, debug WidgetGalleryActivity + Robolectric render test → `docs/screens/t2-widget-gallery-*.png` (real render from Android code). Gaps: fonts not bundled (system sans), LoadingIndicator, grain, hand-drawn 10-lobe cookie, device run.
 - ✅ **T3** [Opus] Screens merged (design v1): `ui/nav`+MainActivity shell (PlayerNavigator, ScreenNavigator, permission first-run), Home, Search, Library hub + detail lists + grids, Settings (PrefsSettingsStore), en+fa strings, VM tests. After merge supervisor re-ran `:app:assembleDebug test lint` → green. Gaps: liked-card collage, multi-browse carousel, plain play circles on Home/Library, system fonts, no skeletons/add-to-playlist dialog, folder picker not implemented; settings (battery-saver/seek-style/online-lyrics/sleep-default) not yet read by consumers → T8. Duplicate SettingsStore (ui vs data) → T8 reconciles.
@@ -87,6 +89,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D15: MIT license added (LICENSE); README license section to say MIT.
 - 2026-10-23: D14: owner wants a GitHub release now + README OK + main fully updated; then full-featured version. Release agent R1 launched (signing, release workflow, README/CHANGELOG, APK build).
 - 2026-10-23: T2 merged; P1/P2 polish agents launched (deadline ~19:28 UTC). Remaining: T8 finish, T9 QA (after T8), merge to main.
 - 2026-10-23: T3, T4 merged; ccr green (build+test+lint, supervisor-run). T2 widget gallery PNGs rendered from real Android code (docs/screens/) and sent to owner.

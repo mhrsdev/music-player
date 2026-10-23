@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- 48dp icon button with a circular ripple; tint with app:tint / android:tint per screen. -->
     <style name="Widget.MusicPlayer.IconButton" parent="">
         <item name="android:layout_width">@dimen/mp_touch_target</item>
@@ -12,32 +12,66 @@
         <item name="android:tint">?attr/mpOnSurfaceVariant</item>
     </style>
 
+    <!-- v1 type ramp (DESIGN.md section 3): Google Sans Flex (Latin) / Vazirmatn (font-fa) via @font/mp_sans.
+         The weight picks a variable-font instance from mp_sans.xml; API 26-27 fall back to textStyle. -->
     <style name="TextAppearance.MusicPlayer.Display" parent="">
         <item name="android:textSize">@dimen/mp_text_display</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">600</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
     </style>
     <style name="TextAppearance.MusicPlayer.Headline" parent="">
         <item name="android:textSize">@dimen/mp_text_headline</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">?attr/mpOnSurface</item>
+    </style>
+    <style name="TextAppearance.MusicPlayer.Lyrics" parent="">
+        <item name="android:textSize">@dimen/mp_text_lyrics</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
     </style>
     <style name="TextAppearance.MusicPlayer.Title" parent="">
         <item name="android:textSize">@dimen/mp_text_title</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
     </style>
     <style name="TextAppearance.MusicPlayer.Body" parent="">
         <item name="android:textSize">@dimen/mp_text_body</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">400</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurface</item>
     </style>
     <style name="TextAppearance.MusicPlayer.Supporting" parent="">
         <item name="android:textSize">@dimen/mp_text_supporting</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">400</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurfaceVariant</item>
     </style>
     <style name="TextAppearance.MusicPlayer.Label" parent="">
         <item name="android:textSize">@dimen/mp_text_label</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/mp_sans</item>
+        <item name="android:textFontWeight" tools:targetApi="28">500</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?attr/mpOnSurfaceVariant</item>
+    </style>
+    <!-- Durations, counts and times: tabular figures so columns do not jitter. -->
+    <style name="TextAppearance.MusicPlayer.Numeric" parent="TextAppearance.MusicPlayer.Supporting">
+        <item name="android:fontFeatureSettings">tnum</item>
     </style>
 </resources>
