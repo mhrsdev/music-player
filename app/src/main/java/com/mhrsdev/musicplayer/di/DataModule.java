@@ -1,6 +1,8 @@
 package com.mhrsdev.musicplayer.di;
 
 import android.content.Context;
+import com.mhrsdev.musicplayer.BuildConfig;
+import com.mhrsdev.musicplayer.data.backup.SqliteBackupService;
 import com.mhrsdev.musicplayer.data.db.DbHelper;
 import com.mhrsdev.musicplayer.data.repository.ChangeNotifier;
 import com.mhrsdev.musicplayer.data.repository.LocalHomeFeedSource;
@@ -28,6 +30,9 @@ public final class DataModule {
     /** Persistent waveform cache, ready to hand to {@code WaveformModule} (blocking calls, background thread). */
     public final SqliteWaveformStore waveformStore;
 
+    /** User-data export / import over the same database and settings. */
+    public final SqliteBackupService backup;
+
     private DataModule(Context context, Executor io, Executor scanIo, SettingsStore settings) {
         dbHelper = new DbHelper(context);
         this.settings = settings;
@@ -37,6 +42,7 @@ public final class DataModule {
         homeFeed = new LocalHomeFeedSource(dbHelper, io, notifier);
         browser = new SqliteLibraryBrowser(dbHelper, io, notifier, context.getContentResolver());
         waveformStore = new SqliteWaveformStore(dbHelper);
+        backup = new SqliteBackupService(dbHelper, io, notifier, settings, BuildConfig.VERSION_NAME, System::currentTimeMillis);
     }
 
     /**
