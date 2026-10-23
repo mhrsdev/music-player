@@ -114,7 +114,8 @@ public final class PlayerFragment extends Fragment {
         vm.getCurrentTrack().observe(getViewLifecycleOwner(), this::renderTrack);
         vm.getLiked().observe(getViewLifecycleOwner(), this::renderLiked);
         // Wavy ignores the envelope: don't extract it (CPU/battery) unless the chosen style draws it.
-        if (!(seek instanceof WavySeekView)) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
+        // (WaveformSeekView extends WavySeekView, so compare the exact class.)
+        if (seek.getClass() != WavySeekView.class) vm.getWaveform().observe(getViewLifecycleOwner(), w -> seek.setWaveform(w));
         vm.getShowLyrics().observe(getViewLifecycleOwner(), this::renderStage);
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
@@ -219,7 +220,8 @@ public final class PlayerFragment extends Fragment {
                 if (item.getItemId() == 1) vm.toggleLyrics();
                 else if (item.getItemId() == 4 && current != null)
                     com.mhrsdev.musicplayer.ui.playlist.AddToPlaylistSheet.show(getParentFragmentManager(), current);
-                else b.playerQueue.performClick(); // sleep timer lives in the queue sheet (design v1, 07)
+                else if (item.getItemId() == 3) com.mhrsdev.musicplayer.ui.queue.SleepTimerSheet.show(getParentFragmentManager());
+                else b.playerQueue.performClick();
                 return true;
             });
             menu.show();
@@ -553,13 +555,19 @@ public final class PlayerFragment extends Fragment {
         }
         b.lyricsRetry.setVisibility(View.GONE);
         b.lyricsMessage.setVisibility(View.GONE);
-        if (b.lyricsList.getVisibility() != View.VISIBLE) crossfade(b.lyricsList, true);
-        if (b.lyricsList.getTag() != l) {
+        boolean appearing = b.lyricsList.getVisibility() != View.VISIBLE;
+        if (appearing) crossfade(b.lyricsList, true);
+        boolean fresh = b.lyricsList.getTag() != l;
+        if (fresh) {
             b.lyricsList.setTag(l);
             lyricsAdapter.setLyrics(l);
             Integer active = vm.getActiveLyricLine().getValue();
-            renderActiveLine(active);
+            lyricsAdapter.setActive(active == null ? -1 : active);
             if (!l.synced()) b.lyricsList.scrollToPosition(0);
+        }
+        // Opening lyrics (or a new song's text) jumps straight to the current line instead of scrolling from the top.
+        if ((appearing || fresh) && l.synced()) {
+            b.lyricsList.post(() -> { if (b != null) scrollToLine(lyricsAdapter.getActive(), false); });
         }
     }
 
