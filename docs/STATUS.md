@@ -105,6 +105,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - Online (needs owner decision, K2): legal catalog provider.
 
 ## Change log
+- 2026-10-23: **v0.1.0 pre-release is LIVE** on GitHub (Release workflow run #1 success; https://github.com/mhrsdev/music-player/releases/tag/v0.1.0). Owner chose signing key in Secrets (D17); keystore generated + sent to owner (not committed). Owner sent first real-device screenshot with bugs → routed to U1/U3/E (see D17). Phase 2 agents running.
 - 2026-10-23: **ccr → main fast-forward; tag v0.1.0 pushed** (release workflow builds the GitHub pre-release; APK also sent to owner in chat). Phase 2 (full-featured version) next, see backlog.
 - 2026-10-23: everything merged into ccr (green full build). Next: ccr → main (fast-forward), tag v0.1.0 (pre-release via Actions), APK sent to owner. Then phase 2 (backlog above).
 - 2026-10-23: D15: MIT license added (LICENSE); README license section to say MIT.
