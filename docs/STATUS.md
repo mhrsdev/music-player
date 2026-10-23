@@ -37,13 +37,13 @@ _Last updated: 2026-10-23 — D8: parallel agents + ponytail skill + UI/RAM/batt
 
 ## Open questions for the owner
 0. ~~Q-J~~ **ANSWERED (D7): Java only, no Kotlin.** Residual assumption for owner: "کوعری ها رو مرتب بزن" was read as "keep DB queries tidy".
+D-A. Persian: keep transport + seek bar LTR (default yes). D-B. Default seek bar (rec. Wavy). D-C. App name/icon (placeholder 'Music Player', arch + 3 bars). D-E. Lyrics centered (default) or start-aligned? D-F. Liked = saffron everywhere or cover color in player?
 1. Online catalog (Home "New releases", search of songs not on device): keep Phase 1 local-only, or the owner picks a legal provider/API (e.g. own backend, Jamendo, Audius)? Default until answered: local-only + pluggable interface.
 
 ## Task board
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
-- 🔄 **T2b** [Opus] Design revision for Java/Views: less stock-Material/Google look, own identity, custom-drawn controls; update `docs/design/DESIGN.md` + re-render PNGs; show owner in chat and get OK. Branch `task/t2b-design-revision`.
 
 
 - 🔄 **T5** [Sonnet + ponytail] Data layer (SQLite DB + MediaStore scanner + repos + settings). Branch `task/t5-data-java`, worktree `../wt-t5`.
@@ -71,6 +71,7 @@ Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room
 Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform` — algorithms (LRC parsing, RMS extraction) may be ported to Java by reading them.
 
 ### Done
+- ✅ **T2b** [Opus] Design v2 merged: `docs/design/DESIGN.md` v2 + 18 PNGs (new `17-player-bars.png`). Own identity (Readex Pro + Vazirmatn, 42 custom icons, Persian arch/tile language, 'Deck' = mini-player+nav, lamp controls, 3 real-loudness seek bars, 'Still' low-power mode, 64px pre-blurred backdrop, ≤30 fps wave only while playing+visible). Screenshots sent to owner in chat. Not verified: any Android run; not mocked: tablet/landscape, overflow menus, sleep-timer sheet, permission-denied states. **Open owner questions D-A..D-F** (see below).
 - ✅ **T-W** [Sonnet+ponytail] Waveform extractor merged: `data/waveform` (WaveformMath, SamplingPlan sparse windows ~25% decode, EnvelopeBuilder, WaveformExtractor MediaCodec glue, WaveformStore + in-memory/file impls, WaveformRepositoryImpl with lazy/observer-driven work + battery-saver skip, `di/WaveformModule`), 45 JVM tests, build green (agent-reported). NOT verified: MediaCodec decode on a real device. T8 should bind `WaveformStore` to SQLite and call `prefetch(next track)`.
 - ✅ **T1b** [Sonnet+ponytail] Java scaffold merged into the working branch. Gradle 9.0.0 + **AGP 8.13.2** (AGP 9.x needs Gradle ≥ 9.1; tried 9.0.1 → refused), compileSdk/targetSdk 37 (suppressUnsupportedCompileSdk), minSdk 26, Java records for models, LiveData contracts + `Callback<T>`, fakes (37 tracks / 7 artists / 8 albums), `AppContainer`, `DbHelper` skeleton, 24 JVM tests, R8 release builds. **Supervisor re-ran `:app:assembleDebug test lint` → green; 0 `.kt/.kts` files.** Not verified: device run, GitHub Actions.
 - ✅ **T2a** [Opus] Design phase: 17 PNG mockups in `docs/design/png/` + spec `docs/design/DESIGN.md` (sources in `docs/design/src/`). Sent to owner in chat. **Approved by owner (D4).** Not verified: nothing runs on Android (browser mockups); notification/lock-screen is approximate; Persian copy needs native check; not mocked: tablet, overflow menus, sleep-timer sheet, permission-denied state.
@@ -78,6 +79,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: T2b done + merged; PNGs sent to owner in chat; owner feedback to be applied as follow-up to T2/T3/T4.
 - 2026-10-23: D12 archived: 1-hour budget, up to 8 agents. Launched T2/T3/T4 (Opus) in parallel on WIP design v2; T2b asked to wrap up and report.
 - 2026-10-23: T1b merged into ccr-b49e5e2a-53r8m3 (reviewed: build green, no Kotlin). T-W launched → 5 agents running (T2b, T5, T6, T7, T-W).
 - 2026-10-23: D11 archived: up to 5 parallel agents; design screenshots go to the owner in chat when T2b is complete. Launched T5, T6, T7 on top of T1b contracts (origin/task/t1b-java-scaffold).
