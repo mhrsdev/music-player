@@ -1,0 +1,25 @@
+/* Home (HomeFragment). Shared by 01, 08, 10, 14. */
+.glow { position: absolute; left: -140px; top: -170px; width: 700px; height: 660px; z-index: 0; pointer-events: none;
+  background: radial-gradient(closest-side at 38% 46%, rgba(var(--glow),.40), rgba(var(--glow),.11) 55%, rgba(var(--glow),0) 100%); }
+[dir="rtl"] .glow { left: auto; right: -140px; background: radial-gradient(closest-side at 62% 46%, rgba(var(--glow),.40), rgba(var(--glow),.11) 55%, rgba(var(--glow),0) 100%); }
+.content { position: absolute; inset: 40px 0 0 0; z-index: 2; }
+.hello { display: flex; align-items: center; justify-content: space-between; padding: 14px 12px 0 20px; height: 60px; }
+[dir="rtl"] .hello { padding: 14px 20px 0 12px; }
+.hello .mark { display: flex; align-items: center; gap: 10px; }
+.hello .mark .g { color: var(--accent); }
+.car { position: relative; height: 264px; margin-top: 4px; }
+.car > .art { position: absolute; top: 0; height: 264px; }
+.car .playd { position: absolute; right: 14px; bottom: 14px; width: 56px; height: 56px; }
+[dir="rtl"] .car .playd { right: auto; left: 14px; }
+.cap { padding: 12px 20px 0; width: 300px; }
+.mixes { display: flex; gap: 10px; padding: 0 20px; margin-top: 6px; }
+.mix { position: relative; width: 166px; flex: none; }
+.mix .rec { position: absolute; left: 44px; top: 7px; width: 122px; height: 122px; border-radius: 50%;
+  background: radial-gradient(circle, var(--lab) 0 15px, #0c0c10 15.5px 17px, transparent 17.5px), repeating-radial-gradient(circle, #15161c 0 1.4px, #2a2c36 1.4px 2.2px, #15161c 2.2px 3.4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06); }
+.mix .rec::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 20deg, transparent 0 30deg, rgba(255,255,255,.16) 50deg, transparent 75deg 200deg, rgba(255,255,255,.10) 225deg, transparent 250deg); }
+[dir="rtl"] .mix .rec { left: auto; right: 44px; }
+.mix > .art { position: relative; width: 136px; height: 136px; box-shadow: 6px 0 16px -4px rgba(0,0,0,.55); }
+[dir="rtl"] .mix > .art { box-shadow: -6px 0 16px -4px rgba(0,0,0,.55); }
+.mix .t-title { margin-top: 10px; }
+.theme-light .mix .rec { box-shadow: 0 6px 14px rgba(40,46,70,.22); }
