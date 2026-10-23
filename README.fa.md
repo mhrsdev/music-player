@@ -2,6 +2,12 @@
 
 # Music Player (اندروید)
 
+<div dir="ltr">
+
+![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Pre-release v0.1.0](https://img.shields.io/badge/release-v0.1.0%20pre--release-orange)
+
+</div>
+
 یک **پخش‌کنندهٔ موسیقی محلی**، سریع و کم‌مصرف برای اندروید، با هویت بصری اختصاصی، متن آهنگ همگام (synced lyrics)، سه سبک seek bar و پشتیبانی کامل از فارسی و RTL.
 
 > **وضعیت: پیش‌انتشار (pre-release) `v0.1.0`.** پروژه build می‌شود و unit testها پاس می‌شوند، اما تا الان فقط با تست‌های JVM و رندرهای Robolectric بررسی شده است؛
@@ -199,7 +205,7 @@ docs/                              ARCHITECTURE, DESIGN, STATUS, screenshots, de
 
 - **روی دستگاه واقعی تأیید نشده**: اسکن MediaStore روی کتابخانهٔ واقعی، نوتیفیکیشن / lock screen / بلوتوث، شروع foreground service در اندروید ۱۴+، استخراج waveform با MediaCodec و مصرف باتری. ظاهر فقط از راه رندرهای Robolectric بررسی شده است.
 - APK نسخهٔ release با کلید debug امضا شده (بخش «نصب»)؛ آپدیت خودکار ندارد.
-- متن‌های فارسی را فارسی‌زبان بومی بازبینی نکرده است؛ فونت‌های Google Sans Flex و Vazirmatn داخل پروژه‌اند - پیش از بازتوزیع مجوزشان را بررسی کنید.
+- متن‌های فارسی را فارسی‌زبان بومی بازبینی نکرده است.
 - در دسترس بودن LRCLIB دست ما نیست (هنگام توسعه گاهی 503 داده است).
 - هنوز نمی‌توان از UI پلی‌لیست ساخت یا آهنگ اضافه کرد؛ ردیف پوشه‌ها در Settings فقط نمایشی است.
 - کاتالوگ آنلاین یا streaming وجود ندارد: برنامه فقط فایل‌های روی دستگاه را پخش می‌کند.
@@ -210,6 +216,9 @@ docs/                              ARCHITECTURE, DESIGN, STATUS, screenshots, de
 
 ## مجوز (License)
 
-**هنوز مجوزی انتخاب نشده - تا زمانی که مالک مجوزی انتخاب کند، همهٔ حقوق محفوظ است.**
+منتشرشده با [مجوز MIT](LICENSE) - Copyright (c) 2026 mhrsdev.
+
+فونت‌های داخل پروژه (Google Sans Flex و Vazirmatn) تحت مجوز SIL Open Font License 1.1 هستند؛ به
+[`app/src/main/assets/licenses/FONTS-NOTICE.txt`](app/src/main/assets/licenses/FONTS-NOTICE.txt) مراجعه کنید.
 
 </div>

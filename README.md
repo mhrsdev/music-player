@@ -1,5 +1,7 @@
 # Music Player (Android)
 
+![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Pre-release v0.1.0](https://img.shields.io/badge/release-v0.1.0%20pre--release-orange)
+
 A fast, battery-friendly **local-library music player** for Android with its own visual identity, synced lyrics,
 three seek-bar styles and first-class Persian / RTL support.
 
@@ -199,7 +201,7 @@ in query classes), clean packages, Gradle 9.0.0. Battery and RAM use are hard re
 - **Not verified on a real device**: MediaStore scan on real libraries, notification / lock screen / Bluetooth, foreground-service
   start on Android 14+, MediaCodec waveform extraction, battery drain. Visuals are verified only through Robolectric renders.
 - The release APK is debug-signed (see Install); no automatic updates.
-- Persian copy has not been reviewed by a native speaker; fonts (Google Sans Flex, Vazirmatn) are bundled - check their licenses before redistributing.
+- Persian copy has not been reviewed by a native speaker.
 - LRCLIB availability is outside our control (it returned occasional 503s during development).
 - Playlists cannot yet be created / filled from the UI; the folder row in Settings is display-only.
 - No online catalog or streaming: the app plays files on the device only.
@@ -211,4 +213,7 @@ picker, tablet / landscape layouts, crossfade, tag editing, signed releases with
 
 ## License
 
-**No license chosen yet - all rights reserved until the owner picks one.**
+Released under the [MIT License](LICENSE) - Copyright (c) 2026 mhrsdev.
+
+The bundled fonts (Google Sans Flex, Vazirmatn) are under the SIL Open Font License 1.1; see
+[`app/src/main/assets/licenses/FONTS-NOTICE.txt`](app/src/main/assets/licenses/FONTS-NOTICE.txt).

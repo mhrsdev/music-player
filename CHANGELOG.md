@@ -17,6 +17,9 @@ Pre-release (first installable build). Not tested on a physical device yet - exp
 - Battery saver mode (no motion, blur or grain) and reduced-motion support.
 - Release build with R8 + resource shrinking, signed with the Android **debug** key unless a release keystore is configured.
 
+### License
+- MIT (see `LICENSE`). Bundled fonts (Google Sans Flex, Vazirmatn) are SIL OFL 1.1 (`app/src/main/assets/licenses/FONTS-NOTICE.txt`).
+
 ### Not included yet
 - Equalizer, home-screen widget, Android Auto, Chromecast, crossfade/gapless tuning, tag editor.
 - Music-folder picker (the setting shows "All folders"; the scanner supports folder filters but there is no UI yet).
