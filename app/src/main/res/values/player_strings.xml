@@ -41,4 +41,23 @@
     <string name="queue_sleep_chip_end">End of track</string>
     <string name="queue_now_playing">Now playing</string>
     <string name="queue_sleep_preset_short">%1$s min</string>
+    <string name="player_output_headphones">Headphones</string>
+    <string name="player_output_bluetooth">Bluetooth</string>
+    <string name="player_output_usb">USB audio</string>
+    <string name="player_output_cd">Audio output: %1$s</string>
+    <string name="player_add_to_playlist">Add to playlist</string>
+    <string name="lyrics_offline">You\'re offline</string>
+    <string name="lyrics_offline_hint">Connect to the internet to look for lyrics.</string>
+    <string name="lyrics_retry">Retry</string>
+    <string name="playlist_add_title">Add to playlist</string>
+    <string name="playlist_new_hint">New playlist name</string>
+    <string name="playlist_create">Create</string>
+    <string name="playlist_name_required">Enter a name</string>
+    <string name="playlist_none">No playlists yet. Create one above.</string>
+    <string name="playlist_add_to">Add to %1$s</string>
+    <string name="playlist_added">Added to %1$s</string>
+    <plurals name="playlist_track_count">
+        <item quantity="one">%d song</item>
+        <item quantity="other">%d songs</item>
+    </plurals>
 </resources>

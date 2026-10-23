@@ -41,4 +41,23 @@
     <string name="queue_sleep_chip_end">پایان آهنگ</string>
     <string name="queue_now_playing">در حال پخش</string>
     <string name="queue_sleep_preset_short">%1$s دقیقه</string>
+    <string name="player_output_headphones">هدفون</string>
+    <string name="player_output_bluetooth">بلوتوث</string>
+    <string name="player_output_usb">صدای USB</string>
+    <string name="player_output_cd">خروجی صدا: %1$s</string>
+    <string name="player_add_to_playlist">افزودن به فهرست پخش</string>
+    <string name="lyrics_offline">اتصال اینترنت برقرار نیست</string>
+    <string name="lyrics_offline_hint">برای یافتن متن ترانه به اینترنت وصل شوید.</string>
+    <string name="lyrics_retry">تلاش دوباره</string>
+    <string name="playlist_add_title">افزودن به فهرست پخش</string>
+    <string name="playlist_new_hint">نام فهرست پخش تازه</string>
+    <string name="playlist_create">ساختن</string>
+    <string name="playlist_name_required">یک نام وارد کنید</string>
+    <string name="playlist_none">هنوز فهرست پخشی ندارید. بالا یکی بسازید.</string>
+    <string name="playlist_add_to">افزودن به %1$s</string>
+    <string name="playlist_added">به %1$s افزوده شد</string>
+    <plurals name="playlist_track_count">
+        <item quantity="one">%d آهنگ</item>
+        <item quantity="other">%d آهنگ</item>
+    </plurals>
 </resources>

@@ -5,7 +5,6 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
-import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -66,6 +65,8 @@ public final class PlayerFragment extends Fragment {
     @Nullable private String paletteTrackId;
     private boolean scrubbing;
     private final Runnable resumeAutoScroll = this::onAutoScrollResume;
+    @Nullable private OutputRoute outputRoute;
+    private boolean light;
 
     public static PlayerFragment newInstance() { return new PlayerFragment(); }
 
@@ -101,9 +102,13 @@ public final class PlayerFragment extends Fragment {
                 v.post(() -> { if (b != null) b.playerArtwork.setLayoutParams(lp); });
             }
         });
+        light = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                != android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        applyThemeColors();
         setupControls();
         setupLyrics();
         setupSwipeToCollapse();
+        applyPalette(palette, null, false); // theme-correct accents before the first track arrives
 
         vm.getState().observe(getViewLifecycleOwner(), this::render);
         vm.getCurrentTrack().observe(getViewLifecycleOwner(), this::renderTrack);
@@ -135,17 +140,54 @@ public final class PlayerFragment extends Fragment {
         }
     }
 
-    /** Cheap container-transform-like entry from the mini-player: rise + fade, cover scales up (no bitmap snapshot). */
+    /**
+     * Shared-element-like entry from the mini-player, cheaply: the player cover starts exactly over the mini-player's
+     * artwork (translation + scale of the same ArtworkView, no bitmap copy) and flies to its slot with one
+     * ViewPropertyAnimator while the rest of the content rises and fades in.
+     */
     private void playEnterTransition() {
         View content = b.playerContent;
         content.setAlpha(0f);
         content.setTranslationY(dp(72));
         content.animate().alpha(1f).translationY(0f).setDuration(380)
                 .setInterpolator(new DecelerateInterpolator(2.2f)).start();
-        b.playerArtwork.setScaleX(0.86f);
-        b.playerArtwork.setScaleY(0.86f);
-        b.playerArtwork.animate().scaleX(1f).scaleY(1f).setDuration(450)
-                .setInterpolator(new DecelerateInterpolator(2f)).start();
+        View art = b.playerArtwork;
+        art.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener() {
+            @Override public boolean onPreDraw() {
+                art.getViewTreeObserver().removeOnPreDrawListener(this);
+                if (b == null) return true;
+                View mini = miniArtwork();
+                int[] from = new int[2], to = new int[2];
+                if (mini != null && mini.isShown() && mini.getWidth() > 0 && art.getWidth() > 0) {
+                    mini.getLocationOnScreen(from);
+                    art.getLocationOnScreen(to);
+                    float scale = mini.getWidth() / (float) art.getWidth();
+                    // content is translated by 72 dp at this point; undo it so the cover starts on the mini art
+                    art.setPivotX(0f);
+                    art.setPivotY(0f);
+                    art.setScaleX(scale);
+                    art.setScaleY(scale);
+                    art.setTranslationX(from[0] - to[0]);
+                    art.setTranslationY(from[1] - to[1]);
+                    art.animate().scaleX(1f).scaleY(1f).translationX(0f).translationY(0f).setDuration(420)
+                            .setInterpolator(new android.view.animation.PathInterpolator(0.2f, 0f, 0f, 1f))
+                            .withEndAction(() -> { art.setPivotX(art.getWidth() / 2f); art.setPivotY(art.getHeight() / 2f); })
+                            .start();
+                } else {
+                    art.setScaleX(0.86f);
+                    art.setScaleY(0.86f);
+                    art.animate().scaleX(1f).scaleY(1f).setDuration(450)
+                            .setInterpolator(new DecelerateInterpolator(2f)).start();
+                }
+                return true;
+            }
+        });
+    }
+
+    @Nullable private View miniArtwork() {
+        View mini = requireActivity().findViewById(R.id.mini);
+        return mini instanceof com.mhrsdev.musicplayer.ui.widget.MiniPlayerView
+                ? ((com.mhrsdev.musicplayer.ui.widget.MiniPlayerView) mini).getArtworkView() : null;
     }
 
     private void setupControls() {
@@ -171,8 +213,12 @@ public final class PlayerFragment extends Fragment {
             menu.getMenu().add(0, 1, 0, lyrics ? R.string.player_show_cover : R.string.player_show_lyrics);
             menu.getMenu().add(0, 2, 1, R.string.player_queue);
             menu.getMenu().add(0, 3, 2, R.string.player_sleep_timer);
+            Track current = vm.getCurrentTrack().getValue();
+            if (current != null) menu.getMenu().add(0, 4, 3, R.string.player_add_to_playlist);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) vm.toggleLyrics();
+                else if (item.getItemId() == 4 && current != null)
+                    com.mhrsdev.musicplayer.ui.playlist.AddToPlaylistSheet.show(getParentFragmentManager(), current);
                 else b.playerQueue.performClick(); // sleep timer lives in the queue sheet (design v1, 07)
                 return true;
             });
@@ -201,6 +247,7 @@ public final class PlayerFragment extends Fragment {
         });
         b.lyricsList.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.lyricsList.setAdapter(lyricsAdapter);
+        lyricsAdapter.setTextColor(light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK);
         b.lyricsList.setItemAnimator(null);
         b.lyricsList.addOnLayoutChangeListener((v, l, t, r, bt, ol, ot, or, ob) -> {
             int h = bt - t;
@@ -217,6 +264,80 @@ public final class PlayerFragment extends Fragment {
             }
         });
         b.lyricsBackToCurrent.setOnClickListener(v -> onAutoScrollResume());
+        b.lyricsRetry.setOnClickListener(v -> {
+            b.lyricsRetry.setVisibility(View.GONE);
+            b.lyricsMessageTitle.setText(R.string.lyrics_loading);
+            b.lyricsMessageBody.setText(null);
+            vm.retryLyrics();
+        });
+    }
+
+    /** Dark (05) or light (15) player: text/icon colors over the backdrop; the backdrop's guard keeps the contrast. */
+    private void applyThemeColors() {
+        int text = light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK;
+        int rgb = text & 0x00FFFFFF;
+        b.playerRoot.setBackgroundColor(light ? 0xFFF7F9FF : 0xFF0F1216);
+        b.playerBackdrop.setLight(light);
+        b.playerTitle.setTextColor(text);
+        b.playerArtist.setTextColor(rgb | 0xB8000000);
+        b.playerElapsed.setTextColor(rgb | 0xC7000000);
+        b.playerRemaining.setTextColor(rgb | 0xC7000000);
+        b.lyricsMessageTitle.setTextColor(text);
+        b.lyricsMessageBody.setTextColor(rgb | 0xB8000000);
+        b.lyricsBackToCurrent.setTextColor(text);
+        b.lyricsRetry.setTextColor(text);
+        b.playerOutput.setTextColor(text);
+        androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(b.playerOutput, ColorStateList.valueOf(text));
+        ColorStateList icon = ColorStateList.valueOf(text);
+        for (ImageButton ib : new ImageButton[]{b.playerLyricsToggle, b.playerMore, b.playerPrev, b.playerNext}) {
+            ib.setImageTintList(icon);
+        }
+        if (light) {
+            b.playerHandle.getBackground().mutate().setTint(rgb | 0x52000000);
+        }
+    }
+
+    @Override public void onStart() {
+        super.onStart();
+        // Output chip: an AudioDeviceCallback only while the player is visible (no background cost).
+        outputRoute = new OutputRoute(requireContext());
+        outputRoute.start(this::renderOutput);
+    }
+
+    @Override public void onStop() {
+        if (outputRoute != null) outputRoute.stop();
+        outputRoute = null;
+        super.onStop();
+    }
+
+    private void renderOutput(OutputRoute.Route r) {
+        if (b == null) return;
+        String label;
+        int icon;
+        switch (r.kind()) {
+            case BLUETOOTH:
+                label = r.name() != null ? r.name() : getString(R.string.player_output_bluetooth);
+                icon = R.drawable.player_ic_bluetooth;
+                break;
+            case WIRED: label = getString(R.string.player_output_headphones); icon = R.drawable.player_ic_headphones; break;
+            case USB: label = getString(R.string.player_output_usb); icon = R.drawable.player_ic_headphones; break;
+            default: label = getString(R.string.player_output_device); icon = R.drawable.player_ic_speaker; break;
+        }
+        b.playerOutput.setText(label);
+        b.playerOutput.setContentDescription(getString(R.string.player_output_cd, label));
+        b.playerOutput.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
+    }
+
+    private boolean isOnline() {
+        android.net.ConnectivityManager cm = (android.net.ConnectivityManager)
+                requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return true;
+        try {
+            android.net.NetworkCapabilities nc = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            return nc != null && nc.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        } catch (SecurityException e) {
+            return true;
+        }
     }
 
     private void onAutoScrollResume() {
@@ -226,19 +347,65 @@ public final class PlayerFragment extends Fragment {
         scrollToLine(lyricsAdapter.getActive(), true);
     }
 
+    /** Swipe down on the handle/cover/background: the whole player tracks the finger; release past 22% or fling closes. */
     @SuppressWarnings("ClickableViewAccessibility")
     private void setupSwipeToCollapse() {
-        GestureDetector detector = new GestureDetector(requireContext(), new GestureDetector.SimpleOnGestureListener() {
-            @Override public boolean onDown(@NonNull MotionEvent e) { return true; }
-            @Override public boolean onFling(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float vx, float vy) {
-                if (vy > 1200 && Math.abs(vy) > Math.abs(vx) * 1.5f) { collapse(); return true; }
-                return false;
+        final float[] downY = new float[1];
+        final boolean[] tracking = new boolean[1];
+        final android.view.VelocityTracker[] vt = new android.view.VelocityTracker[1];
+        int slop = android.view.ViewConfiguration.get(requireContext()).getScaledTouchSlop();
+        View.OnTouchListener l = (v, e) -> {
+            View root = b.playerRoot;
+            switch (e.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    downY[0] = e.getRawY();
+                    tracking[0] = false;
+                    vt[0] = android.view.VelocityTracker.obtain();
+                    vt[0].addMovement(e);
+                    return true;
+                case MotionEvent.ACTION_MOVE: {
+                    if (vt[0] != null) vt[0].addMovement(e);
+                    float dy = e.getRawY() - downY[0];
+                    if (!tracking[0] && dy > slop) tracking[0] = true;
+                    if (tracking[0]) {
+                        float y = Math.max(0f, dy);
+                        root.setTranslationY(y);
+                        root.setAlpha(1f - 0.35f * Math.min(1f, y / root.getHeight()));
+                    }
+                    return true;
+                }
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL: {
+                    float vy = 0f;
+                    if (vt[0] != null) {
+                        vt[0].addMovement(e);
+                        vt[0].computeCurrentVelocity(1000);
+                        vy = vt[0].getYVelocity();
+                        vt[0].recycle();
+                        vt[0] = null;
+                    }
+                    if (!tracking[0]) {
+                        if (e.getActionMasked() == MotionEvent.ACTION_UP && v != b.playerRoot) v.performClick();
+                        return true;
+                    }
+                    boolean close = root.getTranslationY() > root.getHeight() * 0.22f || vy > 1200;
+                    if (close) {
+                        boolean motion = PlayerPalette.motionAllowed(requireContext());
+                        root.animate().translationY(root.getHeight()).alpha(0.6f).setDuration(motion ? 200 : 0)
+                                .withEndAction(this::collapse).start();
+                    } else {
+                        root.animate().translationY(0f).alpha(1f).setDuration(220)
+                                .setInterpolator(new DecelerateInterpolator(2f)).start();
+                    }
+                    return true;
+                }
+                default:
+                    return false;
             }
-        });
-        View.OnTouchListener l = (v, e) -> detector.onTouchEvent(e) || v.onTouchEvent(e);
+        };
         b.playerArtwork.setOnTouchListener(l);
         b.playerHandle.setOnTouchListener(l);
-        b.playerRoot.setOnTouchListener((v, e) -> detector.onTouchEvent(e));
+        b.playerRoot.setOnTouchListener(l);
     }
 
     private void collapse() {
@@ -285,7 +452,8 @@ public final class PlayerFragment extends Fragment {
     private void setToggle(ImageButton btn, boolean on) {
         btn.setActivated(on);
         btn.setBackgroundTintList(on ? ColorStateList.valueOf(palette.primary) : null);
-        btn.setImageTintList(ColorStateList.valueOf(on ? palette.onPrimary : 0xFFFFFFFF));
+        btn.setImageTintList(ColorStateList.valueOf(on ? palette.onPrimary
+                : light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK));
     }
 
     private void renderTrack(@Nullable Track t) {
@@ -317,9 +485,11 @@ public final class PlayerFragment extends Fragment {
     private void applyPalette(PlayerPalette p, @Nullable android.graphics.Bitmap tinyArt, boolean animate) {
         palette = p;
         b.playerBackdrop.setContent(p, tinyArt, animate);
-        b.playerPlay.setColors(p.primary, p.onPrimary);
-        seek.setColors(p.primary, 0x47FFFFFF);
-        b.playerLike.setImageTintList(ColorStateList.valueOf(p.primary));
+        b.playerPlay.setColors(light ? p.glow : p.primary, light ? 0xFFFFFFFF : p.onPrimary);
+        // Light theme: the tone-40 role reads on the pale scrim; dark theme keeps the tone-80 primary.
+        int accent = light ? p.glow : p.primary;
+        seek.setColors(accent, light ? 0x3D181C21 : 0x47FFFFFF);
+        b.playerLike.setImageTintList(ColorStateList.valueOf(accent));
         render(vm.getState().getValue());
     }
 
@@ -373,10 +543,15 @@ public final class PlayerFragment extends Fragment {
         if (l == null || l.isEmpty()) {
             b.lyricsList.setVisibility(View.GONE);
             b.lyricsMessage.setVisibility(View.VISIBLE);
-            b.lyricsMessageTitle.setText(l == null ? R.string.lyrics_loading : R.string.lyrics_none);
-            b.lyricsMessageBody.setText(l == null ? null : getString(R.string.lyrics_none_hint));
+            boolean offline = PlayerViewModel.showOfflineRetry(l, isOnline());
+            b.lyricsRetry.setVisibility(offline ? View.VISIBLE : View.GONE);
+            b.lyricsMessageTitle.setText(l == null ? R.string.lyrics_loading
+                    : offline ? R.string.lyrics_offline : R.string.lyrics_none);
+            b.lyricsMessageBody.setText(l == null ? null
+                    : getString(offline ? R.string.lyrics_offline_hint : R.string.lyrics_none_hint));
             return;
         }
+        b.lyricsRetry.setVisibility(View.GONE);
         b.lyricsMessage.setVisibility(View.GONE);
         if (b.lyricsList.getVisibility() != View.VISIBLE) crossfade(b.lyricsList, true);
         if (b.lyricsList.getTag() != l) {

@@ -74,7 +74,7 @@ public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder
         h.title.setText(t.title());
         h.artist.setText(isCurrent ? h.itemView.getContext().getString(R.string.queue_now_playing) : t.artistName());
         h.duration.setText(PlayerFormat.time(t.durationMs(), loc));
-        h.art.setSeed(t.placeholderSeed());
+        h.art.bind(t);
         h.row.setActivated(isCurrent);
         h.title.setTextColor(isCurrent ? 0xFFD4E3FF : 0xFFE2E2E9);
         h.drag.setVisibility(isCurrent ? View.INVISIBLE : View.VISIBLE);
@@ -125,7 +125,7 @@ public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder
     static final class Holder extends RecyclerView.ViewHolder {
         final View row, drag;
         final TextView title, artist, duration, removeBg;
-        final QueueArtView art;
+        final com.mhrsdev.musicplayer.ui.widget.ArtworkView art;
         Holder(View v) {
             super(v);
             row = v.findViewById(R.id.queue_row);
@@ -135,6 +135,7 @@ public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder
             duration = v.findViewById(R.id.queue_duration);
             removeBg = v.findViewById(R.id.queue_remove_bg);
             art = v.findViewById(R.id.queue_art);
+            art.setCornerRadiusDp(12);
         }
     }
 }
