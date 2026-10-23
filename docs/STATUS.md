@@ -1,6 +1,6 @@
 # Project Status (live — supervisor updates after every event)
 
-_Last updated: 2026-10-23 — D7: Q-J answered → JAVA ONLY (no Kotlin), MVVM, no Room (framework SQLite), Gradle 9.0.0; Compose/Kotlin scaffold obsolete_
+_Last updated: 2026-10-23 — D8: parallel agents + ponytail skill + UI/RAM/battery bar; D7: Q-J answered → JAVA ONLY (no Kotlin), MVVM, no Room (framework SQLite), Gradle 9.0.0; Compose/Kotlin scaffold obsolete_
 
 ## HOW TO RESUME IN A NEW CHAT (read this first)
 1. Read `CLAUDE.md` (roles/rules), this file, `docs/DIRECTIVES.md` (all owner orders, D1–D7), `docs/design/DESIGN.md` (approved design; PNGs in `docs/design/png/`).
@@ -45,7 +45,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - 🔄 **T2b** [Opus] Design revision for Java/Views: less stock-Material/Google look, own identity, custom-drawn controls; update `docs/design/DESIGN.md` + re-render PNGs; show owner in chat and get OK. Branch `task/t2b-design-revision`.
 
 ### Todo
-**Plan after D7 (sequential, ONE sub-agent at a time — D5; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
+**Plan after D7/D8 (PARALLEL sub-agents allowed — D8 replaces D5; non-UI agents use the ponytail skill; each in its own git worktree; each in `task/<id>-<slug>`; supervisor reviews + merges into `ccr-b49e5e2a-53r8m3`, finally `main`).**
 Rules for every task: Java only (no `.kt/.kts`), MVVM, framework SQLite (no Room), tidy query classes, clean packages, Gradle 9.0.0 (CLAUDE.md "Hard code rules").
 - ⬜ **T1b** [Sonnet] Re-scaffold in Java: delete Kotlin/Compose/Room code, Groovy `.gradle`, Gradle 9.0.0 wrapper (+ compatible AGP; report if impossible), Material Components/AndroidX Views, Media3, ViewModel/LiveData, packages per ARCHITECTURE.md (rewrite it for Java), domain models + repository interfaces + in-memory fakes with sample data, SQLite helper skeleton, CI, SDK setup per README. `./gradlew :app:assembleDebug test lint` green.
 - ⬜ **T2** [Opus] UI foundation (Views): theme/styles, custom widgets incl. 3 seek bars (Wavy/Waveform/**Bars** voice-memo loudness, D4), nav shell, `WaveformRepository` contract + fake.
@@ -66,6 +66,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **T0** Supervisor: repo bootstrap — `CLAUDE.md`, `docs/` (STATUS, DIRECTIVES, ARCHITECTURE), reference screenshots saved.
 
 ## Change log
+- 2026-10-23: D8 archived: parallel agents allowed (replaces D5), ponytail skill installed in .claude/skills and mandatory for non-UI agents, UI must be prettier/own-identity, battery+RAM minimal. T2b told; T1b launched in parallel.
 - 2026-10-23: D7 archived (Q-J answered: Java only, MVVM, no Room, tidy queries, Gradle 9.0.0). CLAUDE.md got "Hard code rules". Plan rewritten (new T1b re-scaffold). T2b launched (Opus).
 - 2026-10-23: D6 archived; T2 paused (WIP pushed); handoff prompt written to docs/HANDOFF_PROMPT.md.
 - 2026-10-23: Owner: continue, one sub at a time. T2 launched (Opus).

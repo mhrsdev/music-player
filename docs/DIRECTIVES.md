@@ -146,3 +146,26 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 6. **Gradle 9.0.0** (wrapper). Supervisor note: AGP/Gradle compatibility must be verified by the build agent; if Gradle 9.0.0 cannot work with any available AGP, report to owner before deviating.
 
 **Consequences (supervisor):** the Compose/Kotlin scaffold (T1), the approved Compose-based UI plan, and the Kotlin WIP branches (`task/t2-ui-foundation`, `task/t5-data`, `task/t7-lyrics`, `task/tw-waveform`) are obsolete as code (design PNGs/spec stay as the visual target; UI becomes XML/custom Views). Re-scaffold in Java (T1b). Wavy / Waveform / Bars seek bars become custom `View`s.
+
+---
+
+## D8 — 2026-10-23 — Repeat of D7 rules + UI quality bar + parallel sub-agents + ponytail skill
+
+**Original (verbatim):**
+
+> قوانین زیر را رعایت کن 
+> استفاده از kt ممنوع است
+> از معماری mvvm کمک بگیر
+> از room کمک نگیر سیع کن از دیتابیس خود اندروید کمک بگیری
+> کوعری ها رو مرتب بزن 
+> کد های تمیز با پوشه بندی درست 
+> از گردل 9.0.0 کمک بگیر
+> ببین، خواستم اینه که یو آی خیلی قشنگ و خوشگل داشته باشه، کمتر شبیه دیزاین های گوگل باشه و دیزاین انحصاری خودمون باشه. تو مایه های همینی که فرستادی، ولی میمقدار قشنگتر، سیغل خورده تر، مصرف باتری و رم کاملا باید بهینه باشه، خیلی کم و مناسب. بعد بقیهش هم دیگه با خودت.
+> و از همزمان چند ساب ایجنت استفاده کن و بجز حالا ساب ایجنت یو آی برای بقیه ساب ایجنت ها از اسکیل پونی تیل استفاده کن
+> https://github.com/DietrichGebert/ponytail
+
+**Summary:**
+1. The D7 rules are repeated (Java only / MVVM / no Room, framework SQLite / tidy queries / clean packaging / Gradle 9.0.0) — they are binding (already in CLAUDE.md "Hard code rules").
+2. **UI quality bar:** very beautiful, **less Google-like, an exclusive identity of our own**, in the spirit of the mockups already shown but a bit prettier and more polished ("سیقل‌خورده‌تر"). **Battery AND RAM must be fully optimized — very low.** The rest is left to the supervisor's judgment.
+3. **Use several sub-agents in parallel** — this **replaces D5's one-at-a-time rule** (parallel work uses separate git worktrees/branches).
+4. **All sub-agents except the UI sub-agent must use the "ponytail" skill** (https://github.com/DietrichGebert/ponytail — "lazy senior dev": smallest complete change, no speculative abstraction). Installed (reviewed, MIT, no hooks) at `.claude/skills/ponytail`, `ponytail-review`, `ponytail-audit`. Supervisor note: where ponytail's minimalism conflicts with D7 (clean packaging, tidy query classes, MVVM layering) the D7 structure rules win.
