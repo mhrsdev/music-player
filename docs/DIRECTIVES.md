@@ -204,3 +204,14 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 1. Run **up to 5 sub-agents at the same time** (each in its own git worktree + `task/<id>-<slug>` branch).
 2. As soon as the new design is complete, **post its screenshots in this chat** (SendUserFile).
 3. Move faster and get the project ready; the owner wants a very impressive ("خفن") result. No hard deadline, but less elapsed time is better.
+
+---
+
+## D12 — 2026-10-23 — One-hour budget, up to 8 sub-agents
+
+**Original (verbatim):**
+
+> خب تو ۱ ساعت زمان داری
+> میتونی از حداکثر ۸ ساب ایجنت استفاده کنی
+
+**Summary:** Supervisor has **~1 hour** for the whole project and may run **up to 8 sub-agents in parallel**. Plan compressed: UI split into three parallel Opus agents with strict file ownership (T2 foundation/widgets, T3 screens, T4 player/queue/lyrics) started now on the WIP design v2 (no waiting for approval — owner's design feedback is applied as a follow-up); T8 wiring + T9 QA start as soon as data/playback/lyrics/waveform land; merge to `main` at the end. Honest limit: no device/emulator here, so on-device polish remains a follow-up round.
