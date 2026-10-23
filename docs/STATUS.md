@@ -29,16 +29,16 @@ _Last updated: 2026-10-23 — D4: design approved, implementation started_
 Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 
 ### In progress
+- 🔄 **T2** [Opus] UI foundation + 3 seek-bar styles — branch `task/t2-ui-foundation`
+- 🔄 **T5** [Sonnet] Data layer — branch `task/t5-data`
+- 🔄 **T6** [Sonnet] Playback service — branch `task/t6-playback`
+- 🔄 **T7** [Sonnet] Lyrics — branch `task/t7-lyrics`
+- 🔄 **T-W** [Sonnet] Waveform extractor — branch `task/tw-waveform`
 
 ### Todo
-- ⬜ **T-W** [Sonnet] Waveform (loudness bars) extractor + cache → `WaveformRepository`; UI style "Bars" by Opus.
 - ~~T1~~ (done) Scaffold Gradle project (app module, version catalog, Compose + M3 Expressive, Media3, Room, DI), Android SDK setup, `./gradlew assembleDebug` works, domain models/interfaces per ARCHITECTURE.md, in-memory fakes with sample data, CI workflow (GitHub Actions build + lint + unit tests).
-- ⬜ **T2** [Opus] UI foundation: theme (M3 Expressive, dynamic color from artwork, dark/light/AMOLED), shared components (floating pill nav, wavy slider, morphing play button, hero carousel, track row, artwork w/ placeholder), navigation shell.
 - ⬜ **T3** [Opus] Screens: Home, Search, Library, Artists/Albums/Playlists/History, Settings (against fakes).
 - ⬜ **T4** [Opus] Player: mini-player → full player (shared element), lyrics view, queue sheet (drag, undo, sleep timer).
-- ⬜ **T5** [Sonnet] Data layer: Room, MediaStore scanner + permissions, repositories, likes/playlists/history, HomeFeedSource from local data.
-- ⬜ **T6** [Sonnet] Playback: Media3 MediaSessionService, PlayerController impl, queue ops, sleep timer, notification, audio focus, Bluetooth/headset controls.
-- ⬜ **T7** [Sonnet] Lyrics: LRC parser, embedded tag + sidecar reader, LRCLIB client + cache.
 - ⬜ **T8** [Sonnet] Wire UI ↔ real data/playback (replace fakes via DI), instrumentation smoke tests, unit tests.
 - ⬜ **T9** [Sonnet] Final QA pass: build release, lint, fix; README with screenshots/build instructions.
 - ⬜ **T10** Supervisor: merge everything into `main`, verify `main` builds.
