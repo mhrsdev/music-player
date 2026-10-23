@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * {@code void setDynamicColor(boolean)}. Resolved by reflection so Settings builds before that lands; the row is
  * hidden until all three exist and the phone supports it (no dead row).
  */
-final class DynamicColor {
+class DynamicColor {
     private final ThemeController theme;
     private final Method get;
     private final Method set;

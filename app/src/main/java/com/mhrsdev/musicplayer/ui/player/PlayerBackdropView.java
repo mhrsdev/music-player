@@ -14,23 +14,40 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.mhrsdev.musicplayer.ui.widget.AmbientBackdropView;
+import com.mhrsdev.musicplayer.ui.widget.AmbientField;
+import com.mhrsdev.musicplayer.ui.widget.AmbientPalette;
+
 /**
  * Artwork-light backdrop (DESIGN §2.3) without live blur: the cover pre-downscaled once per track to a tiny bitmap
  * ({@link #prepare}) and upscaled with bilinear filtering (= a soft blur), a radial glow of the cover's color and the
- * measured scrim. Static; on track change the new layer fades in over 800 ms (alpha only, no per-frame allocation).
+ * measured scrim.
+ *
+ * <p>Living colour field (L1): the shared {@link AmbientField} engine with {@link AmbientPalette} colours (ColorExtractor
+ * seed + quadrant averages of the tiny bitmap, once per track) drifts on slow sine paths (periods 19-31 s). It animates at <= 15 fps only
+ * while {@link #setAnimating} is on (player visible and playing) and decorative motion is allowed; otherwise the same
+ * field is drawn once, still. Per frame only the shaders' local matrices move: no allocation, no bitmap, no blur.
+ * On track change the new layer fades in (alpha only, 600 ms).
  */
-public final class PlayerBackdropView extends View {
+public class PlayerBackdropView extends View {
     private static final int TINY = 20;
 
     /** One fully prepared layer: gradient + glow shaders and an optional tiny artwork bitmap. */
-    private static final class Layer {
+    private static class Layer {
         final Paint base = new Paint();
         final Paint glow = new Paint(Paint.ANTI_ALIAS_FLAG);
         final Paint art = new Paint(Paint.FILTER_BITMAP_FLAG);
         final Matrix matrix = new Matrix();
         @Nullable Bitmap bitmap;
         PlayerPalette palette;
+        /** Shared colour-field engine (also behind {@link AmbientBackdropView}). */
+        final AmbientField field = new AmbientField();
     }
+
+    static final long DRIFT_FRAME_MS = 66; // <= 15 fps
+    private boolean animating;
+    private long driftStart = android.os.SystemClock.uptimeMillis();
+    private final Runnable driftFrame = this::driftFrame;
 
     private Layer back = new Layer(), front = new Layer();
     private final Paint scrim = new Paint();
@@ -124,7 +141,7 @@ public final class PlayerBackdropView extends View {
         buildScrim();
         if (anim != null) anim.cancel();
         if (!animate || !PlayerPalette.motionAllowed(getContext())) { t = 1f; invalidate(); return; }
-        anim = ValueAnimator.ofFloat(0f, 1f).setDuration(800);
+        anim = ValueAnimator.ofFloat(0f, 1f).setDuration(600);
         anim.addUpdateListener(v -> { t = (float) v.getAnimatedValue(); invalidate(); });
         t = 0f;
         anim.start();
@@ -149,6 +166,28 @@ public final class PlayerBackdropView extends View {
             l.matrix.setScale(scale, scale);
             l.matrix.postTranslate((w - l.bitmap.getWidth() * scale) / 2f, (h - l.bitmap.getHeight() * scale) / 2f);
         }
+        boolean dark = !light;
+        AmbientPalette ap = l.bitmap != null ? AmbientPalette.fromBitmap(l.bitmap, dark)
+                : AmbientPalette.fromSeed(p.glow, dark);
+        l.field.setColors(ap.blobs());
+    }
+
+    /** Player visible and playing: drift (if motion is allowed). Otherwise one still frame. */
+    public void setAnimating(boolean on) {
+        boolean run = on && PlayerPalette.motionAllowed(getContext());
+        if (run == animating) return;
+        animating = run;
+        removeCallbacks(driftFrame);
+        if (run) postOnAnimation(driftFrame);
+    }
+
+    public boolean isAnimating() { return animating; }
+
+    private void driftFrame() {
+        if (!animating) return;
+        if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE || !isShown()) { animating = false; return; }
+        invalidate();
+        postOnAnimationDelayed(driftFrame, DRIFT_FRAME_MS);
     }
 
     private void drawLayer(Canvas c, Layer l, int alpha) {
@@ -159,6 +198,7 @@ public final class PlayerBackdropView extends View {
             l.art.setAlpha(alpha * 3 / 4);
             c.drawBitmap(l.bitmap, l.matrix, l.art);
         }
+        l.field.draw(c, w, h, alpha * 7 / 10, (android.os.SystemClock.uptimeMillis() - driftStart) / 1000f, 1f);
         l.glow.setAlpha(alpha);
         c.drawRect(0, 0, w, h, l.glow);
     }
@@ -171,6 +211,8 @@ public final class PlayerBackdropView extends View {
 
     @Override protected void onDetachedFromWindow() {
         if (anim != null) anim.cancel();
+        removeCallbacks(driftFrame);
+        animating = false;
         super.onDetachedFromWindow();
     }
 }

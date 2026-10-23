@@ -30,7 +30,7 @@ import java.text.NumberFormat;
  * App updates: current version, check / download / install, release notes and the update options. Opened by class name
  * from Settings, so it needs the public no-arg constructor.
  */
-public final class UpdateFragment extends Fragment {
+public class UpdateFragment extends Fragment {
     private UpdateFragmentBinding b;
     private UpdateViewModel vm;
     private boolean rendering;

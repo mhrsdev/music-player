@@ -15,7 +15,7 @@ import java.util.Queue;
 import java.util.function.IntConsumer;
 
 /** In-memory stand-ins for the updater's seams (network, preferences, platform glue). */
-final class FakeUpdates {
+class FakeUpdates {
     private FakeUpdates() { }
 
     static final class Http implements UpdateHttp {

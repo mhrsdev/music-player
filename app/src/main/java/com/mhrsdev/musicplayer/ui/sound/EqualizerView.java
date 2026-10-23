@@ -164,6 +164,16 @@ public final class EqualizerView extends View {
 
     // --- drawing ------------------------------------------------------------------------------
 
+    private float[] xs = new float[0];
+    private float[] ys = new float[0];
+
+    /** The band count never changes after setup: allocated once, not per frame. */
+    private void ensureBuffers(int n) {
+        if (xs.length == n) return;
+        xs = new float[n];
+        ys = new float[n];
+    }
+
     @Override protected void onDraw(@NonNull Canvas canvas) {
         int n = levelsMb.length;
         if (n == 0) return;
@@ -176,8 +186,7 @@ public final class EqualizerView extends View {
         canvas.drawLine(left, bottom, right, bottom, grid);
         canvas.drawLine(left, zeroY, right, zeroY, zero);
 
-        float[] xs = new float[n];
-        float[] ys = new float[n];
+        ensureBuffers(n);
         for (int i = 0; i < n; i++) {
             xs[i] = centerX(i);
             ys[i] = EqCurve.yFor(levelsMb[i], minMb, maxMb, top, bottom);

@@ -24,7 +24,7 @@ import java.util.function.LongSupplier;
  * -> READY_TO_INSTALL | ERROR. One operation at a time. Downloaded files live in {@code dir} and are wiped before every
  * download and once per process start. Network and disk work runs on {@code io}.
  */
-final class UpdateRepositoryImpl implements UpdateRepository {
+class UpdateRepositoryImpl implements UpdateRepository {
     static final long CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000;
     static final long RETRY_AFTER_FAILURE_MS = 60L * 60 * 1000;
     private static final String APK_FILE = "update.apk"; // fixed name: never a path taken from the release JSON

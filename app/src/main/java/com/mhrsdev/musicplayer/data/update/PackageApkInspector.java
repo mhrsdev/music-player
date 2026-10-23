@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** An APK passes when it is this app (same package name) and is signed with exactly the installed app's certificates. */
-final class PackageApkInspector implements ApkInspector {
+class PackageApkInspector implements ApkInspector {
     private final PackageManager pm;
     private final String packageName;
 

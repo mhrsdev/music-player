@@ -21,7 +21,7 @@ import java.util.Set;
  * Settings → Library: the scanner's include/exclude folders and the manual rescan. Changing a folder list starts a
  * rescan right away so the library matches what the person sees (the store says a change needs one).
  */
-public final class LibrarySettingsViewModel extends ViewModel {
+public class LibrarySettingsViewModel extends ViewModel {
 
     private final SettingsStore settings;
     private final LibraryAdmin admin;

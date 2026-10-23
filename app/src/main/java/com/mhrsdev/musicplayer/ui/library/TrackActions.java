@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /** Track actions that leave the app's own data: share the audio file, delete it from the device. */
-public final class TrackActions {
+public class TrackActions {
     private static final AtomicInteger REQUEST_KEYS = new AtomicInteger();
 
     private TrackActions() { }

@@ -30,7 +30,7 @@ import java.util.Locale;
  * Sleep timer sheet: presets 5–90 min + "End of track" as chips (the running choice is highlighted), a custom
  * minutes stepper (±5) with Start, and Turn off. A tap applies immediately and closes the sheet.
  */
-public final class SleepTimerSheet extends BottomSheetDialogFragment {
+public class SleepTimerSheet extends BottomSheetDialogFragment {
     public static final String TAG = "sleep_timer";
     static final int CUSTOM_STEP = 5, CUSTOM_MIN = 5, CUSTOM_MAX = 240;
 

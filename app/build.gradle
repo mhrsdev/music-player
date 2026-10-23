@@ -47,6 +47,11 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    // Only the app's own languages (see res/xml/locales_config.xml): drops the ~80 library translations (resources.arsc).
+    androidResources {
+        localeFilters = ['en', 'fa']
+    }
+
     buildFeatures {
         viewBinding true
         buildConfig true
