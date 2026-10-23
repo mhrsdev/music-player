@@ -39,7 +39,7 @@ public final class PlayerViewModel extends ViewModel {
     private final MediatorLiveData<Boolean> liked = new MediatorLiveData<>();
     private final MediatorLiveData<Integer> activeLyricLine = new MediatorLiveData<>();
     private final MutableLiveData<Boolean> showLyrics = new MutableLiveData<>(false);
-    /** Re-emits the current track on {@link #retryLyrics()} so the repository is asked again. */
+    /** The track whose lyrics are wanted (null while the lyrics view is hidden); re-emitted by {@link #retryLyrics()}. */
     private final MediatorLiveData<Track> lyricsRequest = new MediatorLiveData<>();
     private Set<String> likedIds = new HashSet<>();
     private boolean likedLoaded;
@@ -54,8 +54,11 @@ public final class PlayerViewModel extends ViewModel {
             Track old = currentTrack.getValue();
             if (!sameId(old, t)) currentTrack.setValue(t);
         });
-        lyricsRequest.addSource(currentTrack, lyricsRequest::setValue);
-        lyrics = Transformations.switchMap(lyricsRequest, t -> t == null ? new MutableLiveData<>() : lyricsRepo.lyricsFor(t));
+        // Lyrics (disk + possibly network) are only requested while the lyrics view is showing: no fetch per track change.
+        lyricsRequest.addSource(currentTrack, t -> updateLyricsRequest());
+        lyricsRequest.addSource(showLyrics, shown -> updateLyricsRequest());
+        lyrics = Transformations.switchMap(lyricsRequest,
+                t -> t == null ? new MutableLiveData<Lyrics>(null) : lyricsRepo.lyricsFor(t)); // null clears stale lyrics
         waveform = Transformations.switchMap(currentTrack,
                 t -> t == null ? new MutableLiveData<>() : waveformRepo.waveformFor(t, WAVEFORM_BARS));
 
@@ -71,6 +74,11 @@ public final class PlayerViewModel extends ViewModel {
 
         activeLyricLine.addSource(lyrics, l -> updateActiveLine());
         activeLyricLine.addSource(state, s -> updateActiveLine());
+    }
+
+    private void updateLyricsRequest() {
+        Track wanted = Boolean.TRUE.equals(showLyrics.getValue()) ? currentTrack.getValue() : null;
+        if (!sameId(lyricsRequest.getValue(), wanted)) lyricsRequest.setValue(wanted);
     }
 
     private static boolean sameId(@Nullable Track a, @Nullable Track b) {

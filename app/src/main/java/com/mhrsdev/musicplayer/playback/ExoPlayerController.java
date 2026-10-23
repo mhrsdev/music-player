@@ -23,6 +23,7 @@ import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -56,6 +57,7 @@ public final class ExoPlayerController implements PlayerController {
     @Nullable private String notifiedNextId;
 
     private List<Track> queue = Collections.emptyList();
+    private IdentityHashMap<MediaItem, Track> decoded = new IdentityHashMap<>();
     private int consecutiveErrors;
 
     /**
@@ -325,13 +327,21 @@ public final class ExoPlayerController implements PlayerController {
         return index >= 0 && index < queue.size() ? queue.get(index) : null;
     }
 
+    /**
+     * Decodes the player's items into tracks. Items seen by the previous call are reused by identity, so adding one
+     * track to a 10k queue decodes one item instead of 10k.
+     */
     private List<Track> readQueue() {
         int count = player.getMediaItemCount();
         List<Track> tracks = new ArrayList<>(count);
+        IdentityHashMap<MediaItem, Track> seen = new IdentityHashMap<>(count);
         for (int i = 0; i < count; i++) {
-            Track t = TrackMapper.fromMediaItem(player.getMediaItemAt(i));
+            MediaItem item = player.getMediaItemAt(i);
+            Track t = decoded.containsKey(item) ? decoded.get(item) : TrackMapper.fromMediaItem(item);
+            seen.put(item, t);
             if (t != null) tracks.add(t);
         }
+        decoded = seen;
         return tracks;
     }
 
@@ -418,7 +428,9 @@ public final class ExoPlayerController implements PlayerController {
         }
 
         @Override public void onTimelineChanged(Timeline timeline, int reason) {
-            queue = readQueue(); // before onMediaItemTransition, which looks up the current track
+            // Before onMediaItemTransition, which looks up the current track. Duration updates (SOURCE_UPDATE) fire on
+            // every track change but never change the items, so they must not cost an O(queue) pass.
+            if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) queue = readQueue();
         }
 
         @Override public void onEvents(Player p, Player.Events events) {

@@ -46,7 +46,7 @@ public class SqliteRepositoryTest {
         helper = new DbHelper(context);
         Executor inline = Runnable::run;
         notifier = new ChangeNotifier();
-        repo = new SqliteLibraryRepository(helper, inline, notifier,
+        repo = new SqliteLibraryRepository(helper, inline, inline, notifier,
                 new MediaStoreScanner(context, helper, new SettingsStore(context)));
         home = new LocalHomeFeedSource(helper, inline, notifier);
         TrackQueries tracks = new TrackQueries(helper.getWritableDatabase());
