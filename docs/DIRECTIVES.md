@@ -92,3 +92,30 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 1. **Stop all running sub-agents** (done: all 5 wave-1 agents killed).
 2. From now on **one sub-agent per section, and only ONE sub-agent running at a time** (sequential, no parallel fan-out). Interpreted conservatively; owner can relax it.
 3. Keep `docs/STATUS.md` always resume-ready: the owner may switch chats at any moment, and the next agent must continue without explanation.
+
+---
+
+## D6 — 2026-10-23 — Handoff to a new chat + friend's suggestions (Java, MVVM, battery, less "Google-look")
+
+**Original (verbatim):**
+
+> همه چیزو پوش کن و یه پرامپت بده میخوام برم یه چت دیگه
+> و دوستم پیشنهاد کرد بگم
+> با جاوا باشه
+> معماریشم mvvm
+> نمیدونم چرا
+> ولی خب گفت بگم
+> و اینکه مصرف باتریش خیلی بهینه باشه
+> و کمتر شبیه دیزاین کامپوننت گوگل باشن
+
+**Summary:**
+1. Push everything; produce a **handoff prompt** for a new chat (see `docs/HANDOFF_PROMPT.md`).
+2. Owner relays, without a reason ("don't know why, but he said to say it"): **use Java**; architecture **MVVM**.
+3. **Very battery-efficient** playback/app.
+4. UI components should look **less like stock Google (Material) components** — a more own, distinctive identity.
+
+**Supervisor analysis (needs owner confirmation of #2a):**
+- **MVVM**: compatible with the plan (ViewModel + StateFlow/UDF over the existing domain interfaces). Adopted.
+- **Java**: the approved design/implementation is **Jetpack Compose, which is Kotlin-only**. Java means rewriting the UI layer with XML Views/custom Views (custom drawn views are fine for wavy/bars seekbars) and losing Compose/M3-Expressive APIs; Media3/Room/Koin-or-Hilt all work from Java. Java brings **no battery or performance benefit** (battery is decided by wakelocks, tick rates, animation/scan scheduling — not language). Recommendation: **keep Kotlin** (Android's first-class language; Java interop is full). Decision is the owner's: **OPEN QUESTION Q-J — must be asked first in the new chat.** Until answered, no further UI code is written.
+- **Battery**: adopted as a hard requirement (see docs/ARCHITECTURE.md → "Battery & efficiency").
+- **Less Google-look**: adopted; requires a design revision (task T2b, Opus) of DESIGN.md before more UI code: custom-drawn controls/shapes/typography/motion with own identity (closer to Melodiha), M3 used only as an invisible foundation (accessibility/semantics), no stock-looking M3 widgets.

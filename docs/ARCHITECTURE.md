@@ -37,3 +37,15 @@ Original draft contract (kept for reference):
 
 ## UI requirements (beat the reference)
 See `docs/design-reference/` + `docs/DIRECTIVES.md` table. Must-haves: floating expressive pill nav; hero carousel; wavy seek slider; scalloped morphing play/pause; blurred artwork backdrop with dynamic color from artwork; synced lyrics with smooth auto-scroll, tap-to-seek, active-line emphasis, word fade; queue sheet with drag reorder, swipe-remove, shuffle+Undo snackbar, sleep timer; predictive-back; edge-to-edge; RTL/Persian-ready layout and fonts; accessibility (content descriptions, 48dp targets, TalkBack); tablet/foldable adaptive layouts; haptics; shared-element transition mini-player → full player. Improvements over reference: mini-player, dynamic color toggle, light/dark/AMOLED, equalizer-friendly settings, better empty/loading/error states.
+
+## Architecture pattern: MVVM (owner D6)
+`ui` screen (stateless composables/views) ⇄ `ViewModel` (exposes immutable `UiState` via `StateFlow`, takes events/intents) ⇄ domain interfaces (`PlayerController`, `*Repository`). No business logic in UI; ViewModels never touch Android UI classes; unidirectional data flow; one ViewModel per screen; `PlayerController` state is shared app-wide. Unit-test ViewModels on the JVM with the `fake/` implementations.
+
+## Battery & efficiency requirements (owner D6 — hard requirements)
+- Playback runs in the Media3 foreground `MediaSessionService`; **no wake locks of our own** beyond ExoPlayer's `setWakeMode`, released on pause/stop; service stops (and notification dismissible) shortly after pause.
+- Position ticks only while playing AND UI visible (~4–10 Hz max; notification progress is system-driven by MediaSession, not by our timer). No polling loops when backgrounded; collect state with lifecycle-aware `repeatOnLifecycle`/`collectAsStateWithLifecycle`.
+- Animations (wavy/bars/morph/backdrop blur) are paused when the screen is off/app backgrounded or the player isn't visible; honor "reduce motion" and battery-saver (cheaper visuals: no blur, static bars). Prefer draw-phase-only animation (no recomposition per frame).
+- Heavy work deferred: library scan and **waveform extraction** run through WorkManager/low-priority dispatcher, preferably on charging/idle and never during playback start; results cached on disk; bounded concurrency; cancellable.
+- Network (LRCLIB) only on demand per track, cached incl. negative results, no background sync.
+- Avoid per-frame allocations, large bitmaps (downsample artwork, cap Coil memory), and blur on low-end devices.
+- Add a debug "battery audit" checklist to the final QA task (T9): Perfetto/Battery Historian notes, wakelock dump, idle-after-pause check.
