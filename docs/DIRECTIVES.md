@@ -457,3 +457,15 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** "بعد این اپدیت شروع میکنی روی کارکردن برای اپدیت بعدی و فقط هدفت بهبود پرفورمنس هستش"
 
 **Summary:** Once v0.3.0 is released and verified, start the next release (v0.4.0) whose ONLY goal is performance (smoothness, startup, memory, battery). No new features. D24 still applies: optimise, do not cut effects; the Performance settings section (Q1) stays as an opt-in escape hatch. Plan in docs/STATUS.md (PF1–PF5).
+
+---
+
+## D29 — 2026-10-24 — URGENT: severe lag + overheating even on a Galaxy S26 Ultra
+
+**Original (verbatim):**
+
+> نه مشکل پرفورنس نسخه فعلی خیلی بده گوشی منکه s26 ultra هستش هم لگ میخوره تو برنامه
+> بهترین گوشی سامسونگه
+> گوشی ملتم شده بود بخاری
+
+**Summary:** The current build (owner's phone: S26 Ultra, the best Samsung) lags in the app and the phone got very hot ("melted, like a heater") -> sustained CPU/GPU load. This is the top priority and is not limited to v0.4.0: start performance agents NOW (PF-A UI hot paths, PF-B background CPU) and ship the fix as a quick v0.3.1. D24/D28 still apply: optimise, don't cut effects by default.

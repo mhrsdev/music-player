@@ -123,6 +123,11 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - **O1** Output devices: list connected outputs, show active one, switch via system output switcher, per-device volume, per-device sound profiles (EQ etc.), headset/earbud button mapping (single/double/triple press), auto-resume/pause on connect/disconnect, deep link to OEM dual-audio / audio-sharing. (True 2-device simultaneous playback has no public Android API.)
 - **J1** (after all merges) mechanical refactor: remove `final class`, Java 17 idioms in touched code, drop redundant AppCompat-transitive deps from the version catalog; verify on GitHub CI (local builds OOM).
 
+## URGENT (D29): S26 Ultra lags + overheats -> v0.3.1 perf hotfix
+- 🔄 **PF-A** [Opus] UI hot paths (continuous redraw at 120 Hz, RenderEffect/blur, backdrops, seek bars, carousels, adapters, overdraw). `task/pfa-ui-hotpaths`.
+- 🔄 **PF-B** [Sonnet] Background/sustained CPU (loudness extraction, scans, artwork/palette work, DB, widgets, notification/MediaSession updates, wakelocks). `task/pfb-background-cpu`.
+- Ask owner after v0.3.0: does it still lag/heat? Try Settings > Performance > Light to bisect; which screen heats most.
+
 ## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
 - **PF1** [Sonnet] Cold start + first frame: Application/DI lazy init, work off main thread, baseline profile (hand-written baseline-prof.txt + startup profile), splash→Home time budget; measure with JVM-side counters since no device.
 - **PF2** [Opus] Scroll/animation smoothness: RecyclerView adapters (DiffUtil, payloads, view recycling, no per-bind allocations), overdraw/layout depth, custom View draw paths, image decode sizes. Keep all effects.
