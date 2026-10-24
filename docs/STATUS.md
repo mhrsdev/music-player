@@ -128,6 +128,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - 🔄 **PF-B** [Sonnet] Background/sustained CPU (loudness extraction, scans, artwork/palette work, DB, widgets, notification/MediaSession updates, wakelocks). `task/pfb-background-cpu`.
 - Ask owner after v0.3.0: does it still lag/heat? Try Settings > Performance > Light to bisect; which screen heats most.
 
+- 🔄 **X1** [Opus] D30 crash hunt: CrashReporter (uncaught exceptions to a file), ApplicationExitInfo (API 30+) last-exit reasons, Settings > Diagnostics with Share, plus Robolectric smoke test of every screen with hostile data. `task/x1-crash-hunt`.
+
 ## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
 - **PF1** [Sonnet] Cold start + first frame: Application/DI lazy init, work off main thread, baseline profile (hand-written baseline-prof.txt + startup profile), splash→Home time budget; measure with JVM-side counters since no device.
 - **PF2** [Opus] Scroll/animation smoothness: RecyclerView adapters (DiffUtil, payloads, view recycling, no per-bind allocations), overdraw/layout depth, custom View draw paths, image decode sizes. Keep all effects.

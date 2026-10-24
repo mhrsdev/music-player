@@ -469,3 +469,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > گوشی ملتم شده بود بخاری
 
 **Summary:** The current build (owner's phone: S26 Ultra, the best Samsung) lags in the app and the phone got very hot ("melted, like a heater") -> sustained CPU/GPU load. This is the top priority and is not limited to v0.4.0: start performance agents NOW (PF-A UI hot paths, PF-B background CPU) and ship the fix as a quick v0.3.1. D24/D28 still apply: optimise, don't cut effects by default.
+
+---
+
+## D30 — 2026-10-24 — Screen recording + "the app crashes a lot in different parts"
+
+**Original (verbatim):** (attached screen recording "Screen_Recording_…One_UI_Home.mp4", 4.8 s, 720x1560@120) + "و برنامه کرش میکنه زیاد رو قسمت های مختلفش"
+
+**Summary:** Owner reports frequent crashes in various parts of the app. The recording shows Home (hero 'تازه‌های کتابخانه', 'ادامه‌ی پخش', 'دوباره سراغشان برو', 'ساخته‌شده برای تو', 'انتخاب‌های سریع'), scrolled down and back up, then the app window closes straight to the One UI launcher at ~2.4 s. No stack trace is visible, so the exit could be a crash, a system kill (low memory/thermal) or a normal finish. Task X1: in-app crash/exit diagnostics (UncaughtExceptionHandler log + ApplicationExitInfo reasons + share button) and a hostile-data smoke test of every screen.
