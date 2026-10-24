@@ -140,6 +140,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - 🔄 **N2** [Sonnet] D36 system media card/lock screen/Auto: always expose next+previous via ForwardingPlayer (commands + end-of-queue semantics). `task/n2-always-prev-next`.
 
 - 🔄 **PT1** [Sonnet] D38 perf telemetry: FrameMetrics jank stats per screen + thermal/memory/GC snapshot, off by default, shareable report in Diagnostics. `task/pt1-perf-telemetry`.
+- 🔄 **SC1** [Opus] D39 app-wide scroll jank hunt (row bind cost, GeneratedCover on main thread, shared row layouts, global per-frame consumers, RecyclerView config). `task/sc1-scroll-jank`.
 - ⏭ **AUDIT** (after refactor): full-repo audit (bugs/security/load/tests/slow paths/dead code) + lag fix driven by PT1 numbers.
 
 ## Refactor (D37) — after v0.3.3

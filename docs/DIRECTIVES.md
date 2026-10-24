@@ -549,3 +549,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** "بعد ریفکتور یه اودیت کامل بزن و سعی کن این مشکل لگ رو برطرف کنی / هنوزم هست"
 
 **Summary:** Lag is still present on the owner's phone (latest build). After the refactor (D37): run a full audit of the whole codebase (ponytail-audit style: bugs, security, load behaviour, risky untested code, slow paths, deletions) and keep working on the lag until it is gone. Because we cannot measure on a device, FIRST add local performance telemetry (PT1: FrameMetrics-based jank stats per screen, thermal/memory/GC snapshot, shareable report in Settings > About > Diagnostics) so the owner's phone gives us real numbers; then target what the numbers show.
+
+---
+
+## D39 — 2026-10-24 — Scrolling lags EVERYWHERE in the app
+
+**Original (verbatim):** "اسکرول همه جای برنامه لگه"
+
+**Summary:** Scroll jank is app-wide (all lists/screens), so the cause is in something shared by every scrolling screen: row binding (ArtworkView/ArtworkLoader/GeneratedCover rendering for coverless tracks, which the owner's library has many of), shared row layouts (elevation/outline clipping/overdraw/depth), a global per-frame consumer behind or above the lists (ambient backdrop/DecorBeat/dock/mini-player/edge-to-edge insets listeners), or RecyclerView configuration (prefetch, pools, DiffUtil). Task SC1 (Opus): systematic scroll-path hunt with measurements, then fixes; PT1 will give on-device numbers.
