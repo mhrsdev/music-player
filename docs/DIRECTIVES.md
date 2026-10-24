@@ -525,3 +525,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** (screenshot of Home with the mini-player) "تو اینجا فقط یه دکمه عقب جلو هست از دوتا"
 
 **Summary:** The mini-player shows play/pause and only ONE skip button (next); the owner expects both previous and next. Task U4 (Opus): add the missing previous button to the mini-player (RTL-aware order, touch targets, no layout overflow on small widths), keep effects/perf budgets. Ships in v0.3.3.
+
+---
+
+## D36 — 2026-10-24 — Lock screen / notification shade media card: previous + pause but NO next ("this bug is everywhere")
+
+**Original (verbatim):** (2 screenshots: One UI lock-screen media pill and notification-shade media card, both showing only [previous] [pause]) "تو همه جا این باگه هس"
+
+**Summary:** On the lock screen, the notification shade card (and by extension every system surface fed by our MediaSession) only previous and play/pause are shown, next is missing; together with D35 (mini-player missing previous) the owner expects BOTH skip buttons everywhere, always. Root cause (code read): the session uses ExoPlayer's raw available commands; ExoPlayer withholds COMMAND_SEEK_TO_NEXT when the current item is the last and repeat is off (no ForwardingPlayer anywhere), so Samsung hides the button. Fix N2 (Sonnet): session player wrapper that always exposes seek-to-next/previous; behaviour at the ends defined and consistent (next on the last track -> first track, previous on the first -> restart), applied to notification, lock screen, shade, headset buttons, Android Auto, widgets. Ships v0.3.3 with U4 (+C1 later).

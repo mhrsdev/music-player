@@ -137,6 +137,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 - 🔄 **U4** [Opus] D35 mini-player: add previous button (prev / play-pause / next), RTL-aware. `task/u4-miniplayer-prev`.
 
+- 🔄 **N2** [Sonnet] D36 system media card/lock screen/Auto: always expose next+previous via ForwardingPlayer (commands + end-of-queue semantics). `task/n2-always-prev-next`.
+
 ## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
 - **PF1** [Sonnet] Cold start + first frame: Application/DI lazy init, work off main thread, baseline profile (hand-written baseline-prof.txt + startup profile), splash→Home time budget; measure with JVM-side counters since no device.
 - **PF2** [Opus] Scroll/animation smoothness: RecyclerView adapters (DiffUtil, payloads, view recycling, no per-bind allocations), overdraw/layout depth, custom View draw paths, image decode sizes. Keep all effects.
