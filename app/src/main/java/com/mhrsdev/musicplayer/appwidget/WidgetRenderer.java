@@ -88,9 +88,10 @@ class WidgetRenderer {
         float h = kind.coverDp > 0 ? kind.coverDp : heightDp - 16;
         float radius = kind.coverDp > 0 ? context.getResources().getDimension(R.dimen.widget_cover_radius)
                 : kind.fillRadiusDp * density;
-        float shrink = Math.min(1f, MAX_COVER_PX / (Math.max(w, h) * density));
-        rv.setImageViewBitmap(R.id.cover, WidgetArt.rounded(art, Math.round(w * density * shrink),
-                Math.round(h * density * shrink), radius * shrink));
+        float shrink = Math.min(1f, MAX_COVER_PX / Math.max(1f, Math.max(w, h) * density));
+        // Odd launcher-reported sizes (a 0 or tiny cell) must not reach createBitmap as 0 or negative pixels.
+        rv.setImageViewBitmap(R.id.cover, WidgetArt.rounded(art, Math.max(1, Math.round(w * density * shrink)),
+                Math.max(1, Math.round(h * density * shrink)), radius * shrink));
     }
 
     private static PendingIntent open(Context context) {

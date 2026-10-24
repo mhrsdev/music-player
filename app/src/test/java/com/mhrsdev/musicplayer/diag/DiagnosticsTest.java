@@ -194,6 +194,15 @@ public class DiagnosticsTest {
         assertEquals("REASON_99", ExitReasons.name(99));
     }
 
+    @Test public void android17MemoryLimiterIsItsOwnReason() {
+        ExitRecord r = new ExitRecord(1, ExitReasons.OTHER, 9, 400, 900_000, 1_200_000, "MemoryLimiter:AnonSwap", "");
+        assertEquals(ExitReasons.Kind.MEMORY_LIMIT, r.kind());
+        assertTrue("our own memory use: always worth a report, even in the background", r.unexpected());
+        ExitRecord swipe = new ExitRecord(2, ExitReasons.OTHER, 0, 400, 0, 0, "remove task", "");
+        assertEquals(ExitReasons.Kind.SYSTEM, swipe.kind());
+        assertFalse(swipe.unexpected());
+    }
+
     @Test public void incidentStaysUntilSeen() throws Exception {
         assertEquals(0, store.unseenIncident());
         ExitInfoReader.ingest(store, List.of(), List.of(new ExitRecord(4000, ExitReasons.USER_REQUESTED, 0, 100, 0, 0, "", "")),

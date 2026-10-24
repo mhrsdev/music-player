@@ -107,7 +107,7 @@ public class ArtworkLoader {
         this.generator = generator;
         this.syncGenerator = generator == null ? null : generator.copy();
         // 1/16 of the heap, but never below two hero covers (a 128 MB heap would give 8 MB and thrash on every scroll).
-        int max = (int) Math.max(6L * 1024 * 1024, Math.min(16L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 16));
+        int max = cacheBytes(Runtime.getRuntime().maxMemory());
         cache = new LruCache<String, Bitmap>(max) {
             @Override protected int sizeOf(String key, Bitmap value) {
                 return value.getAllocationByteCount();
@@ -122,6 +122,14 @@ public class ArtworkLoader {
         });
         executor.allowCoreThreadTimeOut(true);
         if (!missesLoaded) executor.execute(this::loadMisses); // first job: off the main thread, before any probe
+    }
+
+    /**
+     * Bitmap cache budget for a heap of {@code maxHeap} bytes: 1/16 of it, at least two hero covers (6 MB), at most
+     * 16 MB whatever the phone (Android 17 kills per-app memory outliers, "MemoryLimiter:AnonSwap").
+     */
+    static int cacheBytes(long maxHeap) {
+        return (int) Math.max(6L * 1024 * 1024, Math.min(16L * 1024 * 1024, maxHeap / 16));
     }
 
     @MainThread
