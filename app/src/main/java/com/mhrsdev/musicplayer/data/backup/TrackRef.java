@@ -2,6 +2,7 @@ package com.mhrsdev.musicplayer.data.backup;
 
 import androidx.annotation.Nullable;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * A track described by what survives a move to another device (MediaStore ids do not): title, artist, album and
@@ -14,7 +15,9 @@ public record TrackRef(String title, String artist, String album, long durationM
         return norm(title) + '\u0001' + norm(artist) + '\u0001' + norm(album) + '\u0001' + Math.round(durationMs / 1000.0);
     }
 
+    private static final Pattern SPACES = Pattern.compile("\\s+");
+
     private static String norm(String s) {
-        return s.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
+        return SPACES.matcher(s.trim()).replaceAll(" ").toLowerCase(Locale.ROOT);
     }
 }

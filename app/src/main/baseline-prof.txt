@@ -1,0 +1,7 @@
+# Hand-written baseline profile (no device was available to record one): every method and class of the app and of
+# Media3 is compiled ahead of time instead of being interpreted and JIT-compiled after each install / update.
+# HSP = hot + startup + post-startup. Replace with a recorded profile when a device is available (docs/PERF_BACKGROUND_v0.3.1.md).
+HSPLcom/mhrsdev/musicplayer/**->**(**)**
+Lcom/mhrsdev/musicplayer/**;
+HSPLandroidx/media3/**->**(**)**
+Landroidx/media3/**;

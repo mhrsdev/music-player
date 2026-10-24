@@ -401,7 +401,7 @@ public class ExoPlayerController implements PlayerController {
             if (t != null) tracks.add(t);
         }
         decoded = seen;
-        return tracks;
+        return PlaybackState.frozen(tracks);
     }
 
     private void publish() {
