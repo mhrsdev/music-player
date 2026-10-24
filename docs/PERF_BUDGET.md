@@ -13,7 +13,7 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 | Idle RAM after 1 min in background, library of 10k tracks | PSS <= 60 MB (`adb shell dumpsys meminfo com.mhrsdev.musicplayer`, "TOTAL PSS"); Java heap <= 20 MB | meminfo |
 | RAM with Home open | PSS <= 110 MB | meminfo |
 | `largeHeap` | never | `PerfBudgetTest` (manifest) |
-| Bitmap memory | `ArtworkLoader` LruCache <= min(16 MB, 1/16 of heap); negative cache <= 512 entries; row art decoded RGB_565; everything evicted on `onTrimMemory(UI_HIDDEN)` (`MusicPlayerApp.onTrimMemory`) | code review, meminfo "Graphics" |
+| Bitmap memory | `ArtworkLoader` LruCache <= min(16 MB, 1/16 of heap); negative cache <= 512 entries, kept across `UI_HIDDEN` and persisted in `cacheDir/artwork_misses.txt` (3-day TTL, read on the artwork worker); a decode is scaled to its size bucket when its shorter side is over 1.25 x the bucket (`ArtworkLoader.fit`, `ArtworkMemoryTest`); row art decoded RGB_565; bitmaps evicted on `onTrimMemory(UI_HIDDEN)` (`MusicPlayerApp.onTrimMemory`) | code review, meminfo "Graphics" |
 | APK | release APK <= 3 MB, no native libraries, only `en`/`fa` resources (`localeFilters`), R8 full mode (AGP 8 default) + resource shrinking | `ls -l app/build/outputs/apk/release/*.apk` (2.77 MB at time of writing) |
 | Threads | every executor is a `ThreadPoolExecutor` with `allowCoreThreadTimeOut(true)`; library scan on its own `THREAD_PRIORITY_BACKGROUND` thread | `PerfBudgetTest.threadsAlwaysTimeOut` |
 
@@ -68,6 +68,9 @@ Details and measurements: `docs/PERF_BACKGROUND_v0.3.1.md`. Enforced by `PerfBud
 * A0c While only beat loops are registered the driver sleeps until just before the next beat
   (`postFrameCallbackDelayed`, `FrameDriver.sleepMillis`): 30 main-thread wake-ups a second on a 120 Hz panel, not 120.
   Adding an every-frame tick (a press spring) re-posts at once, so touch latency is unchanged (`DecorBeatTest`).
+* A0e Adaptive thermal (always on): `ui/theme/ThermalWatch` (API 29+, platform callback, no polling) feeds
+  `MotionPolicy.setThermalLevel`; thermal MODERATE = effects at most Balanced, SEVERE+ = at most Light, never more
+  than the user chose, back to the user's profile when cool; Settings > Performance shows a note (`ThermalPolicyTest`).
 * A0d A view whose own redraws are decorative votes a low refresh category on API 35+ (`ui/motion/FrameRateVote`:
   player and ambient backdrops, seek bars except while dragged), so LTPO/VRR panels are not held at 120 Hz by them.
 * A1 Looping / infinite animations only while the view is attached, visible and `MotionPolicy.decorativeMotionEnabled` (off in battery saver and reduce-motion). Skeleton shimmer <= 15 fps.

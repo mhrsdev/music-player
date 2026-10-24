@@ -51,6 +51,19 @@ Home at rest has **no** loop (the glow is static, the Continue card moves in 2 %
 | 8 | **Low refresh vote for decorative views** (API 35+): player / ambient backdrops and seek bars (not while dragged) ask for the low frame-rate category | `ui/motion/FrameRateVote` (new) | not measurable here; on Android 15+ VRR/LTPO panels it lets the 30 fps decorative frames run the panel below 120 Hz |
 | 9 | Play/pause `onDraw` read the motion policy (settings + power state) on every morph frame; now only while the buffering arc shows | `MorphPlayPauseView` | code |
 
+| 10 | **Artwork memory.** A decode whose shorter side is over 1.25 x its bucket is scaled to the bucket once on the worker (power-of-two sampling left up to ~2x per side) | `ArtworkLoader.fit` | `ArtworkMemoryTest`: a 3000 px picture for a 192 px row 281 KB -> 74 KB in the cache, so ~4x more row covers fit and scrolling re-decodes less (CPU, GC, OOM risk) |
+| 11 | **"No artwork" is remembered** across app switches (it was wiped on every `UI_HIDDEN`, so each return re-probed every cover-less row: thumbnail, MediaMetadataRetriever, up to 4 tracks x 12 file probes) and across restarts (`cacheDir/artwork_misses.txt`, read on the worker, 3-day TTL so new folder art is found) | `ArtworkLoader` | `ArtworkMemoryTest`: after trim + restart the cover is answered without a probe. PF-B finding |
+| 12 | **Generated covers on the main thread no longer wait for the worker.** `GeneratedCover.draw` is synchronized; the <= 96 px synchronous renders shared the worker's instance and could block a scroll frame behind a 1024 px render | `ArtworkLoader.syncGenerator`, `GeneratedCover.copy` | code |
+| 13 | **Adaptive thermal** (always on, D29/PF-B): MODERATE = at most Balanced (60 fps cap, no drift / lyrics blur), SEVERE+ = at most Light, user's profile back when cool; note in Settings > Performance | `ui/theme/ThermalWatch`, `MotionPolicy.setThermalLevel` / `effective` | `ThermalPolicyTest`. Decorative loops are already 30 / 15 fps on the beat; the "199 tick bodies" of Full in `FrameCapTest` are a touch spring at 120 Hz plus those loops, so no default cap was added for touch |
+
+Crash hazards checked (owner: crashes while scrolling / tapping a song; X1 owns the hunt): RecyclerView click
+handlers all guard `NO_POSITION`; `TrackAdapter.moveLocal` invalidates in-flight diffs; artwork callbacks of recycled
+rows are cancelled / ignored by key; `FrameDriver` tolerates ticks added / removed during a frame; no cached bitmap is
+ever recycled. Fixed defensively: every pixel read of a cover (`AmbientPalette`, `ThemeController.seedOf`,
+`PlayerBackdropView.prepare`) copies a HARDWARE bitmap to software first (getPixels on a HARDWARE bitmap throws, and
+createScaledBitmap keeps HARDWARE); `ArtworkLoader.fit` returns the original on OOM; `QueueFragment.removeWithUndo` ignores a negative position (a swipe
+on a holder that was already unbound passed `toUpNext(NO_POSITION)` = -2 on to the view model).
+
 Expected combined effect, player open and playing with lyrics on a 120 Hz QHD+ panel (estimates from the counts
 above, not device measurements): rendered frames from loops ~80/s -> ~31/s; GPU fill per backdrop frame about halved;
 blur passes per line change cut by roughly 80 %; main-thread wake-ups 120/s -> 30/s; no layout passes while playing.
@@ -76,7 +89,7 @@ Home and lists gain one full-screen fill less per frame.
 ## 4. Verified vs not
 
 Verified here: compile (debug), `lintDebug` 0 errors, the new JVM tests (`DecorBeatTest`, `PlayerCoverTest`,
-`LyricLineCostTest`, `AmbientFieldCoverageTest`) plus `PeriodicTickTest`, `FrameCapTest`, `PerfBudgetTest`,
+`LyricLineCostTest`, `AmbientFieldCoverageTest`, `ArtworkMemoryTest`, `ThermalPolicyTest`) plus `PeriodicTickTest`, `FrameCapTest`, `PerfBudgetTest`,
 `MiniPlayerInvalidationTest`, and the full `:app:testDebugUnitTest`.
 
 Not measurable without a device: real GPU time and temperature, the panel's actual refresh rate (LTPO / Samsung

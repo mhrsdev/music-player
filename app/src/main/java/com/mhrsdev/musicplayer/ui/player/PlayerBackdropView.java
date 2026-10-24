@@ -128,6 +128,7 @@ public class PlayerBackdropView extends View {
     /** Downscales the cover once (off the hot path, tiny result: ~1.6 KB) for use as the blurred backdrop. */
     @Nullable public static Bitmap prepare(@Nullable Bitmap cover) {
         if (cover == null || cover.isRecycled()) return null;
+        cover = AmbientPalette.readable(cover); // getPixels on the result (contrast guard, palette) needs software
         Bitmap mid = Bitmap.createScaledBitmap(cover, TINY * 2, TINY * 2, true);
         Bitmap tiny = Bitmap.createScaledBitmap(mid, TINY, TINY, true);
         if (mid != tiny && mid != cover) mid.recycle();
