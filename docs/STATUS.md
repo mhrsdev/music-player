@@ -141,6 +141,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 - 🔄 **PT1** [Sonnet] D38 perf telemetry: FrameMetrics jank stats per screen + thermal/memory/GC snapshot, off by default, shareable report in Diagnostics. `task/pt1-perf-telemetry`.
 - 🔄 **SC1** [Opus] D39 app-wide scroll jank hunt (row bind cost, GeneratedCover on main thread, shared row layouts, global per-frame consumers, RecyclerView config). `task/sc1-scroll-jank`.
+- 🔄 **BG1** [Opus] D41 central visibility gate: when app is backgrounded (music playing) or a part is hidden, all useless work stops; tests count frames/wakeups/threads. `task/bg1-visibility-gate`.
 - ⏭ **AUDIT** (after refactor): full-repo audit (bugs/security/load/tests/slow paths/dead code) + lag fix driven by PT1 numbers.
 
 ## Refactor (D37) — after v0.3.3
