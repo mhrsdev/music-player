@@ -2,6 +2,41 @@
 
 Releases are stable unless the version has a `-` suffix (e.g. `v1.0.0-rc.1`). `v0.1.0` and `v0.2.0` were published as pre-releases; `v0.3.0` onward are normal releases.
 
+## v0.3.1
+
+Normal (stable) release. Smoother and more stable than v0.3.0, with a crash log built in. Verified by tests only, not on real devices.
+
+### Fixed - Performance
+- The full player no longer redraws everything underneath it.
+- Decorative animations now share one 30 fps beat.
+- Lyrics redraw only the two lines that change.
+- Large areas are no longer painted twice.
+- Covers are decoded at display size.
+- "No cover" results are remembered across restarts, so songs without a cover are no longer re-probed after every app switch.
+- Waveform decoding runs only when it is needed and is skipped when the phone is hot.
+- The queue is no longer copied 4 times a second.
+- The widget no longer re-probes artwork on play / pause.
+- Library rescan is throttled on old phones.
+- Added a hand-written baseline profile, for a faster first start after install or update.
+- Adaptive thermal behaviour: effects get temporarily lighter when the phone reports it is warm or hot. The state is shown in Settings > Performance.
+
+### Fixed - Stability
+- Errors in background tasks (scan, waveform, lyrics, queue saving, update check, artwork) are logged instead of crashing the app (release builds).
+- The widget update is guarded against Android 17's bitmap size limit.
+- An unplayable queue stops after 10 skips.
+- Cover decode errors no longer leave a cover loading forever or crash with out-of-memory.
+- Closing the player in the middle of an animation is guarded.
+- The update banner now has an R8 keep rule.
+
+### Added
+- **Settings > About > Diagnostics**: the last crash with its stack trace, why the system last closed the app (including Android 17's memory limiter), breadcrumbs, and Share / Clear buttons.
+- A one-time "closed unexpectedly last time" card on Home.
+
+### Known limitations
+- The cause of the crash seen on the maintainer's phone (Android 17 / One UI 9) is not confirmed yet. If Mowj crashes again, share the Diagnostics log.
+- Everything above is verified by tests only, not on real devices.
+- The v0.3.0 limitations below still apply.
+
 ## v0.3.0
 
 Normal (stable) release. Most of it is verified by tests and renders only; see Known limitations.

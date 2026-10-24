@@ -11,7 +11,7 @@
 
 <div dir="ltr" align="center">
 
-![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Release v0.3.0](https://img.shields.io/badge/release-v0.3.0-blue) ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-brightgreen) ![Java only](https://img.shields.io/badge/code-Java-orange)
+![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Release v0.3.1](https://img.shields.io/badge/release-v0.3.1-blue) ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-brightgreen) ![Java only](https://img.shields.io/badge/code-Java-orange)
 
 </div>
 
