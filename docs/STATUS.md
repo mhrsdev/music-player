@@ -138,6 +138,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 ## Change log
 
+- 2026-10-24: **v0.3.0 released** (stable, not pre-release) https://github.com/mhrsdev/music-player-mowj/releases/tag/v0.3.0 — APK 3.1 MB, SHA-256 74b23b8d…2888, signature = our key (cert 2e59ce52…aacd). main = a92168b. Release body still says 'debug-signed unless keystore' (template text; actual APK is signed with our key) — fix wording in release.yml notes. Next: v0.3.1 perf hotfix (PF-A, PF-B; D29).
+
 - 2026-10-24: CI GREEN on ccr 605c064 (E2, L2, O1, B2, Q1, J1, CI1 all merged; PlaybackNotificationTest/HeadsetButtonsTest flakes fixed test-side). D1 docs (README en/fa, CHANGELOG v0.3.0) merged. Next: main fast-forward + release v0.3.0 (stable). Backlog: tablet/landscape layouts, remove unused constraintlayout dep line, root-cause of Robolectric renderer stall.
 
 - 2026-10-24: CI GREEN again on ccr 22bb13e (hang = stale PlayerHolder player + unbounded release; fixed by CI1; test heap 2g, 20-min timeout, STARTED logging). ccr = E2, L2, O1, B2, Q1 (Performance settings), CI1 merged. Next: J1 cleanup (running), README/docs/screens refresh, main, release 0.3.0 (stable).
