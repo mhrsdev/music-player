@@ -490,3 +490,14 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > موقعی که میخوام یه اهنگو وا کنم / وسط اسکرول تقریبا همه جا
 
 **Summary:** Confirmed real process crashes on v0.3.0 (Android 16-class system dialog). Triggers per owner: (a) tapping a song to start it, (b) mid-scroll almost anywhere. Playback also seemed to stop after leaving the app. Android version not yet given. X1 (crash hunt + diagnostics) and PF-A/PF-B briefed with these triggers; plan: ship diagnostics + crash fixes + perf as v0.3.1 ASAP.
+
+---
+
+## D32 — 2026-10-24 — Owner device is Android 17 / One UI 9; older phones must be good too
+
+**Original (verbatim):**
+
+> اندروردم ۱۷عه وان یو آی ۹
+> ولی خب گوشی منه که اپدیت اخره بقیه چی؟ / پس برنامه باید واسه قبلیا هم بهینه باشه
+
+**Summary:** Owner's phone: Android 17, One UI 9 (targetSdk 37 -> Android 17 behaviour changes apply: per-app memory limiter, widget RemoteViews bitmap limit, background audio hardening). But most users have older Android versions and weaker phones: the app (minSdk 26) must be compatible AND optimised across API 26-37, including low-RAM/low-end devices. Task C1: API matrix tests + low-end device profile.

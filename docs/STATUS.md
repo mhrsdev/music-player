@@ -130,6 +130,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 - 🔄 **X1** [Opus] D30 crash hunt: CrashReporter (uncaught exceptions to a file), ApplicationExitInfo (API 30+) last-exit reasons, Settings > Diagnostics with Share, plus Robolectric smoke test of every screen with hostile data. `task/x1-crash-hunt`.
 
+- 🔄 **C1** [Sonnet] D32 compatibility + low-end: Robolectric matrix over API 26/28/29/30/31/33/34/35, API-gate audit (RenderEffect 31+, thermal 29+, ExitInfo 30+, AudioDeviceInfo.getAddress 28+, notification perms 33+, FGS types 34+, dynamic color 31+, predictive back 33+), low-RAM/low-end auto profile (ActivityManager.isLowRamDevice / memory class / cores -> default Balanced/Light on first run), bitmap/cache budgets by memory class, test under small heap. `task/c1-compat-lowend`.
+
 ## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
 - **PF1** [Sonnet] Cold start + first frame: Application/DI lazy init, work off main thread, baseline profile (hand-written baseline-prof.txt + startup profile), splash→Home time budget; measure with JVM-side counters since no device.
 - **PF2** [Opus] Scroll/animation smoothness: RecyclerView adapters (DiffUtil, payloads, view recycling, no per-bind allocations), overdraw/layout depth, custom View draw paths, image decode sizes. Keep all effects.
