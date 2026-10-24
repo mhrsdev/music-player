@@ -250,6 +250,7 @@ public class PlaybackService extends MediaLibraryService {
         /** Controllers send bare media ids (no URI): resolve them to playable items; unknown ids are dropped. */
         @Override public ListenableFuture<List<MediaItem>> onAddMediaItems(MediaSession s,
                 MediaSession.ControllerInfo controller, List<MediaItem> mediaItems) {
+            store.noteExternalEdit(); // the controller's queue edit replaces whatever the store hid outside the window
             return browseExecutor.submit(() -> {
                 List<MediaItem> out = new ArrayList<>(mediaItems.size());
                 for (MediaItem item : mediaItems) {

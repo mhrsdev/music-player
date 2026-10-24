@@ -98,18 +98,18 @@ public class ExoPlayerController implements PlayerController {
     // --- transport ----------------------------------------------------------------------------
 
     @Override public void play(List<Track> tracks, int startIndex, @Nullable String playingFrom) {
-        List<MediaItem> items = new ArrayList<>(tracks.size());
+        List<Track> playable = new ArrayList<>(tracks.size());
         int start = 0;
         for (int i = 0; i < tracks.size(); i++) {
             if (!TrackMapper.isPlayable(tracks.get(i))) continue;
             if (i < startIndex) start++;
-            items.add(TrackMapper.toMediaItem(tracks.get(i)));
+            playable.add(tracks.get(i));
         }
-        if (items.isEmpty()) return;
+        if (playable.isEmpty()) return;
         shuffler.clear();
         store.setPlayingFrom(playingFrom);
         ensureService();
-        player.setMediaItems(items, Math.min(start, items.size() - 1), 0L);
+        store.show(PlaybackState.frozen(playable), Math.min(start, playable.size() - 1), 0L); // a window of items, not 10k
         player.prepare();
         player.play();
     }
@@ -146,10 +146,16 @@ public class ExoPlayerController implements PlayerController {
     }
 
     @Override public void skipTo(int index) {
-        if (index < 0 || index >= player.getMediaItemCount()) return;
+        if (index < 0 || index >= queue.size()) return;
         ensureService();
-        prepareIfIdle();
-        player.seekToDefaultPosition(index);
+        int first = store.before().size();
+        if (index >= first && index < first + player.getMediaItemCount()) {
+            prepareIfIdle();
+            player.seekToDefaultPosition(index - first);
+        } else {
+            store.show(queue, index, 0L); // far outside the window: a new window around it
+            prepareIfIdle();
+        }
         player.play();
     }
 
@@ -167,36 +173,59 @@ public class ExoPlayerController implements PlayerController {
 
     // --- queue --------------------------------------------------------------------------------
 
+    /**
+     * The queue index to player index offset (queue items hidden before the player's window), after making sure the
+     * player holds every queue index in {@code [a, b]} (else the whole queue is put into it first).
+     */
+    private int offsetFor(int a, int b) {
+        int first = store.before().size();
+        if (a < first || b > first + player.getMediaItemCount()) {
+            store.hydrateAll();
+            first = 0;
+        }
+        return first;
+    }
+
     @Override public void moveQueueItem(int from, int to) {
-        int count = player.getMediaItemCount();
+        int count = queue.size();
         if (from < 0 || to < 0 || from >= count || to >= count || from == to) return;
         shuffler.clear();
-        player.moveMediaItem(from, to);
+        int first = offsetFor(Math.min(from, to), Math.max(from, to) + 1);
+        player.moveMediaItem(from - first, to - first);
     }
 
     @Override public void removeFromQueue(int index) {
-        if (index < 0 || index >= player.getMediaItemCount()) return;
+        if (index < 0 || index >= queue.size()) return;
         shuffler.clear();
-        player.removeMediaItem(index);
+        player.removeMediaItem(index - offsetFor(index, index + 1));
     }
 
     @Override public void addToQueue(Track track) {
-        addToQueue(track, player.getMediaItemCount());
+        if (TrackMapper.isPlayable(track) && !store.after().isEmpty()) { // the end of a windowed queue: no item needed
+            shuffler.clear();
+            store.appendHidden(track);
+            queue = readQueue();
+            publish();
+            return;
+        }
+        addToQueue(track, queue.size());
     }
 
     @Override public void addToQueue(Track track, int index) {
         if (!TrackMapper.isPlayable(track)) return;
         boolean wasEmpty = player.getMediaItemCount() == 0;
         shuffler.clear();
-        player.addMediaItem(Math.max(0, Math.min(index, player.getMediaItemCount())), TrackMapper.toMediaItem(track));
+        int at = Math.max(0, Math.min(index, queue.size()));
+        player.addMediaItem(at - offsetFor(at, at), TrackMapper.toMediaItem(track));
         if (wasEmpty) player.prepare(); // paused, ready to resume
     }
 
     @Override public void playNext(Track track) {
-        addToQueue(track, queue.isEmpty() ? 0 : player.getCurrentMediaItemIndex() + 1);
+        addToQueue(track, queue.isEmpty() ? 0 : store.before().size() + player.getCurrentMediaItemIndex() + 1);
     }
 
     @Override public void shuffleQueue() {
+        store.hydrateAll(); // the whole queue is reordered
         int current = player.getCurrentMediaItemIndex();
         List<Track> shuffled = shuffler.shuffle(queue, current, random);
         if (shuffled == null) return;
@@ -205,6 +234,7 @@ public class ExoPlayerController implements PlayerController {
     }
 
     @Override public void undoShuffleQueue() {
+        store.hydrateAll();
         List<Track> previous = shuffler.undo();
         if (previous != null && previous.size() == player.getMediaItemCount()) {
             int current = previous.indexOf(currentTrack());
@@ -383,8 +413,13 @@ public class ExoPlayerController implements PlayerController {
         return SystemClock.uptimeMillis();
     }
 
+    /** Queue index of the playing item (the player's index is relative to its window). */
+    private int currentIndex() {
+        return store.before().size() + player.getCurrentMediaItemIndex();
+    }
+
     @Nullable private Track currentTrack() {
-        int index = player.getCurrentMediaItemIndex();
+        int index = currentIndex();
         return index >= 0 && index < queue.size() ? queue.get(index) : null;
     }
 
@@ -394,7 +429,9 @@ public class ExoPlayerController implements PlayerController {
      */
     private List<Track> readQueue() {
         int count = player.getMediaItemCount();
-        List<Track> tracks = new ArrayList<>(count);
+        List<Track> head = store.before(), tail = store.after(); // queue items outside the player's window
+        List<Track> tracks = new ArrayList<>(head.size() + count + tail.size());
+        tracks.addAll(head);
         IdentityHashMap<MediaItem, Track> seen = new IdentityHashMap<>(count);
         for (int i = 0; i < count; i++) {
             MediaItem item = player.getMediaItemAt(i);
@@ -403,6 +440,7 @@ public class ExoPlayerController implements PlayerController {
             if (t != null) tracks.add(t);
         }
         decoded = seen;
+        tracks.addAll(tail);
         return PlaybackState.frozen(tracks);
     }
 
@@ -420,7 +458,7 @@ public class ExoPlayerController implements PlayerController {
         return new PlaybackState(current, isPlaying(),
                 player.getPlayWhenReady() && player.getPlaybackState() == Player.STATE_BUFFERING,
                 position, duration, player.getShuffleModeEnabled(), repeatMode(), queue,
-                current == null ? -1 : player.getCurrentMediaItemIndex(), sleep.snapshot(now),
+                current == null ? -1 : currentIndex(), sleep.snapshot(now),
                 queue.isEmpty() ? null : store.playingFrom(), shuffler.canUndo());
     }
 
@@ -428,6 +466,7 @@ public class ExoPlayerController implements PlayerController {
     private void notifyNextTrack() {
         if (nextTrackListener == null || !player.isPlaying()) return;
         int index = player.getNextMediaItemIndex();
+        index = index < 0 ? index : store.before().size() + index;
         Track next = index >= 0 && index < queue.size() ? queue.get(index) : null;
         if (next == null || next.id().equals(notifiedNextId)) return;
         notifiedNextId = next.id();
