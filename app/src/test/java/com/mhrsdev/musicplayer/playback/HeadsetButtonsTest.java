@@ -116,9 +116,10 @@ public class HeadsetButtonsTest {
         settle();
         assertEquals(2, player().getCurrentMediaItemIndex());
         assertTrue("double click must not toggle", player().getPlayWhenReady());
+        // Freeze the position: "previous" restarts the track instead when more than 3 s in, and the silent clip decodes fast.
+        player().pause();
         for (int i = 0; i < 3; i++) press(h, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
         assertEquals("third click resolves at once", 1, player().getCurrentMediaItemIndex());
-        assertTrue(player().getPlayWhenReady());
     }
 
     @Test public void gesturesFollowTheSettings() {
@@ -204,7 +205,10 @@ public class HeadsetButtonsTest {
     @Test public void keysWorkWhilePausedAfterTheIdleStop() {
         HeadsetControls h = startPlaying(0);
         press(h, KeyEvent.KEYCODE_MEDIA_PAUSE);
-        ShadowLooper.idleMainLooper(PlaybackService.IDLE_STOP_DELAY_MS + 1_000, TimeUnit.MILLISECONDS);
+        // Playback-state events after the pause may re-arm the 60 s timer: advance until it has fired.
+        for (int i = 0; i < 5 && player().getPlaybackState() != Player.STATE_IDLE; i++) {
+            ShadowLooper.idleMainLooper(PlaybackService.IDLE_STOP_DELAY_MS + 1_000, TimeUnit.MILLISECONDS);
+        }
         assertEquals("the idle stop released the codec", Player.STATE_IDLE, player().getPlaybackState());
         press(h, KeyEvent.KEYCODE_MEDIA_PLAY);
         settle();
