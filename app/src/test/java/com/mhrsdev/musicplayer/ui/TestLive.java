@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 /** Reads a LiveData's value by observing it (keeps the observer so MediatorLiveData sources stay active). */
-public final class TestLive {
+public class TestLive {
     private TestLive() { }
 
     public static <T> T value(LiveData<T> data) {

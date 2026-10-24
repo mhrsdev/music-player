@@ -27,7 +27,7 @@ import com.mhrsdev.musicplayer.ui.nav.Screens;
  * on track change call {@link #setFromArtwork(Bitmap, String)} once the artwork is decoded, or
  * {@link #setFromSeedColor(int, String)} for placeholder art.
  */
-public final class ThemeController {
+public class ThemeController {
     private static ThemeController instance;
 
     private final Context app;
@@ -143,14 +143,11 @@ public final class ThemeController {
 
     /** Call from Application.onCreate and when the setting changes. */
     public static void applyMode(ThemeMode mode) {
-        int night;
-        switch (mode) {
-            case LIGHT: night = AppCompatDelegate.MODE_NIGHT_NO; break;
-            case DARK:
-            case BLACK: night = AppCompatDelegate.MODE_NIGHT_YES; break;
-            default: night = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM; break;
-        }
-        AppCompatDelegate.setDefaultNightMode(night);
+        AppCompatDelegate.setDefaultNightMode(switch (mode) {
+            case LIGHT -> AppCompatDelegate.MODE_NIGHT_NO;
+            case DARK, BLACK -> AppCompatDelegate.MODE_NIGHT_YES;
+            default -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        });
     }
 
     // ---- Dynamic colour (Material You, API 31+). Contract for Settings: docs/THEMING.md ----

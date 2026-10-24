@@ -1,7 +1,7 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
 /** Pure math for the wavy line (seek bar, mini-player progress, nav underline). */
-public final class WaveMath {
+public class WaveMath {
     public static final float TWO_PI = (float) (Math.PI * 2);
 
     private WaveMath() {}

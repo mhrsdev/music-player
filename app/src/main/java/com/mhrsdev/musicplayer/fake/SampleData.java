@@ -24,7 +24,7 @@ import java.util.Set;
  * Covers are debug-only assets served by the debug {@code SampleCoverProvider}; without it (release) they fall back
  * to the placeholder gradient.
  */
-public final class SampleData {
+public class SampleData {
     private static final long DAY = 86_400_000L;
     /** Fixed "now" so sorting by addedAtMs is deterministic (the added order interleaves albums: order * 11 mod 29). */
     public static final long NOW_MS = 1_790_000_000_000L;

@@ -4,7 +4,7 @@ package com.mhrsdev.musicplayer.data.db.contract;
  * Cache of network lyric lookups, one row per track. A row is valid until {@link #COL_EXPIRES_AT}; a "not found" or
  * failed lookup is stored too ({@link #COL_CONTENT} null) so the network is asked once per period.
  */
-public final class LyricsCacheContract {
+public class LyricsCacheContract {
     public static final String TABLE = "lyrics_cache";
     public static final String COL_TRACK_ID = "track_id";
     /** Raw LRC / plain text; null = cached "no lyrics". */

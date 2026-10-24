@@ -22,13 +22,13 @@ public class WaveformRepositoryImplTest {
     @Rule public InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
 
     /** Executor that runs tasks only when told to, so tests control the worker/main interleaving. */
-    private static final class Manual implements java.util.concurrent.Executor {
+    private static class Manual implements java.util.concurrent.Executor {
         final ArrayDeque<Runnable> queue = new ArrayDeque<>();
         @Override public void execute(Runnable r) { queue.add(r); }
         void drain() { while (!queue.isEmpty()) queue.poll().run(); }
     }
 
-    private static final class FakeSource implements EnvelopeSource {
+    private static class FakeSource implements EnvelopeSource {
         final List<String> calls = new ArrayList<>();
         float[] result = ramp();
         BooleanSupplier lastCancel;
@@ -64,7 +64,7 @@ public class WaveformRepositoryImplTest {
         main.drain();
     }
 
-    private static final class Capture implements Observer<float[]> {
+    private static class Capture implements Observer<float[]> {
         final List<float[]> values = new ArrayList<>();
         @Override public void onChanged(float[] v) { values.add(v); }
     }

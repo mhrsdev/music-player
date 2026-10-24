@@ -136,7 +136,7 @@ public class LyricsQualityTest {
 
     // ------------------------------------------------------------------ resolver
 
-    private static final class Src implements LyricsSource {
+    private static class Src implements LyricsSource {
         @Nullable String text;
         int calls;
         final String label;

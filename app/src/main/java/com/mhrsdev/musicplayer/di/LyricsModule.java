@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * {@link #create} once. Lyrics get their own single thread (exits after 10 s idle) so a slow HTTP call never blocks
  * the shared {@code ioExecutor}.
  */
-public final class LyricsModule {
+public class LyricsModule {
     private LyricsModule() { }
 
     /**

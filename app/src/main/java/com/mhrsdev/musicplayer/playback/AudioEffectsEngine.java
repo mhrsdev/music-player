@@ -32,7 +32,7 @@ import java.util.List;
  * effect unsupported in the {@link SoundState}. Nothing polls; everything is driven by player events and setters.
  */
 @OptIn(markerClass = UnstableApi.class)
-public final class AudioEffectsEngine implements AudioEffectsController {
+public class AudioEffectsEngine implements AudioEffectsController {
     private final ExoPlayer player;
     private final SoundPrefs prefs;
     private final StateData state = new StateData();
@@ -283,7 +283,7 @@ public final class AudioEffectsEngine implements AudioEffectsController {
     }
 
     /** Observing the state (the sound screen) is what makes the effects probe the device and stay attached. */
-    private final class StateData extends MutableLiveData<SoundState> {
+    private class StateData extends MutableLiveData<SoundState> {
         @Override protected void onActive() {
             refresh();
             setValue(buildState());

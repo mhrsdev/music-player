@@ -6,7 +6,7 @@ import androidx.annotation.StringRes;
 import com.mhrsdev.musicplayer.databinding.LibraryStateBinding;
 
 /** Drives the shared empty / loading layout. */
-public final class StateView {
+public class StateView {
     private StateView() { }
 
     public static void hide(LibraryStateBinding s) {

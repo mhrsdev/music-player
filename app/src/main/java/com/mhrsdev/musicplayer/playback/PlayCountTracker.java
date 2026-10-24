@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
  * (seeking forward does not count). Pure logic, no Android; the caller passes a monotonic clock ({@code now}, ms)
  * and schedules ONE timeout from {@link #msUntilCount}, so nothing polls.
  */
-final class PlayCountTracker {
+class PlayCountTracker {
     static final long MAX_THRESHOLD_MS = 30_000L;
     static final long MIN_THRESHOLD_MS = 1_000L;
     static final float FRACTION = 0.3f;

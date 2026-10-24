@@ -14,7 +14,7 @@ import com.mhrsdev.musicplayer.R;
  * (slightly smaller, cut by the screen edge), snap to the start keyline. Only scale/alpha in the scroll callback
  * (no allocation per frame); RecyclerView keeps recycling normally. RTL mirrors.
  */
-final class HeroCarousel {
+class HeroCarousel {
     static final int GAP_DP = 8, PEEK_DP = 68, TAIL_DP = 40, START_DP = 16;
     static final float NEIGHBOUR_SCALE = 0.86f;
 
@@ -138,7 +138,7 @@ final class HeroCarousel {
     }
 
     /** Snaps the nearest card's start edge to the start padding (LTR and RTL). */
-    private static final class StartSnap extends LinearSnapHelper {
+    private static class StartSnap extends LinearSnapHelper {
         @Nullable private OrientationHelper helper;
 
         private OrientationHelper helper(RecyclerView.LayoutManager lm) {

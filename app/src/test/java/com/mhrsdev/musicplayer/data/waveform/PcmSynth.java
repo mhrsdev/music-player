@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /** Synthetic interleaved PCM for tests. */
-final class PcmSynth {
+class PcmSynth {
     static final int RATE = 44_100;
 
     private PcmSynth() { }

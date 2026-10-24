@@ -5,7 +5,7 @@ package com.mhrsdev.musicplayer.data.db.contract;
  * foreign key to {@code tracks}: a track that disappears from the library (SD card removed) keeps its slot and is
  * simply hidden by the inner join until it is back.
  */
-public final class PlaylistTracksContract {
+public class PlaylistTracksContract {
     public static final String TABLE = "playlist_tracks";
     public static final String COL_PLAYLIST_ID = "playlist_id";
     public static final String COL_TRACK_ID = "track_id";

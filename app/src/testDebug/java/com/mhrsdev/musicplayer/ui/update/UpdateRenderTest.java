@@ -31,7 +31,7 @@ public class UpdateRenderTest {
             "## What's new\n- **Update** screen: check, download, verify, install\n- Persian UI polish\n- [Changelog](https://example.com)",
             "2026-10-20T10:00:00Z", "https://example.com/a.apk", 14_600_000L, "https://example.com/a.apk.sha256", null);
 
-    private static final class Fake implements UpdateRepository {
+    private static class Fake implements UpdateRepository {
         final MutableLiveData<UpdateState> state = new MutableLiveData<>();
         final MutableLiveData<UpdateSettings> settings = new MutableLiveData<>(
                 new UpdateSettings(true, true, false, System.currentTimeMillis() - 3 * 3_600_000L));

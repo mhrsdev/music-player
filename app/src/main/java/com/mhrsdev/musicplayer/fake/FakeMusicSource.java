@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 /** Searches {@link SampleData}; has no playable URIs. Callbacks run inline. */
-public final class FakeMusicSource implements MusicSource {
+public class FakeMusicSource implements MusicSource {
     @Override public String getId() {
         return "fake";
     }

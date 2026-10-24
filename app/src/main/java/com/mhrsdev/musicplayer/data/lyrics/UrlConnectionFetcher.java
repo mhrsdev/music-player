@@ -9,7 +9,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 /** {@link HttpFetcher} on the platform {@link HttpURLConnection}: short timeouts, capped body, cancellable. */
-public final class UrlConnectionFetcher implements HttpFetcher {
+public class UrlConnectionFetcher implements HttpFetcher {
     private static final int CONNECT_TIMEOUT_MS = 5_000;
     private static final int READ_TIMEOUT_MS = 8_000;
     private static final int MAX_BODY = 2 * 1024 * 1024;

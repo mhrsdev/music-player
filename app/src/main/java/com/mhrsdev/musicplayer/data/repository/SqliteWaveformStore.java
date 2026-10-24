@@ -13,7 +13,7 @@ import com.mhrsdev.musicplayer.data.waveform.WaveformStore;
  * {@code modified_ms} (a rescan that sees an edited file invalidates the row), so the {@code fingerprint} argument is
  * not stored. Blocks on the database: background thread only.
  */
-public final class SqliteWaveformStore implements WaveformStore {
+public class SqliteWaveformStore implements WaveformStore {
     private final DbHelper helper;
 
     public SqliteWaveformStore(DbHelper helper) {

@@ -41,19 +41,20 @@ class BrowseTree {
     /** A folder or a track; null for an unknown id. */
     @Nullable
     MediaItem item(String id) {
-        switch (id) {
-            case ROOT: return root();
-            case RECENT: return folder(id, res.getString(R.string.browse_recent), MediaMetadata.MEDIA_TYPE_FOLDER_MIXED);
-            case MOST: return folder(id, res.getString(R.string.browse_most_played), MediaMetadata.MEDIA_TYPE_FOLDER_MIXED);
-            case LIKED: return folder(id, res.getString(R.string.browse_liked), MediaMetadata.MEDIA_TYPE_FOLDER_MIXED);
-            case PLAYLISTS: return folder(id, res.getString(R.string.browse_playlists), MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS);
-            case ALBUMS: return folder(id, res.getString(R.string.browse_albums), MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS);
-            case ARTISTS: return folder(id, res.getString(R.string.browse_artists), MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS);
-            default:
-                if (id.startsWith("[") || library == null) return null;
+        return switch (id) {
+            case ROOT -> root();
+            case RECENT -> folder(id, res.getString(R.string.browse_recent), MediaMetadata.MEDIA_TYPE_FOLDER_MIXED);
+            case MOST -> folder(id, res.getString(R.string.browse_most_played), MediaMetadata.MEDIA_TYPE_FOLDER_MIXED);
+            case LIKED -> folder(id, res.getString(R.string.browse_liked), MediaMetadata.MEDIA_TYPE_FOLDER_MIXED);
+            case PLAYLISTS -> folder(id, res.getString(R.string.browse_playlists), MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS);
+            case ALBUMS -> folder(id, res.getString(R.string.browse_albums), MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS);
+            case ARTISTS -> folder(id, res.getString(R.string.browse_artists), MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS);
+            default -> {
+                if (id.startsWith("[") || library == null) yield null;
                 Track t = library.track(id);
-                return t == null ? null : TrackMapper.toMediaItem(t);
-        }
+                yield t == null ? null : TrackMapper.toMediaItem(t);
+            }
+        };
     }
 
     List<MediaItem> children(String parentId) {

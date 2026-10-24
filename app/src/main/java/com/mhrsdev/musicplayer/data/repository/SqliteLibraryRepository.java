@@ -38,7 +38,7 @@ import java.util.function.Function;
  * only while observed ({@link DbLiveData}); writes run on the io executor and notify through {@link ChangeNotifier}.
  * Also the {@link LibraryAdmin}: library scanning and the remaining playlist edits (rename, delete, remove, reorder).
  */
-public final class SqliteLibraryRepository implements LibraryRepository, LibraryAdmin {
+public class SqliteLibraryRepository implements LibraryRepository, LibraryAdmin {
     private static final int HISTORY_LIMIT = 200;
     private static final int RECENT_LIMIT = 100;
     private static final int SEARCH_LIMIT = 50;

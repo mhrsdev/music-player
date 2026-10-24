@@ -12,7 +12,7 @@ import java.io.IOException;
  * Simple file-backed {@link WaveformStore}: one small file per track ({@code id, fingerprint, blob}) in a directory.
  * The file name is a hash of the id; the id inside the file guards against hash collisions.
  */
-public final class FileWaveformStore implements WaveformStore {
+public class FileWaveformStore implements WaveformStore {
     private final File dir;
 
     public FileWaveformStore(File dir) {

@@ -6,7 +6,7 @@ package com.mhrsdev.musicplayer.ui.player;
  * at least {@code minRatio} (WCAG 2.x) against every backdrop pixel inside a horizontal band. Runs once per track on
  * a ~20×20 bitmap, so it costs nothing per frame.
  */
-public final class ContrastGuard {
+public class ContrastGuard {
     private ContrastGuard() {}
 
     /** WCAG relative luminance of an opaque sRGB color. */

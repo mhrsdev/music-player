@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Non-persistent {@link WaveformStore} for tests and previews. */
-public final class InMemoryWaveformStore implements WaveformStore {
+public class InMemoryWaveformStore implements WaveformStore {
     private record Entry(String fingerprint, byte[] blob) { }
 
     private final Map<String, Entry> entries = new HashMap<>();

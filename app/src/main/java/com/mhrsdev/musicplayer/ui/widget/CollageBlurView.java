@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
  * stretched with bitmap filtering plus a legibility scrim. No live blur, zero per-frame work.
  * Without covers it falls back to the seed colours of {@link PlaceholderArt}.
  */
-public final class CollageBlurView extends View {
+public class CollageBlurView extends View {
     private static final int W = 96, H = 48, COVER_PX = 96;
     private static final ExecutorService EXEC = idleExitPool();
     /** One low-priority worker that exits after 10 s idle (a plain single-thread executor would keep it forever). */

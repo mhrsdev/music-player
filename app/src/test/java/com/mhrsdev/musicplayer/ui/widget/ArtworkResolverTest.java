@@ -47,7 +47,7 @@ public class ArtworkResolverTest {
     }
 
     /** Fake provider: nothing opens unless configured; counts calls. */
-    static final class FakeBackend implements ArtworkResolver.Backend {
+    static class FakeBackend implements ArtworkResolver.Backend {
         final Map<String, byte[]> embedded = new HashMap<>();
         final Map<String, byte[]> streams = new HashMap<>();
         final Map<String, List<ArtworkResolver.AudioRef>> albums = new HashMap<>();

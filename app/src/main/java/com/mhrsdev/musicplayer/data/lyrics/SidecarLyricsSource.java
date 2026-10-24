@@ -10,7 +10,7 @@ import java.io.RandomAccessFile;
  * A lyrics file next to the audio file with the same base name. Word-synced formats first ({@code .ttml}, {@code .elrc}
  * = enhanced LRC or JSON), then {@code .lrc}, a {@code .xml} that is TTML, then {@code .txt}.
  */
-public final class SidecarLyricsSource implements LyricsSource {
+public class SidecarLyricsSource implements LyricsSource {
     private static final String[] EXTENSIONS = {".ttml", ".elrc", ".lrc", ".LRC", ".xml", ".txt"};
     private static final int MAX_BYTES = 512 * 1024;
     private final AudioFileLocator locator;

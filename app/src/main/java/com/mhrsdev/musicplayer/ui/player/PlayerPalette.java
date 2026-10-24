@@ -8,7 +8,7 @@ import androidx.core.graphics.ColorUtils;
  * Artwork-derived roles (DESIGN §2.2) computed from a track's placeholder seed until T2's palette extraction from
  * real artwork lands. Deterministic, allocation-free after construction. Also hosts the motion gate.
  */
-public final class PlayerPalette {
+public class PlayerPalette {
     public final int primary, onPrimary, container, onContainer, glow, deep;
 
     private PlayerPalette(float hue) {

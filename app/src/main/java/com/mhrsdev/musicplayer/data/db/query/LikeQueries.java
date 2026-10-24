@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** All SQL touching the {@code likes} table. Call off the main thread. Example of the query-class pattern. */
-public final class LikeQueries {
+public class LikeQueries {
     private final SQLiteDatabase db;
 
     public LikeQueries(SQLiteDatabase db) {

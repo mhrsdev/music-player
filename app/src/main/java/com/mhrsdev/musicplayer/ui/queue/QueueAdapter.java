@@ -26,7 +26,7 @@ import java.util.Locale;
  * Row 0 is the current track ("Now playing", highlighted, fixed); rows 1.. are Up next. The adapter keeps a local copy
  * that is reordered live while dragging; the move is committed to the ViewModel on drop.
  */
-public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder> {
+public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder> {
     public interface Actions {
         void onPlay(int upNextPos);
         void onStartDrag(RecyclerView.ViewHolder h);
@@ -128,7 +128,7 @@ public final class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder
 
     @Override public int getItemCount() { return upNext.size() + offset(); }
 
-    static final class Holder extends RecyclerView.ViewHolder {
+    static class Holder extends RecyclerView.ViewHolder {
         final View row, drag;
         final TextView title, artist, duration, removeBg;
         final com.mhrsdev.musicplayer.ui.widget.ArtworkView art;

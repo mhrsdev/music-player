@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /** Pure Home-feed rules: what goes into each section and in which order. Empty sections are omitted. */
-public final class HomeRanking {
+public class HomeRanking {
     static final int HERO_COUNT = 8;
     static final int THROWBACK_COUNT = 10;
     static final int QUICK_PICK_COUNT = 8;

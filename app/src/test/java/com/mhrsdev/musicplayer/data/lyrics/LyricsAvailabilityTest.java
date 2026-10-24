@@ -12,7 +12,7 @@ import org.junit.Test;
 
 /** Lyrics-button availability: local sources, cache hit / miss / negative, online toggle, track switches. */
 public class LyricsAvailabilityTest {
-    private static final class Src implements LyricsSource {
+    private static class Src implements LyricsSource {
         @Nullable String text;
         int calls;
 

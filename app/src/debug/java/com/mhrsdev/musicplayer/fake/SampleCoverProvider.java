@@ -13,7 +13,7 @@ import java.io.IOException;
  * Debug-only: serves app/src/debug/assets/sample-covers/ as content://com.mhrsdev.musicplayer.samplecovers/NAME.jpg so
  * the unchanged ArtworkLoader can decode {@link SampleData} covers (galleries, Robolectric screenshots). Not in release.
  */
-public final class SampleCoverProvider extends ContentProvider {
+public class SampleCoverProvider extends ContentProvider {
     @Override public boolean onCreate() {
         return true;
     }

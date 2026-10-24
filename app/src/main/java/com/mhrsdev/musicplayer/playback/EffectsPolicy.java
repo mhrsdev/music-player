@@ -1,7 +1,7 @@
 package com.mhrsdev.musicplayer.playback;
 
 /** Pure rules of {@link AudioEffectsEngine}: when effects are worth holding, flatness, level (de)serialisation. */
-final class EffectsPolicy {
+class EffectsPolicy {
     private EffectsPolicy() {}
 
     /**

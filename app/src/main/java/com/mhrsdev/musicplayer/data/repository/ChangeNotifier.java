@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
  * active {@link DbLiveData}s reload only when one of their topics changed. Per-topic counters let a LiveData that was
  * inactive at the time notice on its next activation, so nothing listens (or wakes the CPU) while the UI is hidden.
  */
-public final class ChangeNotifier {
+public class ChangeNotifier {
     public static final int TRACKS = 1;
     public static final int LIKES = 1 << 1;
     public static final int PLAYLISTS = 1 << 2;

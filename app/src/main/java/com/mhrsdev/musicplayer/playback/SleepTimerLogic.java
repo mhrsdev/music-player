@@ -8,7 +8,7 @@ import com.mhrsdev.musicplayer.domain.model.SleepTimer;
  * ({@code now}, ms), schedules one timeout from {@link #nextWakeMs}, and applies {@link #volume} (fade-out
  * during the last {@link #FADE_MS}) and {@link #isExpired}.
  */
-final class SleepTimerLogic {
+class SleepTimerLogic {
     static final long FADE_MS = 8_000L;
     static final long FADE_STEP_MS = 250L;
 
@@ -81,10 +81,10 @@ final class SleepTimerLogic {
     }
 
     SleepTimer snapshot(long now) {
-        switch (kind) {
-            case COUNTDOWN: return SleepTimer.countdown(remainingMs(now), totalMs);
-            case END_OF_TRACK: return SleepTimer.END_OF_TRACK;
-            default: return SleepTimer.OFF;
-        }
+        return switch (kind) {
+            case COUNTDOWN -> SleepTimer.countdown(remainingMs(now), totalMs);
+            case END_OF_TRACK -> SleepTimer.END_OF_TRACK;
+            default -> SleepTimer.OFF;
+        };
     }
 }

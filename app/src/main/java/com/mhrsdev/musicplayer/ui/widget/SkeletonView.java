@@ -24,7 +24,7 @@ import java.util.List;
  * pulse ticked at 15 fps by a single main-thread handler; it stops as soon as no skeleton is visible.
  * Under reduce-motion / battery saver the frame is static (no ticks at all).
  */
-public final class SkeletonView extends View {
+public class SkeletonView extends View {
     private static final long FRAME_MS = 66; // <= 15 fps
     private static final long PERIOD_MS = 1400;
     private static final List<SkeletonView> LIVE = new ArrayList<>();

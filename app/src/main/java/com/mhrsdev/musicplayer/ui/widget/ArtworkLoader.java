@@ -66,7 +66,7 @@ public class ArtworkLoader {
     private final Object[] probeLocks = new Object[8];
     private final Handler main = new Handler(Looper.getMainLooper());
 
-    private static final class Pending {
+    private static class Pending {
         final List<Callback> callbacks = new ArrayList<>(2);
         @Nullable Future<?> future;
     }
@@ -251,7 +251,7 @@ public class ArtworkLoader {
     }
 
     /** Real platform access: MediaStore thumbnails/queries, MediaMetadataRetriever, files. Worker thread only. */
-    public static final class PlatformBackend implements ArtworkResolver.Backend {
+    public static class PlatformBackend implements ArtworkResolver.Backend {
         private static final String AUDIO_URI = "content://media/external/audio/media/";
         private final Context context;
         private final ContentResolver cr;

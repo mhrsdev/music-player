@@ -3,7 +3,7 @@ package com.mhrsdev.musicplayer.ui.widget;
 import java.util.Locale;
 
 /** Pure seek-bar math (JVM-testable). The bar always runs left-to-right, also in RTL (tape direction, D-A). */
-public final class SeekMath {
+public class SeekMath {
     private SeekMath() {}
 
     /** Fraction 0..1 of {@code pos} in {@code duration}; 0 when duration is unknown. */

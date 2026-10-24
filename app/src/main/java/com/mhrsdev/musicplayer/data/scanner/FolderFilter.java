@@ -7,7 +7,7 @@ import java.util.Set;
  * Include / exclude folder rules from the settings (absolute directory paths). An empty include set means "everything";
  * an exclude always wins. Matching is by directory prefix, so {@code /sdcard/Music} does not match {@code /sdcard/Music2}.
  */
-public final class FolderFilter {
+public class FolderFilter {
     private final Set<String> include;
     private final Set<String> exclude;
 

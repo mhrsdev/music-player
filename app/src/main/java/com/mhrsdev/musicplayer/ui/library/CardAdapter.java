@@ -13,7 +13,7 @@ import com.mhrsdev.musicplayer.domain.model.Track;
 import java.util.List;
 
 /** 152 dp cover cards for a horizontal row of tracks (Library "Recently saved"). */
-final class CardAdapter extends ListAdapter<Track, CardAdapter.Holder> {
+class CardAdapter extends ListAdapter<Track, CardAdapter.Holder> {
 
     interface Listener {
         void onCardClick(List<Track> list, int position);
@@ -48,7 +48,7 @@ final class CardAdapter extends ListAdapter<Track, CardAdapter.Holder> {
         });
     }
 
-    static final class Holder extends RecyclerView.ViewHolder {
+    static class Holder extends RecyclerView.ViewHolder {
         final HomeCardBinding b;
 
         Holder(HomeCardBinding b) {

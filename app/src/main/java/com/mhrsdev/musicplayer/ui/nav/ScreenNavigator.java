@@ -31,9 +31,9 @@ public interface ScreenNavigator {
 
     @Nullable
     static ScreenNavigator from(Context context) {
-        while (context instanceof ContextWrapper) {
-            if (context instanceof ScreenNavigator) return (ScreenNavigator) context;
-            context = ((ContextWrapper) context).getBaseContext();
+        while (context instanceof ContextWrapper wrapper) {
+            if (context instanceof ScreenNavigator nav) return nav;
+            context = wrapper.getBaseContext();
         }
         return null;
     }

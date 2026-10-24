@@ -14,7 +14,7 @@ import java.util.function.Function;
  * {@code size:modified:duration} of the track's file, the cache validity key. Does I/O, so call it off the main
  * thread. Anything unreadable degrades to 0 for that part, never throws.
  */
-public final class MediaFingerprint implements Function<Track, String> {
+public class MediaFingerprint implements Function<Track, String> {
     private final ContentResolver resolver;
 
     public MediaFingerprint(Context context) {

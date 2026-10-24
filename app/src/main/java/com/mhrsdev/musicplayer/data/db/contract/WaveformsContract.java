@@ -4,7 +4,7 @@ package com.mhrsdev.musicplayer.data.db.contract;
  * Cached loudness envelopes. Key = track id + bar count; a row is valid only while its {@link #COL_MODIFIED_MS}
  * equals the track's current file modification time.
  */
-public final class WaveformsContract {
+public class WaveformsContract {
     public static final String TABLE = "waveforms";
     public static final String COL_TRACK_ID = "track_id";
     public static final String COL_BARS = "bars";

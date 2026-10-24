@@ -16,7 +16,7 @@ import com.mhrsdev.musicplayer.playback.PlayCountListener;
 import java.util.function.Consumer;
 
 /** Factory for the real playback stack; {@code AppContainer} calls it instead of constructing the fake. */
-public final class PlaybackModule {
+public class PlaybackModule {
     private PlaybackModule() {}
 
     /**

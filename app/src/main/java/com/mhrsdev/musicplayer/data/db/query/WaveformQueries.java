@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.mhrsdev.musicplayer.data.db.contract.TracksContract;
 
 /** All SQL touching the waveform cache. Validity is checked against {@code tracks.modified_ms} inside SQL. */
-public final class WaveformQueries {
+public class WaveformQueries {
     private final SQLiteDatabase db;
 
     public WaveformQueries(SQLiteDatabase db) {

@@ -127,14 +127,14 @@ public class UpdateFragment extends Fragment {
 
     private void renderError(UpdateState.ErrorKind kind) {
         switch (kind) {
-            case NETWORK: title(getString(R.string.update_err_network), getString(R.string.update_err_network_sub)); break;
-            case RATE_LIMITED: title(getString(R.string.update_err_rate), getString(R.string.update_err_rate_sub)); break;
-            case BAD_RESPONSE: title(getString(R.string.update_err_bad), getString(R.string.update_err_bad_sub)); break;
-            case DOWNLOAD: title(getString(R.string.update_err_download), getString(R.string.update_err_download_sub)); break;
-            case CHECKSUM: title(getString(R.string.update_err_checksum), getString(R.string.update_err_checksum_sub)); break;
-            case INVALID_APK: title(getString(R.string.update_err_invalid), getString(R.string.update_err_invalid_sub)); break;
-            case DIFFERENT_SIGNATURE: title(getString(R.string.update_err_signature), getString(R.string.update_err_signature_sub)); break;
-            default: title(getString(R.string.update_err_install), getString(R.string.update_err_install_sub));
+            case NETWORK -> title(getString(R.string.update_err_network), getString(R.string.update_err_network_sub));
+            case RATE_LIMITED -> title(getString(R.string.update_err_rate), getString(R.string.update_err_rate_sub));
+            case BAD_RESPONSE -> title(getString(R.string.update_err_bad), getString(R.string.update_err_bad_sub));
+            case DOWNLOAD -> title(getString(R.string.update_err_download), getString(R.string.update_err_download_sub));
+            case CHECKSUM -> title(getString(R.string.update_err_checksum), getString(R.string.update_err_checksum_sub));
+            case INVALID_APK -> title(getString(R.string.update_err_invalid), getString(R.string.update_err_invalid_sub));
+            case DIFFERENT_SIGNATURE -> title(getString(R.string.update_err_signature), getString(R.string.update_err_signature_sub));
+            default -> title(getString(R.string.update_err_install), getString(R.string.update_err_install_sub));
         }
     }
 

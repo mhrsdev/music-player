@@ -17,7 +17,7 @@ import org.junit.Test;
 public class LrclibClientTest {
 
     /** Canned responses by URL path prefix ("/get", "/search"); records every URL requested. */
-    private static final class FakeHttp implements HttpFetcher {
+    private static class FakeHttp implements HttpFetcher {
         final Map<String, Object> responses = new LinkedHashMap<>(); // String body, null (=404) or IOException
         final List<String> urls = new ArrayList<>();
 

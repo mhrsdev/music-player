@@ -26,7 +26,7 @@ import java.util.Locale;
  * Each band column is the touch target (and a virtual accessibility slider with a range and +/- 1 dB actions).
  * Idle cost: nothing is animated; it only redraws on input or new data.
  */
-public final class EqualizerView extends View {
+public class EqualizerView extends View {
     public interface Listener {
         void onBandChanged(int band, int levelMb);
     }
@@ -272,7 +272,7 @@ public final class EqualizerView extends View {
 
     // --- accessibility: each band is a virtual slider ---------------------------------------
 
-    private final class EqualizerA11y extends ExploreByTouchHelper {
+    private class EqualizerA11y extends ExploreByTouchHelper {
         EqualizerA11y(View host) {
             super(host);
         }

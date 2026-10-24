@@ -9,7 +9,7 @@ import androidx.annotation.WorkerThread;
  * (approximates a Gaussian), boost saturation, and let the caller draw the tiny bitmap stretched with
  * bitmap filtering. One-off cost per track change (~1 ms), ~9 KB of memory, zero per-frame cost.
  */
-public final class BackdropBlur {
+public class BackdropBlur {
     public static final int SIZE = 48;
 
     private BackdropBlur() {}

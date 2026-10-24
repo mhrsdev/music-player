@@ -13,7 +13,7 @@ import java.util.Locale;
  * millisecond timestamps only) win over unsynchronised lyrics (USLT). Walks frame headers with seeks, so large
  * artwork frames are skipped, not loaded. Not handled: tag-level unsynchronisation, compressed/encrypted frames.
  */
-final class Id3LyricsReader {
+class Id3LyricsReader {
     private static final int MAX_FRAME = 512 * 1024;
 
     private Id3LyricsReader() { }

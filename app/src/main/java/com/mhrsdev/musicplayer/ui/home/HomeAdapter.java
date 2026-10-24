@@ -306,7 +306,7 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         return c.getResources().getConfiguration().getLocales().get(0);
     }
 
-    static final class Bound<B extends androidx.viewbinding.ViewBinding> extends RecyclerView.ViewHolder {
+    static class Bound<B extends androidx.viewbinding.ViewBinding> extends RecyclerView.ViewHolder {
         final B b;
 
         Bound(B b) {

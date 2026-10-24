@@ -19,7 +19,7 @@ import java.util.concurrent.Executor;
  * {@code AppContainer.ioExecutor}). Nothing here touches the database or MediaStore until something is observed
  * or called, so creating it on the main thread at startup is cheap.
  */
-public final class DataModule {
+public class DataModule {
     public final DbHelper dbHelper;
     public final SettingsStore settings;
     public final MediaStoreScanner scanner;

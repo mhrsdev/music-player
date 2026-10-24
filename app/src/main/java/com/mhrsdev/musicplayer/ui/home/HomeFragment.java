@@ -25,7 +25,7 @@ import com.mhrsdev.musicplayer.ui.nav.Screens;
 import java.util.List;
 
 /** Home: Recently added hero carousel, Throwbacks carousel, Quick picks list (DESIGN.md 01). */
-public final class HomeFragment extends Fragment implements HomeAdapter.Listener {
+public class HomeFragment extends Fragment implements HomeAdapter.Listener {
     private HomeFragmentBinding b;
     private HomeViewModel vm;
     private HomeBackdrop backdrop;

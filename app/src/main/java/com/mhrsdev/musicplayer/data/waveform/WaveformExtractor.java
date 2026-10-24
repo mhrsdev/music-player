@@ -18,7 +18,7 @@ import java.util.function.BooleanSupplier;
  * RAM stays at one codec buffer; input outside the plan is skipped with {@code advance()} (small gaps) or
  * {@code seekTo()} (gaps over {@link #SEEK_GAP_US}) and never decoded.
  */
-public final class WaveformExtractor implements EnvelopeSource {
+public class WaveformExtractor implements EnvelopeSource {
     private static final String TAG = "WaveformExtractor";
     private static final long DEQUEUE_TIMEOUT_US = 5_000;
     private static final long SEEK_GAP_US = 2_000_000;

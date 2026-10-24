@@ -10,7 +10,7 @@ import androidx.annotation.ColorInt;
 import com.mhrsdev.musicplayer.R;
 
 /** Design tokens as Java constants (dp / ms) plus theme-attribute helpers. Sizes mirror res/values/dimens.xml. */
-public final class Tokens {
+public class Tokens {
     private Tokens() {}
 
     // Shape (dp)

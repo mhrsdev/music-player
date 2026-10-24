@@ -55,7 +55,7 @@ import java.util.Locale;
  * play/pause between rounded prev/next; output chip. All observation uses the view lifecycle, so position ticks and
  * animations stop when the player is not visible.
  */
-public final class PlayerFragment extends Fragment {
+public class PlayerFragment extends Fragment {
 
     private PlayerFragmentBinding b;
     private BaseSeekView seek;
@@ -852,7 +852,7 @@ public final class PlayerFragment extends Fragment {
     // ---------------------------------------------------------------- cover gestures, share, sound
 
     /** Tap = lyrics, double-tap left/right half = -10/+10 s (tape direction, also in RTL), horizontal fling = skip. */
-    private final class CoverGestures extends android.view.GestureDetector.SimpleOnGestureListener {
+    private class CoverGestures extends android.view.GestureDetector.SimpleOnGestureListener {
         @Override public boolean onDown(@NonNull MotionEvent e) { return true; }
 
         @Override public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {

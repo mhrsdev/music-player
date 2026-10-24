@@ -7,7 +7,7 @@ package com.mhrsdev.musicplayer.ui.theme;
  * barely count. The winning bin's weighted mean color is the seed. Falls back to the plain mean for greyscale art.
  * Runs in well under a millisecond for 1024 pixels and allocates nothing beyond the caller's scratch arrays.
  */
-public final class ColorExtractor {
+public class ColorExtractor {
     static final int BINS = 24;
 
     private ColorExtractor() {}

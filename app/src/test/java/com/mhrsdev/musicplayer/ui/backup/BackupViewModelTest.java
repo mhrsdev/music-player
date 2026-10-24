@@ -19,7 +19,7 @@ public class BackupViewModelTest {
     @Rule public InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
 
     /** Answers immediately with {@link #answer}; remembers the last restore mode. */
-    static final class StubService implements BackupService {
+    static class StubService implements BackupService {
         BackupSummary answer = new BackupSummary(2, 3, 4, 1, 5, BackupSummary.Error.NONE);
         RestoreMode restoredWith;
 

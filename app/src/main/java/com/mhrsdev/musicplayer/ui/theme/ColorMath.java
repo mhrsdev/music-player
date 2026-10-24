@@ -1,7 +1,7 @@
 package com.mhrsdev.musicplayer.ui.theme;
 
 /** Pure color math (no Android dependencies, so it is JVM-testable). Colors are packed ARGB ints. */
-public final class ColorMath {
+public class ColorMath {
     private ColorMath() {}
 
     public static int argb(int a, int r, int g, int b) {

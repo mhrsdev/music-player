@@ -1,7 +1,7 @@
 package com.mhrsdev.musicplayer.data.db.contract;
 
 /** Play history and play counts in one row per track: history = rows ordered by last play, counts drive Home. */
-public final class PlayStatsContract {
+public class PlayStatsContract {
     public static final String TABLE = "play_stats";
     public static final String COL_TRACK_ID = "track_id";
     public static final String COL_PLAY_COUNT = "play_count";
