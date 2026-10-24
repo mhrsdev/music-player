@@ -501,3 +501,19 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > ولی خب گوشی منه که اپدیت اخره بقیه چی؟ / پس برنامه باید واسه قبلیا هم بهینه باشه
 
 **Summary:** Owner's phone: Android 17, One UI 9 (targetSdk 37 -> Android 17 behaviour changes apply: per-app memory limiter, widget RemoteViews bitmap limit, background audio hardening). But most users have older Android versions and weaker phones: the app (minSdk 26) must be compatible AND optimised across API 26-37, including low-RAM/low-end devices. Task C1: API matrix tests + low-end device profile.
+
+---
+
+## D33 — 2026-10-24 — First real crash log (friend, Note 9 / Android 10): regex + ICU
+
+**Original (verbatim, forwarded from a friend):** "نسخه 0.3.1 برام باگ داره" + "Mowj diagnostics … Samsung SM-N960F (crownlte), Android 10 (SDK 29) … java.lang.ExceptionInInitializerError … Caused by: java.util.regex.PatternSyntaxException: Syntax error in regexp pattern near index 32 \\([^()]*\\)|\\[[^\\[\\]]*]|\\{[^{}]*}|【[^】]*】 … process up 2 s … breadcrumbs: scan end, screen HomeFragment". Owner: "دوستم اینو گفت".
+
+**Summary:** Root cause of launch/play crashes found with the new Diagnostics screen: `data/lyrics/LyricsQueryNormalizer.BRACKETS` has an unescaped `}`; Android's ICU-backed regex rejects it (the JDK regex used in JVM tests accepts it), a static initializer fails -> ExceptionInInitializerError -> process dies ~2 s after start. Affects v0.3.0 and v0.3.1. Hotfix v0.3.2: escape + audit every regex for ICU compatibility, safe-compile helper, SafeExecutor catches Throwable, a source-scan test for ICU-incompatible regex. (PF-B, branch task/pfb-hotfix-regex.)
+
+---
+
+## D34 — 2026-10-24 — Look at BitChord for useful ideas
+
+**Original (verbatim):** "این پروژه روهم بخون ببین اگه چیزیش بدرد میخپرد استفاده کن: https://github.com/kushagrasinghx/BitChord"
+
+**Summary:** Reviewed BitChord (YouTube Music client, Kotlin, Apple-Music-inspired, **GPL-3.0**). We are MIT + Java-only and the owner's rule is "don't copy others' implementations", so NO code is taken; only ideas, implemented in our own way. Candidate ideas (backlog, after the performance-only releases): crossfade/gapless tuning, 'stats for nerds' audio-format overlay, ListenBrainz/Last.fm scrobbling, optional extra lyrics providers (ToS risk), per-network quality (n/a for local files). Skipped for perf/scope: animated artwork canvas, frosted-glass bars, Discord RPC, streaming sources.
