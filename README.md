@@ -9,7 +9,7 @@ Word-synced lyrics, nine seek bars, a living backdrop, and a design built around
 
 <p align="center">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green">
-  <img alt="Release v0.3.1" src="https://img.shields.io/badge/release-v0.3.1-blue">
+  <img alt="Release v0.3.2" src="https://img.shields.io/badge/release-v0.3.2-blue">
   <img alt="Android 8.0+" src="https://img.shields.io/badge/Android-8.0%2B-brightgreen">
   <img alt="Java only" src="https://img.shields.io/badge/code-Java-orange">
 </p>

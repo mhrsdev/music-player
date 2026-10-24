@@ -2,6 +2,20 @@
 
 Releases are stable unless the version has a `-` suffix (e.g. `v1.0.0-rc.1`). `v0.1.0` and `v0.2.0` were published as pre-releases; `v0.3.0` onward are normal releases.
 
+## v0.3.2
+
+Normal (stable) release. **If you use v0.3.0 or v0.3.1, please update.**
+
+### Fixed
+- **Important:** v0.3.0 and v0.3.1 could crash within seconds of launch, or when playing a song, on some Android phones. A text-cleaning pattern used for finding lyrics was rejected by Android's regular-expression engine. It was found thanks to the Diagnostics log from a real phone (Galaxy Note 9, Android 10).
+- That pattern, and one more like it in the lyrics parser, are fixed. All patterns in the app were checked.
+- A failing pattern can no longer crash the app, and a new test checks every pattern against Android's stricter rules.
+- A failure while a helper class loads is now logged instead of closing the app.
+
+### Known limitations
+- Not verified on real devices beyond the reported phone. If anything crashes, share the Diagnostics log (Settings > About > Diagnostics).
+- The v0.3.1 and v0.3.0 limitations below still apply.
+
 ## v0.3.1
 
 Normal (stable) release. Smoother and more stable than v0.3.0, with a crash log built in. Verified by tests only, not on real devices.
