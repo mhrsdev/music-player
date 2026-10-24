@@ -47,7 +47,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ todo · model in brackets
 - ✅ **B2** [Opus] 6 new seek-bar styles + live-preview picker (D24); owner keeps all 6 (D27). Merged into ccr (local, push pending CI).
 - ✅ **E2** [Sonnet] Perf regression (shared PeriodicTick/FrameDriver, bucketed artwork decode) — merged into ccr.
 - ✅ **L2** [Opus] Lyrics junk filter, query normaliser, empty states/tools (D25) — merged into ccr (d57328b); also fixed 3 lint errors (Motion API33, ArtworkLoader thread, home_mix_card RTL) and M1ThemeRenderTest index.
-- 🔄 **CI1** [Sonnet] BLOCKER: CI hangs (40-min timeout) in unit tests on every run since ~21:20 UTC (after H1/F1/G1/M1 merges). Find hanging test, fix root cause, add test logging + per-task timeout. `task/ci1-test-hang`.
+- ✅ **CI1** (hang fixed, merged; flaky PlaybackNotificationTest follow-up still running)  [Sonnet] BLOCKER: CI hangs (40-min timeout) in unit tests on every run since ~21:20 UTC (after H1/F1/G1/M1 merges). Find hanging test, fix root cause, add test logging + per-task timeout. `task/ci1-test-hang`.
 - ✅ **Q1** [Opus] Settings > Performance (D26): presets Full/Balanced/Light + toggles + fps cap, live. Pushed 41b1ac5; merge pending (conflicts with B2/O1 in SettingsStore/PlayerFragment — Q1 agent to merge ccr after I push).
 - ✅ **O1** [Sonnet] Headset buttons fix + settings + output devices + per-device profiles. Merged into ccr (local, push pending CI). Device-unverified: see docs/HEADSET_CHECKLIST.md.
 - 🔄 **G1** [Opus] Generated covers for tracks without art (deterministic generative art, UI + notification + widget). `task/g1-covers`.
@@ -124,6 +124,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - **J1** (after all merges) mechanical refactor: remove `final class`, Java 17 idioms in touched code, drop redundant AppCompat-transitive deps from the version catalog; verify on GitHub CI (local builds OOM).
 
 ## Change log
+
+- 2026-10-24: CI GREEN again on ccr 22bb13e (hang = stale PlayerHolder player + unbounded release; fixed by CI1; test heap 2g, 20-min timeout, STARTED logging). ccr = E2, L2, O1, B2, Q1 (Performance settings), CI1 merged. Next: J1 cleanup (running), README/docs/screens refresh, main, release 0.3.0 (stable).
 
 - 2026-10-24: E2 + L2 merged into ccr. D25 archived. Waiting on CI, then O1 / B2.
 - 2026-10-24: ccr = everything except E2/O1/B2/(logo pick pending). Merged: N1, F1, R2, U1b, M1, U2, G1, H1, A(M2 logo), L1, S1, E1. CI red-causes triaged (flaky PlaybackNotificationTest, R2 index/collator tests, F1 DB lock) and fixed. R1: CI now `--continue` + failure summary. Real-device: notification card works on owner's phone.
