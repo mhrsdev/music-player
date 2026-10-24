@@ -48,6 +48,8 @@ public class ArtworkView extends View {
     private float fade = 1f;
     private long fadeStart;
     @Nullable private Listener listener;
+    /** False after {@link #clear()}: nothing to load until the next bind (an unbound view shows the seed scene). */
+    private boolean bound = true;
 
     /** Notified when the cover arrives, real or generated (e.g. the player feeds it to its colour extraction). */
     public interface Listener {
@@ -66,19 +68,24 @@ public class ArtworkView extends View {
     }
 
     public void setCornerRadiusDp(float dp) {
-        cornerRadius = Tokens.dp(getContext(), dp);
+        float r = dp * getResources().getDisplayMetrics().density;
+        if (r == cornerRadius) return; // set on every row bind: no redraw when nothing changed
+        cornerRadius = r;
         invalidate();
     }
 
     /** Circle crop (artists). */
     public void setCircle(boolean circle) {
+        if (this.circle == circle) return;
         this.circle = circle;
         invalidate();
     }
 
     /** Zoom into the center (artist avatars use 1.7-2x crops of album art). */
     public void setZoom(float zoom) {
-        this.zoom = Math.max(1f, zoom);
+        float z = Math.max(1f, zoom);
+        if (z == this.zoom) return;
+        this.zoom = z;
         updateShader();
         invalidate();
     }
@@ -102,10 +109,30 @@ public class ArtworkView extends View {
         boolean same = Objects.equals(artworkUri, uri) && placeholderSeed == seed && Objects.equals(coverSpec, spec);
         seed = placeholderSeed;
         spec = coverSpec;
-        if (same && bitmap != null) return;
+        boolean wasBound = bound;
+        bound = true;
+        if (same && wasBound && bitmap != null) return;
         uri = artworkUri;
         setBitmap(null, false, false);
         requestLoad();
+    }
+
+    /**
+     * A recycled row: drops the cover and any pending load without asking for anything else (setting a null artwork
+     * would start the seed cover of a view nobody sees).
+     */
+    public void clear() {
+        cancelInFlight();
+        wantedKey = null;
+        bound = false;
+        if (bitmap != null) setBitmap(null, false, false);
+    }
+
+    /** A fling that held this view's load back ended ({@link FlingGate}). */
+    void resumeLoad() {
+        if (bound && isAttachedToWindow() && bitmap == null && inFlight == null) {
+            requestLoad();
+        }
     }
 
     /** Artist without art: generated avatar (the scene of the name with its initial). */
@@ -144,11 +171,12 @@ public class ArtworkView extends View {
 
     @Override protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (bitmap == null && inFlight == null) requestLoad();
+        if (bound && bitmap == null && inFlight == null) requestLoad();
     }
 
     private void requestLoad() {
         cancelInFlight();
+        if (!bound) return;
         if (getWidth() == 0) {
             wantedKey = null;
             return;
@@ -160,9 +188,10 @@ public class ArtworkView extends View {
         int size = Math.max(getWidth(), getHeight());
         if (zoom > 1f) size = (int) (size * zoom);
         String u = uri;
-        wantedKey = ArtworkLoader.key(u, size);
+        String key = ArtworkLoader.key(u, size);
+        wantedKey = key;
         ArtworkLoader loader = ArtworkLoader.get(getContext());
-        Bitmap hit = loader.cached(u, size);
+        Bitmap hit = loader.cachedKey(key);
         if (hit != null) {
             setBitmap(hit, false, false);
             return;
@@ -171,6 +200,7 @@ public class ArtworkView extends View {
             requestGenerated();
             return;
         }
+        if (holdWhileFlinging()) return;
         ArtworkLoader.Callback cb = new ArtworkLoader.Callback() {
             @Override public void onLoaded(String key, @Nullable Bitmap bmp) {
                 if (inFlight == this) inFlight = null;
@@ -188,12 +218,14 @@ public class ArtworkView extends View {
         CoverSpec s = coverSpec();
         int size = Math.max(getWidth(), getHeight());
         ArtworkLoader loader = ArtworkLoader.get(getContext());
-        wantedKey = ArtworkLoader.generatedKey(s, size);
-        Bitmap hit = loader.generatedNow(s, size);
+        String key = ArtworkLoader.generatedKey(s, size);
+        wantedKey = key;
+        Bitmap hit = loader.generatedNow(s, size, key);
         if (hit != null) {
             setBitmap(hit, false, true);
             return;
         }
+        if (holdWhileFlinging()) return;
         ArtworkLoader.Callback cb = new ArtworkLoader.Callback() {
             @Override public void onLoaded(String key, @Nullable Bitmap bmp) {
                 if (inFlight == this) inFlight = null;
@@ -203,7 +235,15 @@ public class ArtworkView extends View {
             }
         };
         inFlight = cb;
-        loader.loadGenerated(s, size, cb);
+        loader.loadGenerated(s, size, key, cb);
+    }
+
+    /** True when a list around this view flings fast: the load waits for it to end ({@link FlingGate}). */
+    private boolean holdWhileFlinging() {
+        FlingGate gate = FlingGate.flinging(this);
+        if (gate == null) return false;
+        gate.hold(this);
+        return true;
     }
 
     private void setBitmap(@Nullable Bitmap b, boolean animate, boolean isGenerated) {

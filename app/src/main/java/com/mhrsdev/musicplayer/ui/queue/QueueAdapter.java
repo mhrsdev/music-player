@@ -44,6 +44,9 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder> {
 
     @SuppressLint("NotifyDataSetChanged")
     void submit(@Nullable Track current, List<Track> next) {
+        // The sheet re-renders when only its "N min left" label changed (once a minute while playing): do not
+        // rebind and re-lay out every row for that.
+        if (java.util.Objects.equals(current, this.current) && next.equals(upNext)) return;
         this.current = current;
         upNext.clear();
         upNext.addAll(next);
@@ -65,46 +68,66 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder> {
     int toUpNext(int adapterPos) { return adapterPos - offset(); }
 
     @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup p, int viewType) {
-        return new Holder(LayoutInflater.from(p.getContext()).inflate(R.layout.queue_item, p, false));
+        Holder h = new Holder(LayoutInflater.from(p.getContext()).inflate(R.layout.queue_item, p, false));
+        wire(h);
+        addA11yActions(h);
+        return h;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override public void onBindViewHolder(@NonNull Holder h, int position) {
         boolean isCurrent = isCurrentRow(position);
         Track t = isCurrent ? current : upNext.get(toUpNext(position));
         Locale loc = h.itemView.getResources().getConfiguration().getLocales().get(0);
         h.title.setText(t.title());
-        h.artist.setText(isCurrent ? h.itemView.getContext().getString(R.string.queue_now_playing) : t.artistName());
+        h.artist.setText(isCurrent ? h.nowPlaying : t.artistName());
         h.duration.setText(PlayerFormat.time(t.durationMs(), loc));
         h.art.bind(t);
         h.row.setActivated(isCurrent);
-        h.title.setTextColor(com.mhrsdev.musicplayer.ui.theme.Tokens.color(h.itemView.getContext(),
-                isCurrent ? R.attr.mpOnPrimaryContainer : R.attr.mpOnSurface));
-        h.artist.setTextColor(com.mhrsdev.musicplayer.ui.theme.Tokens.color(h.itemView.getContext(),
-                isCurrent ? R.attr.mpOnPrimaryContainer : R.attr.mpOnSurfaceVariant));
+        h.title.setTextColor(isCurrent ? h.onContainer : h.onSurface);
+        h.artist.setTextColor(isCurrent ? h.onContainer : h.onSurfaceVariant);
         h.drag.setVisibility(isCurrent ? View.INVISIBLE : View.VISIBLE);
-        h.drag.setContentDescription(h.itemView.getContext().getString(R.string.queue_reorder, t.title()));
+        h.boundTitle = t.title();
         h.row.setTranslationX(0f);
         h.removeBg.setVisibility(View.INVISIBLE);
-        h.row.setContentDescription(isCurrent ? h.itemView.getContext().getString(R.string.queue_now_playing_cd, t.title()) : null);
-        h.row.setOnClickListener(isCurrent ? v -> actions.onCurrent() : v -> {
+        h.setCurrent(isCurrent);
+    }
+
+    /**
+     * Listeners, accessibility actions and labels are made once per holder and read the bound row when used; the
+     * TalkBack strings are formatted on demand. They were rebuilt on every bind (three actions with their lambdas,
+     * three getString, two theme colour look-ups and two NumberFormats per row: ~60 KB per bind on the JVM).
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    private void wire(Holder h) {
+        h.row.setOnClickListener(v -> {
             int p = h.getBindingAdapterPosition();
-            if (p != RecyclerView.NO_POSITION) actions.onPlay(toUpNext(p));
+            if (p == RecyclerView.NO_POSITION) return;
+            if (isCurrentRow(p)) actions.onCurrent(); else actions.onPlay(toUpNext(p));
         });
-        h.drag.setOnTouchListener(isCurrent ? null : (v, e) -> {
+        h.drag.setOnTouchListener((v, e) -> {
+            if (h.current) return false;
             if (e.getActionMasked() == MotionEvent.ACTION_DOWN) actions.onStartDrag(h);
             return false;
         });
-        bindA11y(h, isCurrent);
+        h.drag.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override public void onInitializeAccessibilityNodeInfo(View host, android.view.accessibility.AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                if (h.boundTitle != null) info.setContentDescription(host.getContext().getString(R.string.queue_reorder, h.boundTitle));
+            }
+        });
+        h.row.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override public void onInitializeAccessibilityNodeInfo(View host, android.view.accessibility.AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                if (h.current && h.boundTitle != null) {
+                    info.setContentDescription(host.getContext().getString(R.string.queue_now_playing_cd, h.boundTitle));
+                }
+            }
+        });
     }
 
     /** Accessible alternative to drag and swipe (DESIGN §8): Move up / Move down / Remove custom actions. */
-    private void bindA11y(Holder h, boolean isCurrent) {
+    private void addA11yActions(Holder h) {
         View v = h.row;
-        ViewCompat.removeAccessibilityAction(v, R.id.queue_a11y_up);
-        ViewCompat.removeAccessibilityAction(v, R.id.queue_a11y_down);
-        ViewCompat.removeAccessibilityAction(v, R.id.queue_a11y_remove);
-        if (isCurrent) return;
         android.content.Context c = v.getContext();
         ViewCompat.replaceAccessibilityAction(v, new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
                 R.id.queue_a11y_up, c.getString(R.string.queue_move_up)), c.getString(R.string.queue_move_up), (view, args) -> {
@@ -128,12 +151,23 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder> {
 
     @Override public int getItemCount() { return upNext.size() + offset(); }
 
-    static class Holder extends RecyclerView.ViewHolder {
+    class Holder extends RecyclerView.ViewHolder {
         final View row, drag;
         final TextView title, artist, duration, removeBg;
         final com.mhrsdev.musicplayer.ui.widget.ArtworkView art;
+        final int onContainer, onSurface, onSurfaceVariant;
+        final String nowPlaying;
+        @Nullable String boundTitle;
+        /** The "Now playing" row: no drag, no move / remove actions. */
+        boolean current;
+
         Holder(View v) {
             super(v);
+            android.content.Context c = v.getContext();
+            onContainer = com.mhrsdev.musicplayer.ui.theme.Tokens.color(c, R.attr.mpOnPrimaryContainer);
+            onSurface = com.mhrsdev.musicplayer.ui.theme.Tokens.color(c, R.attr.mpOnSurface);
+            onSurfaceVariant = com.mhrsdev.musicplayer.ui.theme.Tokens.color(c, R.attr.mpOnSurfaceVariant);
+            nowPlaying = c.getString(R.string.queue_now_playing);
             row = v.findViewById(R.id.queue_row);
             drag = v.findViewById(R.id.queue_drag);
             title = v.findViewById(R.id.queue_title);
@@ -142,6 +176,18 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.Holder> {
             removeBg = v.findViewById(R.id.queue_remove_bg);
             art = v.findViewById(R.id.queue_art);
             art.setCornerRadiusDp(12);
+        }
+
+        void setCurrent(boolean isCurrent) {
+            if (current == isCurrent) return;
+            current = isCurrent;
+            if (isCurrent) {
+                ViewCompat.removeAccessibilityAction(row, R.id.queue_a11y_up);
+                ViewCompat.removeAccessibilityAction(row, R.id.queue_a11y_down);
+                ViewCompat.removeAccessibilityAction(row, R.id.queue_a11y_remove);
+            } else {
+                addA11yActions(this);
+            }
         }
     }
 }

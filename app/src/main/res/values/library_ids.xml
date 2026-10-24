@@ -2,4 +2,5 @@
 <resources>
     <item name="script_font_base" type="id" />
     <item name="home_hero_mask" type="id" />
+    <item name="artwork_fling_gate" type="id" />
 </resources>

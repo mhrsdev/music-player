@@ -53,7 +53,7 @@ public class ArtworkLoader {
     private static ArtworkLoader instance;
 
     /** Generated-cover size buckets (px): a cover renders once per bucket, not once per view size. */
-    static final int[] BUCKETS = {64, 96, 128, 192, 256, 384, 512, 768, 1024};
+    static final int[] BUCKETS = {64, 96, 128, 160, 192, 256, 384, 512, 640, 768, 1024};
     /** At or below this bucket a generated cover is rendered on the calling thread (well under a millisecond). */
     public static final int SYNC_MAX_PX = 96;
 
@@ -148,6 +148,12 @@ public class ArtworkLoader {
         return cache.get(key(uri, sizePx));
     }
 
+    /** Cache lookup by a key from {@link #key} or {@link #generatedKey} (a bind builds its key once). */
+    @Nullable
+    public Bitmap cachedKey(String key) {
+        return cache.get(key);
+    }
+
     /** True when {@code uri} is known to have no artwork (the placeholder can be drawn without a request). */
     public boolean isKnownMiss(String uri) {
         return misses.get(uri) != null;
@@ -224,7 +230,12 @@ public class ArtworkLoader {
     /** Renders a small generated cover now (only for buckets up to {@link #SYNC_MAX_PX}); cached. */
     @MainThread @Nullable
     public Bitmap generatedNow(CoverSpec spec, int sizePx) {
-        String key = generatedKey(spec, sizePx);
+        return generatedNow(spec, sizePx, generatedKey(spec, sizePx));
+    }
+
+    /** As {@link #generatedNow(CoverSpec, int)} with the caller's {@link #generatedKey}. */
+    @MainThread @Nullable
+    public Bitmap generatedNow(CoverSpec spec, int sizePx, String key) {
         Bitmap hit = cache.get(key);
         if (hit != null || syncGenerator == null || bucket(sizePx) > SYNC_MAX_PX) return hit;
         try {
@@ -240,7 +251,12 @@ public class ArtworkLoader {
     /** The generated cover for {@code spec} at the bucket of {@code sizePx}, rendered on a worker thread. */
     @MainThread
     public void loadGenerated(CoverSpec spec, int sizePx, Callback callback) {
-        String key = generatedKey(spec, sizePx);
+        loadGenerated(spec, sizePx, generatedKey(spec, sizePx), callback);
+    }
+
+    /** As {@link #loadGenerated(CoverSpec, int, Callback)} with the caller's {@link #generatedKey}. */
+    @MainThread
+    public void loadGenerated(CoverSpec spec, int sizePx, String key, Callback callback) {
         Bitmap hit = cache.get(key);
         if (hit != null || generator == null) {
             callback.onLoaded(key, hit);

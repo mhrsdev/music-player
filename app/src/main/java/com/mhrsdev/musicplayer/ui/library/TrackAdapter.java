@@ -188,7 +188,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
     }
 
     @Override public void onViewRecycled(@NonNull Holder h) {
-        h.b.art.setArtwork(null, 0); // drops the pending load key: a late bitmap is not applied to a reused row
+        h.b.art.clear(); // drops the cover and the pending load: nothing is applied to (or rendered for) a pooled row
     }
 
     class Holder extends RecyclerView.ViewHolder {

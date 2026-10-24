@@ -48,6 +48,7 @@ public class SearchFragment extends Fragment implements SearchResultAdapter.List
 
         SearchResultAdapter adapter = new SearchResultAdapter(this);
         b.results.setLayoutManager(new LinearLayoutManager(requireContext()));
+        b.results.setHasFixedSize(true); // match_parent: a keystroke's new results relayout the list only
         b.results.setAdapter(adapter);
 
         b.query.setText(vm.getQuery().getValue());

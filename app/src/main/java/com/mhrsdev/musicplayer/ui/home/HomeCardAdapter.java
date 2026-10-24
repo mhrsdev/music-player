@@ -54,6 +54,8 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
     }
 
     @androidx.annotation.Nullable private RecyclerView host;
+    /** The list last handed to {@link #submitPreview}: rebinding the same row with the same feed does nothing. */
+    @androidx.annotation.Nullable private java.util.List<HomeItem> source;
     private final int mode;
     private final boolean grid;
     private final Listener listener;
@@ -68,6 +70,13 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
 
     HomeCardAdapter(boolean hero, Listener listener) {
         this(hero ? HERO : CARD, false, listener);
+    }
+
+    /** The first {@code cap} items of a Home row; a no-op when the row is rebound with the list it already shows. */
+    void submitPreview(java.util.List<HomeItem> items, int cap) {
+        if (items == source) return;
+        source = items;
+        submitList(items.size() > cap ? new java.util.ArrayList<>(items.subList(0, cap)) : items);
     }
 
     @Override public int getItemViewType(int position) {

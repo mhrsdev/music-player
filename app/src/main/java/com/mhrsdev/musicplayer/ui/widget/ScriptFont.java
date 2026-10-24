@@ -21,10 +21,14 @@ public class ScriptFont {
 
     private ScriptFont() {}
 
-    /** Sets {@code text} on {@code view} and picks the typeface for its script. */
+    /**
+     * Sets {@code text} on {@code view} and picks the typeface for its script. The typeface goes first: a typeface
+     * change after setText throws away the text layout setText just built (a Persian row bound after a Latin one, or
+     * back, laid its text out twice per bind).
+     */
     public static void setText(TextView view, @Nullable CharSequence text) {
-        view.setText(text);
         apply(view, text);
+        view.setText(text);
     }
 
     /** Applies the script typeface for {@code text} without changing the view's text. */

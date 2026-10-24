@@ -114,7 +114,14 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         @Override public boolean areContentsTheSame(@NonNull Row a, @NonNull Row b) { return a.equals(b); }
     };
 
+    /** Horizontal rows get one view type per section (encoded with {@link #CAROUSEL_TYPES}): see getItemViewType. */
+    private static final int CAROUSEL_TYPES = 1000;
+    private static final Object PAYLOAD_PROGRESS = new Object();
+
     private final Listener listener;
+    private final java.util.HashMap<String, Integer> sectionSlots = new java.util.HashMap<>();
+    /** The Continue card while it is bound: the 2 % progress steps go straight to it (no rebind, no layout pass). */
+    @Nullable private Bound<HomeContinueBinding> continueHolder;
     /** One pool for every horizontal row: cards / mixes / avatars / chips recycle across rows. */
     private final RecyclerView.RecycledViewPool cardPool = new RecyclerView.RecycledViewPool();
     @Nullable private String nowTrackId;
@@ -135,22 +142,46 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         if (java.util.Objects.equals(trackId, nowTrackId) && q == nowProgress) return;
         nowTrackId = trackId;
         nowProgress = q;
+        // Only the progress strip shows these values: set it on the bound card (RenderNode scale, no layout, no
+        // change animation). It used to be a full rebind + crossfade + a predictive layout pass of all of Home
+        // every 2 % of a song, i.e. every ~4 s while music plays, right in the middle of a scroll.
+        Bound<HomeContinueBinding> k = continueHolder;
+        int pos = k == null ? RecyclerView.NO_POSITION : k.getBindingAdapterPosition();
+        if (pos != RecyclerView.NO_POSITION && pos < getItemCount() && getItem(pos).type() == Row.CONTINUE) {
+            bindProgress(k.b, getItem(pos).section());
+            return;
+        }
         for (int i = 0; i < getItemCount(); i++) {
-            if (getItem(i).type() == Row.CONTINUE) notifyItemChanged(i);
+            if (getItem(i).type() == Row.CONTINUE) notifyItemChanged(i, PAYLOAD_PROGRESS);
         }
     }
 
+    /**
+     * Horizontal rows (carousels, avatars, chips, hero) get a view type per section, so a row is only ever rebound to
+     * its own section: rebinding it costs nothing (same cards, same scroll position). With one shared type a row
+     * scrolled back into view was handed another section's carousel: a full inner re-layout + diff + card
+     * add/remove animations per row entering the screen (JVM: 2 ms and 745 KB per bind).
+     */
     @Override public int getItemViewType(int position) {
-        return getItem(position).type();
+        Row row = getItem(position);
+        int t = row.type();
+        if (t != Row.CAROUSEL && t != Row.HERO && t != Row.AVATARS && t != Row.CHIPS) return t;
+        Integer slot = sectionSlots.get(row.section().id());
+        if (slot == null) {
+            slot = sectionSlots.size();
+            sectionSlots.put(row.section().id(), slot);
+        }
+        return CAROUSEL_TYPES + slot * 16 + t;
     }
 
-    @NonNull @Override public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
+    @NonNull @Override public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inf = LayoutInflater.from(parent.getContext());
+        int type = viewType >= CAROUSEL_TYPES ? (viewType - CAROUSEL_TYPES) % 16 : viewType;
         switch (type) {
             case Row.HEADER:
                 return new Bound<>(HomeHeaderBinding.inflate(inf, parent, false));
             case Row.TRACK:
-                return new Bound<>(LibraryRowTrackBinding.inflate(inf, parent, false));
+                return trackHolder(LibraryRowTrackBinding.inflate(inf, parent, false));
             case Row.CONTINUE:
                 return new Bound<>(HomeContinueBinding.inflate(inf, parent, false));
             case Row.ACTIONS: {
@@ -191,13 +222,62 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         }
     }
 
+    /** Listeners and the TalkBack label are per holder (they read the bound row), not allocated per bind. */
+    private Bound<LibraryRowTrackBinding> trackHolder(LibraryRowTrackBinding t) {
+        Bound<LibraryRowTrackBinding> h = new Bound<>(t);
+        t.getRoot().setOnClickListener(v -> {
+            Row row = rowAt(h);
+            if (row != null) listener.onTrackClick(row.section(), row.track());
+        });
+        t.more.setOnClickListener(v -> {
+            Row row = rowAt(h);
+            if (row != null) TrackMenu.show(v, row.track());
+        });
+        t.more.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override public void onInitializeAccessibilityNodeInfo(View host,
+                    android.view.accessibility.AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                Row row = rowAt(h);
+                if (row != null) info.setContentDescription(host.getContext().getString(R.string.library_more, row.track().title()));
+            }
+        });
+        return h;
+    }
+
+    @Nullable private Row rowAt(RecyclerView.ViewHolder h) {
+        int p = h.getBindingAdapterPosition();
+        if (p == RecyclerView.NO_POSITION || p >= getItemCount()) return null;
+        Row row = getItem(p);
+        return row.track() == null ? null : row;
+    }
+
+    @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position,
+            @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty() && ((Bound<?>) holder).b instanceof HomeContinueBinding k) {
+            boolean progressOnly = true;
+            for (Object p : payloads) progressOnly &= p == PAYLOAD_PROGRESS;
+            if (progressOnly) {
+                bindProgress(k, getItem(position).section());
+                return;
+            }
+        }
+        onBindViewHolder(holder, position);
+    }
+
+    @Override public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        if (holder == continueHolder) continueHolder = null;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Row row = getItem(position);
         Object b = ((Bound<?>) holder).b;
         Context c = holder.itemView.getContext();
         if (b instanceof HomeHeaderBinding h) {
-            ScriptFont.setText(h.title, SectionText.title(c, row.section()));
             HomeSection s = row.section();
+            if (h.getRoot().getTag() == s) return; // same header scrolled back in: nothing changed
+            h.getRoot().setTag(s);
+            ScriptFont.setText(h.title, SectionText.title(c, s));
             if ("quick-picks".equals(s.id())) {
                 h.action.setVisibility(View.VISIBLE);
                 h.action.setText(R.string.home_shuffle);
@@ -217,19 +297,16 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
             ScriptFont.setText(t.subtitle, SectionText.artist(c, track.artistName()));
             t.duration.setText(Format.duration(track.durationMs(), locale(c)));
             t.explicit.setVisibility(track.explicit() ? View.VISIBLE : View.GONE);
-            t.more.setContentDescription(c.getString(R.string.library_more, track.title()));
             Art.bind(t.art, track.artworkUri(), track.placeholderSeed(), 12, false, CoverSpec.forTrack(track));
-            t.getRoot().setOnClickListener(v -> listener.onTrackClick(row.section(), track));
-            t.more.setOnClickListener(v -> TrackMenu.show(v, track));
         } else if (b instanceof HomeContinueBinding k) {
+            continueHolder = (Bound<HomeContinueBinding>) holder;
             bindContinue(k, row.section());
         } else if (b instanceof HomeStatsBinding st) {
             bindStats(st, row.section().stats());
         } else if (b instanceof HomeCarouselBinding car) {
             List<HomeItem> items = row.section().items();
             int cap = row.type() == Row.CHIPS ? CHIP_PREVIEW : ROW_PREVIEW;
-            ((HomeCardAdapter) car.carousel.getAdapter()).submitList(
-                    items.size() > cap ? new ArrayList<>(items.subList(0, cap)) : items);
+            ((HomeCardAdapter) car.carousel.getAdapter()).submitPreview(items, cap);
         }
     }
 
@@ -251,13 +328,7 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         ScriptFont.setText(k.title, track.title());
         ScriptFont.setText(k.subtitle, SectionText.artist(k.getRoot().getContext(), track.artistName()));
         Art.bind(k.art, track.artworkUri(), track.placeholderSeed(), 14, false);
-        boolean current = track.id().equals(nowTrackId) && nowProgress >= 0;
-        k.progressTrack.setVisibility(current ? View.VISIBLE : View.INVISIBLE);
-        if (current) {
-            k.progressFill.setPivotX(k.getRoot().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
-                    ? k.progressTrack.getWidth() : 0);
-            k.progressFill.setScaleX(Math.max(0.02f, nowProgress));
-        }
+        bindProgress(k, s);
         k.resume.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.nav_ic_play, 0, 0, 0);
         k.resume.setOnClickListener(v -> listener.onContinue(track));
         k.getRoot().setOnClickListener(v -> listener.onContinue(track));
@@ -265,15 +336,34 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
                 + track.title() + ", " + track.artistName());
     }
 
+    /** The Continue card's progress strip (the only part that follows the player). */
+    private void bindProgress(HomeContinueBinding k, HomeSection s) {
+        Track track = s.items().get(0).track();
+        boolean current = track.id().equals(nowTrackId) && nowProgress >= 0;
+        k.progressTrack.setVisibility(current ? View.VISIBLE : View.INVISIBLE);
+        if (current) {
+            float pivot = k.getRoot().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL ? k.progressTrack.getWidth() : 0;
+            if (k.progressFill.getPivotX() != pivot) k.progressFill.setPivotX(pivot);
+            k.progressFill.setScaleX(Math.max(0.02f, nowProgress));
+        }
+    }
+
+    /**
+     * The four stat cells are built once per holder and only their texts change. Rebuilding them on every bind (8 new
+     * TextViews with text appearances) was the most expensive bind on Home: 13 ms and 14 MB per bind on the JVM.
+     */
     private static void bindStats(HomeStatsBinding st, @Nullable HomeStats s) {
         if (s == null) return;
         Context c = st.getRoot().getContext();
         NumberFormat nf = NumberFormat.getIntegerInstance(locale(c));
-        st.row.removeAllViews();
-        addStat(st.row, nf.format(s.tracks()), c.getString(R.string.home_stat_songs));
-        addStat(st.row, nf.format(Math.round(s.libraryMs() / 3_600_000.0)), c.getString(R.string.home_stat_hours));
-        addStat(st.row, nf.format(s.artists()), c.getString(R.string.home_stat_artists));
-        addStat(st.row, nf.format(s.playsMonth()), c.getString(R.string.home_stat_plays_month));
+        if (st.row.getChildCount() != 4) {
+            st.row.removeAllViews();
+            for (int i = 0; i < 4; i++) addStat(st.row);
+        }
+        setStat(st.row, 0, nf.format(s.tracks()), c.getString(R.string.home_stat_songs));
+        setStat(st.row, 1, nf.format(Math.round(s.libraryMs() / 3_600_000.0)), c.getString(R.string.home_stat_hours));
+        setStat(st.row, 2, nf.format(s.artists()), c.getString(R.string.home_stat_artists));
+        setStat(st.row, 3, nf.format(s.playsMonth()), c.getString(R.string.home_stat_plays_month));
         st.topArtist.setVisibility(s.topArtistMonth() == null ? View.GONE : View.VISIBLE);
         if (s.topArtistMonth() != null) {
             ScriptFont.setText(st.topArtist, c.getString(R.string.home_stat_top_artist,
@@ -283,23 +373,29 @@ class HomeAdapter extends ListAdapter<HomeAdapter.Row, RecyclerView.ViewHolder> 
         st.listened.setText(c.getString(R.string.home_stat_listened_month, Format.duration(s.listenedMsMonth(), locale(c))));
     }
 
-    private static void addStat(LinearLayout row, String value, String label) {
+    private static void addStat(LinearLayout row) {
         Context c = row.getContext();
         LinearLayout cell = new LinearLayout(c);
         cell.setOrientation(LinearLayout.VERTICAL);
         TextView v = new TextView(c);
         v.setTextAppearance(R.style.TextAppearance_MusicPlayer_Headline);
         v.setTextColor(com.mhrsdev.musicplayer.ui.theme.Tokens.color(c, R.attr.mpOnSurface));
-        v.setText(value);
         TextView l = new TextView(c);
         l.setTextAppearance(R.style.TextAppearance_MusicPlayer_Supporting);
-        l.setText(label);
         l.setMaxLines(2);
         cell.addView(v);
         cell.addView(l);
-        cell.setContentDescription(value + " " + label);
         cell.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         row.addView(cell, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+    }
+
+    private static void setStat(LinearLayout row, int i, String value, String label) {
+        LinearLayout cell = (LinearLayout) row.getChildAt(i);
+        TextView v = (TextView) cell.getChildAt(0);
+        TextView l = (TextView) cell.getChildAt(1);
+        if (!value.contentEquals(v.getText())) v.setText(value);
+        if (!label.contentEquals(l.getText())) l.setText(label);
+        cell.setContentDescription(value + " " + label);
     }
 
     private static Locale locale(Context c) {

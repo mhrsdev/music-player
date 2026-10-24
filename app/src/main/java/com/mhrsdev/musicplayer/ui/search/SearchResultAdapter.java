@@ -38,6 +38,8 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
         };
     }
 
+    private static final Object QUERY_CHANGED = new Object();
+
     private final Listener listener;
     @Nullable private String query;
 
@@ -58,7 +60,8 @@ class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.
     void setQuery(@Nullable String q) {
         if (java.util.Objects.equals(query, q)) return;
         query = q;
-        if (getItemCount() > 0) notifyItemRangeChanged(0, getItemCount());
+        // with a payload: the visible rows rebind in place (no change crossfade, no second set of holders per keystroke)
+        if (getItemCount() > 0) notifyItemRangeChanged(0, getItemCount(), QUERY_CHANGED);
     }
 
     @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

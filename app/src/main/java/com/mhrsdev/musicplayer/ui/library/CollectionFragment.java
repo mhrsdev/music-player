@@ -81,6 +81,7 @@ public class CollectionFragment extends Fragment {
                     p -> { if (p != null && isAdded()) Screens.openTrackList(this, TrackList.PLAYLIST, p.id()); }));
         }
         b.grid.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        b.grid.setHasFixedSize(true);
         b.grid.setAdapter(adapter);
 
         switch (kind) {

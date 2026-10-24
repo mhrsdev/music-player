@@ -32,9 +32,29 @@ public record CoverSpec(Kind kind, String identity, long seed, String title, @Nu
     private static final Set<String> NOT_AN_ARTIST = Set.of("", "unknown artist", "<unknown>", "unknown",
             "various artists", "هنرمند ناشناخته", "ناشناخته");
 
-    /** Album-level spec when the track has a real album, otherwise a single of its own. */
+    /** Recent {@link #forTrack(Track)} answers: a list scrolling back and forth rebinds the same rows (SC1). */
+    private static final int RECENT = 512;
+    private static final java.util.Map<Track, CoverSpec> recent =
+            new java.util.LinkedHashMap<>(RECENT * 4 / 3 + 1, 0.75f, true) {
+                @Override protected boolean removeEldestEntry(java.util.Map.Entry<Track, CoverSpec> eldest) {
+                    return size() > RECENT;
+                }
+            };
+
+    /**
+     * Album-level spec when the track has a real album, otherwise a single of its own. Called on every row bind; the
+     * text normalisation behind it (NFKC, case folding, two hashes) allocates ~1.4 KB, so recent answers are kept.
+     */
     public static CoverSpec forTrack(Track t) {
-        return forTrack(t.albumId(), t.albumTitle(), t.title(), t.artistName());
+        synchronized (recent) {
+            CoverSpec hit = recent.get(t);
+            if (hit != null) return hit;
+        }
+        CoverSpec s = forTrack(t.albumId(), t.albumTitle(), t.title(), t.artistName());
+        synchronized (recent) {
+            recent.put(t, s);
+        }
+        return s;
     }
 
     /** {@link #forTrack(Track)} from its parts (for consumers that only carry these, e.g. the widget). */

@@ -1,23 +1,17 @@
 package com.mhrsdev.musicplayer.ui.player;
 
-import java.text.NumberFormat;
 import java.util.Locale;
 
 /** Pure formatting helpers for the player (locale-aware digits, so Persian shows ۰–۹). */
 public class PlayerFormat {
     private PlayerFormat() {}
 
-    /** "3:07" / "1:02:09" in the locale's digits. Negative input clamps to 0. */
+    /**
+     * "3:07" / "1:02:09" in the locale's digits. Negative input clamps to 0. Same text as two NumberFormats, without
+     * building them: this runs for every queue row bind and every second in the player (SC1).
+     */
     public static String time(long ms, Locale locale) {
-        long totalSec = Math.max(0L, ms) / 1000L;
-        long h = totalSec / 3600, m = (totalSec % 3600) / 60, s = totalSec % 60;
-        NumberFormat nf = NumberFormat.getIntegerInstance(locale);
-        nf.setGroupingUsed(false);
-        NumberFormat two = NumberFormat.getIntegerInstance(locale);
-        two.setGroupingUsed(false);
-        two.setMinimumIntegerDigits(2);
-        if (h > 0) return nf.format(h) + ":" + two.format(m) + ":" + two.format(s);
-        return nf.format(m) + ":" + two.format(s);
+        return com.mhrsdev.musicplayer.ui.library.Format.duration(ms, locale);
     }
 
     /** "-2:09": time left in the track. */

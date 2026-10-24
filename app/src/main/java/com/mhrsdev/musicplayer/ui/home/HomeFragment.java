@@ -49,6 +49,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.Listener {
         vm = new ViewModelProvider(this, HomeViewModel.factory(c.homeFeed, c.player)).get(HomeViewModel.class);
         HomeAdapter adapter = new HomeAdapter(this);
         b.list.setLayoutManager(new LinearLayoutManager(requireContext()));
+        b.list.setHasFixedSize(true); // match_parent: a feed update relayouts the list, not the whole shell
         b.list.setAdapter(adapter);
         StateView.loading(b.state, R.string.home_loading);
         vm.getSections().observe(getViewLifecycleOwner(), s -> {

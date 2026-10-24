@@ -40,6 +40,10 @@ public class FrameDriver implements Choreographer.FrameCallback {
     /** Wake this long before the next beat, so the delayed callback lands on the vsync at (or just after) it. */
     static final long WAKE_EARLY_NANOS = 6_000_000L;
 
+    /** Same base as Choreographer frame times (System.nanoTime); a test with a simulated clock swaps it. */
+    @androidx.annotation.VisibleForTesting
+    public static java.util.function.LongSupplier clock = System::nanoTime;
+
     private final ArrayList<Tick> ticks = new ArrayList<>();
     private boolean posted;
     /** Posted with a delay (only beat loops registered); a new every-frame tick must re-post at once. */
@@ -107,7 +111,8 @@ public class FrameDriver implements Choreographer.FrameCallback {
     long sleepMillis(long nowNanos) {
         for (int i = 0, n = ticks.size(); i < n; i++) if (ticks.get(i).everyFrame()) return 0;
         long wake = lastBeatNanos + BEAT_NANOS - WAKE_EARLY_NANOS;
-        return Math.max(0L, (wake - nowNanos) / 1_000_000L);
+        // never longer than one beat: a vsync stamp ahead of the clock must not stall every decorative loop
+        return Math.max(0L, Math.min(BEAT_NANOS / 1_000_000L, (wake - nowNanos) / 1_000_000L));
     }
 
     /** Number of live animations (tests, battery audit). */
@@ -140,7 +145,7 @@ public class FrameDriver implements Choreographer.FrameCallback {
             posted = false;
             return;
         }
-        long sleep = sleepMillis(System.nanoTime());
+        long sleep = sleepMillis(clock.getAsLong());
         if (sleep > 0) {
             sleeping = true;
             Choreographer.getInstance().postFrameCallbackDelayed(this, sleep);
