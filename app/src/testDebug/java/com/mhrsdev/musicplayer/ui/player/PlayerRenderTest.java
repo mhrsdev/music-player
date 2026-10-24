@@ -99,6 +99,22 @@ public class PlayerRenderTest {
         snap(content(a), "u3-player-lyrics-font130-dark");
     }
 
+    /** D36: on the last track with repeat off both skips stay enabled (the controller defines the ends). */
+    @Test @Config(sdk = 35, qualifiers = DARK)
+    public void skipsStayEnabledOnTheLastTrack() throws Exception {
+        FragmentActivity a = host(SettingsStore.SeekStyle.WAVY, SampleData.TRACKS.size() - 1);
+        PlayerFragment f = player(a);
+        org.junit.Assert.assertEquals(com.mhrsdev.musicplayer.domain.model.RepeatMode.OFF,
+                ((MusicPlayerApp) a.getApplication()).getContainer().player.getState().getValue().repeatMode());
+        for (int id : new int[]{R.id.player_prev, R.id.player_next}) {
+            View b = f.requireView().findViewById(id);
+            org.junit.Assert.assertTrue(b.isEnabled());
+            org.junit.Assert.assertEquals(1f, b.getAlpha(), 0f);
+        }
+        for (int i = 0; i < 4; i++) { Thread.sleep(40); idle(); } // cover decodes on the artwork thread
+        snap(content(a), "u4-player-last-track-dark");
+    }
+
     private static final com.mhrsdev.musicplayer.domain.model.Track LONG_EN = new com.mhrsdev.musicplayer.domain.model.Track(
             "long-en", "Concerto pour piano no. 2 en ut mineur, op. 18: II. Adagio sostenuto (Piano et orchestre)",
             "a-x", "Orchestre philharmonique de Radio France, Mikko Franck", "al-x", "Rachmaninov", 683_000L, null, 77,
