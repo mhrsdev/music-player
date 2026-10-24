@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.lyrics;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.domain.model.LyricLine;
 import com.mhrsdev.musicplayer.domain.model.LyricWord;
@@ -32,15 +33,15 @@ import java.util.regex.Pattern;
  * Without any timestamp the text becomes unsynced lines.
  */
 public class LrcParser {
-    private static final Pattern SPACE_RUNS = Pattern.compile("[ \\t]{2,}");
-    private static final Pattern WORD_TAG = Pattern.compile("<\\s*\\d+\\s*:\\s*\\d+(?:\\s*[.:,]\\s*\\d+)?\\s*>");
-    private static final Pattern SHORT_TS = Pattern.compile("(\\d{1,5}):(\\d{1,2})(?:[.:,](\\d{1,3}))?");
-    private static final Pattern LONG_TS = Pattern.compile("(\\d{1,4}):(\\d{1,2}):(\\d{1,2})[.,](\\d{1,3})");
+    private static final Pattern SPACE_RUNS = Regexes.compile("[ \\t]{2,}");
+    private static final Pattern WORD_TAG = Regexes.compile("<\\s*\\d+\\s*:\\s*\\d+(?:\\s*[.:,]\\s*\\d+)?\\s*>");
+    private static final Pattern SHORT_TS = Regexes.compile("(\\d{1,5}):(\\d{1,2})(?:[.:,](\\d{1,3}))?");
+    private static final Pattern LONG_TS = Regexes.compile("(\\d{1,4}):(\\d{1,2}):(\\d{1,2})[.,](\\d{1,3})");
     /** A word tag inside line text: {@code <ts>} or (after the line's own timestamps) {@code [ts]}. */
-    private static final Pattern INLINE_TAG = Pattern.compile("<([^<>]{3,16})>|\\[([^\\[\\]]{3,16})]");
-    private static final Pattern WALAOKE = Pattern.compile("^(?:[MFD]|v\\d)\\s*:\\s+");
+    private static final Pattern INLINE_TAG = Regexes.compile("<([^<>]{3,16})>|\\[([^\\[\\]]{3,16})\\]");
+    private static final Pattern WALAOKE = Regexes.compile("^(?:[MFD]|v\\d)\\s*:\\s+");
     static final long OPEN_END_MS = 3_000;
-    private static final Pattern META = Pattern.compile("([A-Za-z]+)\\s*:(.*)", Pattern.DOTALL);
+    private static final Pattern META = Regexes.compile("([A-Za-z]+)\\s*:(.*)", Pattern.DOTALL);
     private static final Set<String> META_KEYS = new HashSet<>(
             Arrays.asList("ti", "ar", "al", "au", "by", "offset", "length", "re", "ve", "tool", "lang"));
 

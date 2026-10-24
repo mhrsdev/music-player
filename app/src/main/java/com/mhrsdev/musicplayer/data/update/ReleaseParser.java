@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.update;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.domain.model.ReleaseInfo;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import org.json.JSONObject;
  * offer no checksum (neither the {@code <apk>.sha256} asset nor the asset's {@code digest}).
  */
 class ReleaseParser {
-    private static final Pattern APK_NAME = Pattern.compile("MusicPlayer-v.+\\.apk");
+    private static final Pattern APK_NAME = Regexes.compile("MusicPlayer-v.+\\.apk");
     private static final String DIGEST_PREFIX = "sha256:";
 
     private ReleaseParser() { }

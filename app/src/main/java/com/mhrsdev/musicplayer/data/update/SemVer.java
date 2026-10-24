@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.update;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,7 +8,7 @@ import java.util.regex.Pattern;
 /** {@code [v]MAJOR.MINOR.PATCH[-pre][+build]} with semver 2.0 ordering: a pre-release is lower than its release. */
 public record SemVer(long major, long minor, long patch, @Nullable String pre) implements Comparable<SemVer> {
     private static final Pattern FORMAT =
-            Pattern.compile("^v?(\\d{1,9})\\.(\\d{1,9})\\.(\\d{1,9})(?:-([0-9A-Za-z.-]+))?(?:\\+[0-9A-Za-z.-]+)?$");
+            Regexes.compile("^v?(\\d{1,9})\\.(\\d{1,9})\\.(\\d{1,9})(?:-([0-9A-Za-z.-]+))?(?:\\+[0-9A-Za-z.-]+)?$");
 
     /** @return null for anything that is not a version (such tags are ignored) */
     @Nullable
