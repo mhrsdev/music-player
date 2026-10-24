@@ -19,7 +19,7 @@ Normal (stable) release. Most of it is verified by tests and renders only; see K
 - **Home-screen widgets** (three sizes), **Android Auto** browse tree, **backup / restore** of playlists, likes and history.
 - **Auto-update from GitHub Releases** (once a day at most while the app is open, plus a manual button; SHA-256 and signing-certificate check; you confirm the install).
 - **Library management**: playlist create / rename / delete / remove track, sort options, multi-select, genres / folders / years, track details, share and delete, rescan button and music-folder picker. Richer Home (mixes, decades, genres, stats).
-- **Full-screen layout** (edge-to-edge, cutouts, optional immersive player), landscape and large-screen layouts for the main screens.
+- **Full-screen layout** (edge-to-edge, cutouts, optional immersive player).
 - New name and logo: **Mowj / موج**.
 
 ### Changed
@@ -46,7 +46,7 @@ Normal (stable) release. Most of it is verified by tests and renders only; see K
 - Aggressive battery managers (Xiaomi, Oppo, Realme, Samsung "sleeping apps") can stop headset buttons from waking the app.
 - The One UI media card draws its own seek bar and cannot be restyled by apps.
 - Persian copy has not been reviewed by a native speaker; LRCLIB availability is outside our control.
-- Local files only (no streaming), no tag editor, no crossfade.
+- Local files only (no streaming), no tag editor, no crossfade, no dedicated landscape/tablet layouts yet.
 
 ## v0.1.0
 
