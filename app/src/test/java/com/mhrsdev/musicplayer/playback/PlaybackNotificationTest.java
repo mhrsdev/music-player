@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.service.notification.StatusBarNotification;
 import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.widget.ArtworkResolver;
@@ -22,6 +23,7 @@ import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,21 +85,34 @@ public class PlaybackNotificationTest {
         NotificationManager nm = (NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE);
         StatusBarNotification posted = null;
         for (int i = 0; i < 200 && posted == null; i++) {
-            ShadowLooper.idleMainLooper();
+            tick();
             for (StatusBarNotification n : nm.getActiveNotifications()) posted = n;
             if (posted == null) Thread.sleep(25);
         }
         assertNotNull("no media notification posted", posted);
         // Media3's onTaskRemoved keeps the service only if player.isPlaying() (READY + playWhenReady) and it is already
         // foreground. Poll (bounded, returns as soon as true) so a slow CI runner cannot race the first buffering.
-        Player player = PlayerHolder.get(app);
+        ExoPlayer player = PlayerHolder.get(app);
         player.setRepeatMode(Player.REPEAT_MODE_ONE); // can never reach ENDED, whatever the runner's speed
         for (int i = 0; i < 2400 && !(player.isPlaying() && shadow().isLastForegroundNotificationAttached()); i++) {
-            ShadowLooper.idleMainLooper();
+            tick();
+            // Under CPU load the audio renderer sometimes never signals ready after the first prepare (BUFFERING with
+            // the whole file buffered, a 10 ms doSomeWork pending); one seek flushes it. Re-seek every 2 s until playing.
+            if (i % 80 == 79 && !player.isPlaying()) player.seekTo(0);
             Thread.sleep(25);
         }
-        assertTrue("player never started playing, state " + player.getPlaybackState(), player.isPlaying());
+        assertTrue("player never started playing, state " + player.getPlaybackState() + ", loading " + player.isLoading()
+                + ", buffered " + player.getBufferedPosition() + " ms, error " + player.getPlayerError(),
+                player.isPlaying());
         return posted;
+    }
+
+    /**
+     * One poll step. Robolectric's paused clock is frozen unless advanced, and ExoPlayer's playback thread lives on
+     * delayed messages (doSomeWork every 10 ms); without advancing it a loaded machine can leave the player in BUFFERING.
+     */
+    private static void tick() {
+        ShadowLooper.idleMainLooper(25, TimeUnit.MILLISECONDS);
     }
 
     @Before public void dropPlayerLeftByEarlierTests() throws Exception {
@@ -131,7 +146,7 @@ public class PlaybackNotificationTest {
             NotificationManager nm = (NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE);
             boolean cover = false;
             for (int i = 0; i < 200 && !cover; i++) { // the cover arrives asynchronously and re-posts
-                ShadowLooper.idleMainLooper();
+                tick();
                 for (StatusBarNotification sbn : nm.getActiveNotifications()) {
                     cover |= sbn.getNotification().getLargeIcon() != null;
                 }
