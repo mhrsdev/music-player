@@ -103,9 +103,15 @@ dependency; the supervisor should decide before the first public release.
 * R8 full mode is the default since AGP 8.0 (project uses AGP 8.13, no `android.enableR8.fullMode=false`); `minifyEnabled true` + `shrinkResources true` for release (`app/build.gradle`); keep rules are one line (Fragment constructors).
 * `androidResources.localeFilters = ['en','fa']` removed ~0.4 MB of library translations (resources.arsc 1.10 MB to 0.67 MB, APK 3.18 MB to 2.77 MB).
 
+## Performance telemetry (PT1, D38 / D40)
+
+* PT1 `diag/PerfProbe` costs **nothing while 'Record performance' is OFF** (default; never persisted): no frame-metrics listener, no thread, no timer. The always-on hooks are a few array / atomic writes on screen changes and decoration changes (`PerfProbe.setScreen/leaveScreen/setFlag`, never per frame; `FrameDriver` publishes its two bits only when a tick is added or removed).
+* While ON: one frame-metrics listener on the main window delivered on its own `THREAD_PRIORITY_BACKGROUND` `HandlerThread` (`perf-probe`; no main-thread work, no allocation per frame: fixed arrays, a reused `long[]`), one 5 s sampler tick plus a 30 s `/proc/self/task` pass on that thread, auto-stop after 10 minutes or 1 minute after the app left the screen (not while music plays, so screen-off drain can be measured; still capped at 10 minutes). The thread quits with the recording.
+* `PerfBudgetTest.performanceProbeCostsNothingUntilTheCardSwitchIsOn`: `HandlerThread` / frame-metrics listeners only in `PerfProbe` (and the debug-only `JankLogger`), `PerfProbe.start` only from the Diagnostics card, `onFrame` has no `new`, no `String.format`, no concatenation. `PerfProbeTest`: OFF registers no listener and no thread, ON registers exactly one and removes it on stop.
+
 ## Exceptions
 
-(none)
+* PT1 (owner D38): `diag/PerfProbe` is the only non-debug `HandlerThread` and delayed callback besides the reviewed list above (B3): it exists only while the owner switches 'Record performance' on, ends after 10 minutes at the latest, and is on the `PerfBudgetTest` allow-list.
 
 ## Regex safety (hotfix v0.3.2)
 

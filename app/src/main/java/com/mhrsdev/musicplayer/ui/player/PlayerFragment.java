@@ -29,6 +29,7 @@ import com.mhrsdev.musicplayer.MusicPlayerApp;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.databinding.PlayerFragmentBinding;
 import com.mhrsdev.musicplayer.di.AppContainer;
+import com.mhrsdev.musicplayer.diag.PerfProbe;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.model.RepeatMode;
@@ -206,6 +207,7 @@ public class PlayerFragment extends Fragment {
         Context ctx = requireContext();
         lyricsAdapter.setEffects(LyricsEffects.blurAllowed(ctx), MotionPolicy.decorativeMotionEnabled(ctx),
                 MotionPolicy.lyricsWordsEnabled());
+        PerfProbe.setFlag(PerfProbe.F_LYRICS_BLUR, LyricsEffects.blurAllowed(ctx) && MotionPolicy.lyricsBlurEnabled(ctx));
     }
 
     /** The 30 fps word-sweep loop runs only for shown, synced lyrics with the word sweep on. */
@@ -741,6 +743,7 @@ public class PlayerFragment extends Fragment {
 
     private void renderStage(Boolean showLyrics) {
         boolean lyrics = Boolean.TRUE.equals(showLyrics);
+        PerfProbe.setFlag(PerfProbe.F_LYRICS, lyrics);
         crossfade(b.playerArtwork, !lyrics);
         b.playerLyricsToggle.setContentDescription(getString(lyrics ? R.string.player_show_cover : R.string.player_show_lyrics));
         b.playerLyricsToggle.setActivated(lyrics);
@@ -1076,6 +1079,7 @@ public class PlayerFragment extends Fragment {
 
     @Override public void onDestroyView() {
         setCovering(false);
+        PerfProbe.setFlag(PerfProbe.F_LYRICS | PerfProbe.F_LYRICS_BLUR, false);
         b.lyricsList.removeCallbacks(resumeAutoScroll);
         if (lyricsTicker != null) lyricsTicker.stop();
         renderedOnce = false;

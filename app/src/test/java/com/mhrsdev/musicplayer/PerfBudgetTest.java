@@ -108,11 +108,33 @@ public class PerfBudgetTest {
                 "java/com/mhrsdev/musicplayer/di/AppContainer.java",              // MediaStore-change scan debounce, removed in onAppBackground
                 "java/com/mhrsdev/musicplayer/playback/NowPlayingBridge.java",     // one coalesced widget push per playback event
                 "java/com/mhrsdev/musicplayer/ui/library/FastScrollerView.java",  // one-shot hide after a touch
+                "java/com/mhrsdev/musicplayer/diag/PerfProbe.java",               // PT1: 5 s sample tick + 10 min / 1 min auto-stop, only while 'Record performance' is on
                 "java/com/mhrsdev/musicplayer/ui/player/PlayerFragment.java"));   // lyrics auto-scroll resume, view-scoped
         Set<String> found = filesMatching("postDelayed\\(|scheduleAtFixedRate|scheduleWithFixedDelay|new Timer\\(");
         found.removeAll(allowed);
         assertEquals("new delayed callbacks: gate them on visibility/playback and add to the allow-list: " + found,
                 new TreeSet<String>(), found);
+    }
+
+    @Test public void performanceProbeCostsNothingUntilTheCardSwitchIsOn() throws IOException {
+        // PT1 (D38): frame metrics + a sampler thread exist only inside PerfProbe, are started only from the Diagnostics
+        // card, and the per-frame callback allocates nothing. See docs/PERF_BUDGET.md "Performance telemetry".
+        Set<String> threads = filesMatching("new HandlerThread\\(");
+        threads.remove("java/com/mhrsdev/musicplayer/diag/PerfProbe.java");
+        threads.remove("java/com/mhrsdev/musicplayer/debug/JankLogger.java"); // debug builds only (MusicPlayerApp: BuildConfig.DEBUG)
+        assertTrue("a new HandlerThread needs a reviewed reason: " + threads, threads.isEmpty());
+        Set<String> metrics = filesMatching("addOnFrameMetricsAvailableListener");
+        metrics.remove("java/com/mhrsdev/musicplayer/diag/PerfProbe.java");
+        metrics.remove("java/com/mhrsdev/musicplayer/debug/JankLogger.java");
+        assertTrue("frame metrics listeners belong in PerfProbe: " + metrics, metrics.isEmpty());
+        Set<String> starters = filesMatching("PerfProbe\\.start\\(");
+        assertEquals("PerfProbe.start only from the Diagnostics card", new TreeSet<>(Arrays.asList(
+                "java/com/mhrsdev/musicplayer/ui/diagnostics/DiagnosticsFragment.java")), starters);
+        String probe = read(MAIN.resolve(PKG + "diag/PerfProbe.java"));
+        int start = probe.indexOf("void onFrame(");
+        String body = probe.substring(start, probe.indexOf("// ---- every 5 s", start));
+        assertTrue("PerfProbe.onFrame runs per frame: no allocation (found 'new ')", !Pattern.compile("\\bnew\\s").matcher(body).find());
+        assertTrue("no String.format / concatenation per frame", !body.contains("String.format") && !body.contains("\" +") && !body.contains("+ \""));
     }
 
     @Test public void loopingAnimationsRideTheSharedFrameDriver() throws IOException {

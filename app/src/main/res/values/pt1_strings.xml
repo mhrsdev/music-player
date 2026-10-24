@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PT1 (D38): Settings > About > Diagnostics > Performance. -->
+<resources>
+    <string name="perf_title">Performance</string>
+    <string name="perf_record">Record performance (for bug reports)</string>
+    <string name="perf_record_sub">Measures how smoothly each screen draws, plus temperature, memory and CPU every 5 seconds. It stays on this phone, and stops by itself after 10 minutes or a minute after you leave the app. Turn it on, use the app for two minutes (scroll Home, open the player with lyrics), then tap Share.</string>
+    <string name="perf_summary_live">Recording %1$s · %2$s frames · %3$s janky</string>
+    <string name="perf_summary_done">Recorded %1$s · %2$s frames · %3$s janky</string>
+    <string name="perf_worst">Worst screen: %1$s (%2$s janky)</string>
+    <string name="perf_share">Share performance report</string>
+    <string name="perf_clear">Clear recording</string>
+    <string name="perf_cleared">Performance data cleared</string>
+    <string name="perf_nothing">Nothing recorded yet. Turn on Record performance first.</string>
+    <string name="perf_share_subject">Mowj performance report</string>
+    <string name="perf_share_chooser">Send performance report with</string>
+</resources>

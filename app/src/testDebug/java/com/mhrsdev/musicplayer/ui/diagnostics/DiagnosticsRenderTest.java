@@ -15,6 +15,8 @@ import com.mhrsdev.musicplayer.MainActivity;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.diag.Diagnostics;
 import com.mhrsdev.musicplayer.diag.DiagnosticsFixtures;
+import com.mhrsdev.musicplayer.diag.PerfProbe;
+import com.mhrsdev.musicplayer.diag.PerfStats;
 import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
 import java.io.File;
@@ -60,6 +62,54 @@ public class DiagnosticsRenderTest {
         assertEquals(View.GONE, root.findViewById(R.id.crash_card).getVisibility());
     }
 
+    /** PT1 (D38): the Performance card with a recording in progress and its live summary. */
+    @Test @Config(qualifiers = "w412dp-h915dp-night-xhdpi")
+    public void performanceCardDark() throws Exception {
+        MainActivity a = start(false);
+        seedRecording(a);
+        a.openFragment(new DiagnosticsFragment(), DiagnosticsFragment.TAG);
+        View root = render(a, "pt1-perf-card-dark", true);
+        assertTrue(((android.widget.Checkable) root.findViewById(R.id.perf_switch)).isChecked());
+        assertTrue(((TextView) root.findViewById(R.id.perf_summary)).getText().toString().contains("2,000"));
+        assertTrue(((TextView) root.findViewById(R.id.perf_worst)).getText().toString().contains("PlayerFragment+lyrics"));
+        PerfProbe.clear();
+    }
+
+    @Test @Config(qualifiers = "fa-w412dp-h915dp-notnight-xhdpi")
+    public void performanceCardFaLight() throws Exception {
+        MainActivity a = start(false);
+        seedRecording(a);
+        a.openFragment(new DiagnosticsFragment(), DiagnosticsFragment.TAG);
+        View root = render(a, "pt1-perf-card-fa-light", true);
+        assertEquals(View.VISIBLE, root.findViewById(R.id.perf_share).getVisibility());
+        PerfProbe.clear();
+    }
+
+    @Test @Config(qualifiers = "w412dp-h915dp-night-xhdpi")
+    public void performanceCardOffByDefault() throws Exception {
+        PerfProbe.clear();
+        MainActivity a = start(false);
+        a.openFragment(new DiagnosticsFragment(), DiagnosticsFragment.TAG);
+        settle();
+        View root = a.getWindow().getDecorView();
+        assertEquals(false, ((android.widget.Checkable) root.findViewById(R.id.perf_switch)).isChecked());
+        assertEquals(View.GONE, root.findViewById(R.id.perf_summary).getVisibility());
+        assertEquals(false, root.findViewById(R.id.perf_share).isEnabled());
+    }
+
+    /** A recording in progress with 2,000 frames: a smooth Home and a janky Player with lyrics. */
+    private static void seedRecording(MainActivity a) {
+        PerfProbe.start(a, new PerfProbe.AppState() {
+            @Override public boolean playing() { return true; }
+            @Override public String profile() { return "FULL"; }
+        });
+        PerfStats st = PerfProbe.statsForTest();
+        int home = st.slotFor("HomeFragment"), player = st.slotFor("PlayerFragment+lyrics");
+        long[] ph = new long[PerfStats.PHASE_COUNT];
+        for (int i = 0; i < 1200; i++) st.record(home, 0, 5_000_000L, ph, 8_333_333L, 1000 + i, false);
+        for (int i = 0; i < 800; i++) st.record(player, 6, i % 3 == 0 ? 30_000_000L : 6_000_000L, ph, 8_333_333L, 3000 + i, false);
+    }
+
     @Test @Config(qualifiers = "fa-w412dp-h915dp-night-xhdpi")
     public void homeNoticeFaDark() throws Exception {
         MainActivity a = start(true);
@@ -95,6 +145,10 @@ public class DiagnosticsRenderTest {
     }
 
     private static View render(MainActivity a, String name) throws Exception {
+        return render(a, name, false);
+    }
+
+    private static View render(MainActivity a, String name, boolean scrollToEnd) throws Exception {
         settle();
         View root = a.getWindow().getDecorView();
         int w = 412 * 2, h = 915 * 2;
@@ -102,13 +156,17 @@ public class DiagnosticsRenderTest {
                 View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
         root.layout(0, 0, w, h);
         settle();
+        if (scrollToEnd) {
+            androidx.core.widget.NestedScrollView sv = root.findViewById(R.id.scroll);
+            sv.scrollTo(0, sv.getChildAt(0).getHeight());
+        }
         Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
         c.drawColor(Tokens.color(a, R.attr.mpBackground));
         root.draw(c);
         File dir = new File("../docs/screens");
         if (!dir.isDirectory()) dir = new File("build");
-        File out = new File(dir, "x1-" + name + ".png");
+        File out = new File(dir, (name.startsWith("pt1-") ? "" : "x1-") + name + ".png");
         try (FileOutputStream fos = new FileOutputStream(out)) {
             bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
         }

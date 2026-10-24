@@ -4,6 +4,8 @@ import android.view.Choreographer;
 
 import androidx.annotation.MainThread;
 
+import com.mhrsdev.musicplayer.diag.PerfProbe;
+
 import java.util.ArrayList;
 
 /**
@@ -56,8 +58,21 @@ public class FrameDriver implements Choreographer.FrameCallback {
         return instance;
     }
 
+    /** Tells the performance probe which kinds of loop are alive (a few reads of a short list, only when it changes). */
+    private void publishFlags() {
+        boolean beat = false, spring = false;
+        for (int i = 0, n = ticks.size(); i < n; i++) {
+            if (ticks.get(i).everyFrame()) spring = true; else beat = true;
+        }
+        PerfProbe.setFlag(PerfProbe.F_BEAT, beat);
+        PerfProbe.setFlag(PerfProbe.F_SPRING, spring);
+    }
+
     public void add(Tick t) {
-        if (!ticks.contains(t)) ticks.add(t);
+        if (!ticks.contains(t)) {
+            ticks.add(t);
+            publishFlags();
+        }
         if (!posted) {
             posted = true;
             lastNanos = 0;
@@ -74,6 +89,7 @@ public class FrameDriver implements Choreographer.FrameCallback {
 
     public void remove(Tick t) {
         ticks.remove(t);
+        publishFlags();
     }
 
     /** Caps every animation driven here; {@code fps <= 0} removes the cap. Takes effect on the next frame. */
@@ -128,6 +144,7 @@ public class FrameDriver implements Choreographer.FrameCallback {
         if (beat) lastBeatNanos = frameTimeNanos;
         if (dt <= 0f) dt = 1f / 120f;
         float scaled = dt / Motion.durationScale();
+        int before = ticks.size();
         for (int i = ticks.size() - 1; i >= 0; i--) {
             if (i >= ticks.size()) continue; // a tick removed others
             Tick t = ticks.get(i);
@@ -136,6 +153,7 @@ public class FrameDriver implements Choreographer.FrameCallback {
                 if (idx >= 0) ticks.remove(idx);
             }
         }
+        if (ticks.size() != before) publishFlags();
         if (ticks.isEmpty()) {
             posted = false;
             return;
