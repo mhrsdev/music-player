@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private static final String STATE_TAB = "tab";
 
     private ActivityMainBinding binding;
+    private com.mhrsdev.musicplayer.ui.nav.PlayerCover playerCover;
     private ShellViewModel shell;
     private boolean permissionFlow;
     private OnBackPressedCallback backToHome;
@@ -77,6 +78,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        // The opaque root (mpBackground, full-bleed) hides the window background on every frame; drawing both was one
+        // wasted full-screen fill per frame on every screen (the starting window still uses the theme's background).
+        getWindow().setBackgroundDrawable(null);
+        // Adaptive thermal: effects step down to Balanced / Light while the phone is hot (event driven, API 29+).
+        com.mhrsdev.musicplayer.ui.theme.ThermalWatch.install(this);
+        playerCover = new com.mhrsdev.musicplayer.ui.nav.PlayerCover(binding.root, binding.screenContainer,
+                binding.bottomScrim, binding.chrome);
         applySystemBarAppearance();
         applyInsets();
 
@@ -211,7 +219,8 @@ public class MainActivity extends AppCompatActivity
 
     /** Recomputes the space the dock takes and hands it to the scrim and every scrolling screen. */
     private void updateDock() {
-        boolean shown = binding.chrome.getVisibility() == View.VISIBLE && binding.chrome.getHeight() > 0;
+        // INVISIBLE (hidden under the full player) still takes its space: only GONE changes the dock.
+        boolean shown = binding.chrome.getVisibility() != View.GONE && binding.chrome.getHeight() > 0;
         int dock = shown ? binding.chrome.getHeight() : insetBottom;
         int px = dock + getResources().getDimensionPixelSize(R.dimen.mp_dock_content_clearance);
         int scrimH = shown ? dock + getResources().getDimensionPixelSize(R.dimen.mp_dock_scrim_fade) : 0;
@@ -426,6 +435,11 @@ public class MainActivity extends AppCompatActivity
             fm.beginTransaction().setReorderingAllowed(true)
                     .add(R.id.player_container, f, QUEUE_TAG).addToBackStack(QUEUE_TAG).commit();
         }
+    }
+
+    @Override public void setPlayerCovering(boolean covering) {
+        // never hide the shell unless the player is really there (a late animator end after it was removed)
+        playerCover.setCovered(covering && getSupportFragmentManager().findFragmentByTag(PLAYER_TAG) != null);
     }
 
     @Override public void closeFullPlayer() {

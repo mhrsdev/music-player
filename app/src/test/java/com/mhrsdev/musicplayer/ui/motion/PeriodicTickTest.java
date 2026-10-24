@@ -23,7 +23,8 @@ public class PeriodicTickTest {
         tick.start();
         tick.start(); // idempotent
         assertEquals(1, FrameDriver.get().activeCount());
-        for (int frame = 0; frame < 60; frame++) tick.onFrame(1f / 60f); // one second of 60 Hz display frames
+        long t0 = 5_000_000_000_000L;
+        for (int frame = 0; frame < 60; frame++) FrameDriver.get().doFrame(t0 + frame * 1_000_000_000L / 60); // 1 s at 60 Hz
         System.out.println("PERF PeriodicTick 66 ms over 1 s of 60 Hz frames: " + calls.get() + " body calls");
         assertTrue("about 15 fps, got " + calls.get(), calls.get() >= 13 && calls.get() <= 16);
         tick.stop();
@@ -34,7 +35,7 @@ public class PeriodicTickTest {
     @Test public void bodyReturningFalseStopsTheLoop() {
         PeriodicTick tick = new PeriodicTick(0, () -> false);
         tick.start();
-        assertFalse(tick.onFrame(1f / 60f));
+        assertFalse(tick.onFrame(1f / 60f)); // period 0: every frame, beat or not
         assertFalse(tick.isActive());
     }
 }

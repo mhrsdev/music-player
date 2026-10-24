@@ -58,9 +58,20 @@ public class ArtworkLoader {
 
     private final ArtworkResolver resolver;
     @Nullable private final GeneratedCover generator;
+    /** Main-thread renders (<= {@link #SYNC_MAX_PX}) use their own instance: never blocked behind a worker render. */
+    @Nullable private final GeneratedCover syncGenerator;
     private final LruCache<String, Bitmap> cache;
-    /** URIs (any size) that have no artwork. Bounded; {@link #forgetMisses()} clears it. */
-    private final LruCache<String, Boolean> misses = new LruCache<>(MISS_CAPACITY);
+    /**
+     * URIs (any size) that have no artwork, with the time it was found out. Bounded; survives app switches (it used to
+     * be wiped on every UI_HIDDEN, so each return re-probed every cover-less row: thumbnail, MediaMetadataRetriever,
+     * up to 4 tracks x 12 file probes) and process restarts ({@link #missFile}, at most {@link #MISS_TTL_MS} old).
+     */
+    private final LruCache<String, Long> misses = new LruCache<>(MISS_CAPACITY);
+    /** A remembered miss is re-probed after this long (new folder art, re-tagged files); a rescan clears all. */
+    static final long MISS_TTL_MS = 3L * 24 * 60 * 60 * 1000;
+    @Nullable private final File missFile;
+    private final Object missFileLock = new Object();
+    private volatile boolean missesLoaded;
     private final Map<String, Pending> pending = new HashMap<>();
     private final ThreadPoolExecutor executor;
     private final Object[] probeLocks = new Object[8];
@@ -72,19 +83,28 @@ public class ArtworkLoader {
     }
 
     private ArtworkLoader(Context context) {
-        this(new ArtworkResolver(new PlatformBackend(context.getApplicationContext())), GeneratedCover.get(context));
+        this(new ArtworkResolver(new PlatformBackend(context.getApplicationContext())), GeneratedCover.get(context),
+                new File(context.getApplicationContext().getCacheDir(), "artwork_misses.txt"));
     }
 
     @VisibleForTesting
     ArtworkLoader(ArtworkResolver resolver) {
-        this(resolver, null);
+        this(resolver, null, null);
     }
 
     @VisibleForTesting
     ArtworkLoader(ArtworkResolver resolver, @Nullable GeneratedCover generator) {
+        this(resolver, generator, null);
+    }
+
+    @VisibleForTesting
+    ArtworkLoader(ArtworkResolver resolver, @Nullable GeneratedCover generator, @Nullable File missFile) {
         this.resolver = resolver;
+        this.missFile = missFile;
+        this.missesLoaded = missFile == null;
         for (int i = 0; i < probeLocks.length; i++) probeLocks[i] = new Object();
         this.generator = generator;
+        this.syncGenerator = generator == null ? null : generator.copy();
         // 1/16 of the heap, but never below two hero covers (a 128 MB heap would give 8 MB and thrash on every scroll).
         int max = (int) Math.max(6L * 1024 * 1024, Math.min(16L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 16));
         cache = new LruCache<String, Bitmap>(max) {
@@ -100,6 +120,7 @@ public class ArtworkLoader {
             return t;
         });
         executor.allowCoreThreadTimeOut(true);
+        if (!missesLoaded) executor.execute(this::loadMisses); // first job: off the main thread, before any probe
     }
 
     @MainThread
@@ -141,14 +162,34 @@ public class ArtworkLoader {
         np.callbacks.add(callback);
         pending.put(key, np);
         np.future = executor.submit(() -> {
-            Bitmap bmp;
+            Bitmap found;
             // One probe per cover at a time: the same album asked at 3 sizes (row, card, player) must not run the
             // thumbnail / retriever / folder probes three times in parallel. The later ones find the miss or the winner.
+            loadMisses();
             synchronized (probeLocks[(uri.hashCode() & 0x7fffffff) % probeLocks.length]) {
-                bmp = misses.get(uri) != null ? null : resolver.resolve(uri, bucket(sizePx));
+                found = misses.get(uri) != null ? null : resolver.resolve(uri, bucket(sizePx));
             }
+            Bitmap bmp = fit(found, bucket(sizePx));
             main.post(() -> deliver(uri, key, bmp));
         });
+    }
+
+    /**
+     * Caps a decoded cover to its bucket (worker thread). Power-of-two sampling keeps the shorter side anywhere in
+     * [target, 2 x target): a 3000 px embedded picture asked for a 192 px row came back 375 px, i.e. ~4x the memory, so
+     * the shared cache held a quarter of the covers it could and scrolling re-decoded (CPU, heat, GC; OOM risk with
+     * several decodes in flight on a QHD+ screen). Anything over 1.25 x the bucket is scaled down to it once, here.
+     */
+    @Nullable static Bitmap fit(@Nullable Bitmap b, int bucketPx) {
+        if (b == null) return null;
+        int w = b.getWidth(), h = b.getHeight(), shorter = Math.min(w, h);
+        if (shorter <= bucketPx * 5 / 4 || b.getConfig() == Bitmap.Config.HARDWARE) return b;
+        float s = bucketPx / (float) shorter;
+        try {
+            return Bitmap.createScaledBitmap(b, Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s)), true);
+        } catch (RuntimeException | OutOfMemoryError e) {
+            return b; // keep the (larger) decode rather than nothing
+        }
     }
 
     /** Smallest bucket at or above {@code px} (capped at the largest). */
@@ -171,8 +212,8 @@ public class ArtworkLoader {
     public Bitmap generatedNow(CoverSpec spec, int sizePx) {
         String key = generatedKey(spec, sizePx);
         Bitmap hit = cache.get(key);
-        if (hit != null || generator == null || bucket(sizePx) > SYNC_MAX_PX) return hit;
-        Bitmap b = generator.render(spec, bucket(sizePx));
+        if (hit != null || syncGenerator == null || bucket(sizePx) > SYNC_MAX_PX) return hit;
+        Bitmap b = syncGenerator.render(spec, bucket(sizePx));
         cache.put(key, b);
         return b;
     }
@@ -209,7 +250,7 @@ public class ArtworkLoader {
     }
 
     private void deliver(@Nullable String uri, String key, @Nullable Bitmap bmp) {
-        if (bmp != null) cache.put(key, bmp); else if (uri != null) misses.put(uri, Boolean.TRUE);
+        if (bmp != null) cache.put(key, bmp); else if (uri != null) misses.put(uri, System.currentTimeMillis());
         Pending p = pending.remove(key);
         if (p == null) return;
         for (Callback c : p.callbacks) c.onLoaded(key, bmp);
@@ -229,16 +270,69 @@ public class ArtworkLoader {
         cache.evictAll();
     }
 
-    /** UI hidden (Application.onTrimMemory): bitmaps and miss memory go; the next visit reloads what it shows. */
+    /**
+     * UI hidden (Application.onTrimMemory): bitmaps go, the next visit reloads what it shows. The "no artwork" memory
+     * stays (tiny) and is written to disk on the worker, so a return or a restart does not re-probe every row.
+     */
     public static void trimAll() {
         if (instance == null) return;
         instance.trim();
-        instance.forgetMisses();
+        instance.saveMisses();
     }
 
-    /** Forget "no artwork" results, e.g. after a library rescan. */
+    /** Forget "no artwork" results, e.g. after a library rescan (memory and disk). */
     public void forgetMisses() {
         misses.evictAll();
+        File f = missFile;
+        if (f != null) executor.execute(() -> { synchronized (missFileLock) { f.delete(); } });
+    }
+
+    /** Snapshot on the calling (main) thread, file write on the worker. */
+    @VisibleForTesting
+    void saveMisses() {
+        File f = missFile;
+        if (f == null || !missesLoaded) return;
+        Map<String, Long> snap = misses.snapshot();
+        executor.execute(() -> {
+            StringBuilder sb = new StringBuilder(snap.size() * 64);
+            for (Map.Entry<String, Long> e : snap.entrySet()) {
+                if (e.getKey().indexOf('\n') >= 0) continue;
+                sb.append(e.getValue()).append('\t').append(e.getKey()).append('\n');
+            }
+            synchronized (missFileLock) {
+                try (java.io.Writer w = new java.io.OutputStreamWriter(new java.io.FileOutputStream(f),
+                        java.nio.charset.StandardCharsets.UTF_8)) {
+                    w.write(sb.toString());
+                } catch (java.io.IOException | RuntimeException ignored) {
+                    // a cache: losing it only costs probes
+                }
+            }
+        });
+    }
+
+    /** Worker thread: reads the remembered misses once (entries older than {@link #MISS_TTL_MS} are dropped). */
+    private void loadMisses() {
+        if (missesLoaded) return;
+        synchronized (missFileLock) {
+            if (missesLoaded) return;
+            File f = missFile;
+            long now = System.currentTimeMillis();
+            if (f != null && f.isFile()) {
+                try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(
+                        new java.io.FileInputStream(f), java.nio.charset.StandardCharsets.UTF_8))) {
+                    for (String line; (line = r.readLine()) != null; ) {
+                        int tab = line.indexOf('\t');
+                        if (tab <= 0) continue;
+                        long t = Long.parseLong(line.substring(0, tab));
+                        String uri = line.substring(tab + 1);
+                        if (now - t < MISS_TTL_MS && t <= now && misses.get(uri) == null) misses.put(uri, t);
+                    }
+                } catch (java.io.IOException | RuntimeException ignored) {
+                    // corrupt or unreadable: start empty
+                }
+            }
+            missesLoaded = true;
+        }
     }
 
     /** Largest power of two that keeps the shorter side at or above {@code target}. */

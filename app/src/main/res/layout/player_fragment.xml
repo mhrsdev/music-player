@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    android:focusable="false"
-    android:background="#0F1216">
+    android:focusable="false">
 
     <com.mhrsdev.musicplayer.ui.player.PlayerBackdropView
         android:id="@+id/player_backdrop"
@@ -296,10 +295,14 @@
                 android:textSize="13sp"
                 tools:text="0:52" />
 
+            <!-- 0dp + weight (not wrap_content): a new time each second then only redraws the label; a wrap_content
+                 TextView requested a layout pass of the whole player every second. -->
             <TextView
                 android:id="@+id/player_remaining"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
                 android:fontFeatureSettings="tnum"
                 android:textColor="#C7FFFFFF"
                 android:textSize="13sp"

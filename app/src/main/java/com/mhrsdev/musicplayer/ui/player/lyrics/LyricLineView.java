@@ -37,6 +37,10 @@ import java.util.List;
  *   <li>other lines: alpha and (API 31+, when allowed) a cached blur {@link RenderEffect} by distance from the
  *       active line; scale 0.94 → 1 on the spring curve when a line becomes active.</li>
  * </ul>
+ * <p>Cost (v0.3.1, D29): a line that is not (and does not become) the active one only changes alpha and blur when the
+ * active line moves. Its alpha is a RenderNode property ({@link #setAlpha}) and its blur a cached effect, so such a
+ * transition re-records nothing and, above all, does not re-render + re-blur the line's layer on every animation frame
+ * (before: ~10 visible blurred lines x 55 frames of 460 ms at 120 Hz on every line change).
  * Each line takes its own paragraph direction from its text (first strong character), so Persian lines run RTL and
  * align right even inside an English song, and mixed lines keep the bidi order of the layout.
  */
@@ -86,7 +90,9 @@ public class LyricLineView extends View {
             emphasis = fromEmphasis + (toEmphasis - fromEmphasis) * t;
             distance = fromDistance + (toDistance - fromDistance) * t;
             applyBlur();
-            invalidate();
+            applyAlpha();
+            // only emphasis (scale, sweep contrast) is drawn by hand; alpha + blur alone need no new display list
+            if (fromEmphasis != toEmphasis) invalidate();
         });
         if (latin == null) {
             try {
@@ -136,6 +142,7 @@ public class LyricLineView extends View {
         wordSweep = words;
         appliedBlurBucket = -1;
         applyBlur();
+        applyAlpha();
     }
 
     /**
@@ -149,6 +156,7 @@ public class LyricLineView extends View {
             emphasis = toEmphasis = e;
             distance = toDistance = newDistance;
             applyBlur();
+            applyAlpha();
             invalidate();
             return;
         }
@@ -164,6 +172,21 @@ public class LyricLineView extends View {
     public boolean isActiveLine() { return toEmphasis > 0.5f; }
 
     public boolean hasWordTiming() { return line != null && line.hasWords(); }
+
+    /** Plain lines (no sweep drawn) get their distance alpha on the RenderNode; the sung line draws its own. */
+    private boolean plain() {
+        return emphasis < 0.01f || line == null || line.words() == null || !wordSweep;
+    }
+
+    private void applyAlpha() {
+        float a = plain() ? LyricsMotion.alphaForDistance(distance, distance < 0, blurAllowed) : 1f;
+        if (getAlpha() != a) setAlpha(a);
+    }
+
+    /** One plain text draw: view alpha can go straight to the paint (no offscreen layer for the alpha). */
+    @Override public boolean hasOverlappingRendering() {
+        return !plain();
+    }
 
     private void applyBlur() {
         if (Build.VERSION.SDK_INT < 31) return;
@@ -211,9 +234,11 @@ public class LyricLineView extends View {
         float lineAlpha = LyricsMotion.alphaForDistance(distance, past, blurAllowed);
         List<LyricWord> words = line.words();
         long pos = clock == null ? 0 : clock.positionMs();
-        if (emphasis < 0.01f || words == null || !wordSweep) {
-            drawPlain(c, l, Math.round(255 * lineAlpha));
+        if (plain()) {
+            applyAlpha(); // in case the line changed without a distance change (rebind)
+            drawPlain(c, l, 255); // the line alpha is the view's alpha (applyAlpha)
         } else {
+            if (getAlpha() != 1f) setAlpha(1f);
             drawSung(c, l, words, pos, lineAlpha);
         }
         c.restoreToCount(save);

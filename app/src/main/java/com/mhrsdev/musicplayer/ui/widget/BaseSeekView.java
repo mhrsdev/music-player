@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
+import com.mhrsdev.musicplayer.ui.motion.FrameRateVote;
 import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -74,6 +75,7 @@ public abstract class BaseSeekView extends View implements SeekBarView {
         inactivePaint.setStrokeWidth(strokeWidth);
         thumbPaint.setStyle(Paint.Style.FILL);
         setColors(Tokens.primary(context), Tokens.outlineVariant(context));
+        FrameRateVote.decorative(this, true); // the wave travels at 30 fps; a drag votes normally (below)
     }
 
     // ---- SeekBarView ----
@@ -87,7 +89,14 @@ public abstract class BaseSeekView extends View implements SeekBarView {
     @Override public void setPosition(long positionMs) {
         if (dragging || position == positionMs) return;
         position = positionMs;
-        invalidate();
+        // While the 30 fps loop runs, its next beat draws the new position: an invalidate here would render one more
+        // frame off the beat (4 a second while playing).
+        if (!framesFlowing()) invalidate();
+    }
+
+    /** True while a frame loop is about to redraw this view anyway (on the shared decorative beat). */
+    protected boolean framesFlowing() {
+        return frameTick.isActive();
     }
 
     @Override public void setBuffered(long bufferedMs) {
@@ -216,6 +225,7 @@ public abstract class BaseSeekView extends View implements SeekBarView {
             case MotionEvent.ACTION_DOWN:
                 getParent().requestDisallowInterceptTouchEvent(true);
                 dragging = true;
+                FrameRateVote.decorative(this, false); // the thumb follows the finger at the display rate
                 position = SeekMath.positionFor(e.getX(), left, right, duration);
                 lastTickBucket = position / Tokens.SEEK_STEP_MS;
                 if (listener != null) listener.onSeekStart(position);
@@ -238,6 +248,7 @@ public abstract class BaseSeekView extends View implements SeekBarView {
             case MotionEvent.ACTION_CANCEL:
                 if (!dragging) return false;
                 dragging = false;
+                FrameRateVote.decorative(this, true);
                 getParent().requestDisallowInterceptTouchEvent(false);
                 if (listener != null) listener.onSeekEnd(position);
                 invalidate();

@@ -10,7 +10,7 @@ import android.graphics.Shader;
  * The colour-field engine shared by {@link AmbientBackdropView} and the player backdrop: four large, soft radial
  * gradients in the artwork's colours. Shaders are built once per colour set at unit radius; drawing a frame only
  * moves/scales them through their local matrices (no allocation, no bitmap, no blur filter). {@code sec} drives the
- * slow drift (periods 19-31 s); pass a constant for a still field.
+ * slow drift (periods 19-31 s); pass a constant for a still field. Each blob fills only its own circle.
  */
 public class AmbientField {
     public static final int BLOBS = 4;
@@ -57,8 +57,29 @@ public class AmbientField {
             m.postTranslate(cx, cy);
             paints[i].getShader().setLocalMatrix(m);
             paints[i].setAlpha(alpha);
-            c.drawRect(0, 0, w, h, paints[i]);
+            // The gradient is fully transparent beyond its radius (CLAMP of an alpha-0 edge): a circle draws exactly
+            // the same pixels as the full-screen rect it replaced, but fills ~25 % fewer of them (blobs sit near the
+            // edges, so much of the screen is outside each circle). Pure GPU fill saved, on every drift frame.
+            c.drawCircle(cx, cy, r * breathe, paints[i]);
         }
+    }
+
+    /**
+     * Fraction of a {@code w x h} frame that blob {@code i}'s circle covers at {@code sec} (sampled on a grid; tests and
+     * the perf doc). The old full-screen rect was 1.0 for every blob.
+     */
+    public static float coverage(int i, int w, int h, float sec, float drift) {
+        float r = Math.max(w, h) * 0.55f
+                * (1f + drift * 0.06f * (float) Math.sin(2 * Math.PI * sec / (PERIOD[i] * 0.8f) + PHASE[i]));
+        float cx = w * (BX[i] + drift * driftX(i, sec)), cy = h * (BY[i] + drift * driftY(i, sec));
+        int n = 0, in = 0;
+        for (int y = 0; y < 64; y++) {
+            for (int x = 0; x < 64; x++, n++) {
+                float px = (x + 0.5f) * w / 64f - cx, py = (y + 0.5f) * h / 64f - cy;
+                if (px * px + py * py <= r * r) in++;
+            }
+        }
+        return in / (float) n;
     }
 
     /** Pure drift path: blob {@code i} centre offset at {@code sec}, as a fraction of the width (|x| <= 0.12). */

@@ -46,6 +46,8 @@ public class PlayerBackdropView extends View {
     }
 
     static final long DRIFT_FRAME_MS = 66; // <= 15 fps
+    /** Glow centre (fractions of w/h) and radius (fraction of the longer side). */
+    private static final float GLOW_X = 0.7f, GLOW_Y = 0.28f, GLOW_R = 0.6f;
     private boolean animating;
     private long driftStart = android.os.SystemClock.uptimeMillis();
     private final PeriodicTick ticker = new PeriodicTick(DRIFT_FRAME_MS, this::driftFrame);
@@ -69,6 +71,7 @@ public class PlayerBackdropView extends View {
         super(c, a);
         front.palette = back.palette = PlayerPalette.forSeed(0);
         System.arraycopy(DARK_BASE, 0, scrimAlpha, 0, 4);
+        com.mhrsdev.musicplayer.ui.motion.FrameRateVote.decorative(this, true); // slow drift: ~30 Hz is plenty
     }
 
     /** Light-theme variant (design 15): pale scrim, dark text. */
@@ -159,7 +162,7 @@ public class PlayerBackdropView extends View {
         if (w == 0 || l.palette == null) return;
         PlayerPalette p = l.palette;
         l.base.setShader(new LinearGradient(0, 0, 0, h, p.container, p.deep, Shader.TileMode.CLAMP));
-        l.glow.setShader(new RadialGradient(w * 0.7f, h * 0.28f, Math.max(w, h) * 0.6f,
+        l.glow.setShader(new RadialGradient(w * GLOW_X, h * GLOW_Y, Math.max(w, h) * GLOW_R,
                 (p.glow & 0x00FFFFFF) | 0x8C000000, p.glow & 0x00FFFFFF, Shader.TileMode.CLAMP));
         if (l.bitmap != null) {
             float bleed = 80 * getResources().getDisplayMetrics().density;
@@ -200,7 +203,8 @@ public class PlayerBackdropView extends View {
         }
         l.field.draw(c, w, h, alpha * 7 / 10, (android.os.SystemClock.uptimeMillis() - driftStart) / 1000f, 1f);
         l.glow.setAlpha(alpha);
-        c.drawRect(0, 0, w, h, l.glow);
+        // transparent beyond its radius: the circle draws the same pixels as a full-screen rect, with less fill
+        c.drawCircle(w * GLOW_X, h * GLOW_Y, Math.max(w, h) * GLOW_R, l.glow);
     }
 
     @Override protected void onDraw(Canvas c) {

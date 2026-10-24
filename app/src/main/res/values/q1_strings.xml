@@ -34,6 +34,7 @@
     <string name="settings_perf_fps_60_sub">At most 60 frames a second. Saves work on 90 and 120 Hz screens.</string>
     <string name="settings_perf_fps_30_sub">At most 30 frames a second: half the drawing, a little less fluid.</string>
     <string name="settings_perf_note_system">Your phone’s “Remove animations” is on, so Mowj stays still whatever you choose here.</string>
+    <string name="settings_perf_note_thermal">The phone is warm, so effects are lighter for now. They come back when it cools down.</string>
     <string name="settings_perf_note_saver">Battery saving is on right now, so motion and blur are paused.</string>
     <string name="settings_perf_tips_title">On a slower phone</string>
     <string-array name="settings_perf_tips">
