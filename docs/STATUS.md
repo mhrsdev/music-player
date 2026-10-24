@@ -142,6 +142,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 ## Change log
 
+- 2026-10-24: **v0.3.1 released** (stable) https://github.com/mhrsdev/music-player-mowj/releases/tag/v0.3.1 — APK 3.19 MB, SHA-256 18c30ffb…174d, signature = our key (2e59ce52…aacd), baseline profile included. Contains PF-A/PF-B perf, X1 diagnostics + non-fatal background tasks + widget/Android 17 guards. Pending: C1 (compat/low-end profile + queue restore window) -> v0.3.2; crash root cause on owner's S26 Ultra (Android 17 / One UI 9) still unconfirmed — waiting for his Diagnostics log. TODO: fix release.yml install-text template (says 'debug-signed unless keystore', misleading); wire UpdateBanner (Banners.attach never called); remove unused constraintlayout dep line.
+
 - 2026-10-24: **v0.3.0 released** (stable, not pre-release) https://github.com/mhrsdev/music-player-mowj/releases/tag/v0.3.0 — APK 3.1 MB, SHA-256 74b23b8d…2888, signature = our key (cert 2e59ce52…aacd). main = a92168b. Release body still says 'debug-signed unless keystore' (template text; actual APK is signed with our key) — fix wording in release.yml notes. Next: v0.3.1 perf hotfix (PF-A, PF-B; D29).
 
 - 2026-10-24: CI GREEN on ccr 605c064 (E2, L2, O1, B2, Q1, J1, CI1 all merged; PlaybackNotificationTest/HeadsetButtonsTest flakes fixed test-side). D1 docs (README en/fa, CHANGELOG v0.3.0) merged. Next: main fast-forward + release v0.3.0 (stable). Backlog: tablet/landscape layouts, remove unused constraintlayout dep line, root-cause of Robolectric renderer stall.
