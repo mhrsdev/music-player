@@ -35,6 +35,18 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 * B4 The foreground service stops 60 s after playback stops (10 min when "resume when a headset connects" is on, so a reconnect finds it; no polling meanwhile; its `AudioDeviceCallback` lives only as long as the service); the player's queue and position are already persisted.
 * B5 A feature that keeps a native resource (audio effect, `AudioDeviceCallback`, sensor) releases it when its screen is hidden or playback ends.
 
+## Background CPU / sustained load (PF-B, D29, v0.3.1)
+
+Details and measurements: `docs/PERF_BACKGROUND_v0.3.1.md`. Enforced by `PerfBudgetTest` (source scan) and unit tests.
+
+* BG1 Audio decoding (`WaveformExtractor`) is on demand: the track on screen (only for the 6 seek styles that draw a waveform, `SeekBarStyle.usesWaveform`) or the track queued next. The next-track prefetch additionally needs: the UI visible (an activity is started), a waveform seek style, no battery saver. Nothing is decoded while the phone reports thermal status >= MODERATE (API 29+; cached envelopes are still served). One job at a time on one `THREAD_PRIORITY_BACKGROUND` thread, cancelled when nobody observes it, cached forever (256 bytes per track). `PerfBudgetTest.waveformDecodingIsOnDemandBackgroundPriorityAndGated`, `WaveformRepositoryImplTest`.
+* BG2 The library scan reads MediaStore columns only (never opens audio files: no `MediaMetadataRetriever` / `MediaExtractor` / `MediaCodec` in `MediaStoreScanner`), is incremental and committed in chunks of 500, runs on its own background thread, is debounced after MediaStore changes (>= 2 s), throttled on foreground (>= 20 s; >= 5 min below API 30 where there is no MediaStore generation) and never watches MediaStore while the UI is hidden. `PerfBudgetTest.libraryScanIsDebouncedThrottledAndOnItsOwnLowPriorityThread`.
+* BG3 Widgets: redrawn on track / play-state events only, coalesced over >= 200 ms, never on position ticks, seeks, buffering or metadata events; the cover of one track is resolved once (play/pause does not probe artwork again). `PerfBudgetTest.widgetsAreRedrawnOnPlaybackStateEventsOnlyAndCoalesced`.
+* BG4 The 4 Hz player state (`ExoPlayerController.TICK_MS`) must not do O(queue) work: the queue snapshot is frozen once per queue edit (`PlaybackState.frozen`) and shared by every tick. `PlaybackStateTest`, `PerfBudgetTest.playerStateTickNeverCopiesTheQueue`.
+* BG5 No regex compiled per call in non-UI code: `String.matches/replaceAll/replaceFirst` with a regex literal are forbidden (static `Pattern` instead). `PerfBudgetTest.noRegexCompiledPerCall`.
+* BG6 Update check at most once a day (retry >= 1 h after a failure), foreground only; LRCLIB only for the track whose lyrics view is open; both cached. `PerfBudgetTest.updateCheckIsAtMostDaily`.
+* BG7 A baseline profile (`app/src/main/baseline-prof.txt`, wildcard rules expanded by AGP) compiles the app and Media3 ahead of time; replace by a recorded profile when a device is available. `PerfBudgetTest.aBaselineProfileCompilesTheAppAheadOfTime`.
+
 ## Animations
 
 * A0 Every looping animation runs through `ui/motion/PeriodicTick` or a `FrameDriver.Tick` (one Choreographer callback for the app); no private `postInvalidateDelayed` / `postOnAnimationDelayed` / Handler loops (`PerfBudgetTest`).

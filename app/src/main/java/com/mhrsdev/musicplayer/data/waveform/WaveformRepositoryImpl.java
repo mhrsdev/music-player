@@ -30,7 +30,8 @@ public class WaveformRepositoryImpl implements WaveformRepository {
     private final WaveformStore store;
     private final EnvelopeSource source;
     private final Function<Track, String> fingerprint;
-    private final BooleanSupplier powerSave;
+    private final BooleanSupplier skipPrefetch;
+    private final BooleanSupplier throttled;
     private final Executor worker;
     private final Executor main;
 
@@ -41,17 +42,26 @@ public class WaveformRepositoryImpl implements WaveformRepository {
     };
     private final Map<String, Job> inFlight = new HashMap<>();
 
+    public WaveformRepositoryImpl(WaveformStore store, EnvelopeSource source, Function<Track, String> fingerprint,
+            BooleanSupplier skipPrefetch, Executor worker, Executor main) {
+        this(store, source, fingerprint, skipPrefetch, () -> false, worker, main);
+    }
+
     /**
      * @param fingerprint file size/modified/duration key, called on {@code worker}
-     * @param powerSave true while the device is in battery saver (background prefetch is skipped then)
+     * @param skipPrefetch true when nobody could see a prefetched envelope (battery saver, hot phone, UI hidden, a seek
+     *                     style without waveform): the next-track prefetch is skipped then; on-screen requests still run
+     * @param throttled true while the phone is hot (thermal status >= MODERATE): no decoding at all, cached envelopes
+     *                  are still served
      * @param worker single low-priority thread; main: posts to the main thread
      */
     public WaveformRepositoryImpl(WaveformStore store, EnvelopeSource source, Function<Track, String> fingerprint,
-            BooleanSupplier powerSave, Executor worker, Executor main) {
+            BooleanSupplier skipPrefetch, BooleanSupplier throttled, Executor worker, Executor main) {
         this.store = store;
         this.source = source;
         this.fingerprint = fingerprint;
-        this.powerSave = powerSave;
+        this.skipPrefetch = skipPrefetch;
+        this.throttled = throttled;
         this.worker = worker;
         this.main = main;
     }
@@ -61,12 +71,12 @@ public class WaveformRepositoryImpl implements WaveformRepository {
     }
 
     /**
-     * Warms the cache for the track queued next. Does nothing in battery saver or when already cached/in flight.
+     * Warms the cache for the track queued next. Does nothing when skipped (see the constructor) or when already cached/in flight.
      * Main thread. Replaces an earlier unobserved prefetch.
      */
     public void prefetch(Track track) {
         String key = keyOf(track);
-        if (memory.containsKey(key) || powerSave.getAsBoolean()) return;
+        if (memory.containsKey(key) || skipPrefetch.getAsBoolean() || throttled.getAsBoolean()) return;
         cancelUnobservedPrefetches(key);
         Job job = inFlight.get(key);
         if (job == null) job = start(key, track, false);
@@ -106,7 +116,7 @@ public class WaveformRepositoryImpl implements WaveformRepository {
         if (blob != null && (blob.length == 0 || blob.length == WaveformMath.MASTER_BUCKETS)) {
             master = blob.length == 0 ? FAILED : WaveformMath.decode(blob);
         } else {
-            if (job.cancelled || (!job.hasObservers && powerSave.getAsBoolean())) {
+            if (job.cancelled || (!job.hasObservers && skipPrefetch.getAsBoolean()) || throttled.getAsBoolean()) {
                 main.execute(() -> finish(job, null));
                 return;
             }

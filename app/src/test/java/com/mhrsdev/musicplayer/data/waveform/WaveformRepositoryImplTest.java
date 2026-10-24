@@ -222,4 +222,40 @@ public class WaveformRepositoryImplTest {
         assertEquals(0, c0.values.get(0).length);
         assertEquals(1, c1.values.get(0).length);
     }
+
+    @Test public void hotPhoneDecodesNothingNotEvenForTheTrackOnScreen() {
+        boolean[] hot = {true};
+        WaveformRepositoryImpl r = new WaveformRepositoryImpl(store, source, t -> "fp", () -> false, () -> hot[0], worker, main);
+        Capture c = new Capture();
+        r.waveformFor(track("a"), 64).observeForever(c);
+        r.prefetch(track("n"));
+        settle();
+        assertTrue("throttled: no decode", source.calls.isEmpty());
+        assertTrue(c.values.isEmpty());
+        assertNull("throttled work is not negative-cached", store.get("a", "fp"));
+        hot[0] = false;
+        r.waveformFor(track("a"), 64).observeForever(c);
+        settle();
+        assertEquals("cooled down: the next request decodes", 1, source.calls.size());
+    }
+
+    @Test public void hotPhoneStillServesEnvelopesThatAreAlreadyCached() {
+        repo.waveformFor(track("a"), 64).observeForever(new Capture());
+        settle();
+        WaveformRepositoryImpl hotRepo = new WaveformRepositoryImpl(store, source, t -> "fp", () -> false, () -> true, worker, main);
+        Capture c = new Capture();
+        hotRepo.waveformFor(track("a"), 64).observeForever(c);
+        settle();
+        assertEquals(1, c.values.size());
+        assertEquals(1, source.calls.size());
+    }
+
+    @Test public void prefetchSkipIsAboutPrefetchOnlyTheTrackOnScreenStillDecodes() {
+        powerSave = true; // "skip prefetch": UI hidden / battery saver / a seek style without waveform
+        Capture c = new Capture();
+        repo.waveformFor(track("a"), 64).observeForever(c);
+        settle();
+        assertEquals(1, source.calls.size());
+        assertEquals(1, c.values.size());
+    }
 }
