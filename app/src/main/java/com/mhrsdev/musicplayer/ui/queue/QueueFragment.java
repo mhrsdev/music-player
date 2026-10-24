@@ -167,6 +167,7 @@ public class QueueFragment extends BottomSheetDialogFragment {
     private Locale locale() { return getResources().getConfiguration().getLocales().get(0); }
 
     private void removeWithUndo(int upNextPos) {
+        if (upNextPos < 0) return; // swiped holder already unbound (NO_POSITION) or the "now playing" row
         QueueViewModel.Removed r = vm.remove(upNextPos);
         if (r != null) snackbar(getString(R.string.queue_removed, r.track().title()), () -> vm.undoRemove(r));
     }

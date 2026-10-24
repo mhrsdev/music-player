@@ -122,6 +122,7 @@ public class ThemeController {
 
     /** Seed color of a bitmap; safe to call from a background thread (does not touch shared scratch). */
     public static int seedOf(Bitmap artwork) {
+        artwork = com.mhrsdev.musicplayer.ui.widget.AmbientPalette.readable(artwork);
         Bitmap small = artwork.getWidth() <= 32 && artwork.getHeight() <= 32
                 ? artwork : Bitmap.createScaledBitmap(artwork, 32, 32, true);
         int w = small.getWidth(), h = small.getHeight();

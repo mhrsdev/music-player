@@ -130,7 +130,8 @@ class PerformanceSection {
         float scale = android.provider.Settings.Global.getFloat(c.getContentResolver(),
                 android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f);
         int note = scale == 0f ? R.string.settings_perf_note_system
-                : MotionPolicy.batterySaver(c) ? R.string.settings_perf_note_saver : 0;
+                : MotionPolicy.batterySaver(c) ? R.string.settings_perf_note_saver
+                : MotionPolicy.thermalThrottled() ? R.string.settings_perf_note_thermal : 0;
         b.perfSystemNote.setVisibility(note == 0 ? View.GONE : View.VISIBLE);
         if (note != 0) b.perfSystemNote.setText(note);
     }

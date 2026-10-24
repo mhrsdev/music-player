@@ -147,6 +147,46 @@ public class PlayerFragment extends Fragment {
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
 
         if (savedInstanceState == null && MotionPolicy.transitionsEnabled(requireContext())) playEnterTransition();
+        // Restored (rotation, process death): no enter fade runs, the player covers the shell from its first frame.
+        if (savedInstanceState != null) view.post(() -> setCovering(true));
+    }
+
+    /**
+     * The host's fade in/out (MainActivity's custom animations): the shell under the player stops drawing once the
+     * fade-in ended and starts again the moment the fade-out begins (see {@code PlayerCover}). Same animator as the
+     * default, only observed.
+     */
+    @Nullable @Override
+    public android.animation.Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
+        if (nextAnim == 0) return null;
+        android.animation.Animator a;
+        try {
+            a = android.animation.AnimatorInflater.loadAnimator(requireContext(), nextAnim);
+        } catch (RuntimeException e) {
+            return null; // not an animator resource: let the fragment manager load it as before
+        }
+        if (enter) {
+            a.addListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    setCovering(true);
+                }
+            });
+        } else {
+            setCovering(false);
+        }
+        return a;
+    }
+
+    /** Tells the host whether the opaque player fully hides the shell (only while this view exists and rests). */
+    private void setCovering(boolean on) {
+        Context ctx = getContext();
+        if (ctx == null) return;
+        if (on && (b == null || b.playerRoot.getTranslationY() != 0f || b.playerRoot.getAlpha() < 1f
+                || isRemoving())) {
+            return;
+        }
+        PlayerNavigator nav = PlayerNavigator.from(ctx);
+        if (nav != null) nav.setPlayerCovering(on);
     }
 
     /**
@@ -402,7 +442,8 @@ public class PlayerFragment extends Fragment {
     private void applyThemeColors() {
         int text = light ? PlayerBackdropView.TEXT_ON_LIGHT : PlayerBackdropView.TEXT_ON_DARK;
         int rgb = text & 0x00FFFFFF;
-        b.playerRoot.setBackgroundColor(light ? 0xFFF7F9FF : 0xFF0F1216);
+        // No root background: the backdrop below is opaque and full-bleed (a colour here was one more full-screen
+        // fill under it on every drift / seek / lyrics frame).
         b.playerBackdrop.setLight(light);
         b.playerTitle.setTextColor(text);
         b.playerArtist.setTextColor(rgb | 0xB8000000);
@@ -502,6 +543,7 @@ public class PlayerFragment extends Fragment {
                     float dy = e.getRawY() - downY[0];
                     if (!tracking[0] && dy > slop) tracking[0] = true;
                     if (tracking[0]) {
+                        setCovering(false); // the shell shows under the dragged player
                         float y = Math.max(0f, dy);
                         root.setTranslationY(y);
                         root.setAlpha(1f - 0.35f * Math.min(1f, y / root.getHeight()));
@@ -529,7 +571,8 @@ public class PlayerFragment extends Fragment {
                                 .withEndAction(this::collapse).start();
                     } else {
                         root.animate().translationY(0f).alpha(1f).setDuration(220)
-                                .setInterpolator(new DecelerateInterpolator(2f)).start();
+                                .setInterpolator(new DecelerateInterpolator(2f))
+                                .withEndAction(() -> setCovering(true)).start();
                     }
                     return true;
                 }
@@ -1029,6 +1072,7 @@ public class PlayerFragment extends Fragment {
     private int dp(int v) { return Math.round(v * getResources().getDisplayMetrics().density); }
 
     @Override public void onDestroyView() {
+        setCovering(false);
         b.lyricsList.removeCallbacks(resumeAutoScroll);
         if (lyricsTicker != null) lyricsTicker.stop();
         renderedOnce = false;

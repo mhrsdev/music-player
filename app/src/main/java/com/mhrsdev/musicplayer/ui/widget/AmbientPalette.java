@@ -29,8 +29,19 @@ public record AmbientPalette(int[] blobs, int top, int bottom, int seed) {
         CACHE.put(key + (dark ? "#d" : "#l"), p);
     }
 
+    /**
+     * A bitmap whose pixels can be read: a HARDWARE bitmap (any decoder or a future loader may hand one out) throws
+     * IllegalStateException from getPixels, and createScaledBitmap keeps it HARDWARE: copy it to software once.
+     */
+    public static Bitmap readable(Bitmap b) {
+        if (b.getConfig() != Bitmap.Config.HARDWARE) return b;
+        Bitmap copy = b.copy(Bitmap.Config.ARGB_8888, false);
+        return copy != null ? copy : b;
+    }
+
     /** Call off the main thread for big bitmaps; a <= 96 px bitmap is fine on the main thread (< 1 ms). */
     public static AmbientPalette fromBitmap(Bitmap art, boolean dark) {
+        art = readable(art);
         Bitmap small = art.getWidth() <= 32 && art.getHeight() <= 32 ? art : Bitmap.createScaledBitmap(art, 32, 32, true);
         int w = small.getWidth(), h = small.getHeight();
         int[] px = new int[w * h];

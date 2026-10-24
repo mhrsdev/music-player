@@ -244,8 +244,9 @@ public class MorphPlayPauseView extends View {
 
         int alpha = isEnabled() ? 255 : 97;
         float u = r * 0.235f;
-        boolean motion = visibleToUser && Motion.enabled(getContext());
         if (buffering) {
+            // the policy read (settings + power state) only while the arc shows, not on every morph frame
+            boolean motion = visibleToUser && Motion.enabled(getContext());
             arcPaint.setColor(iconColor);
             arcPaint.setAlpha(alpha);
             arcPaint.setStrokeWidth(r * 0.09f);

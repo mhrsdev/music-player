@@ -62,6 +62,15 @@ public class GeneratedCover {
         stroke.setStrokeJoin(Paint.Join.ROUND);
     }
 
+    /**
+     * A second renderer with the same fonts and its own paints/paths. {@link #draw} is synchronized, so the main
+     * thread's tiny synchronous renders must not share the worker's instance: they would wait for a whole 1024 px
+     * render (tens of ms) in the middle of a scroll frame.
+     */
+    public GeneratedCover copy() {
+        return new GeneratedCover(latin, arabic);
+    }
+
     /** Process-wide instance with the bundled fonts (any thread). */
     public static synchronized GeneratedCover get(Context context) {
         if (instance == null) {

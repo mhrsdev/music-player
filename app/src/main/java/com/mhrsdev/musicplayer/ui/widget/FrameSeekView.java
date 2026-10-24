@@ -13,6 +13,8 @@ import com.mhrsdev.musicplayer.ui.motion.FrameDriver;
  * view is visible with decorative motion allowed (reduce motion, battery saver, animator scale 0 and Settings &gt;
  * Performance "Moving seek bar" off make it fully static; the Performance frame-rate cap applies in the FrameDriver).
  * Subclasses advance their own clock in {@link #advance} and draw from it; nothing allocates per frame.
+ * The 30 fps styles step on the driver's shared decorative beat (same display frame as the backdrop and the lyrics,
+ * and the driver may sleep between beats); a style asking for {@code frameInterval() == 0} gets every frame.
  */
 public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.Tick {
     /** Decorative ripples / pulses run at 30 fps at most. */
@@ -21,6 +23,7 @@ public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.
 
     private boolean registered;
     private float pending;
+    private long lastBeatNanos;
     /** Seconds of motion clock; subclasses read it in drawTrack. */
     protected float clock;
 
@@ -48,6 +51,7 @@ public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.
         if (want && !registered) {
             registered = true;
             pending = 0f;
+            lastBeatNanos = 0;
             FrameDriver.get().add(this);
         } else if (!want && registered) {
             registered = false;
@@ -60,11 +64,24 @@ public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.
         return registered;
     }
 
+    @Override protected boolean framesFlowing() {
+        return registered || super.framesFlowing();
+    }
+
     @Override public boolean onFrame(float dt) {
         if (!(needsFrames() && canAnimate() && isAttachedToWindow())) {
             registered = false;
             invalidate(); // settle on a static frame
             return false;
+        }
+        if (frameInterval() > 0f) { // decorative: on the shared beat, with the real time since the last one
+            FrameDriver d = FrameDriver.get();
+            if (!d.isBeat()) return true;
+            long now = d.frameTimeNanos();
+            float step = lastBeatNanos == 0 ? FRAME : Math.min(0.1f, (now - lastBeatNanos) / 1e9f);
+            lastBeatNanos = now;
+            if (advance(step / com.mhrsdev.musicplayer.ui.motion.Motion.durationScale())) invalidate();
+            return true;
         }
         pending += dt;
         if (pending >= frameInterval()) {
@@ -72,6 +89,10 @@ public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.
             pending = 0f;
         }
         return true;
+    }
+
+    @Override public boolean everyFrame() {
+        return frameInterval() <= 0f;
     }
 
     @Override public void setPlaying(boolean playing) {

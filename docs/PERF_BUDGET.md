@@ -13,7 +13,7 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 | Idle RAM after 1 min in background, library of 10k tracks | PSS <= 60 MB (`adb shell dumpsys meminfo com.mhrsdev.musicplayer`, "TOTAL PSS"); Java heap <= 20 MB | meminfo |
 | RAM with Home open | PSS <= 110 MB | meminfo |
 | `largeHeap` | never | `PerfBudgetTest` (manifest) |
-| Bitmap memory | `ArtworkLoader` LruCache <= min(16 MB, 1/16 of heap); negative cache <= 512 entries; row art decoded RGB_565; everything evicted on `onTrimMemory(UI_HIDDEN)` (`MusicPlayerApp.onTrimMemory`) | code review, meminfo "Graphics" |
+| Bitmap memory | `ArtworkLoader` LruCache <= min(16 MB, 1/16 of heap); negative cache <= 512 entries, kept across `UI_HIDDEN` and persisted in `cacheDir/artwork_misses.txt` (3-day TTL, read on the artwork worker); a decode is scaled to its size bucket when its shorter side is over 1.25 x the bucket (`ArtworkLoader.fit`, `ArtworkMemoryTest`); row art decoded RGB_565; bitmaps evicted on `onTrimMemory(UI_HIDDEN)` (`MusicPlayerApp.onTrimMemory`) | code review, meminfo "Graphics" |
 | APK | release APK <= 3 MB, no native libraries, only `en`/`fa` resources (`localeFilters`), R8 full mode (AGP 8 default) + resource shrinking | `ls -l app/build/outputs/apk/release/*.apk` (2.77 MB at time of writing) |
 | Threads | every executor is a `ThreadPoolExecutor` with `allowCoreThreadTimeOut(true)`; library scan on its own `THREAD_PRIORITY_BACKGROUND` thread | `PerfBudgetTest.threadsAlwaysTimeOut` |
 
@@ -22,7 +22,17 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 * R1 No disk, DB, network or `SharedPreferences` first-load on the main thread after startup (StrictMode debug log must stay empty for your screen: `adb logcat -s StrictMode`).
 * R2 RecyclerView: `DiffUtil` or targeted notify, stable ids where possible, no `notifyDataSetChanged` on playback ticks; cancel artwork loads on recycle/detach (`ArtworkView` does).
 * R3 No allocation in `onDraw`/`dispatchDraw`/`draw` (no `new Paint/Path/RectF/Rect/Matrix/Gradient/Shader`, arrays, strings). Hoist into fields, rebuild shaders in `onSizeChanged`. Enforced by `PerfBudgetTest.noAllocationInDrawPaths`.
+* R3b Overdraw (v0.3.1, D29): the GPU has no occlusion culling, so nothing may be drawn under an opaque full-screen
+  layer. The window background is dropped after `setContentView` (the opaque root draws it); the player has no root
+  background (its backdrop is opaque); while the full player covers the window, the shell under it (screens, scrim,
+  dock) is INVISIBLE and the root background is dropped (`ui/nav/PlayerCover`, `PlayerCoverTest`; uncovered before the
+  exit fade and while dragging the player down). Soft radial gradients that are transparent beyond their radius are
+  drawn as circles, not full-screen rects (`AmbientField`, player glow; `AmbientFieldCoverageTest`: blobs 4.00 -> 2.94
+  screens of fill per drift frame).
 * R4 The 4 Hz playback state may only touch a view when the value it shows changed (see `PlayerFragment.render`); no `setImageResource`, `setBackgroundTintList` or text set per tick unless changed.
+* R4b A TextView updated on a timer has a fixed width (`0dp` + weight or a fixed size), never `wrap_content`: a
+  wrap_content TextView requests a layout of the whole screen on every `setText` (player remaining time, 1 Hz). The seek
+  bar's 4 Hz position does not invalidate while its 30 fps loop runs (the next beat draws it).
 * R5 A screen observes LiveData with the view lifecycle owner; `observeForever` only for process-wide singletons or with removal in the same callback; Handler callbacks removed in `onDestroyView`/`onDetachedFromWindow`; no static `Context/View/Activity/Fragment` fields (`PerfBudgetTest.noContextOrViewHeldInStaticFields`).
 * R6 Lists of 10k rows: queries return in < 150 ms on a mid-range phone, use an index (see `QueryPlanTest`, prints every plan), share repeated strings (`TrackQueries.read`).
 * R7 A 10k-track queue must not jank: queue save runs off the main thread (`PlaybackStore`), decode is incremental (`ExoPlayerController.readQueue`). Measured on the JVM: encode 16 ms, decode 10 ms, 1.35 MB.
@@ -50,9 +60,25 @@ Details and measurements: `docs/PERF_BACKGROUND_v0.3.1.md`. Enforced by `PerfBud
 ## Animations
 
 * A0 Every looping animation runs through `ui/motion/PeriodicTick` or a `FrameDriver.Tick` (one Choreographer callback for the app); no private `postInvalidateDelayed` / `postOnAnimationDelayed` / Handler loops (`PerfBudgetTest`).
+* A0b (v0.3.1, D29) Decorative loops act only on the driver's **shared 30 fps beat** (`FrameDriver.isBeat`): a
+  `PeriodicTick` with a period and the 30 fps seek styles (`FrameSeekView`) never invalidate between beats, so every
+  decorative loop on screen lands on the same rendered frame (player: 31 frames/s instead of 76 with three phases,
+  `DecorBeatTest`). A new decorative loop must be a `PeriodicTick` with a period, or return `everyFrame() == false`
+  and gate itself on `isBeat()`. Only springs, touch and spinners (period 0) may take every display frame.
+* A0c While only beat loops are registered the driver sleeps until just before the next beat
+  (`postFrameCallbackDelayed`, `FrameDriver.sleepMillis`): 30 main-thread wake-ups a second on a 120 Hz panel, not 120.
+  Adding an every-frame tick (a press spring) re-posts at once, so touch latency is unchanged (`DecorBeatTest`).
+* A0e Adaptive thermal (always on): `ui/theme/ThermalWatch` (API 29+, platform callback, no polling) feeds
+  `MotionPolicy.setThermalLevel`; thermal MODERATE = effects at most Balanced, SEVERE+ = at most Light, never more
+  than the user chose, back to the user's profile when cool; Settings > Performance shows a note (`ThermalPolicyTest`).
+* A0d A view whose own redraws are decorative votes a low refresh category on API 35+ (`ui/motion/FrameRateVote`:
+  player and ambient backdrops, seek bars except while dragged), so LTPO/VRR panels are not held at 120 Hz by them.
 * A1 Looping / infinite animations only while the view is attached, visible and `MotionPolicy.decorativeMotionEnabled` (off in battery saver and reduce-motion). Skeleton shimmer <= 15 fps.
 * A2 Transitions are one-shot (<= 800 ms); none runs while the app is backgrounded; `animate()` / `ValueAnimator` are cancelled in `onDestroyView`/`onDetachedFromWindow`.
 * A3 No live blur: blur once into a tiny bitmap off the main thread (`BackdropBlur`, `CollageBlurView`).
+* A3b Lyrics: a line that stays inactive while the active line moves changes only its RenderNode alpha
+  (`View.setAlpha`, `hasOverlappingRendering() == false`) and its cached blur effect; it is never invalidated per
+  animation frame, so its blurred layer is not re-rendered and re-blurred 55 times per line change (`LyricLineCostTest`).
 * A4 Settings > Performance (Q1, D26): an effect asks `ui/theme/MotionPolicy` (`transitionsEnabled`, `bounceEnabled`,
   `backdropMotionEnabled`, `seekMotionEnabled`, `lyricsBlurEnabled`, `lyricsWordsEnabled`), never the settings store; the
   profile (`data/settings/PerformanceProfile`) reaches MotionPolicy through the one app-wide observer in `MusicPlayerApp`

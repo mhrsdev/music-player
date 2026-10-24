@@ -15,6 +15,12 @@ public interface PlayerNavigator {
     /** Closes the full player (and the queue) if open; no-op otherwise. */
     void closeFullPlayer();
 
+    /**
+     * The full player fully covers the window ({@code true}: its enter fade ended) or is about to reveal the shell
+     * again ({@code false}: exit fade, swipe-down drag). The host stops drawing what is hidden (see {@code PlayerCover}).
+     */
+    default void setPlayerCovering(boolean covering) {}
+
     /** Walks up the context-wrapper chain; null if no host implements the navigator. */
     @androidx.annotation.Nullable
     static PlayerNavigator from(android.content.Context context) {

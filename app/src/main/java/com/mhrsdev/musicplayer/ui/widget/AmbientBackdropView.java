@@ -74,6 +74,7 @@ public class AmbientBackdropView extends View {
     public AmbientBackdropView(Context c, @Nullable AttributeSet a) {
         super(c, a);
         front.palette = neutral();
+        com.mhrsdev.musicplayer.ui.motion.FrameRateVote.decorative(this, true); // slow drift / one fade
     }
 
     public void setMode(Mode m) {

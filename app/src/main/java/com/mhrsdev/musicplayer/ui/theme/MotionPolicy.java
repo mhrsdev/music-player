@@ -21,17 +21,57 @@ public class MotionPolicy {
     private static volatile boolean appReduceMotion;
     /** The user's battery-saver choice: TRUE = always on, FALSE = always off, null = follow the system. */
     private static volatile Boolean saverOverride;
+    /** What every effect follows: the user's profile, tightened while the phone is hot. */
     private static volatile PerformanceProfile profile = PerformanceProfile.FULL;
+    /** The user's choice in Settings &gt; Performance. */
+    private static volatile PerformanceProfile userProfile = PerformanceProfile.FULL;
+    /** 0 cool, 1 warm (thermal MODERATE): at most Balanced, 2 hot (SEVERE or worse): at most Light. */
+    private static volatile int thermal;
 
     private MotionPolicy() {}
 
     /** Settings &gt; Performance changed (main thread, from the settings LiveData): applies it app-wide, live. */
     public static void setPerformance(PerformanceProfile p) {
+        userProfile = p;
+        apply();
+    }
+
+    /**
+     * Adaptive thermal (v0.3.1, D29), always on: {@code ThermalWatch} reports the platform's thermal status; while the
+     * phone is warm the effects behave at most like Balanced (60 fps cap, no full-screen drift, no lyrics blur), while
+     * hot at most like Light, and the user's own profile returns when it cools down. Nothing is saved.
+     */
+    public static void setThermalLevel(int level) {
+        int l = Math.max(0, Math.min(2, level));
+        if (l == thermal) return;
+        thermal = l;
+        apply();
+    }
+
+    /** True while the thermal state is holding effects back (Settings &gt; Performance shows a note). */
+    public static boolean thermalThrottled() {
+        return thermal > 0 && !effective(userProfile, thermal).equals(userProfile);
+    }
+
+    private static void apply() {
+        PerformanceProfile p = effective(userProfile, thermal);
         profile = p;
         appReduceMotion = p.reduceMotion();
         FrameDriver.get().setMaxFps(p.maxFps());
     }
 
+    /** {@code user} tightened to at most Balanced (level 1) / Light (level 2): never more effects than the user chose. */
+    static PerformanceProfile effective(PerformanceProfile user, int level) {
+        if (level <= 0) return user;
+        PerformanceProfile cap = level == 1 ? PerformanceProfile.BALANCED : PerformanceProfile.LIGHT;
+        int fps = user.maxFps() == PerformanceProfile.FPS_SCREEN ? cap.maxFps() : Math.min(user.maxFps(), cap.maxFps());
+        return new PerformanceProfile(user.reduceMotion() || cap.reduceMotion(), user.transitions() && cap.transitions(),
+                user.bounce() && cap.bounce(), user.movingBackdrop() && cap.movingBackdrop(),
+                user.lyricsBlur() && cap.lyricsBlur(), user.lyricsWords() && cap.lyricsWords(),
+                user.seekMotion() && cap.seekMotion(), fps);
+    }
+
+    /** The profile the effects follow right now (the user's, or tightened while hot). */
     public static PerformanceProfile performance() {
         return profile;
     }
