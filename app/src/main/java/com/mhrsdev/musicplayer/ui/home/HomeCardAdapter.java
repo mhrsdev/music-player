@@ -229,7 +229,7 @@ class HomeCardAdapter extends ListAdapter<HomeItem, HomeCardAdapter.Holder> {
         h.itemView.setContentDescription(subtitle.isEmpty() ? title : title + ", " + subtitle);
     }
 
-    static final class Holder extends RecyclerView.ViewHolder {
+    static class Holder extends RecyclerView.ViewHolder {
         final ViewBinding b;
 
         Holder(ViewBinding b) {

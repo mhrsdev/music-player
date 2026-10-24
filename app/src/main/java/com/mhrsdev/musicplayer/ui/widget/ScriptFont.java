@@ -15,7 +15,7 @@ import com.mhrsdev.musicplayer.R;
  * fa locale) is drawn with Vazirmatn at the view's weight; Latin text keeps the view's own typeface.
  * Cheap enough for every bind: a plain char-range scan, no regex or allocation, one cached Typeface per weight.
  */
-public final class ScriptFont {
+public class ScriptFont {
     private static Typeface vazir;
     private static final Typeface[] BY_WEIGHT = new Typeface[10];
 

@@ -1,7 +1,7 @@
 package com.mhrsdev.musicplayer.data.db.query;
 
 /** Builds the argument for {@code LIKE ? ESCAPE '\'} so user input cannot act as a wildcard. */
-public final class LikePattern {
+public class LikePattern {
     /** SQL fragment to append after a column name. */
     public static final String CLAUSE = " LIKE ? ESCAPE '\\'";
 

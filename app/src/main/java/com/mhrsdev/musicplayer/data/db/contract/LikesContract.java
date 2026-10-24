@@ -1,7 +1,7 @@
 package com.mhrsdev.musicplayer.data.db.contract;
 
-/** Table and column names of liked tracks. Example of the contract pattern: one final class per table. */
-public final class LikesContract {
+/** Table and column names of liked tracks. Example of the contract pattern: one class per table. */
+public class LikesContract {
     public static final String TABLE = "likes";
     public static final String COL_TRACK_ID = "track_id";
     public static final String COL_LIKED_AT = "liked_at";

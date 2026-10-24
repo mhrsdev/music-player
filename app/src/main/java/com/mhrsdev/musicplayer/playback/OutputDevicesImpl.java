@@ -158,7 +158,7 @@ public class OutputDevicesImpl implements OutputDevices {
     }
 
     /** Registers the system callback only while observed. */
-    private final class DevicesData extends MutableLiveData<List<OutputDevice>> {
+    private class DevicesData extends MutableLiveData<List<OutputDevice>> {
         @Override protected void onActive() {
             if (am != null) am.registerAudioDeviceCallback(callback, main); // delivers the current devices once
             refresh();

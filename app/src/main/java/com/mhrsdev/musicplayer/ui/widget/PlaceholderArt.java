@@ -3,7 +3,7 @@ package com.mhrsdev.musicplayer.ui.widget;
 import com.mhrsdev.musicplayer.ui.theme.ColorMath;
 
 /** Deterministic placeholder gradient colors from {@code Track.placeholderSeed} (pure, JVM-testable). */
-public final class PlaceholderArt {
+public class PlaceholderArt {
     private PlaceholderArt() {}
 
     /** Two colors (top-left, bottom-right) for a seed; same seed, same colors, on every device. */

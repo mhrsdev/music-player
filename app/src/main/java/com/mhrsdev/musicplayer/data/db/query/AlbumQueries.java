@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Albums are derived from the tracks table with GROUP BY album_id (no album table to keep in sync). */
-public final class AlbumQueries {
+public class AlbumQueries {
     /** An album with listening / freshness numbers, input of the Home ranking. */
     public record AlbumStat(Album album, long newestAddedMs, int plays, long lastPlayedMs) { }
 

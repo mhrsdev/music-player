@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 /** Builds tiny ID3 / FLAC / MP4 files in memory for the embedded-lyrics tests. */
-final class EmbeddedTagFixtures {
+class EmbeddedTagFixtures {
     private EmbeddedTagFixtures() { }
 
     static byte[] bytes(Object... parts) {

@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import java.util.Locale;
 
 /** Bolds the first case-insensitive match of the query (DESIGN.md search match highlight). */
-public final class Highlight {
+public class Highlight {
     private Highlight() { }
 
     public static CharSequence apply(String text, @Nullable String query) {

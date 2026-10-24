@@ -41,7 +41,7 @@ public class LyricsRepositoryImplTest {
             manual);
     private final Track track = TestTracks.queen();
 
-    private static final class Capture implements Observer<Lyrics> {
+    private static class Capture implements Observer<Lyrics> {
         final List<Lyrics> values = new ArrayList<>();
         @Override public void onChanged(Lyrics l) {
             values.add(l);

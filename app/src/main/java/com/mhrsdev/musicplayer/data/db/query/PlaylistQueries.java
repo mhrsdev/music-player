@@ -19,7 +19,7 @@ import java.util.List;
  * All SQL touching playlists and their ordered members. Playlist ids are rowids passed around as strings; SQLite
  * converts them for the INTEGER columns, an unknown / non-numeric id simply matches nothing.
  */
-public final class PlaylistQueries {
+public class PlaylistQueries {
     private static final int MOSAIC = 4;
     private static final String PT = PlaylistTracksContract.TABLE;
     private static final String PT_PLAYLIST = PlaylistTracksContract.COL_PLAYLIST_ID;

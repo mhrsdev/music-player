@@ -3,7 +3,7 @@ package com.mhrsdev.musicplayer.data.waveform;
 import java.util.Arrays;
 
 /** Pure-Java envelope maths (no Android): gap filling, smoothing, perceptual normalisation, resampling, byte codec. */
-public final class WaveformMath {
+public class WaveformMath {
     /** Length of the master envelope stored per track; any {@code bars} count is resampled from it. */
     public static final int MASTER_BUCKETS = 256;
     /** Dynamic range shown, in dB below the track's loud reference level. */

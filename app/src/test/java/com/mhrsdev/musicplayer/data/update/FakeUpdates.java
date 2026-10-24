@@ -18,7 +18,7 @@ import java.util.function.IntConsumer;
 class FakeUpdates {
     private FakeUpdates() { }
 
-    static final class Http implements UpdateHttp {
+    static class Http implements UpdateHttp {
         final Map<String, Queue<Response>> answers = new HashMap<>();
         final Map<String, byte[]> files = new HashMap<>();
         /** One entry per get(): "url|etag". */
@@ -49,7 +49,7 @@ class FakeUpdates {
         }
     }
 
-    static final class Store implements UpdateStore {
+    static class Store implements UpdateStore {
         UpdateSettings settings = new UpdateSettings(true, true, false, 0);
         String skipped, cacheUrl, cacheEtag, cacheBody;
 
@@ -67,12 +67,12 @@ class FakeUpdates {
         }
     }
 
-    static final class Inspector implements ApkInspector {
+    static class Inspector implements ApkInspector {
         Verdict verdict = Verdict.OK;
         @Override public Verdict inspect(File apk) { return verdict; }
     }
 
-    static final class Installer implements ApkInstaller {
+    static class Installer implements ApkInstaller {
         final List<File> installed = new ArrayList<>();
         boolean fail;
         @Override public void install(File apk) throws IOException {
@@ -81,7 +81,7 @@ class FakeUpdates {
         }
     }
 
-    static final class Net implements Connectivity {
+    static class Net implements Connectivity {
         boolean online = true;
         boolean metered;
         @Override public boolean isOnline() { return online; }

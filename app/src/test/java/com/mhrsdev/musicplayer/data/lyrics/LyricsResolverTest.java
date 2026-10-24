@@ -20,7 +20,7 @@ public class LyricsResolverTest {
     private static final String PLAIN = "one\ntwo";
 
     /** Scripted source: returns {@code result}, or throws {@code error}; counts calls. */
-    private static final class Scripted implements LyricsSource {
+    private static class Scripted implements LyricsSource {
         final String label;
         @Nullable String text;
         @Nullable IOException error;

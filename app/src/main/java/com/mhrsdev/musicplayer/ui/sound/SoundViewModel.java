@@ -11,7 +11,7 @@ import com.mhrsdev.musicplayer.domain.repository.AudioEffectsController;
 import com.mhrsdev.musicplayer.domain.repository.PlayerController;
 
 /** Sound screen: forwards user intents to the effects and the player. Editing the equalizer switches it on. */
-public final class SoundViewModel extends ViewModel {
+public class SoundViewModel extends ViewModel {
     /** Quick speed chips. */
     public static final float[] SPEED_CHIPS = {0.75f, 1f, 1.25f, 1.5f, 2f};
 

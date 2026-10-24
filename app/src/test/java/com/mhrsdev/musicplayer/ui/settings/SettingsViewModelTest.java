@@ -12,7 +12,7 @@ public class SettingsViewModelTest {
     @Rule public InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
 
     /** In-memory store. */
-    static final class MemoryStore implements SettingsStore {
+    static class MemoryStore implements SettingsStore {
         Theme theme = Theme.SYSTEM;
         boolean artwork = true;
         SeekStyle seek = SeekStyle.WAVY;

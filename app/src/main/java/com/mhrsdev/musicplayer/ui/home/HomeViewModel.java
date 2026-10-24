@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 /** Home feed. No Android UI classes; exposes LiveData only and talks to domain interfaces. */
-public final class HomeViewModel extends ViewModel {
+public class HomeViewModel extends ViewModel {
     private final LiveData<List<HomeSection>> sections;
     private final PlayerController player;
     private final HomeFeedSource feed;

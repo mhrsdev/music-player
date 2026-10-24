@@ -17,7 +17,7 @@ import com.mhrsdev.musicplayer.ui.motion.FrameDriver;
  * reads the settings itself). Every question is "decorative motion allowed AND this effect on", except the lyrics
  * word sweep, which carries timing information and so keeps running under reduce motion, as it always did.
  */
-public final class MotionPolicy {
+public class MotionPolicy {
     private static volatile boolean appReduceMotion;
     /** The user's battery-saver choice: TRUE = always on, FALSE = always off, null = follow the system. */
     private static volatile Boolean saverOverride;

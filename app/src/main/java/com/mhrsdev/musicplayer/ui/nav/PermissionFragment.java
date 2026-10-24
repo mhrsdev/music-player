@@ -64,7 +64,7 @@ public class PermissionFragment extends Fragment {
     }
 
     private void done() {
-        if (getActivity() instanceof Host) ((Host) getActivity()).onPermissionFlowDone();
+        if (getActivity() instanceof Host host) host.onPermissionFlowDone();
     }
 
     @Override public void onDestroyView() {

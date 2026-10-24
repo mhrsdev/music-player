@@ -23,7 +23,7 @@ import java.util.function.Function;
  * at most one extraction runs at a time. Failures are cached negatively (memory + store) so a bad file is tried once.
  * All mutable state is touched on the main thread only; the worker just reads {@link Job}'s volatile fields.
  */
-public final class WaveformRepositoryImpl implements WaveformRepository {
+public class WaveformRepositoryImpl implements WaveformRepository {
     private static final int MEMORY_ENTRIES = 8;
     private static final float[] FAILED = new float[0];
 
@@ -130,7 +130,7 @@ public final class WaveformRepositoryImpl implements WaveformRepository {
         for (Result r : new ArrayList<>(job.observers)) r.deliver(master);
     }
 
-    private static final class Job {
+    private static class Job {
         final String key;
         final Track track;
         final List<Result> observers = new ArrayList<>();
@@ -144,7 +144,7 @@ public final class WaveformRepositoryImpl implements WaveformRepository {
         }
     }
 
-    private final class Result extends LiveData<float[]> {
+    private class Result extends LiveData<float[]> {
         private final Track track;
         private final int bars;
         private Job job;

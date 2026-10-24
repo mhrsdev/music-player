@@ -7,7 +7,7 @@ import com.mhrsdev.musicplayer.domain.model.ReplayGainMode;
 import com.mhrsdev.musicplayer.domain.model.SoundState;
 
 /** SharedPreferences ("sound") behind the audio effects and the playback options. Main thread; writes are async. */
-final class SoundPrefs {
+class SoundPrefs {
     private final SharedPreferences prefs;
 
     SoundPrefs(Context context) {

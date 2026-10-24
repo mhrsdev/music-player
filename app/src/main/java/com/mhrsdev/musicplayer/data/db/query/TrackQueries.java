@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /** All SQL touching the {@code tracks} table (plus the likes / play_stats / playlist joins that decorate a Track). */
-public final class TrackQueries {
+public class TrackQueries {
     /** A track with its listening numbers, input of the Home "Quick picks" ranking. */
     public record TrackStat(Track track, int plays, long lastPlayedMs) { }
 

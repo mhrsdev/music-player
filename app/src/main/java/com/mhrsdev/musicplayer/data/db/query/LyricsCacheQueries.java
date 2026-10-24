@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import androidx.annotation.Nullable;
 
 /** All SQL touching {@code lyrics_cache}. Call off the main thread. */
-public final class LyricsCacheQueries {
+public class LyricsCacheQueries {
     /** @param content raw LRC / plain text; null = cached "no lyrics" */
     public record Entry(@Nullable String content, @Nullable String source, long expiresAtMs) { }
 

@@ -21,7 +21,7 @@ import java.util.function.LongSupplier;
  * <p>Synced beats plain: a local plain-text result is kept as fallback and only replaced by a synced remote result.
  * The first synced result wins immediately. Returns null when cancelled.
  */
-public final class LyricsResolver {
+public class LyricsResolver {
     static final long FOUND_TTL_MS = 30L * 24 * 3600 * 1000;
     static final long NOT_FOUND_TTL_MS = 3L * 24 * 3600 * 1000;
     static final long ERROR_TTL_MS = 5L * 60 * 1000;

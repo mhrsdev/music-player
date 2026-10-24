@@ -32,7 +32,7 @@ import java.util.Locale;
  * Now playing row, drag-to-reorder by handle, swipe end-to-start to remove (+ Undo snackbar).
  * Open with {@link #show(FragmentManager)} (T3's PlayerNavigator.openQueue should call it).
  */
-public final class QueueFragment extends BottomSheetDialogFragment {
+public class QueueFragment extends BottomSheetDialogFragment {
     public static final String TAG = "queue";
 
     private QueueSheetBinding b;
@@ -177,7 +177,7 @@ public final class QueueFragment extends BottomSheetDialogFragment {
         s.show();
     }
 
-    private final class TouchCallback extends ItemTouchHelper.Callback {
+    private class TouchCallback extends ItemTouchHelper.Callback {
         @Override public int getMovementFlags(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder h) {
             if (adapter.isCurrentRow(h.getBindingAdapterPosition())) return 0;
             int swipe = rv.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL ? ItemTouchHelper.RIGHT : ItemTouchHelper.LEFT;

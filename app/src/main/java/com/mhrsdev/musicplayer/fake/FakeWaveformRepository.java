@@ -7,7 +7,7 @@ import com.mhrsdev.musicplayer.domain.repository.WaveformRepository;
 import java.util.Random;
 
 /** Deterministic pseudo-loudness envelope per track (smoothed random walk in [0.08, 1]). */
-public final class FakeWaveformRepository implements WaveformRepository {
+public class FakeWaveformRepository implements WaveformRepository {
     @Override public LiveData<float[]> waveformFor(Track track, int bars) {
         Random random = new Random(track.id().hashCode());
         float[] out = new float[Math.max(bars, 0)];

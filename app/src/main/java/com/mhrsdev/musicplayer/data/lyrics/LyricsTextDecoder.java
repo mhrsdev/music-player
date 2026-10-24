@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
  * Old Persian/Arabic {@code .lrc} files are usually Windows-1256, so that is chosen when most non-ASCII characters decode
  * to Arabic-script letters; anything else falls back to ISO-8859-1.
  */
-final class LyricsTextDecoder {
+class LyricsTextDecoder {
     private LyricsTextDecoder() { }
 
     static String decode(byte[] b) {

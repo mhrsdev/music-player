@@ -154,7 +154,7 @@ public class PlaybackService extends MediaLibraryService {
      * Android Auto / Assistant browsing, headset buttons and playback resumption. The notification's own buttons and
      * everything else keep the stock session behaviour.
      */
-    private final class BrowseCallback implements MediaLibrarySession.Callback {
+    private class BrowseCallback implements MediaLibrarySession.Callback {
         private final BrowseTree tree;
         private final PlaybackStore store;
 

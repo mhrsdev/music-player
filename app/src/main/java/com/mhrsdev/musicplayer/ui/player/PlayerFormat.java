@@ -4,7 +4,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /** Pure formatting helpers for the player (locale-aware digits, so Persian shows ۰–۹). */
-public final class PlayerFormat {
+public class PlayerFormat {
     private PlayerFormat() {}
 
     /** "3:07" / "1:02:09" in the locale's digits. Negative input clamps to 0. */

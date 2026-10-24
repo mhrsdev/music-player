@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /** Maps LRCLIB JSON ({@code /api/get} object, {@code /api/search} array) and picks the best match for a track. */
-final class LrclibJson {
+class LrclibJson {
     /** Largest accepted difference between the track's duration and a result's, in seconds. */
     static final double DURATION_TOLERANCE_SEC = 3.0;
 

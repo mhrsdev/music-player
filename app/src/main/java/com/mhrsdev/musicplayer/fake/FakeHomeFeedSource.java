@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Builds Home sections from the library: New releases (newest albums), Throwbacks (oldest), playlists, Quick picks. */
-public final class FakeHomeFeedSource implements HomeFeedSource {
+public class FakeHomeFeedSource implements HomeFeedSource {
     private final MediatorLiveData<List<HomeSection>> sections = new MediatorLiveData<>();
 
     public FakeHomeFeedSource(LibraryRepository library) {

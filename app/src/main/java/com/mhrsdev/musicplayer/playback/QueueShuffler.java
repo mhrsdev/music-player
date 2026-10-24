@@ -11,7 +11,7 @@ import java.util.Random;
  * current item in place, shuffles the rest and remembers the previous order; {@link #undo} hands that exact order
  * back. Any other queue edit must call {@link #clear()} (the snapshot would no longer match).
  */
-final class QueueShuffler<T> {
+class QueueShuffler<T> {
     @Nullable private List<T> snapshot;
 
     boolean canUndo() {

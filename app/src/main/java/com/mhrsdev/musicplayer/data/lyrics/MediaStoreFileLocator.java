@@ -9,7 +9,7 @@ import com.mhrsdev.musicplayer.domain.model.Track;
 import java.io.File;
 
 /** {@link AudioFileLocator} that resolves {@code content://media/...} URIs to their file path via MediaStore. */
-public final class MediaStoreFileLocator implements AudioFileLocator {
+public class MediaStoreFileLocator implements AudioFileLocator {
     private final ContentResolver resolver;
 
     public MediaStoreFileLocator(ContentResolver resolver) {

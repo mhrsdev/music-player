@@ -8,7 +8,7 @@ import java.util.Arrays;
  * Streams decoded PCM into per-bucket RMS: downmixes to mono on the fly and keeps only a sum of squares and a count
  * per bucket, so memory is O(buckets) however long the track is. Pure Java, unit-tested.
  */
-public final class EnvelopeBuilder {
+public class EnvelopeBuilder {
     private final SamplingPlan plan;
     private final double[] sumSq;
     private final long[] count;

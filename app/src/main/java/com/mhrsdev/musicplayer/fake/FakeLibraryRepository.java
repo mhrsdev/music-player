@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /** In-memory {@link LibraryRepository} seeded from {@link SampleData}. Main thread only; callbacks run inline. */
-public final class FakeLibraryRepository implements LibraryRepository, LibraryAdmin, LibraryBrowser {
+public class FakeLibraryRepository implements LibraryRepository, LibraryAdmin, LibraryBrowser {
     private final List<Track> tracks = new ArrayList<>();
     private final Map<String, Playlist> playlists = new LinkedHashMap<>();
     private final Map<String, List<String>> playlistTrackIds = new LinkedHashMap<>();

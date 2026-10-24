@@ -7,7 +7,7 @@ package com.mhrsdev.musicplayer.data.waveform;
  * have recovered after a skipped gap. Short tracks therefore decode fully; a 60 min podcast decodes ~1.4%.
  * Pure Java, unit-tested.
  */
-public final class SamplingPlan {
+public class SamplingPlan {
     /** Measured audio per bucket. shortcut: one window per bucket, upgrade to 2 if bars look jittery on device. */
     static final long MAX_WINDOW_US = 200_000;
     static final long WARMUP_US = 50_000;

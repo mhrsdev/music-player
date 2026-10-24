@@ -8,7 +8,7 @@ import java.util.Locale;
  * {@code NumberFormat} construction (ICU object setup costs far more than the string itself on a slow phone): the
  * zero digit of the last used locale is cached and the digits are mapped by hand.
  */
-public final class Format {
+public class Format {
     /** Immutable pair so concurrent callers never see a locale with another locale's digit. */
     private record Zero(Locale locale, char digit) { }
 

@@ -28,7 +28,7 @@ public class BrowseTreeTest {
                 "content://media/" + id, false, false, 0, 1, 1);
     }
 
-    private static final class Stub implements LibraryReader {
+    private static class Stub implements LibraryReader {
         public List<Track> recentlyAdded(int limit) { return List.of(sample("1"), sample("2")); }
         public List<Track> mostPlayed(int limit) { return List.of(sample("2")); }
         public List<Track> liked(int limit) { return List.of(); }

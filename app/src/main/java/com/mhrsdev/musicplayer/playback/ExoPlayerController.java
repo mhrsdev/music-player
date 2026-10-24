@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  * threshold and one for the sleep timer; all idle while paused.
  */
 @OptIn(markerClass = UnstableApi.class)
-public final class ExoPlayerController implements PlayerController {
+public class ExoPlayerController implements PlayerController {
     static final long TICK_MS = 250L;
 
     private final Context appContext;
@@ -433,15 +433,15 @@ public final class ExoPlayerController implements PlayerController {
     }
 
     private RepeatMode repeatMode() {
-        switch (player.getRepeatMode()) {
-            case Player.REPEAT_MODE_ALL: return RepeatMode.ALL;
-            case Player.REPEAT_MODE_ONE: return RepeatMode.ONE;
-            default: return RepeatMode.OFF;
-        }
+        return switch (player.getRepeatMode()) {
+            case Player.REPEAT_MODE_ALL -> RepeatMode.ALL;
+            case Player.REPEAT_MODE_ONE -> RepeatMode.ONE;
+            default -> RepeatMode.OFF;
+        };
     }
 
     /** LiveData that ticks (and flushes persistence) only while observed. */
-    private final class StateData extends MutableLiveData<PlaybackState> {
+    private class StateData extends MutableLiveData<PlaybackState> {
         @Override protected void onActive() {
             publish();
             scheduleTick();
@@ -454,7 +454,7 @@ public final class ExoPlayerController implements PlayerController {
     }
 
     /** Individual callbacks run before {@code onEvents}, so the bookkeeping is done before the state is published. */
-    private final class PlayerEvents implements Player.Listener {
+    private class PlayerEvents implements Player.Listener {
         @Override public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
             startPlayCount();
         }

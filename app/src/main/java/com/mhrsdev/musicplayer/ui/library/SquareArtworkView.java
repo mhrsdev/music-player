@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import com.mhrsdev.musicplayer.ui.widget.ArtworkView;
 
 /** ArtworkView that is as tall as it is wide (grid covers / artist avatars). */
-public final class SquareArtworkView extends ArtworkView {
+public class SquareArtworkView extends ArtworkView {
     public SquareArtworkView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

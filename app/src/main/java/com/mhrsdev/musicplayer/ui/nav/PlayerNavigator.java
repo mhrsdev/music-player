@@ -18,9 +18,9 @@ public interface PlayerNavigator {
     /** Walks up the context-wrapper chain; null if no host implements the navigator. */
     @androidx.annotation.Nullable
     static PlayerNavigator from(android.content.Context context) {
-        while (context instanceof android.content.ContextWrapper) {
-            if (context instanceof PlayerNavigator) return (PlayerNavigator) context;
-            context = ((android.content.ContextWrapper) context).getBaseContext();
+        while (context instanceof android.content.ContextWrapper wrapper) {
+            if (context instanceof PlayerNavigator nav) return nav;
+            context = wrapper.getBaseContext();
         }
         return null;
     }

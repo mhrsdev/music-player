@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /** Reads the LYRICS / UNSYNCEDLYRICS / SYNCEDLYRICS Vorbis comment of a FLAC file (synced text wins). */
-final class FlacLyricsReader {
+class FlacLyricsReader {
     private static final int MAX_BLOCK = 1024 * 1024;
 
     private FlacLyricsReader() { }

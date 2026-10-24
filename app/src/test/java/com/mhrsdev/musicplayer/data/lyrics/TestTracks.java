@@ -2,7 +2,7 @@ package com.mhrsdev.musicplayer.data.lyrics;
 
 import com.mhrsdev.musicplayer.domain.model.Track;
 
-final class TestTracks {
+class TestTracks {
     private TestTracks() { }
 
     static Track track(String id, String title, String artist, String album, long durationMs, String mediaUri) {

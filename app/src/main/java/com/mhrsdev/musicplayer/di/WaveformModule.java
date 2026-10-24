@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * Factory for the real waveform repository (wired into {@link AppContainer} by the integration task). Owns the
  * dedicated extraction thread: one thread, {@code THREAD_PRIORITY_BACKGROUND}, exits after 20 s idle.
  */
-public final class WaveformModule {
+public class WaveformModule {
     private WaveformModule() { }
 
     /** With the simple file-backed store under {@code filesDir/waveforms}. */

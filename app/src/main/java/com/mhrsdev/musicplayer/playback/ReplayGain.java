@@ -17,7 +17,7 @@ import com.mhrsdev.musicplayer.domain.model.ReplayGainMode;
  * boosted. Upgrade: add the positive part to a LoudnessEnhancer limited by REPLAYGAIN_*_PEAK headroom.
  */
 @OptIn(markerClass = UnstableApi.class)
-final class ReplayGain {
+class ReplayGain {
     static final String TRACK_KEY = "REPLAYGAIN_TRACK_GAIN";
     static final String ALBUM_KEY = "REPLAYGAIN_ALBUM_GAIN";
     static final ReplayGain NONE = new ReplayGain(Double.NaN, Double.NaN);
@@ -78,16 +78,15 @@ final class ReplayGain {
             Metadata.Entry e = metadata.get(i);
             String key = null;
             String value = null;
-            if (e instanceof TextInformationFrame && "TXXX".equals(((TextInformationFrame) e).id)) {
-                TextInformationFrame f = (TextInformationFrame) e;
+            if (e instanceof TextInformationFrame f && "TXXX".equals(f.id)) {
                 key = f.description;
                 value = f.values.isEmpty() ? null : f.values.get(0);
-            } else if (e instanceof VorbisComment) {
-                key = ((VorbisComment) e).key;
-                value = ((VorbisComment) e).value;
-            } else if (e instanceof InternalFrame) {
-                key = ((InternalFrame) e).description;
-                value = ((InternalFrame) e).text;
+            } else if (e instanceof VorbisComment vc) {
+                key = vc.key;
+                value = vc.value;
+            } else if (e instanceof InternalFrame frame) {
+                key = frame.description;
+                value = frame.text;
             }
             if (TRACK_KEY.equalsIgnoreCase(key)) track = parseDb(value);
             else if (ALBUM_KEY.equalsIgnoreCase(key)) album = parseDb(value);

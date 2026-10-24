@@ -20,7 +20,7 @@ import java.util.concurrent.Executor;
  * While a track's lookup is pending, every {@link #lyricsFor} call for it returns the same LiveData, so one track never
  * has two requests in flight. Each LiveData emits exactly one value: lyrics or {@link Lyrics#none}.
  */
-public final class LyricsRepositoryImpl implements LyricsRepository {
+public class LyricsRepositoryImpl implements LyricsRepository {
     private final LyricsResolver resolver;
     private final Executor executor;
     private final Map<String, Lookup> pending = new ConcurrentHashMap<>();
@@ -99,7 +99,7 @@ public final class LyricsRepositoryImpl implements LyricsRepository {
      * One-shot background work bound to observation like {@link Lookup}: starts when observed, cancelled when the
      * last observer leaves, emits one value ({@code onError} on IOException/RuntimeException).
      */
-    private final class Task<T> extends LiveData<T> {
+    private class Task<T> extends LiveData<T> {
         private final Work<T> work;
         private final java.util.function.Supplier<T> onError;
         @Nullable private CancelToken token;
@@ -135,7 +135,7 @@ public final class LyricsRepositoryImpl implements LyricsRepository {
         return pending.computeIfAbsent(track.id(), id -> new Lookup(track));
     }
 
-    private final class Lookup extends LiveData<Lyrics> {
+    private class Lookup extends LiveData<Lyrics> {
         private final Track track;
         @Nullable private CancelToken token; // main thread only
 

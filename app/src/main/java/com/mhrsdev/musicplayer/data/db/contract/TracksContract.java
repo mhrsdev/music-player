@@ -5,7 +5,7 @@ package com.mhrsdev.musicplayer.data.db.contract;
  * {@code GROUP BY} over this table (see {@code AlbumQueries} / {@code ArtistQueries}).
  * {@link #COL_TRACK_NUMBER} stores MediaStore's raw value (disc * 1000 + track) so ordering respects discs.
  */
-public final class TracksContract {
+public class TracksContract {
     public static final String TABLE = "tracks";
     public static final String COL_ID = "id";
     public static final String COL_TITLE = "title";

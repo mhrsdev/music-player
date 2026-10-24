@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** In-memory {@link AudioEffectsController}: a 5-band equalizer with the usual presets and no audio. Main thread only. */
-public final class FakeAudioEffects implements AudioEffectsController {
+public class FakeAudioEffects implements AudioEffectsController {
     private static final int[] CENTERS_HZ = {60, 230, 910, 3600, 14000};
     private static final List<String> PRESETS = Arrays.asList("Normal", "Classical", "Dance", "Flat", "Folk",
             "Heavy Metal", "Hip Hop", "Jazz", "Pop", "Rock");

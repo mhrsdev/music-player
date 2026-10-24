@@ -34,7 +34,7 @@ import java.util.function.IntConsumer;
  * Opened by class name, so it keeps the public no-arg constructor. Observing the effects state is what attaches the
  * native effects (and probes the device); leaving the screen lets them go again.
  */
-public final class SoundFragment extends Fragment {
+public class SoundFragment extends Fragment {
     private static final int LOUDNESS_STEP_MB = 50;
     private static final int SPEED_STEPS = Math.round((PlaybackOptions.MAX - PlaybackOptions.MIN) / PlaybackOptions.STEP);
     private static final Map<String, Integer> PRESET_NAMES = Map.of(
@@ -180,7 +180,7 @@ public final class SoundFragment extends Fragment {
     }
 
     /** One title + value + native SeekBar row (slider semantics and 48 dp touch height come with SeekBar). */
-    private final class Slider {
+    private class Slider {
         private final SoundSliderRowBinding row;
 
         Slider(FrameLayout slot, @StringRes int title, int max, IntConsumer onUser) {

@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat;
  * ({@link #start}/{@link #stop}), so it costs nothing in the background. Bluetooth product names are shown only when
  * BLUETOOTH_CONNECT is granted (API 31+); otherwise a generic "Bluetooth".
  */
-public final class OutputRoute {
+public class OutputRoute {
     public enum Kind { SPEAKER, WIRED, USB, BLUETOOTH }
 
     /**

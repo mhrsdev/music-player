@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  * matching {@link ChangeNotifier} event. Bursts of events collapse into one pending load. Results are delivered with
  * {@code postValue}, so observers see them on the main thread. The executor must run tasks in order (single thread).
  */
-final class DbLiveData<T> extends LiveData<T> implements ChangeNotifier.Listener {
+class DbLiveData<T> extends LiveData<T> implements ChangeNotifier.Listener {
     private final Executor io;
     private final ChangeNotifier notifier;
     private final int topics;

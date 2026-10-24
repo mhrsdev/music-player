@@ -26,7 +26,7 @@ import java.util.Set;
  * Full player screen state. Holds no Context/View. Position ticks come from {@link PlayerController#getState()}; the
  * fragment observes with its view lifecycle, so nothing is delivered while the player is not visible.
  */
-public final class PlayerViewModel extends ViewModel {
+public class PlayerViewModel extends ViewModel {
     /** Number of buckets requested for the Waveform / Bars seek styles. */
     public static final int WAVEFORM_BARS = 120;
 

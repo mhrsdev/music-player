@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** All SQL touching {@code play_stats} (history + play counts). Reads of it are joins in the track / album queries. */
-public final class PlayStatsQueries {
+public class PlayStatsQueries {
     private final SQLiteDatabase db;
 
     public PlayStatsQueries(SQLiteDatabase db) {

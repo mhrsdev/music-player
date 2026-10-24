@@ -3,7 +3,7 @@ package com.mhrsdev.musicplayer.data.lyrics;
 import androidx.annotation.Nullable;
 
 /** Cooperative cancellation for one lyrics lookup; a running HTTP call registers {@code disconnect} here. */
-public final class CancelToken {
+public class CancelToken {
     private volatile boolean cancelled;
     @Nullable private volatile Runnable onCancel;
 

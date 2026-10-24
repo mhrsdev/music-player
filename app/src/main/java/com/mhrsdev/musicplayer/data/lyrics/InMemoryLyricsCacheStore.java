@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Non-persistent {@link LyricsCacheStore} for tests and previews. */
-public final class InMemoryLyricsCacheStore implements LyricsCacheStore {
+public class InMemoryLyricsCacheStore implements LyricsCacheStore {
     private final Map<String, Entry> map = new ConcurrentHashMap<>();
 
     @Override public Entry get(String trackId) {

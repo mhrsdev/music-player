@@ -21,7 +21,7 @@ import com.mhrsdev.musicplayer.data.db.contract.WaveformsContract;
  * v3 = lyrics cache keyed by expiry instead of fetch time, v4 = tracks keep file size + path (change detection,
  * folder browser) + genre, and play_events (timestamped history for the Home mixes). v0.2.0 shipped v3.
  */
-public final class DbHelper extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper {
     public static final String NAME = "musicplayer.db";
     public static final int VERSION = 4;
 

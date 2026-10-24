@@ -164,7 +164,7 @@ public class SectionPageFragment extends Fragment implements TrackAdapter.Listen
     }
 
     /** The page header row (title, count, play / shuffle when it lists tracks). */
-    private final class Header extends RecyclerView.Adapter<Header.Holder> {
+    private class Header extends RecyclerView.Adapter<Header.Holder> {
         private String title = "";
         @Nullable private String subtitle;
         @Nullable private String art;
@@ -207,7 +207,7 @@ public class SectionPageFragment extends Fragment implements TrackAdapter.Listen
             h.b.shuffle.setOnClickListener(v -> vm.playShuffled(tracks, SectionPageFragment.this.title));
         }
 
-        final class Holder extends RecyclerView.ViewHolder {
+        class Holder extends RecyclerView.ViewHolder {
             final LibraryListHeaderBinding b;
 
             Holder(LibraryListHeaderBinding b) {

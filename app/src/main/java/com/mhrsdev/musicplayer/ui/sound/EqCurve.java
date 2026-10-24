@@ -4,7 +4,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /** Pure maths and number formatting of {@link EqualizerView}: response curve, level/position mapping, labels. */
-final class EqCurve {
+class EqCurve {
     private EqCurve() {}
 
     /**

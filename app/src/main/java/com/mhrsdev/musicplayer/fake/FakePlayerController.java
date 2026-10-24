@@ -22,7 +22,7 @@ import java.util.Random;
  * A {@link Handler} ticker runs only while playing, so a paused fake costs nothing. Starts paused at 0:42
  * with a populated queue so the UI has something to render on first launch.
  */
-public final class FakePlayerController implements PlayerController {
+public class FakePlayerController implements PlayerController {
     static final long TICK_MS = 250L;
 
     private final MutableLiveData<PlaybackState> state = new MutableLiveData<>();
@@ -189,11 +189,11 @@ public final class FakePlayerController implements PlayerController {
     }
 
     @Override public void cycleRepeat() {
-        switch (repeatMode) {
-            case OFF: repeatMode = RepeatMode.ALL; break;
-            case ALL: repeatMode = RepeatMode.ONE; break;
-            default: repeatMode = RepeatMode.OFF;
-        }
+        repeatMode = switch (repeatMode) {
+            case OFF -> RepeatMode.ALL;
+            case ALL -> RepeatMode.ONE;
+            default -> RepeatMode.OFF;
+        };
         publish();
     }
 

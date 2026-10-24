@@ -9,7 +9,7 @@ import java.util.function.LongSupplier;
  * {@link LyricsCacheStore} on the {@code lyrics_cache} table. The database opens on the first call, which comes from
  * the lyrics thread. Every write also drops expired rows, so the table cannot grow without bound.
  */
-public final class SqliteLyricsCacheStore implements LyricsCacheStore {
+public class SqliteLyricsCacheStore implements LyricsCacheStore {
     private final DbHelper helper;
     private final LongSupplier clock;
 

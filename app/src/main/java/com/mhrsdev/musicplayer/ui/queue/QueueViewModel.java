@@ -27,7 +27,7 @@ import java.util.Set;
  * Queue sheet state. The list shows the tracks AFTER the current one ("Up next"); adapter positions map to queue
  * indices with {@link #toQueueIndex}. Holds no Context/View.
  */
-public final class QueueViewModel extends ViewModel {
+public class QueueViewModel extends ViewModel {
 
     /** What the sheet renders. {@code sleepMinutes} is meaningful only for {@link SleepTimer.Kind#COUNTDOWN}. */
     public record UiState(List<Track> upNext, int currentIndex, @Nullable String playingFrom, int minutesLeft,
