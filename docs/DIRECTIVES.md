@@ -525,3 +525,19 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** (screenshot of Home with the mini-player) "تو اینجا فقط یه دکمه عقب جلو هست از دوتا"
 
 **Summary:** The mini-player shows play/pause and only ONE skip button (next); the owner expects both previous and next. Task U4 (Opus): add the missing previous button to the mini-player (RTL-aware order, touch targets, no layout overflow on small widths), keep effects/perf budgets. Ships in v0.3.3.
+
+---
+
+## D36 — 2026-10-24 — Lock screen / notification shade media card: previous + pause but NO next ("this bug is everywhere")
+
+**Original (verbatim):** (2 screenshots: One UI lock-screen media pill and notification-shade media card, both showing only [previous] [pause]) "تو همه جا این باگه هس"
+
+**Summary:** On the lock screen, the notification shade card (and by extension every system surface fed by our MediaSession) only previous and play/pause are shown, next is missing; together with D35 (mini-player missing previous) the owner expects BOTH skip buttons everywhere, always. Root cause (code read): the session uses ExoPlayer's raw available commands; ExoPlayer withholds COMMAND_SEEK_TO_NEXT when the current item is the last and repeat is off (no ForwardingPlayer anywhere), so Samsung hides the button. Fix N2 (Sonnet): session player wrapper that always exposes seek-to-next/previous; behaviour at the ends defined and consistent (next on the last track -> first track, previous on the first -> restart), applied to notification, lock screen, shade, headset buttons, Android Auto, widgets. Ships v0.3.3 with U4 (+C1 later).
+
+---
+
+## D37 — 2026-10-24 — Refactor the project
+
+**Original (verbatim):** "یه ریفکتور هم بزن رو پروژه"
+
+**Summary:** Owner asks for a refactor of the whole project. Plan (behaviour-preserving, starts AFTER v0.3.3 ships so it does not collide with U4/N2/C1): RF-UI (Opus) splits the giant UI classes (PlayerFragment 1089 lines, SettingsFragment 595, MainActivity 518, TrackListFragment 476, GeneratedCover 751) into focused binders/controllers/helpers; RF-CORE (Sonnet) splits ExoPlayerController (510), HomeFeedBuilder (397), SettingsStore (322), removes dead code (e.g. UpdateBanner never wired, unused constraintlayout), fixes layer leaks (playback -> ui.widget dependency; neutral package), consistent naming/package-info; adds a layer-rules test (ui -> domain/data interfaces only, playback never imports ui, domain pure Java) next to PerfBudgetTest. Rules: NO behaviour change, no perf regression (PerfBudgetTest, RegexIcuTest, smoke tests), small commits, CI green on every merge, nothing on `final class`, Java only.
