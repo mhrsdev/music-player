@@ -601,14 +601,14 @@ public class PlayerFragment extends Fragment {
     // ---------------------------------------------------------------- rendering
 
     /** Last values pushed to the views by {@link #render}: it runs at 4 Hz, so only changes may touch a view. */
-    private boolean rPlaying, rBuffering, rNext, rHasTrack, rShuffle;
+    private boolean rPlaying, rBuffering, rSkips, rHasTrack, rShuffle;
     private RepeatMode rRepeat;
     private long rElapsedSec = -1, rDuration = -1;
     private boolean renderedOnce;
 
     private void render(@Nullable PlaybackState s) {
         if (s == null) s = PlaybackState.empty();
-        boolean next = s.hasNext() || s.repeatMode() == RepeatMode.ALL;
+        boolean skips = !s.queue().isEmpty(); // D36: both skips whenever a queue exists; the controller handles the ends
         boolean hasTrack = s.currentTrack() != null;
         if (!renderedOnce || rPlaying != s.playing()) {
             b.playerPlay.setPlaying(s.playing(), true);
@@ -634,9 +634,11 @@ public class PlayerFragment extends Fragment {
             }
         }
         updateTitleMarquee(s.playing());
-        if (!renderedOnce || rNext != next) {
-            b.playerNext.setEnabled(next);
-            b.playerNext.setAlpha(next ? 1f : 0.38f);
+        if (!renderedOnce || rSkips != skips) {
+            for (View v : new View[]{b.playerPrev, b.playerNext}) {
+                v.setEnabled(skips);
+                v.setAlpha(skips ? 1f : 0.38f);
+            }
         }
         if (!renderedOnce || rHasTrack != hasTrack) b.playerPlay.setEnabled(hasTrack);
         if (!renderedOnce || rShuffle != s.shuffleEnabled()) {
@@ -655,7 +657,7 @@ public class PlayerFragment extends Fragment {
         renderedOnce = true;
         rPlaying = s.playing();
         rBuffering = s.buffering();
-        rNext = next;
+        rSkips = skips;
         rHasTrack = hasTrack;
         rShuffle = s.shuffleEnabled();
         rRepeat = s.repeatMode();
