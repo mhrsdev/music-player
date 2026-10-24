@@ -56,7 +56,6 @@
     <string name="settings_dynamic_color">رنگ پویا (Material You)</string>
     <string name="settings_dynamic_color_sub">رنگ‌های والپیپر برای بقیهٔ برنامه استفاده شود</string>
     <string name="settings_reduce_motion">کاهش حرکت</string>
-    <string name="settings_reduce_motion_sub">انیمیشن‌های تزئینی خاموش شود. گزینهٔ «حذف انیمیشن‌ها»ی گوشی هم همین کار را می‌کند.</string>
     <string name="settings_min_length">نادیده‌گرفتن صداهای کوتاه</string>
     <string name="settings_min_length_sub">فایل‌های کوتاه‌تر از این، مثل یادداشت صوتی و زنگ، پنهان شوند. کتابخانه فوراً به‌روز می‌شود.</string>
     <string name="settings_min_length_all">همه بمانند</string>

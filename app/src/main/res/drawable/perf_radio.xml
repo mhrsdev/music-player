@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Preset radio mark: filled check when chosen, an empty ring otherwise (reads as "pick one" without the label). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:drawable="@drawable/perf_radio_on" />
+    <item android:drawable="@drawable/perf_radio_off" />
+</selector>

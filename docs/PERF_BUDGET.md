@@ -41,6 +41,12 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 * A1 Looping / infinite animations only while the view is attached, visible and `MotionPolicy.decorativeMotionEnabled` (off in battery saver and reduce-motion). Skeleton shimmer <= 15 fps.
 * A2 Transitions are one-shot (<= 800 ms); none runs while the app is backgrounded; `animate()` / `ValueAnimator` are cancelled in `onDestroyView`/`onDetachedFromWindow`.
 * A3 No live blur: blur once into a tiny bitmap off the main thread (`BackdropBlur`, `CollageBlurView`).
+* A4 Settings > Performance (Q1, D26): an effect asks `ui/theme/MotionPolicy` (`transitionsEnabled`, `bounceEnabled`,
+  `backdropMotionEnabled`, `seekMotionEnabled`, `lyricsBlurEnabled`, `lyricsWordsEnabled`), never the settings store; the
+  profile (`data/settings/PerformanceProfile`) reaches MotionPolicy through the one app-wide observer in `MusicPlayerApp`
+  and the frame-rate cap (screen / 60 / 30) is applied in `FrameDriver` only, so every spring and `PeriodicTick` obeys it.
+  Default = Full (D24). JVM measurement (`FrameCapTest`, 1 s at 120 Hz, player playing + lyrics + one spring): tick
+  bodies Full 199, Balanced 123, Light 31. One-shot `animate()`/`ValueAnimator` fades are not capped (platform API).
 
 ## Baseline Profile recommendation (not done yet: needs a device or emulator)
 

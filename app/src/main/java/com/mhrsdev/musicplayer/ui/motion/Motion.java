@@ -16,7 +16,8 @@ import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
  * vocabulary (press squish, state-change wobble, pop). Everything here animates only scale / translation / alpha.
  *
  * <p>Policy: {@link #enabled} is false under the app's reduce-motion setting, system animator scale 0 or battery
- * saver; then springs snap, jiggles are skipped and page transitions become a short fade or nothing.
+ * saver; then springs snap, jiggles are skipped and page transitions become a short fade or nothing. Settings &gt;
+ * Performance can also switch off just the bounce ({@link #bounce}) or just the transitions ({@link #transitions}).
  */
 public class Motion {
     private Motion() {}
@@ -63,6 +64,23 @@ public class Motion {
     /** Below API 33: the global setting, read once and cached (no per-frame Settings lookup). */
     private static float cachedScale = -1f;
 
+    /** Page / screen transitions may play (motion allowed and Settings &gt; Performance "Screen transitions" on). */
+    public static boolean transitions(@Nullable Context context) {
+        Context c = context != null ? context : app;
+        if (c == null) return ValueAnimator.areAnimatorsEnabled();
+        return MotionPolicy.transitionsEnabled(c);
+    }
+
+    /** The playful rebound (jiggle, pop, release overshoot); off = presses still squish, then settle without wobble. */
+    public static boolean bounce() {
+        return MotionPolicy.bounceEnabled();
+    }
+
+    /** Preset for springing back after a press: the jiggle, or a plain snappy return when bounce is off. */
+    public static Spring.Preset releasePreset() {
+        return bounce() ? Spring.Preset.JIGGLE : Spring.Preset.SNAPPY;
+    }
+
     /** System animator duration scale (developer options); springs run slower by the same factor. */
     public static float durationScale() {
         float s;
@@ -97,7 +115,7 @@ public class Motion {
 
     /** Finger up: spring back to 1 with the jiggle spring, so the release rebounds once. */
     public static void release(View v) {
-        scaleSpring(v).setPreset(Spring.Preset.JIGGLE).animateTo(1f);
+        scaleSpring(v).setPreset(releasePreset()).animateTo(1f);
     }
 
     /** State change (play/pause, chip toggled): dip, one small rebound, rest. */
@@ -107,6 +125,7 @@ public class Motion {
 
     /** Jiggle on any scale spring (e.g. one a custom View draws internally). */
     public static void jiggle(SpringAnimator scale) {
+        if (!bounce()) return;
         scale.setPreset(Spring.Preset.JIGGLE);
         scale.spring().setTarget(1f);
         scale.kick(Spring.kickFor(-JIGGLE_DIP, Spring.Preset.JIGGLE.stiffness, Spring.Preset.JIGGLE.dampingRatio));
@@ -114,6 +133,7 @@ public class Motion {
 
     /** Toggled on (like heart): grow and settle with a bounce. */
     public static void pop(View v) {
+        if (!bounce()) return;
         SpringAnimator a = scaleSpring(v).setPreset(Spring.Preset.BOUNCY);
         a.spring().setTarget(1f);
         a.kick(Spring.kickFor(POP, Spring.Preset.BOUNCY.stiffness, Spring.Preset.BOUNCY.dampingRatio));

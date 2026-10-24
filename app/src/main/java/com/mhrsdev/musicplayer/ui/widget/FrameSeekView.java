@@ -10,8 +10,9 @@ import com.mhrsdev.musicplayer.ui.motion.FrameDriver;
 /**
  * Base of the D25 seek styles that move: frames come from M1's shared {@link FrameDriver} (one Choreographer
  * callback for the app, never our own loop), throttled to {@link #FPS}, and only while {@link #needsFrames()} and the
- * view is visible with decorative motion allowed (reduce motion, battery saver and animator scale 0 make it fully
- * static). Subclasses advance their own clock in {@link #advance} and draw from it; nothing allocates per frame.
+ * view is visible with decorative motion allowed (reduce motion, battery saver, animator scale 0 and Settings &gt;
+ * Performance "Moving seek bar" off make it fully static; the Performance frame-rate cap applies in the FrameDriver).
+ * Subclasses advance their own clock in {@link #advance} and draw from it; nothing allocates per frame.
  */
 public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.Tick {
     /** Decorative ripples / pulses run at 30 fps at most. */
@@ -75,6 +76,12 @@ public abstract class FrameSeekView extends BaseSeekView implements FrameDriver.
 
     @Override public void setPlaying(boolean playing) {
         super.setPlaying(playing);
+        updateFrames();
+    }
+
+    /** Settings &gt; Performance "Moving seek bar" (or reduce motion) changed while shown: start / stop frames now. */
+    @Override public void refreshMotion() {
+        super.refreshMotion();
         updateFrames();
     }
 

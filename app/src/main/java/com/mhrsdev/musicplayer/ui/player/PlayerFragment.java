@@ -41,6 +41,7 @@ import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsOffsetStore;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsTicker;
 import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsScrollPolicy;
 import com.mhrsdev.musicplayer.ui.queue.QueueFragment;
+import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
 import com.mhrsdev.musicplayer.data.settings.SeekBarStyle;
 import com.mhrsdev.musicplayer.ui.widget.BaseSeekView;
 import com.mhrsdev.musicplayer.ui.widget.SeekBarView;
@@ -121,6 +122,7 @@ public final class PlayerFragment extends Fragment {
         applyThemeColors();
         setupControls();
         setupLyrics();
+        c.settings().performance().observe(getViewLifecycleOwner(), p -> applyPerformance());
         c.settings().lyricsTextSize().observe(getViewLifecycleOwner(),
                 size -> lyricsAdapter.setTextSizeSp(LyricsEffects.textSp(size)));
         setupSwipeToCollapse();
@@ -144,7 +146,32 @@ public final class PlayerFragment extends Fragment {
         vm.getLyrics().observe(getViewLifecycleOwner(), this::renderLyrics);
         vm.getActiveLyricLine().observe(getViewLifecycleOwner(), this::renderActiveLine);
 
-        if (savedInstanceState == null && PlayerPalette.motionAllowed(requireContext())) playEnterTransition();
+        if (savedInstanceState == null && MotionPolicy.transitionsEnabled(requireContext())) playEnterTransition();
+    }
+
+    /**
+     * Settings &gt; Performance changed (MotionPolicy already holds the new profile: the app-wide observer runs
+     * first). Re-applies every effect of this screen at once, live; each one asks MotionPolicy, none reads settings.
+     */
+    private void applyPerformance() {
+        if (b == null) return;
+        applyLyricsEffects();
+        gateLyricsTicker(vm.getLyrics().getValue());
+        seek.refreshMotion();
+        PlaybackState s = vm.getState().getValue();
+        b.playerBackdrop.setAnimating(s != null && s.playing());
+    }
+
+    private void applyLyricsEffects() {
+        Context ctx = requireContext();
+        lyricsAdapter.setEffects(LyricsEffects.blurAllowed(ctx), MotionPolicy.decorativeMotionEnabled(ctx),
+                MotionPolicy.lyricsWordsEnabled());
+    }
+
+    /** The 30 fps word-sweep loop runs only for shown, synced lyrics with the word sweep on. */
+    private void gateLyricsTicker(@Nullable Lyrics l) {
+        boolean showing = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
+        lyricsTicker.setEnabled(showing && l != null && l.synced() && !l.isEmpty() && MotionPolicy.lyricsWordsEnabled());
     }
 
     /** The "seek_bar_style" setting; Wavy when unset or unknown. */
@@ -317,8 +344,7 @@ public final class PlayerFragment extends Fragment {
             b.lyricsBackToCurrent.setVisibility(View.GONE);
             vm.seekTo(line.timeMs() + lyricsClock.offsetMs());
         }, lyricsClock);
-        lyricsAdapter.setEffects(LyricsEffects.blurAllowed(requireContext()),
-                com.mhrsdev.musicplayer.ui.theme.MotionPolicy.decorativeMotionEnabled(requireContext()));
+        applyLyricsEffects();
         lyricsTicker = new LyricsTicker(b.lyricsList, lyricsClock, () -> renderActiveLine(null));
         b.lyricsList.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.lyricsList.setAdapter(lyricsAdapter);
@@ -620,7 +646,7 @@ public final class PlayerFragment extends Fragment {
         applyPalette(artColors ? PlayerPalette.forSeed(t.placeholderSeed()) : PlayerPalette.fromColor(0xFF5F7FA6),
                 null, changed);
         b.playerArtwork.bind(t); // may call onArtwork() with the real cover, which refines the palette
-        if (changed && PlayerPalette.motionAllowed(requireContext())) {
+        if (changed && MotionPolicy.transitionsEnabled(requireContext())) {
             View art = b.playerArtwork;
             art.setAlpha(0.4f);
             art.setTranslationX(dp(24));
@@ -714,7 +740,7 @@ public final class PlayerFragment extends Fragment {
 
     private void renderLyrics(@Nullable Lyrics l) {
         boolean showing = Boolean.TRUE.equals(vm.getShowLyrics().getValue());
-        lyricsTicker.setEnabled(showing && l != null && l.synced() && !l.isEmpty());
+        gateLyricsTicker(l);
         if (!showing) {
             b.lyricsList.setVisibility(View.GONE);
             b.lyricsMessage.setVisibility(View.GONE);

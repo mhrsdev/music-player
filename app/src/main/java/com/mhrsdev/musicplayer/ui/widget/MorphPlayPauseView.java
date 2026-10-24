@@ -299,7 +299,7 @@ public class MorphPlayPauseView extends View {
             if (a == MotionEvent.ACTION_DOWN) {
                 scaleSpring.setPreset(Spring.Preset.SNAPPY).animateTo(Motion.PRESS_SCALE);
             } else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) {
-                scaleSpring.setPreset(Spring.Preset.JIGGLE).animateTo(1f);
+                scaleSpring.setPreset(Motion.releasePreset()).animateTo(1f);
             }
         }
         return super.onTouchEvent(e);
