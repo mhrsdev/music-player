@@ -1,0 +1,121 @@
+Mowj performance report v1
+App 0.3.2 (302)
+Device samsung SM-S948U (e3q)
+Android 17 (SDK 37)
+recorded=2026-09-21 14:13:20 duration=03:00 ended=stopped by user
+profile=FULL (fps cap screen)
+frames=4750 janky=1075 (22.6%) first-draw-skipped=0 listener-dropped=0 refresh=120Hz
+screen on in 36 of 36 samples, music playing in 36
+janky = longer than one display interval, slow = longer than 2 intervals, frozen = longer than 700 ms (each counts in the one before)
+
+== Top findings ==
+1. battery fell 80% -> 75% in 02:55 = 1.7 %/min (typical with music and the screen on: 0.2-0.4 %/min) -> heavy drain
+2. average battery current 3600 mA with the screen on (a phone playing music at normal brightness draws 500-1200 mA) -> the app, or the screen at 120 Hz, burns power
+3. LibraryFragment_tab_with_a_very_long_name_2: redraws 31 frames/s while nobody touches the screen (22 s idle) -> something animates continuously, a direct battery cost; decorations active: playing, backdrop-drift, decor-beat
+
+== Per screen (ms) ==
+screen                     frames   fps  idle  jank%  slow% frozen    p50    p95    p99     max
+PlayerFragment+lyrics        3000    50    30   35.8   32.5      0    6.5   54.5   59.7    61.0
+LibraryFragment_tab_with_~    800    13    31    0.0    0.0      0    4.3    5.8    6.0     6.0
+LibraryFragment_tab_with_~    800    13    31    0.0    0.0      0    4.3    5.8    6.0     6.0
+HomeFragment                  150     3     2    0.0    0.0      0    4.5    5.9    6.0     6.0
+fps = frames per second while the screen is shown; idle = frames per second while nobody touches the app (should be ~0 when nothing plays)
+
+== Per screen detail ==
+PlayerFragment+lyrics
+  hist% 0-4=25 4-8=39 8-12=0 12-17=3 17-33=11 33-66=22 66-150=0 150+=0 
+  avg-phase ms (all frames) delay=0.52 input=0.00 anim=0.00 layout=1.59 draw=10.62 sync=0.80 issue=0.00 swap=0.00 gpu=5.30
+  avg-phase ms (janky frames) delay=0.52 input=0.00 anim=0.00 layout=3.71 draw=26.00 sync=1.86 issue=0.00 swap=0.00 gpu=12.38
+  worst 61.0 ms at 00:02 (interval 8.3): delay=1.0 input=0.0 anim=0.0 layout=6.1 draw=42.7 sync=3.1 issue=0.0 swap=0.0 gpu=20.3 | playing,lyrics,lyrics-blur
+  idle: 96 s untouched, 30.3 frames/s; decorations in those frames: playing
+  janky% with/without: lyrics=100%/0% lyrics-blur=100%/0%
+LibraryFragment_tab_with_a_very_long_name_2
+  hist% 0-4=43 4-8=57 8-12=0 12-17=0 17-33=0 33-66=0 66-150=0 150+=0 
+  avg-phase ms (all frames) delay=0.50 input=0.00 anim=0.00 layout=0.39 draw=1.97 sync=0.20 issue=0.00 swap=0.00 gpu=1.31
+  worst 6.0 ms at 02:54 (interval 8.3): delay=1.0 input=0.0 anim=0.0 layout=0.6 draw=3.0 sync=0.3 issue=0.0 swap=0.0 gpu=2.0 | playing,backdrop-drift,decor-beat
+  idle: 22 s untouched, 31.2 frames/s; decorations in those frames: playing,backdrop-drift,decor-beat
+LibraryFragment_tab_with_a_very_long_name_3
+  hist% 0-4=40 4-8=60 8-12=0 12-17=0 17-33=0 33-66=0 66-150=0 150+=0 
+  avg-phase ms (all frames) delay=0.49 input=0.00 anim=0.00 layout=0.40 draw=2.00 sync=0.20 issue=0.00 swap=0.00 gpu=1.33
+  worst 6.0 ms at 03:19 (interval 8.3): delay=0.0 input=0.0 anim=0.0 layout=0.6 draw=3.0 sync=0.3 issue=0.0 swap=0.0 gpu=2.0 | playing
+  idle: 22 s untouched, 31.2 frames/s; decorations in those frames: playing
+HomeFragment
+  hist% 0-4=33 4-8=67 8-12=0 12-17=0 17-33=0 33-66=0 66-150=0 150+=0 
+  avg-phase ms (all frames) delay=0.55 input=0.00 anim=0.00 layout=0.42 draw=2.10 sync=0.21 issue=0.00 swap=0.00 gpu=1.40
+  worst 6.0 ms at 01:39 (interval 8.3): delay=1.0 input=0.0 anim=0.0 layout=0.6 draw=3.0 sync=0.3 issue=0.0 swap=0.0 gpu=2.0 | playing
+  idle: 72 s untouched, 2.0 frames/s; decorations in those frames: playing
+
+== Battery / power ==
+level 80% -> 75% in 02:55
+drain 1.71 %/min (typical with music and the screen on: 0.2-0.4 %/min): HIGH: 4.3x the typical maximum
+charge counter: 175.0 mAh used = average 3600 mA
+current_now, screen on: 3600 mA avg of 36 readings
+voltage 4.05 V -> 4.02 V, temperature 37.2 -> 37.2 C
+
+== CPU ==
+process CPU (percent of ONE core, from the 5 s samples):
+  screen on, playing    48.0% over 175 s
+threads by CPU over 03:00 (share of the process, percent of one core, count):
+  RenderThread                43.1%   17.8% x1
+  main                        35.0%   14.4% x1
+  ExoPlayer:Playb              9.4%    3.9% x1
+  pool-#-thread-#              7.0%    2.9% x6
+  HeapTaskDaemon               3.2%    1.3% x1
+  binder:#_#                   1.2%    0.5% x4
+  perf-probe                   0.2%    0.1% x1  (this recorder)
+  worker-0                     0.1%    0.0% x1
+
+== Timeline (every 5 s; min / avg / max) ==
+thermal: NONE / MODERATE
+battery temp C: 37.2 / 37.2 / 37.2
+battery level 80% -> 75%, charging false -> false
+java heap MB: 29.3 / 37.8 / 46.4
+java heap limit 250 MB
+native heap MB: 39.1 / 39.1 / 39.1
+GC: 43 runs, 35 blocking, blocking time 140 ms (over 02:55)
+threads: 40.0 / 40.0 / 40.0
+cpu % of one core: 30.0 / 47.5 / 65.0
+frames/s: 55.0 / 55.0 / 55.0
+playing in 36 of 36 samples, lyrics open in 31
+events:
+  01:00 thermal NONE -> LIGHT
+  02:00 thermal LIGHT -> MODERATE
+
+== Samples (csv) ==
+t_s,thermal,batt_c,batt_pct,chg,volt_mv,cur_ma,chg_uah,java_mb,native_mb,gc,gc_block_ms,threads,cpu_pct,fps,hz,screen,play,lyrics
+0,0,37.2,80,0,4050,-3600,3000000,29,39,0,0,40,30,55,120,1,1,0
+5,0,37.2,80,0,4049,-3600,2995000,29,39,1,4,40,31,55,120,1,1,0
+10,0,37.2,80,0,4048,-3600,2990000,30,39,2,8,40,32,55,120,1,1,0
+15,0,37.2,80,0,4047,-3600,2985000,30,39,3,12,40,33,55,120,1,1,0
+20,0,37.2,80,0,4046,-3600,2980000,31,39,5,16,40,34,55,120,1,1,0
+25,0,37.2,80,0,4045,-3600,2975000,31,39,6,20,40,35,55,120,1,1,1
+30,0,37.2,79,0,4044,-3600,2970000,32,39,7,24,40,36,55,120,1,1,1
+35,0,37.2,79,0,4043,-3600,2965000,32,39,8,28,40,37,55,120,1,1,1
+40,0,37.2,79,0,4042,-3600,2960000,33,39,10,32,40,38,55,120,1,1,1
+45,0,37.2,79,0,4041,-3600,2955000,33,39,11,36,40,39,55,120,1,1,1
+50,0,37.2,79,0,4040,-3600,2950000,34,39,12,40,40,40,55,120,1,1,1
+55,0,37.2,79,0,4039,-3600,2945000,34,39,13,44,40,41,55,120,1,1,1
+60,1,37.2,78,0,4038,-3600,2940000,35,39,15,48,40,42,55,120,1,1,1
+65,1,37.2,78,0,4037,-3600,2935000,35,39,16,52,40,43,55,120,1,1,1
+70,1,37.2,78,0,4036,-3600,2930000,36,39,17,56,40,44,55,120,1,1,1
+75,1,37.2,78,0,4035,-3600,2925000,36,39,18,60,40,45,55,120,1,1,1
+80,1,37.2,78,0,4034,-3600,2920000,37,39,20,64,40,46,55,120,1,1,1
+85,1,37.2,78,0,4033,-3600,2915000,37,39,21,68,40,47,55,120,1,1,1
+90,1,37.2,77,0,4032,-3600,2910000,38,39,22,72,40,48,55,120,1,1,1
+95,1,37.2,77,0,4031,-3600,2905000,38,39,23,76,40,49,55,120,1,1,1
+100,1,37.2,77,0,4030,-3600,2900000,39,39,25,80,40,50,55,120,1,1,1
+105,1,37.2,77,0,4029,-3600,2895000,39,39,26,84,40,51,55,120,1,1,1
+110,1,37.2,77,0,4028,-3600,2890000,40,39,27,88,40,52,55,120,1,1,1
+115,1,37.2,77,0,4027,-3600,2885000,40,39,28,92,40,53,55,120,1,1,1
+120,2,37.2,76,0,4026,-3600,2880000,41,39,30,96,40,54,55,120,1,1,1
+125,2,37.2,76,0,4025,-3600,2875000,41,39,31,100,40,55,55,120,1,1,1
+130,2,37.2,76,0,4024,-3600,2870000,41,39,32,104,40,56,55,120,1,1,1
+135,2,37.2,76,0,4023,-3600,2865000,42,39,33,108,40,57,55,120,1,1,1
+140,2,37.2,76,0,4022,-3600,2860000,42,39,35,112,40,58,55,120,1,1,1
+145,2,37.2,76,0,4021,-3600,2855000,43,39,36,116,40,59,55,120,1,1,1
+150,2,37.2,75,0,4020,-3600,2850000,43,39,37,120,40,60,55,120,1,1,1
+155,2,37.2,75,0,4019,-3600,2845000,44,39,38,124,40,61,55,120,1,1,1
+160,2,37.2,75,0,4018,-3600,2840000,44,39,40,128,40,62,55,120,1,1,1
+165,2,37.2,75,0,4017,-3600,2835000,45,39,41,132,40,63,55,120,1,1,1
+170,2,37.2,75,0,4016,-3600,2830000,45,39,42,136,40,64,55,120,1,1,1
+175,2,37.2,75,0,4015,-3600,2825000,46,39,43,140,40,65,55,120,1,1,1

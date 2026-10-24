@@ -135,6 +135,50 @@
                 android:textAllCaps="false"
                 android:textColor="?attr/mpOnSurfaceVariant"
                 android:textSize="14sp" />
+
+            <!-- PT1 (D38): frame timing + thermal / memory / GC / CPU snapshots, shared as text. Off by default. -->
+            <TextView style="@style/Scr.GroupLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:accessibilityHeading="true" android:layout_marginTop="12dp" android:text="@string/perf_title" />
+            <LinearLayout style="@style/Settings.Card">
+                <androidx.appcompat.widget.SwitchCompat android:id="@+id/perf_switch" style="@style/Settings.CardSwitch" android:text="@string/perf_record" />
+                <TextView style="@style/Settings.CardSub" android:text="@string/perf_record_sub" />
+                <TextView
+                    android:id="@+id/perf_summary"
+                    style="@style/Settings.CardSub"
+                    android:accessibilityLiveRegion="polite"
+                    android:textColor="?attr/mpOnSurface" />
+                <TextView
+                    android:id="@+id/perf_worst"
+                    style="@style/Settings.CardSub"
+                    android:textColor="?attr/mpOnSurface" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/perf_share"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/library_tonal_button"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/perf_share"
+                android:textAllCaps="false"
+                android:textColor="?attr/mpOnSecondaryContainer"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/perf_clear"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="4dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/perf_clear"
+                android:textAllCaps="false"
+                android:textColor="?attr/mpOnSurfaceVariant"
+                android:textSize="14sp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

@@ -97,7 +97,7 @@ public class PlaybackService extends MediaLibraryService {
         pool.allowCoreThreadTimeOut(true);
         browseExecutor = MoreExecutors.listeningDecorator(pool);
         callback = new BrowseCallback(new BrowseTree(getResources(), BrowseHolder.get()), store);
-        MediaLibrarySession.Builder builder = new MediaLibrarySession.Builder(this, player, callback)
+        MediaLibrarySession.Builder builder = new MediaLibrarySession.Builder(this, new SessionPlayer(player), callback)
                 .setBitmapLoader(bitmapLoader = new ArtworkLoader(this));
         Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (launch != null) {

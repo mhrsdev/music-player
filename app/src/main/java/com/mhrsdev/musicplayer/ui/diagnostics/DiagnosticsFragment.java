@@ -12,10 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import java.text.NumberFormat;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.databinding.DiagnosticsFragmentBinding;
 import com.mhrsdev.musicplayer.diag.Diagnostics;
 import com.mhrsdev.musicplayer.diag.ExitRecord;
+import com.mhrsdev.musicplayer.diag.PerfProbe;
 import com.mhrsdev.musicplayer.ui.nav.Adaptive;
 import com.mhrsdev.musicplayer.ui.nav.Screens;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
@@ -50,6 +52,54 @@ public class DiagnosticsFragment extends Fragment {
             Toast.makeText(requireContext(), R.string.diag_cleared, Toast.LENGTH_SHORT).show();
         });
         vm.getSummary().observe(getViewLifecycleOwner(), this::render);
+        setupPerformance();
+    }
+
+    // ---- Performance card (PT1, D38) ----
+
+    private void setupPerformance() {
+        b.perfSwitch.setOnCheckedChangeListener((v, on) -> {
+            if (on == PerfProbe.isRecording()) return; // a programmatic update from renderPerf
+            if (on) PerfProbe.start(requireActivity(), new PerfAppState(Screens.container(this)));
+            else PerfProbe.stop();
+        });
+        b.perfShare.setOnClickListener(v -> vm.sharePerf(text -> {
+            if (!isAdded()) return;
+            if (text == null) Toast.makeText(requireContext(), R.string.perf_nothing, Toast.LENGTH_SHORT).show();
+            else ExitText.share(requireContext(), text, R.string.perf_share_subject, R.string.perf_share_chooser);
+        }));
+        b.perfClear.setOnClickListener(v -> {
+            PerfProbe.clear();
+            Toast.makeText(requireContext(), R.string.perf_cleared, Toast.LENGTH_SHORT).show();
+        });
+        PerfProbe.changes().observe(getViewLifecycleOwner(), n -> renderPerf());
+    }
+
+    private void renderPerf() {
+        PerfProbe.Summary s = PerfProbe.summary();
+        if (b.perfSwitch.isChecked() != s.recording()) b.perfSwitch.setChecked(s.recording());
+        b.perfSummary.setVisibility(s.hasData() ? View.VISIBLE : View.GONE);
+        boolean worst = s.hasData() && s.worstScreen() != null && s.worstPercent() >= 1;
+        b.perfWorst.setVisibility(worst ? View.VISIBLE : View.GONE);
+        if (s.hasData()) {
+            b.perfSummary.setText(getString(s.recording() ? R.string.perf_summary_live : R.string.perf_summary_done,
+                    DateUtils.formatElapsedTime(s.elapsedMs() / 1000), NumberFormat.getIntegerInstance().format(s.frames()),
+                    percent(s.jankyPercent())));
+        }
+        if (worst) {
+            // screen names are class names: keep them left-to-right inside Persian text
+            b.perfWorst.setText(getString(R.string.perf_worst, "\u2066" + s.worstScreen() + "\u2069", percent(s.worstPercent())));
+        }
+        b.perfShare.setEnabled(s.hasData());
+        b.perfShare.setAlpha(s.hasData() ? 1f : 0.4f);
+        b.perfClear.setEnabled(s.hasData());
+        b.perfClear.setAlpha(s.hasData() ? 1f : 0.4f);
+    }
+
+    private static String percent(double value) {
+        NumberFormat nf = NumberFormat.getPercentInstance();
+        nf.setMaximumFractionDigits(1);
+        return nf.format(value / 100.0);
     }
 
     private void render(DiagnosticsViewModel.Summary s) {

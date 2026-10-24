@@ -29,6 +29,7 @@ import com.mhrsdev.musicplayer.MusicPlayerApp;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.databinding.PlayerFragmentBinding;
 import com.mhrsdev.musicplayer.di.AppContainer;
+import com.mhrsdev.musicplayer.diag.PerfProbe;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.model.RepeatMode;
@@ -206,6 +207,7 @@ public class PlayerFragment extends Fragment {
         Context ctx = requireContext();
         lyricsAdapter.setEffects(LyricsEffects.blurAllowed(ctx), MotionPolicy.decorativeMotionEnabled(ctx),
                 MotionPolicy.lyricsWordsEnabled());
+        PerfProbe.setFlag(PerfProbe.F_LYRICS_BLUR, LyricsEffects.blurAllowed(ctx) && MotionPolicy.lyricsBlurEnabled(ctx));
     }
 
     /** The 30 fps word-sweep loop runs only for shown, synced lyrics with the word sweep on. */
@@ -601,14 +603,14 @@ public class PlayerFragment extends Fragment {
     // ---------------------------------------------------------------- rendering
 
     /** Last values pushed to the views by {@link #render}: it runs at 4 Hz, so only changes may touch a view. */
-    private boolean rPlaying, rBuffering, rNext, rHasTrack, rShuffle;
+    private boolean rPlaying, rBuffering, rSkips, rHasTrack, rShuffle;
     private RepeatMode rRepeat;
     private long rElapsedSec = -1, rDuration = -1;
     private boolean renderedOnce;
 
     private void render(@Nullable PlaybackState s) {
         if (s == null) s = PlaybackState.empty();
-        boolean next = s.hasNext() || s.repeatMode() == RepeatMode.ALL;
+        boolean skips = !s.queue().isEmpty(); // D36: both skips whenever a queue exists; the controller handles the ends
         boolean hasTrack = s.currentTrack() != null;
         if (!renderedOnce || rPlaying != s.playing()) {
             b.playerPlay.setPlaying(s.playing(), true);
@@ -634,9 +636,11 @@ public class PlayerFragment extends Fragment {
             }
         }
         updateTitleMarquee(s.playing());
-        if (!renderedOnce || rNext != next) {
-            b.playerNext.setEnabled(next);
-            b.playerNext.setAlpha(next ? 1f : 0.38f);
+        if (!renderedOnce || rSkips != skips) {
+            for (View v : new View[]{b.playerPrev, b.playerNext}) {
+                v.setEnabled(skips);
+                v.setAlpha(skips ? 1f : 0.38f);
+            }
         }
         if (!renderedOnce || rHasTrack != hasTrack) b.playerPlay.setEnabled(hasTrack);
         if (!renderedOnce || rShuffle != s.shuffleEnabled()) {
@@ -655,7 +659,7 @@ public class PlayerFragment extends Fragment {
         renderedOnce = true;
         rPlaying = s.playing();
         rBuffering = s.buffering();
-        rNext = next;
+        rSkips = skips;
         rHasTrack = hasTrack;
         rShuffle = s.shuffleEnabled();
         rRepeat = s.repeatMode();
@@ -741,6 +745,7 @@ public class PlayerFragment extends Fragment {
 
     private void renderStage(Boolean showLyrics) {
         boolean lyrics = Boolean.TRUE.equals(showLyrics);
+        PerfProbe.setFlag(PerfProbe.F_LYRICS, lyrics);
         crossfade(b.playerArtwork, !lyrics);
         b.playerLyricsToggle.setContentDescription(getString(lyrics ? R.string.player_show_cover : R.string.player_show_lyrics));
         b.playerLyricsToggle.setActivated(lyrics);
@@ -1076,6 +1081,7 @@ public class PlayerFragment extends Fragment {
 
     @Override public void onDestroyView() {
         setCovering(false);
+        PerfProbe.setFlag(PerfProbe.F_LYRICS | PerfProbe.F_LYRICS_BLUR, false);
         b.lyricsList.removeCallbacks(resumeAutoScroll);
         if (lyricsTicker != null) lyricsTicker.stop();
         renderedOnce = false;

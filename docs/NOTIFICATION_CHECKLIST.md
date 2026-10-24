@@ -23,7 +23,13 @@ Root cause of the original bug: the session was never added to the service (no `
 7. **Swipe-away of the notification** while paused: allowed; playing: not dismissible on most versions.
 8. **Track change**: title/artist/cover update; seek from the card moves the position in the app.
 9. **After process death**: `adb shell am kill com.mhrsdev.musicplayer` while paused, press a headset play button: the queue and position restore and playback starts.
-10. **Battery**: no wake lock while paused, no repeated wakeups (see below).
+10. **Both skip buttons, always (D36)**: on the shade card, the lock-screen pill, a Bluetooth / Buds display and Android Auto,
+    [previous] and [next] are visible on the first, a middle AND the last track, with repeat off. Next on the last track
+    jumps to the first track (keeps playing if it was playing, stays paused if paused); previous on the first track restarts it;
+    previous after 3 s restarts the current track. Same from the headset buttons, the widget and the in-app buttons.
+    Collapsed shade card shows prev / play-pause / next. (Implemented by `SessionPlayer`; `adb shell dumpsys media_session`
+    should list actions with `skip to next` in the playback state `actions=` mask at the last track.)
+11. **Battery**: no wake lock while paused, no repeated wakeups (see below).
 
 ## adb commands
 ```

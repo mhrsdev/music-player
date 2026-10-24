@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PT1 (D38): تنظیمات > درباره > عیب‌یابی > کارایی. -->
+<resources>
+    <string name="perf_title">کارایی</string>
+    <string name="perf_record">ثبت کارایی (برای گزارش مشکل)</string>
+    <string name="perf_record_sub">روانیِ ترسیم هر صفحه را همراه با دما، حافظه و پردازنده هر ۵ ثانیه اندازه می‌گیرد. روی همین گوشی می‌ماند و بعد از ۱۰ دقیقه یا یک دقیقه پس از خروج از برنامه خودش خاموش می‌شود. روشنش کنید، دو دقیقه از برنامه استفاده کنید (فهرست خانه را اسکرول کنید، پخش‌کننده را با متن آهنگ باز کنید) و بعد «ارسال» را بزنید.</string>
+    <string name="perf_summary_live">در حال ثبت %1$s · %2$s فریم · %3$s فریم پرش‌دار</string>
+    <string name="perf_summary_done">ثبت‌شده %1$s · %2$s فریم · %3$s فریم پرش‌دار</string>
+    <string name="perf_worst">بدترین صفحه: %1$s (%2$s پرش‌دار)</string>
+    <string name="perf_share">ارسال گزارش کارایی</string>
+    <string name="perf_clear">پاک کردن ثبت کارایی</string>
+    <string name="perf_cleared">داده‌های کارایی پاک شد</string>
+    <string name="perf_nothing">هنوز چیزی ثبت نشده. اول «ثبت کارایی» را روشن کنید.</string>
+    <string name="perf_share_subject">گزارش کارایی موج</string>
+    <string name="perf_share_chooser">ارسال گزارش کارایی با</string>
+</resources>
