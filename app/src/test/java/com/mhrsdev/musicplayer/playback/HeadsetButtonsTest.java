@@ -194,12 +194,12 @@ public class HeadsetButtonsTest {
         assertEquals(1, player().getCurrentMediaItemIndex());
     }
 
-    @Test public void nextOnTheLastTrackRestartsInsteadOfBeingDropped() {
+    @Test public void nextOnTheLastTrackWrapsToTheFirstAndKeepsPlaying() {
         HeadsetControls h = startPlaying(2);
         assertFalse(player().hasNextMediaItem());
         press(h, KeyEvent.KEYCODE_MEDIA_NEXT);
-        assertEquals(2, player().getCurrentMediaItemIndex());
-        assertTrue("restarted: " + player().getCurrentPosition(), player().getCurrentPosition() < 5_000L);
+        assertEquals(0, player().getCurrentMediaItemIndex());
+        assertTrue("restarted at the first track: " + player().getCurrentPosition(), player().getCurrentPosition() < 5_000L);
         assertTrue(player().getPlayWhenReady());
     }
 

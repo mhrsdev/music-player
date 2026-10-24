@@ -134,15 +134,14 @@ public class ExoPlayerController implements PlayerController {
         player.seekTo(Math.max(0L, positionMs));
     }
 
+    /** Same rules as the notification / headset buttons (last track wraps to the first): see {@link SessionPlayer}. */
     @Override public void next() {
-        prepareIfIdle();
-        if (player.hasNextMediaItem()) player.seekToNextMediaItem(); else player.seekToDefaultPosition();
+        SessionPlayer.skipNext(player);
     }
 
-    /** ExoPlayer's own rule matches the contract: restart when more than 3 s in, else previous item. */
+    /** Restart when more than 3 s in or on the first track, else the previous track. */
     @Override public void previous() {
-        prepareIfIdle();
-        player.seekToPrevious();
+        SessionPlayer.skipPrevious(player);
     }
 
     @Override public void skipTo(int index) {

@@ -181,17 +181,13 @@ public class HeadsetControls implements Player.Listener {
         player.pause();
     }
 
-    /** Matches the in-app button: the last track restarts instead of the key being ignored. */
+    /** Same as the in-app and notification buttons: the last track wraps to the first. */
     void next() {
-        if (player.getMediaItemCount() == 0) return;
-        if (player.getPlaybackState() == Player.STATE_IDLE) player.prepare();
-        if (player.hasNextMediaItem()) player.seekToNextMediaItem(); else player.seekToDefaultPosition();
+        SessionPlayer.skipNext(player);
     }
 
     void previous() {
-        if (player.getMediaItemCount() == 0) return;
-        if (player.getPlaybackState() == Player.STATE_IDLE) player.prepare();
-        player.seekToPrevious();
+        SessionPlayer.skipPrevious(player);
     }
 
     void seekBy(long deltaMs) {
