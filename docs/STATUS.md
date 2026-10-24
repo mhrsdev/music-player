@@ -123,6 +123,14 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - **O1** Output devices: list connected outputs, show active one, switch via system output switcher, per-device volume, per-device sound profiles (EQ etc.), headset/earbud button mapping (single/double/triple press), auto-resume/pause on connect/disconnect, deep link to OEM dual-audio / audio-sharing. (True 2-device simultaneous playback has no public Android API.)
 - **J1** (after all merges) mechanical refactor: remove `final class`, Java 17 idioms in touched code, drop redundant AppCompat-transitive deps from the version catalog; verify on GitHub CI (local builds OOM).
 
+## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
+- **PF1** [Sonnet] Cold start + first frame: Application/DI lazy init, work off main thread, baseline profile (hand-written baseline-prof.txt + startup profile), splash→Home time budget; measure with JVM-side counters since no device.
+- **PF2** [Opus] Scroll/animation smoothness: RecyclerView adapters (DiffUtil, payloads, view recycling, no per-bind allocations), overdraw/layout depth, custom View draw paths, image decode sizes. Keep all effects.
+- **PF3** [Sonnet] Battery/background: wakeups, service/notification/widget update cadence, scan/DB cost (indexes, batching, query plans), network (LRCLIB/update check) discipline.
+- **PF4** [Sonnet] Build output: R8 full mode + shrinkResources, keep rules, APK size, resource dedupe, startup class loading.
+- **PF5** [Sonnet] Memory: artwork/bitmap caches sizing, leak audit (static refs, listeners, FrameDriver clients), lyrics/waveform memory.
+- Cross-cutting: update docs/PERF_BUDGET.md + tests that enforce budgets; every change measured or argued; no feature work; owner's D24 rule: never cut effects by default.
+
 ## Change log
 
 - 2026-10-24: CI GREEN on ccr 605c064 (E2, L2, O1, B2, Q1, J1, CI1 all merged; PlaybackNotificationTest/HeadsetButtonsTest flakes fixed test-side). D1 docs (README en/fa, CHANGELOG v0.3.0) merged. Next: main fast-forward + release v0.3.0 (stable). Backlog: tablet/landscape layouts, remove unused constraintlayout dep line, root-cause of Robolectric renderer stall.

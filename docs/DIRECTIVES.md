@@ -449,3 +449,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** "همه ۶ تا نوار"
 
 **Summary:** Owner keeps all six new seek-bar styles from B2 (Ribbon, Pulse dots, LED ladder, Mountain, Thread & beads, Liquid) alongside Wavy/Waveform/Bars. B2 merged into ccr.
+
+---
+
+## D28 — 2026-10-24 — After v0.3.0: next release is performance-only
+
+**Original (verbatim):** "بعد این اپدیت شروع میکنی روی کارکردن برای اپدیت بعدی و فقط هدفت بهبود پرفورمنس هستش"
+
+**Summary:** Once v0.3.0 is released and verified, start the next release (v0.4.0) whose ONLY goal is performance (smoothness, startup, memory, battery). No new features. D24 still applies: optimise, do not cut effects; the Performance settings section (Q1) stays as an opt-in escape hatch. Plan in docs/STATUS.md (PF1–PF5).
