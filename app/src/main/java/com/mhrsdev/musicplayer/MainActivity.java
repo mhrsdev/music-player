@@ -24,7 +24,6 @@ import com.mhrsdev.musicplayer.databinding.ActivityMainBinding;
 import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import com.mhrsdev.musicplayer.diag.ExitInfoReader;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
-import com.mhrsdev.musicplayer.domain.model.RepeatMode;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.playback.PlaybackService;
 import com.mhrsdev.musicplayer.ui.home.HomeFragment;
@@ -363,7 +362,6 @@ public class MainActivity extends AppCompatActivity
         }
         binding.mini.setPlaying(s.playing());
         binding.mini.setBuffering(s.buffering());
-        binding.mini.setSkipEnabled(true, s.hasNext() || s.repeatMode() == RepeatMode.ALL); // as PlayerFragment
         binding.mini.setProgress(s.positionMs(), s.durationMs());
     }
 

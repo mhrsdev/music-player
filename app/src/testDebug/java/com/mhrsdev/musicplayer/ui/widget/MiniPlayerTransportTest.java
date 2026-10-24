@@ -1,7 +1,6 @@
 package com.mhrsdev.musicplayer.ui.widget;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
@@ -32,8 +31,8 @@ import java.util.List;
 
 /**
  * D35: the mini-player has previous | play/pause | next. The transport keeps that physical order in RTL too (like the
- * full player's always-LTR transport row), the buttons are wired to the listener, next greys out like the full
- * player's, the targets stay >= 44 dp and the title still gets room (and ellipsizes) at 360 dp with font scale 2.
+ * full player's always-LTR transport row), the buttons are wired to the listener and both skips are always
+ * enabled (D36), the targets stay >= 44 dp and the title still gets room (and ellipsizes) at 360 dp with font scale 2.
  * Renders docs/screens/u4-miniplayer-*.png.
  */
 @RunWith(RobolectricTestRunner.class)
@@ -80,7 +79,7 @@ public class MiniPlayerTransportTest {
     }
 
     @Test @Config(sdk = 35, qualifiers = DARK)
-    public void buttonsAreWiredAndNextGreysOutLikeTheFullPlayer() throws Exception {
+    public void buttonsAreWiredAndBothSkipsAlwaysEnabled() throws Exception {
         MiniPlayerView m = render(null, 412, 0);
         List<String> calls = new ArrayList<>();
         m.setListener(new MiniPlayerView.Listener() {
@@ -97,20 +96,14 @@ public class MiniPlayerTransportTest {
         m.nextButton().performClick();
         assertEquals(List.of("previous", "play", "next"), calls);
 
+        // D36: both skips always available while the pill shows a track; real taps reach the listener
         assertTrue(m.previousButton().isEnabled() && m.nextButton().isEnabled());
-        m.setSkipEnabled(true, false); // last track, repeat off
-        assertTrue(m.previousButton().isEnabled());
         assertEquals(1f, m.previousButton().getAlpha(), 0f);
-        assertFalse(m.nextButton().isEnabled());
-        assertEquals(0.38f, m.nextButton().getAlpha(), 0f);
-        calls.clear();
-        tap(m.nextButton());
-        assertTrue("a tap on a disabled next does nothing", calls.isEmpty());
-        m.setSkipEnabled(true, true);
-        assertTrue(m.nextButton().isEnabled());
         assertEquals(1f, m.nextButton().getAlpha(), 0f);
+        calls.clear();
+        tap(m.previousButton());
         tap(m.nextButton());
-        assertEquals(List.of("next"), calls);
+        assertEquals(List.of("previous", "next"), calls);
     }
 
     private static void tap(View v) {

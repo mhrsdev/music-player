@@ -34,6 +34,8 @@ import com.mhrsdev.musicplayer.ui.theme.Tokens;
  *
  * <p>The pill mirrors in RTL (art at the start), but the transport cluster is always laid out LTR (previous | play |
  * next, glyphs not mirrored), exactly like the full player's transport row and the system media controls (D35).
+ * Both skips stay enabled whenever the pill is shown (it is hidden without a track): previous restarts the track when
+ * more than 3 s in, and the owner wants both skips available everywhere, always (D36).
  */
 public class MiniPlayerView extends LinearLayout {
     public interface Listener {
@@ -47,8 +49,6 @@ public class MiniPlayerView extends LinearLayout {
 
         default void onDismiss() {}
     }
-
-    private static final float DISABLED_ALPHA = 0.38f; // as the full player's disabled next
 
     private final ArtworkView art;
     private final TextView title;
@@ -70,7 +70,6 @@ public class MiniPlayerView extends LinearLayout {
     private boolean playing;
     private int progressInset, progressBottom;
     private boolean playingSet;
-    private boolean previousEnabled = true, nextEnabled = true;
     /** The wave path is rebuilt only when the progress end moved (its phase is static, so same x = same path). */
     private float waveX = Float.NaN;
     @Nullable private Listener listener;
@@ -215,23 +214,6 @@ public class MiniPlayerView extends LinearLayout {
         playPause.setPlaying(playing, true);
         waveX = Float.NaN; // static line <-> wave: rebuild
         invalidate();
-    }
-
-    /**
-     * Same rule as the full player (PlayerFragment.render): previous always works while there is a track (it restarts
-     * the track when more than 3 s in), next needs a following item or repeat-all. Only touches the views on change.
-     */
-    public void setSkipEnabled(boolean previous, boolean next) {
-        if (previous != previousEnabled) {
-            previousEnabled = previous;
-            this.previous.setEnabled(previous);
-            this.previous.setAlpha(previous ? 1f : DISABLED_ALPHA);
-        }
-        if (next != nextEnabled) {
-            nextEnabled = next;
-            this.next.setEnabled(next);
-            this.next.setAlpha(next ? 1f : DISABLED_ALPHA);
-        }
     }
 
     public void setBuffering(boolean buffering) {
