@@ -1,7 +1,9 @@
 package com.mhrsdev.musicplayer.playback;
 
+import androidx.annotation.OptIn;
 import androidx.media3.common.ForwardingPlayer;
 import androidx.media3.common.Player;
+import androidx.media3.common.util.UnstableApi;
 
 /**
  * The player every outside surface (notification, lock screen, shade, Bluetooth, Android Auto, Assistant) talks to.
@@ -16,6 +18,7 @@ import androidx.media3.common.Player;
  *       restarts it.</li>
  * </ul>
  */
+@OptIn(markerClass = UnstableApi.class)
 public class SessionPlayer extends ForwardingPlayer {
     private static final int[] SKIP_COMMANDS = {
             Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
