@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.update;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +13,7 @@ import java.util.regex.Pattern;
 
 /** SHA-256 of a file and the {@code sha256sum} line format ({@code <hex>  <filename>}). */
 class Sha256 {
-    private static final Pattern HEX = Pattern.compile("[0-9a-fA-F]{64}");
+    private static final Pattern HEX = Regexes.compile("[0-9a-fA-F]{64}");
 
     private Sha256() { }
 

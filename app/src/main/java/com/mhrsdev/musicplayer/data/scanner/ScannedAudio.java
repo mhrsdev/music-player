@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.scanner;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.data.db.query.Seeds;
 import com.mhrsdev.musicplayer.domain.model.Track;
@@ -50,7 +51,7 @@ public record ScannedAudio(
     }
 
     /** Compiled once: the scan calls {@link #cleanGenre} for every row. */
-    private static final java.util.regex.Pattern GENRE_CODE = java.util.regex.Pattern.compile("\\(?\\d+\\)?");
+    private static final java.util.regex.Pattern GENRE_CODE = Regexes.compile("\\(?\\d+\\)?");
 
     /** MediaStore's placeholder for missing tags. */
     private static final String UNKNOWN = "<unknown>";

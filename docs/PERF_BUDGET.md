@@ -106,3 +106,10 @@ dependency; the supervisor should decide before the first public release.
 ## Exceptions
 
 (none)
+
+## Regex safety (hotfix v0.3.2)
+
+* RX1 Android's regex engine is ICU and rejects what the JDK (our unit tests) accepts: an unescaped `}` or `]`, `{` that is not a quantifier, `[` or `&&` inside a class, `\p{IsXxx}` / `\p{javaXxx}`, `\h`, `\R`, unbounded lookbehind, possessive/atomic/named groups. v0.3.1 crashed at launch on Android 10 because of `\{[^{}]*}`.
+* RX2 A static `Pattern` is built only with `diag/Regexes.compile` (a bad pattern is logged as a non-fatal and replaced by a never-matching one; it can never kill the process from a static initializer). `SafeExecutor` also survives `LinkageError` (ExceptionInInitializerError, NoClassDefFoundError).
+* RX3 `diag/RegexIcuTest` scans every regex literal in `src/main/java` (Pattern.compile, Regexes.compile, matches, replaceAll, replaceFirst, split) against an ICU-strictness checker, forbids raw static `Pattern.compile`, and initialises every class that keeps a static Pattern. A new regex must pass it; write `\}` and `\]` always.
+

@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.lyrics;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -11,17 +12,17 @@ import java.util.regex.Pattern;
  * and underscores into spaces so the same song always gets the same query and cache key.
  */
 public class LyricsQueryNormalizer {
-    private static final Pattern HANDLE = Pattern.compile("@\\S+");
-    private static final Pattern URL = Pattern.compile(
+    private static final Pattern HANDLE = Regexes.compile("@\\S+");
+    private static final Pattern URL = Regexes.compile(
             "(?i)(https?://\\S+|www\\.\\S+|\\b[\\p{L}\\p{N}-]+\\.(com|ir|net|org|info|me|io|co|biz|xyz|fm|tv|top|site|online|club|music)\\b)");
-    private static final Pattern BRACKETS = Pattern.compile("\\([^()]*\\)|\\[[^\\[\\]]*]|\\{[^{}]*}|\u3010[^\u3011]*\u3011");
-    private static final Pattern FEAT = Pattern.compile(
+    private static final Pattern BRACKETS = Regexes.compile("\\([^()]*\\)|\\[[^\\[\\]]*\\]|\\{[^\\{\\}]*\\}|\u3010[^\u3011]*\u3011");
+    private static final Pattern FEAT = Regexes.compile(
             "(?i)\\s+(feat\\.?|ft\\.?|featuring|\u0628\u0627\\s+\u062D\u0636\u0648\u0631|\u0641\u062A)\\s+.*$");
     /** Artists only: "A x B" collaborations keep A. */
-    private static final Pattern FEAT_ARTIST = Pattern.compile("(?i)\\s+(x|\u00D7)\\s+.*$");
-    private static final Pattern TRACK_NO = Pattern.compile("^\\s*\\d{1,3}\\s*[-._)\\]]+\\s*");
-    private static final Pattern SPACES = Pattern.compile("[\\s\u00A0]+");
-    private static final Pattern EDGE_PUNCT = Pattern.compile("^[\\s\\-\u2013\u2014|:,.~_*]+|[\\s\\-\u2013\u2014|:,.~_*]+$");
+    private static final Pattern FEAT_ARTIST = Regexes.compile("(?i)\\s+(x|\u00D7)\\s+.*$");
+    private static final Pattern TRACK_NO = Regexes.compile("^\\s*\\d{1,3}\\s*[-._)\\]]+\\s*");
+    private static final Pattern SPACES = Regexes.compile("[\\s\u00A0]+");
+    private static final Pattern EDGE_PUNCT = Regexes.compile("^[\\s\\-\u2013\u2014|:,.~_*]+|[\\s\\-\u2013\u2014|:,.~_*]+$");
 
     private LyricsQueryNormalizer() { }
 

@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.lyrics;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.domain.model.LyricLine;
 import com.mhrsdev.musicplayer.domain.model.LyricWord;
@@ -16,9 +17,9 @@ import java.util.regex.Pattern;
  * Times: {@code hh:mm:ss.fff}, {@code mm:ss.fff}, {@code ss.fff}, {@code 12.3s}, {@code 450ms}.
  */
 class TtmlLyricsParser {
-    private static final Pattern TAG = Pattern.compile("<(/?)([A-Za-z][\\w:.-]*)([^>]*?)(/?)>");
-    private static final Pattern ATTR = Pattern.compile("([\\w:.-]+)\\s*=\\s*(\"([^\"]*)\"|'([^']*)')");
-    private static final Pattern CLOCK = Pattern.compile("(?:(\\d+):)?(?:(\\d+):)?(\\d+(?:\\.\\d+)?)");
+    private static final Pattern TAG = Regexes.compile("<(/?)([A-Za-z][\\w:.-]*)([^>]*?)(/?)>");
+    private static final Pattern ATTR = Regexes.compile("([\\w:.-]+)\\s*=\\s*(\"([^\"]*)\"|'([^']*)')");
+    private static final Pattern CLOCK = Regexes.compile("(?:(\\d+):)?(?:(\\d+):)?(\\d+(?:\\.\\d+)?)");
 
     private TtmlLyricsParser() { }
 

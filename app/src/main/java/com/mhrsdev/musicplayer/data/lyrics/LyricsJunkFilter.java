@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.lyrics;
 
+import com.mhrsdev.musicplayer.diag.Regexes;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.domain.model.LyricLine;
 import com.mhrsdev.musicplayer.domain.model.Lyrics;
@@ -30,9 +31,9 @@ public class LyricsJunkFilter {
     /** Lines longer than this are treated as lyrics even if they mention a keyword. */
     private static final int MAX_WATERMARK_LEN = 90;
 
-    private static final Pattern URL = Pattern.compile(
+    private static final Pattern URL = Regexes.compile(
             "(?i)(https?://|www\\.|\\b[\\p{L}\\p{N}-]+\\.(com|ir|net|org|info|me|io|co|biz|xyz|fm|tv|top|site|online|club|music|app)\\b)");
-    private static final Pattern HANDLE = Pattern.compile("(^|[\\s(\\[:])@[\\w.]{3,}");
+    private static final Pattern HANDLE = Regexes.compile("(^|[\\s(\\[:])@[\\w.]{3,}");
     private static final String[] SITES = {
         "rozmusic", "melovaz", "nex1", "nexmusic", "ahangify", "radiojavan", "musicfa", "music-fa", "1music",
         "upmusics", "upmusic", "avangmusic", "tak3da", "mybia", "bia2", "golsarmusic", "irmusic", "mihanmusic",
@@ -41,14 +42,14 @@ public class LyricsJunkFilter {
         "ritmo", "musicbaran", "melodiha", "ahanghaa", "sevilmusic", "mp3pm", "mp3juice", "zippyshare", "mrjatt",
         "djpunjab", "pagalworld", "songspk", "mymp3song", "freemp3", "musicmp3", "teranemusic", "mahmusic"
     };
-    private static final Pattern ADVERT = Pattern.compile("(?i)(downloaded|download|uploaded|ripped|encoded|provided|"
+    private static final Pattern ADVERT = Regexes.compile("(?i)(downloaded|download|uploaded|ripped|encoded|provided|"
             + "telegram|instagram|whatsapp|facebook|twitter|tiktok|youtube|subscribe|follow us|join us|visit|channel|"
             + "exclusive|free mp3|"
             + "\u06A9\u0627\u0646\u0627\u0644|\u062F\u0627\u0646\u0644\u0648\u062F|\u0644\u06CC\u0646\u06A9|\u0633\u0627\u06CC\u062A|"
             + "\u062A\u0644\u06AF\u0631\u0627\u0645|\u0627\u06CC\u0646\u0633\u062A\u0627\u06AF\u0631\u0627\u0645|"
             + "\u0627\u062E\u062A\u0635\u0627\u0635\u06CC|\u0639\u0636\u0648|\u062C\u0648\u06CC\u0646|\u0645\u0646\u062A\u0634\u0631)");
     /** "Lyrics by X", "Composer: X", "\u0634\u0639\u0631: X", "\u062A\u0631\u0627\u0646\u0647: X", "\u0622\u0647\u0646\u06AF\u0633\u0627\u0632: X", "\u062A\u0646\u0638\u06CC\u0645: X", "\u0645\u062A\u0646 \u0622\u0647\u0646\u06AF X". */
-    private static final Pattern CREDIT = Pattern.compile("(?i)^\\s*(lyrics?|words|written|poem|composer|composed|"
+    private static final Pattern CREDIT = Regexes.compile("(?i)^\\s*(lyrics?|words|written|poem|composer|composed|"
             + "music|arrange(d|ment)?|mix(ed)?|master(ed|ing)?|producer|produced|vocals?|"
             + "\u0634\u0639\u0631|\u062A\u0631\u0627\u0646\u0647(\u200C?\u0633\u0631\u0627)?|\u0622\u0647\u0646\u06AF\u0633\u0627\u0632|"
             + "\u062A\u0646\u0638\u06CC\u0645|\u0645\u06CC\u06A9\u0633|\u0645\u0633\u062A\u0631|\u0645\u062A\u0646(\\s+\u0622\u0647\u0646\u06AF)?|"
