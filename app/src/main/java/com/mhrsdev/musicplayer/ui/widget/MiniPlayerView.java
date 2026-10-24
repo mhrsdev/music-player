@@ -27,9 +27,13 @@ import com.mhrsdev.musicplayer.ui.theme.ThemeController;
 import com.mhrsdev.musicplayer.ui.theme.Tokens;
 
 /**
- * Artwork-tinted mini-player (DESIGN.md 08/16): 76 dp, 24 dp corners, art + title/subtitle + squircle play/pause +
- * next, and a progress line along the bottom edge that is wavy while playing (static wave: no per-frame work on
- * Home). Tap or swipe up opens the player, swipe sideways skips (tape direction: left = next), swipe down dismisses.
+ * Artwork-tinted mini-player (DESIGN.md 08/16): 76 dp, 24 dp corners, art + title/subtitle + previous / squircle
+ * play/pause / next, and a progress line along the bottom edge that is wavy while playing (static wave: no per-frame
+ * work on Home). Tap or swipe up opens the player, swipe sideways skips (tape direction: left = next), swipe down
+ * dismisses.
+ *
+ * <p>The pill mirrors in RTL (art at the start), but the transport cluster is always laid out LTR (previous | play |
+ * next, glyphs not mirrored), exactly like the full player's transport row and the system media controls (D35).
  */
 public class MiniPlayerView extends LinearLayout {
     public interface Listener {
@@ -44,10 +48,13 @@ public class MiniPlayerView extends LinearLayout {
         default void onDismiss() {}
     }
 
+    private static final float DISABLED_ALPHA = 0.38f; // as the full player's disabled next
+
     private final ArtworkView art;
     private final TextView title;
     private final TextView subtitle;
     private final MorphPlayPauseView playPause;
+    private final ImageButton previous;
     private final ImageButton next;
     private final Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint progressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -63,6 +70,7 @@ public class MiniPlayerView extends LinearLayout {
     private boolean playing;
     private int progressInset, progressBottom;
     private boolean playingSet;
+    private boolean previousEnabled = true, nextEnabled = true;
     /** The wave path is rebuilt only when the progress end moved (its phase is static, so same x = same path). */
     private float waveX = Float.NaN;
     @Nullable private Listener listener;
@@ -106,21 +114,26 @@ public class MiniPlayerView extends LinearLayout {
         tlp.setMarginEnd(res.getDimensionPixelSize(R.dimen.mp_mini_text_end));
         addView(texts, tlp);
 
+        // Transport: always LTR like the full player (a mirrored row would put "next" where "previous" is expected).
+        LinearLayout transport = new LinearLayout(context);
+        transport.setOrientation(HORIZONTAL);
+        transport.setGravity(Gravity.CENTER_VERTICAL);
+        transport.setLayoutDirection(LAYOUT_DIRECTION_LTR);
+        previous = skipButton(context, R.drawable.ic_mp_skip_previous, R.string.mp_cd_previous);
+        previous.setOnClickListener(v -> { if (listener != null) listener.onPrevious(); });
+        transport.addView(previous);
+
         playPause = new MorphPlayPauseView(context);
         playPause.setOnClickListener(v -> { if (listener != null) listener.onPlayPause(); });
         // 56 dp touch target, disc drawn inside 4 dp padding (48 dp, < 86% of the view): never touches the pill.
         int playPx = res.getDimensionPixelSize(R.dimen.mp_mini_play), playPad = res.getDimensionPixelSize(R.dimen.mp_mini_play_pad);
         playPause.setPadding(playPad, playPad, playPad, playPad);
-        addView(playPause, new LayoutParams(playPx, playPx));
+        transport.addView(playPause, new LayoutParams(playPx, playPx));
 
-        next = new ImageButton(context, null, 0, R.style.Widget_MusicPlayer_IconButton);
-        next.setImageResource(R.drawable.ic_mp_skip_next);
-        next.setContentDescription(context.getString(R.string.mp_cd_next));
+        next = skipButton(context, R.drawable.ic_mp_skip_next, R.string.mp_cd_next);
         next.setOnClickListener(v -> { if (listener != null) listener.onNext(); });
-        int touch = res.getDimensionPixelSize(R.dimen.mp_mini_touch);
-        LayoutParams nlp = new LayoutParams(touch, touch);
-        nlp.setMarginStart(res.getDimensionPixelSize(R.dimen.mp_mini_play_pad));
-        addView(next, nlp);
+        transport.addView(next);
+        addView(transport, new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         progressPaint.setStyle(Paint.Style.STROKE);
         progressPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -151,6 +164,20 @@ public class MiniPlayerView extends LinearLayout {
         });
         setOnClickListener(v -> { if (listener != null) listener.onOpen(); });
         setAccent(ThemeController.get(context).currentAccent());
+    }
+
+    /** 44 dp target with the 24 dp glyph of the old 48 dp button (10 dp padding instead of 12). */
+    private ImageButton skipButton(Context c, int icon, int description) {
+        ImageButton b = new ImageButton(c, null, 0, R.style.Widget_MusicPlayer_IconButton);
+        int touch = getResources().getDimensionPixelSize(R.dimen.mp_mini_touch);
+        int pad = getResources().getDimensionPixelSize(R.dimen.mp_mini_skip_pad);
+        b.setMinimumWidth(touch);
+        b.setMinimumHeight(touch);
+        b.setPadding(pad, pad, pad, pad);
+        b.setImageResource(icon);
+        b.setContentDescription(c.getString(description));
+        b.setLayoutParams(new LayoutParams(touch, touch));
+        return b;
     }
 
     private static TextView text(Context c, int style) {
@@ -190,6 +217,23 @@ public class MiniPlayerView extends LinearLayout {
         invalidate();
     }
 
+    /**
+     * Same rule as the full player (PlayerFragment.render): previous always works while there is a track (it restarts
+     * the track when more than 3 s in), next needs a following item or repeat-all. Only touches the views on change.
+     */
+    public void setSkipEnabled(boolean previous, boolean next) {
+        if (previous != previousEnabled) {
+            previousEnabled = previous;
+            this.previous.setEnabled(previous);
+            this.previous.setAlpha(previous ? 1f : DISABLED_ALPHA);
+        }
+        if (next != nextEnabled) {
+            nextEnabled = next;
+            this.next.setEnabled(next);
+            this.next.setAlpha(next ? 1f : DISABLED_ALPHA);
+        }
+    }
+
     public void setBuffering(boolean buffering) {
         playPause.setBuffering(buffering);
     }
@@ -215,7 +259,9 @@ public class MiniPlayerView extends LinearLayout {
         title.setTextColor(scheme.onContainer());
         subtitle.setTextColor((scheme.onContainer() & 0x00FFFFFF) | 0xC7000000);
         playPause.setColors(scheme.primary(), scheme.onPrimary());
-        next.setImageTintList(ColorStateList.valueOf(scheme.onContainer()));
+        ColorStateList glyph = ColorStateList.valueOf(scheme.onContainer());
+        previous.setImageTintList(glyph);
+        next.setImageTintList(glyph);
         progressPaint.setColor(scheme.primary());
         trackPaint.setColor((scheme.onContainer() & 0x00FFFFFF) | 0x33000000);
         updateBackground();
@@ -239,6 +285,14 @@ public class MiniPlayerView extends LinearLayout {
 
     public MorphPlayPauseView getPlayPauseView() {
         return playPause;
+    }
+
+    ImageButton previousButton() {
+        return previous;
+    }
+
+    ImageButton nextButton() {
+        return next;
     }
 
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
