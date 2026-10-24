@@ -108,7 +108,10 @@ What is guaranteed, and what is not:
   `setMonogram` uses the artist avatar.
 - **`ui/widget/ArtworkLoader`:**
   - `loadGenerated`, `generatedNow` (sync only for buckets of 96 px or less) and `cachedGenerated`.
-  - Size buckets are 64, 96, 128, 192, 256, 384, 512, 768 and 1024.
+  - Size buckets are 64, 96, 128, 160, 192, 256, 384, 512, 640, 768 and 1024 (160 and 640 since SC1: a 52 dp row and
+    an Albums cell no longer render 1.4-2x the pixels they show).
+  - While a list flings fast, rows that miss the cache wait (`FlingGate`) and render when the fling ends or slows;
+    see `docs/PERF_SCROLL_v0.3.3.md`.
   - It uses the same two low-priority workers, de-duplication and cancellation as artwork decoding.
   - It uses the same LruCache: 1/16 of the heap, at most 16 MB.
 - **UI call sites:**

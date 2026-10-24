@@ -37,6 +37,16 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 * R6 Lists of 10k rows: queries return in < 150 ms on a mid-range phone, use an index (see `QueryPlanTest`, prints every plan), share repeated strings (`TrackQueries.read`).
 * R7 A 10k-track queue must not jank: queue save runs off the main thread (`PlaybackStore`), decode is incremental (`ExoPlayerController.readQueue`). Measured on the JVM: encode 16 ms, decode 10 ms, 1.35 MB.
 
+* S1 Scroll path (SC1, D39; `docs/PERF_SCROLL_v0.3.3.md`). A row bind sets what changed and allocates little: listeners,
+  accessibility actions and labels per holder (labels formatted on demand), no `NumberFormat` / `String.format` /
+  view creation per bind, no `notifyItemChanged` without a payload for a value that only moves a property (Home
+  Continue progress), no re-submit of an unchanged list. Home's horizontal rows have one view type per section. A
+  generated cover is never rendered on the main thread for a list row; cover work waits while a list flings fast
+  (`FlingGate`). Row layouts <= 4 levels, no elevation / outline clip / auto-size / marquee / layer
+  (`RowLayoutBudgetTest`). Bytes per bind are pinned by the `*ScrollBenchTest` light pass (songs / search / albums
+  < 8 KB, queue < 16 KB, Home rows < 4-24 KB, `ArtworkView.bind` < 4 KB). Static screens render 0 frames/s when
+  nobody touches them (`IdleRedrawTest`).
+
 ## Background work
 
 * B1 No WorkManager, JobScheduler, AlarmManager, boot/connectivity receivers, extra wake locks, FCM, SyncAdapter (`PerfBudgetTest`). The only receivers are the media button (`MediaButtonRestartReceiver`: starts the service only when a queue is saved; replaces Media3's), the three home-screen widgets (`updatePeriodMillis="0"`, redrawn from `NowPlayingBridge` on playback events) and two non-exported action/install-result receivers. Self-update (REQUEST_INSTALL_PACKAGES) runs only from the Update screen.
