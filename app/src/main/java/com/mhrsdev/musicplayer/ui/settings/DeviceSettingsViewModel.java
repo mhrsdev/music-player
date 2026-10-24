@@ -11,7 +11,7 @@ import java.io.File;
 import java.util.concurrent.Executor;
 
 /**
- * Settings → Battery, motion and Storage. Folder sizes are walked on the io executor (never on the main thread)
+ * Settings → Battery, immersive player and Storage. Folder sizes are walked on the io executor (never on the main thread)
  * and only when the screen asks (no background work while Settings is closed).
  */
 public class DeviceSettingsViewModel extends ViewModel {
@@ -37,10 +37,6 @@ public class DeviceSettingsViewModel extends ViewModel {
     public LiveData<BatterySaverMode> getBatteryMode() { return settings.batterySaver(); }
 
     public void setBatteryMode(BatterySaverMode m) { settings.setBatterySaver(m); }
-
-    public LiveData<Boolean> getReduceMotion() { return settings.reduceMotion(); }
-
-    public void setReduceMotion(boolean on) { settings.setReduceMotion(on); }
 
     public LiveData<Boolean> getImmersivePlayer() { return settings.immersivePlayer(); }
 

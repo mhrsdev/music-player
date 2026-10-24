@@ -61,6 +61,7 @@ public class LyricLineView extends View {
     @Nullable private Clock clock;
     private boolean rtl;
     private boolean decorative = true;
+    private boolean wordSweep = true;
 
     // emphasis animation: emphasis 0..1 and distance from the active line (signed, past < 0)
     private float emphasis, distance = 1f, fromEmphasis, toEmphasis, fromDistance, toDistance = 1f;
@@ -124,10 +125,15 @@ public class LyricLineView extends View {
         invalidate();
     }
 
-    /** Low-power mode: no blur, no lift (battery saver, reduce motion, low-RAM device, API < 31). */
-    public void setEffects(boolean blur, boolean decorativeMotion) {
+    /**
+     * Low-power mode: no blur, no lift (battery saver, reduce motion, low-RAM device, API < 31); {@code words} false
+     * draws the active line fully lit instead of sweeping word by word (Settings &gt; Performance).
+     */
+    public void setEffects(boolean blur, boolean decorativeMotion, boolean words) {
         blurAllowed = blur && Build.VERSION.SDK_INT >= 31;
         decorative = decorativeMotion;
+        if (wordSweep != words) invalidate();
+        wordSweep = words;
         appliedBlurBucket = -1;
         applyBlur();
     }
@@ -205,7 +211,7 @@ public class LyricLineView extends View {
         float lineAlpha = LyricsMotion.alphaForDistance(distance, past, blurAllowed);
         List<LyricWord> words = line.words();
         long pos = clock == null ? 0 : clock.positionMs();
-        if (emphasis < 0.01f || words == null) {
+        if (emphasis < 0.01f || words == null || !wordSweep) {
             drawPlain(c, l, Math.round(255 * lineAlpha));
         } else {
             drawSung(c, l, words, pos, lineAlpha);

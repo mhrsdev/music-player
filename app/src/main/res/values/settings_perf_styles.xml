@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings > Performance (D26): preset rows inside a Settings.Card. -->
+    <style name="Settings.PerfPreset" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginHorizontal">8dp</item>
+        <item name="android:layout_marginVertical">2dp</item>
+        <item name="android:minHeight">64dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:background">@drawable/perf_preset_bg</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="Settings.PerfPresetIcon" parent="">
+        <item name="android:layout_width">28dp</item>
+        <item name="android:layout_height">28dp</item>
+        <item name="android:layout_marginEnd">14dp</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:tint">@color/perf_preset_icon</item>
+    </style>
+    <style name="Settings.PerfPresetText" parent="">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="Settings.PerfPresetTitle" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/perf_preset_title</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:duplicateParentState">true</item>
+    </style>
+    <style name="Settings.PerfPresetSub" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/perf_preset_sub</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:duplicateParentState">true</item>
+    </style>
+    <style name="Settings.PerfPresetMark" parent="">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:src">@drawable/perf_radio</item>
+    </style>
+</resources>

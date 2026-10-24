@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings > Performance "Full": the Mowj wave at full swell (preset = how much the wave moves). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:strokeColor="@android:color/white" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M2,12C4,4.5 6.5,4.5 8.5,12S13,19.5 15.5,12S20,4.5 22,12" />
+</vector>
