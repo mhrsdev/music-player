@@ -557,3 +557,14 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** "اسکرول همه جای برنامه لگه"
 
 **Summary:** Scroll jank is app-wide (all lists/screens), so the cause is in something shared by every scrolling screen: row binding (ArtworkView/ArtworkLoader/GeneratedCover rendering for coverless tracks, which the owner's library has many of), shared row layouts (elevation/outline clipping/overdraw/depth), a global per-frame consumer behind or above the lists (ambient backdrop/DecorBeat/dock/mini-player/edge-to-edge insets listeners), or RecyclerView configuration (prefetch, pools, DiffUtil). Task SC1 (Opus): systematic scroll-path hunt with measurements, then fixes; PT1 will give on-device numbers.
+
+---
+
+## D40 — 2026-10-24 — Flagship lags + battery drain 6% / 5 min (normal 1–2%)
+
+**Original (verbatim):**
+
+> نخیر مشکلم اینه گوشیم خفن ترین گوشیه و لگ داره میخوره / ببین دیگه رو میان رده و پایین رده چخبره / چخبره گوشیم S26 ULTRA هست
+> مصرف باتریشم خیلی خیلی زیاده تو ۵ دقیقه ۶ درصد شارژمو کم کرد / درحالت عادی این عدد روی ۱ یا ۲ درصد بوده نهایت
+
+**Summary:** The owner stresses that his phone is the most powerful one (S26 Ultra) and still lags — so mid/low-end phones must be far worse; and the app drains 6% battery in 5 minutes (normal 1–2%). Treated as severe: sustained CPU/GPU load (idle redraw at display refresh rate is the prime suspect). SC1 gets scroll budgets for a ~4x slower phone plus an idle-redraw audit; PT1 telemetry adds battery current (mA), per-thread CPU, idle-redraw fps. Questions sent to owner: was the screen on / was music playing / which version.
