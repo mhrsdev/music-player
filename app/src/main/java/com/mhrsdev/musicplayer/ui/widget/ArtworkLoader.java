@@ -17,6 +17,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import com.mhrsdev.musicplayer.data.settings.DeviceClass;
 import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
 import com.mhrsdev.musicplayer.ui.widget.cover.GeneratedCover;
@@ -56,6 +57,10 @@ public class ArtworkLoader {
     static final int[] BUCKETS = {64, 96, 128, 192, 256, 384, 512, 768, 1024};
     /** At or below this bucket a generated cover is rendered on the calling thread (well under a millisecond). */
     public static final int SYNC_MAX_PX = 96;
+
+    /** Largest decoded cover bucket and decode workers for this phone's class (C1); the defaults serve unit tests. */
+    private static volatile int maxBucketPx = BUCKETS[BUCKETS.length - 1];
+    private static volatile int workerOverride;
 
     private final ArtworkResolver resolver;
     @Nullable private final GeneratedCover generator;
@@ -114,7 +119,8 @@ public class ArtworkLoader {
             }
         };
         // Decoding is CPU + I/O heavy: never more workers than the device has spare cores (1 on dual-core phones).
-        int workers = Math.max(1, Math.min(2, Runtime.getRuntime().availableProcessors() - 1));
+        int workers = workerOverride > 0 ? workerOverride
+                : Math.max(1, Math.min(2, Runtime.getRuntime().availableProcessors() - 1));
         executor = new ThreadPoolExecutor(workers, workers, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> {
             Thread t = new Thread(r, "artwork");
             t.setPriority(Thread.MIN_PRIORITY);
@@ -123,6 +129,11 @@ public class ArtworkLoader {
         executor.allowCoreThreadTimeOut(true);
         if (!missesLoaded) executor.execute(this::loadMisses); // first job: off the main thread, before any probe
     }
+
+    /** Tests: bytes the bitmap cache holds now / may hold. */
+    @VisibleForTesting public int cacheUsedBytes() { return cache.size(); }
+
+    @VisibleForTesting public int cacheMaxBytes() { return cache.maxSize(); }
 
     /**
      * Bitmap cache budget for a heap of {@code maxHeap} bytes: 1/16 of it, at least two hero covers (6 MB), at most
@@ -134,7 +145,12 @@ public class ArtworkLoader {
 
     @MainThread
     public static ArtworkLoader get(Context context) {
-        if (instance == null) instance = new ArtworkLoader(context);
+        if (instance == null) {
+            DeviceClass.Signals phone = DeviceClass.detect(context);
+            maxBucketPx = DeviceClass.maxCoverBucketPx(phone);
+            workerOverride = DeviceClass.artworkWorkers(phone);
+            instance = new ArtworkLoader(context);
+        }
         return instance;
     }
 
@@ -208,7 +224,7 @@ public class ArtworkLoader {
 
     /** Smallest bucket at or above {@code px} (capped at the largest). */
     public static int bucket(int px) {
-        for (int b : BUCKETS) if (px <= b) return b;
+        for (int b : BUCKETS) if (px <= b || b >= maxBucketPx) return b;
         return BUCKETS[BUCKETS.length - 1];
     }
 

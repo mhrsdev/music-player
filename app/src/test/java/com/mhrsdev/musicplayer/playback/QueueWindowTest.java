@@ -238,6 +238,15 @@ public class QueueWindowTest {
         assertTrue(store.before().isEmpty() && store.after().isEmpty());
     }
 
+    @Test public void anExternalEditMarkThatWasNeverAppliedDoesNotCollapseALaterWindow() {
+        store.noteExternalEdit(); // e.g. a resumption whose result nobody set into the player
+        showAt(5_000);
+        controller.playNext(named("next"));
+        idle();
+        assertTrue("hidden parts survive", !store.before().isEmpty() && !store.after().isEmpty());
+        assertEquals(N + 1, state().queue().size());
+    }
+
     @Test public void smallQueuesAreNotWindowed() {
         store.show(PlaybackState.frozen(tracks.subList(0, 50)), 10, 0L);
         idle();

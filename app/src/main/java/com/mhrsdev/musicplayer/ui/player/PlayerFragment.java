@@ -322,8 +322,7 @@ public class PlayerFragment extends Fragment {
         b.playerShuffle.setOnClickListener(v -> vm.toggleShuffle());
         b.playerRepeat.setOnClickListener(v -> vm.cycleRepeat());
         b.playerLike.setOnClickListener(v -> {
-            v.performHapticFeedback(android.os.Build.VERSION.SDK_INT >= 30
-                    ? HapticFeedbackConstants.CONFIRM : HapticFeedbackConstants.VIRTUAL_KEY);
+            com.mhrsdev.musicplayer.ui.motion.Haptics.confirm(v);
             v.animate().scaleX(1.18f).scaleY(1.18f).setDuration(110)
                     .withEndAction(() -> v.animate().scaleX(1f).scaleY(1f).setDuration(180).start()).start();
             vm.toggleLike();

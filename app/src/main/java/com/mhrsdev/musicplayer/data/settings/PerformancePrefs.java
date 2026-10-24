@@ -23,6 +23,12 @@ class PerformancePrefs {
 
     private PerformancePrefs() { }
 
+    /** True once the user (or a restored backup) saved any Performance setting, including the older reduce-motion switch. */
+    static boolean hasSaved(SharedPreferences p) {
+        for (String key : BACKUP_TYPES.keySet()) if (p.contains(key)) return true;
+        return false;
+    }
+
     static PerformanceProfile read(SharedPreferences p) {
         PerformanceProfile d = PerformanceProfile.FULL;
         return new PerformanceProfile(

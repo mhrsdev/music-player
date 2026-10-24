@@ -59,7 +59,7 @@ import org.robolectric.shadows.ShadowLooper;
 public class SmokeHostileDataTest {
     private static final List<Throwable> BACKGROUND = Collections.synchronizedList(new ArrayList<>());
     private Thread.UncaughtExceptionHandler previous;
-    private ActivityController<MainActivity> ctl;
+    ActivityController<MainActivity> ctl; // package-private: ApiMatrixSmokeTest reuses this harness
     private Bitmap frame;
 
     @Before public void setUp() throws Exception {
@@ -257,7 +257,7 @@ public class SmokeHostileDataTest {
      * short drag returns, a long drag closes and everything under it is visible again; Back during the close animation
      * must not crash (the end action runs after the fragment is gone).
      */
-    private void playerCoverEnterDragExit(MainActivity a) throws Exception {
+    void playerCoverEnterDragExit(MainActivity a) throws Exception {
         View shell = a.findViewById(R.id.screen_container);
         a.openFullPlayer();
         frames(40);
@@ -291,7 +291,7 @@ public class SmokeHostileDataTest {
     }
 
     /** Library > Songs, tap the first rows like a person picking a song (the hostile ones come first by title). */
-    private void play(MainActivity a) throws Exception {
+    void play(MainActivity a) throws Exception {
         a.openTab(ScreenNavigator.Tab.LIBRARY);
         frames(6);
         assertTrue("no Songs hub", clickIfPresent(a, R.id.hub_songs));
@@ -307,7 +307,7 @@ public class SmokeHostileDataTest {
 
     // ---------------------------------------------------------------------------------------------------- driving
 
-    private MainActivity launch() throws Exception {
+    MainActivity launch() throws Exception {
         ctl = Robolectric.buildActivity(MainActivity.class).setup();
         frames(10);
         return ctl.get();
@@ -323,13 +323,13 @@ public class SmokeHostileDataTest {
         return a;
     }
 
-    private static void clearRows() throws Exception {
+    static void clearRows() throws Exception {
         java.lang.reflect.Field f = HostileMediaStore.class.getDeclaredField("ROWS");
         f.setAccessible(true);
         ((List<?>) f.get(null)).clear();
     }
 
-    private void awaitLibrary(int atLeast) throws Exception {
+    void awaitLibrary(int atLeast) throws Exception {
         MusicPlayerApp app = (MusicPlayerApp) RuntimeEnvironment.getApplication();
         int[] seen = {0};
         Observer<List<Track>> o = t -> seen[0] = t == null ? 0 : t.size();
@@ -344,7 +344,7 @@ public class SmokeHostileDataTest {
     }
 
     /** Scrolls every scrollable thing on screen to its end and back, drawing frames as it goes; flings the first list. */
-    private void explore(MainActivity a) throws Exception {
+    void explore(MainActivity a) throws Exception {
         frames(2);
         List<View> scrollers = new ArrayList<>();
         collectScrollers(a.getWindow().getDecorView(), scrollers);
@@ -395,7 +395,7 @@ public class SmokeHostileDataTest {
         if (v instanceof ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) collect(g.getChildAt(i), id, out);
     }
 
-    private static RecyclerView firstVertical(MainActivity a) {
+    static RecyclerView firstVertical(MainActivity a) {
         View container = a.findViewById(R.id.screen_container);
         List<View> all = new ArrayList<>();
         collectScrollers(container, all);
@@ -406,13 +406,13 @@ public class SmokeHostileDataTest {
         return null;
     }
 
-    private static boolean clickRow(RecyclerView rv, int position) {
+    static boolean clickRow(RecyclerView rv, int position) {
         RecyclerView.ViewHolder h = rv.findViewHolderForAdapterPosition(position);
         if (h == null) return false;
         return h.itemView.performClick();
     }
 
-    private boolean clickIfPresent(MainActivity a, int id) throws Exception {
+    boolean clickIfPresent(MainActivity a, int id) throws Exception {
         View v = a.findViewById(id);
         if (v == null || !v.isShown()) return false;
         v.performClick();
@@ -421,7 +421,7 @@ public class SmokeHostileDataTest {
     }
 
     /** Advances {@code n} 16 ms frames: main looper + workers' posts, then a real measure / layout / draw. */
-    private void frames(int n) throws Exception {
+    void frames(int n) throws Exception {
         for (int i = 0; i < n; i++) {
             ShadowLooper.idleMainLooper(16, java.util.concurrent.TimeUnit.MILLISECONDS);
             if (i % 4 == 3) Thread.sleep(3); // let the artwork / io threads deliver
@@ -455,7 +455,7 @@ public class SmokeHostileDataTest {
     }
 
     /** No worker-thread exception, no error log carrying one of our frames, no crash file written. */
-    private void assertClean() {
+    void assertClean() {
         failOnBackground();
         List<String> ours = new ArrayList<>();
         for (ShadowLog.LogItem item : ShadowLog.getLogs()) {

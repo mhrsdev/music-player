@@ -66,6 +66,9 @@ public class SystemBars {
         WindowInsetsControllerCompat c = WindowCompat.getInsetsController(w, w.getDecorView());
         c.setAppearanceLightStatusBars(!night);
         c.setAppearanceLightNavigationBars(!night);
+        // API 26 cannot draw dark navigation icons (windowLightNavigationBar is 27+): a light theme gets a dim bar behind
+        // the white icons instead of an invisible control row.
+        if (Build.VERSION.SDK_INT < 27) w.setNavigationBarColor(night ? Color.TRANSPARENT : 0x66000000);
     }
 
     /**

@@ -209,7 +209,7 @@ public class SettingsFragment extends Fragment {
         cacheRow.rowEnd.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         cacheRow.rowEnd.setContentDescription(getString(R.string.settings_cache_clear));
         cacheRow.rowEnd.setOnClickListener(v -> {
-            v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            com.mhrsdev.musicplayer.ui.motion.Haptics.confirm(v);
             device.clearCache();
             Toast.makeText(requireContext(), R.string.settings_cache_cleared, Toast.LENGTH_SHORT).show();
         });
@@ -356,7 +356,7 @@ public class SettingsFragment extends Fragment {
         r.rowEnd.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         r.rowEnd.setContentDescription(getString(R.string.settings_folder_remove, label));
         r.rowEnd.setOnClickListener(v -> {
-            v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            com.mhrsdev.musicplayer.ui.motion.Haptics.confirm(v);
             library.removeFolder(path, excluded);
             releasePermission(path);
         });

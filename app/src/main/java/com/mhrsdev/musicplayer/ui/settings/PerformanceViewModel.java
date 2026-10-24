@@ -22,6 +22,10 @@ public class PerformanceViewModel extends ViewModel {
 
     public LiveData<PerformanceProfile> getProfile() { return settings.performance(); }
 
+    /** The preset picked for this phone on first run while the user has not touched Performance since, else null. */
+    @androidx.annotation.Nullable
+    public PerformanceProfile.Preset chosenForThisPhone() { return settings.performanceChosenForPhone(); }
+
     /** Only to refresh the "battery saving is on right now" note. */
     public LiveData<BatterySaverMode> getBatteryMode() { return settings.batterySaver(); }
 

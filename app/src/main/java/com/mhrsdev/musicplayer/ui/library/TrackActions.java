@@ -73,8 +73,25 @@ public class TrackActions {
                 ? a.getString(R.string.u2_delete_confirm_one, deletable.get(0).title())
                 : a.getResources().getQuantityString(R.plurals.u2_delete_confirm_many, deletable.size(), deletable.size());
         new AlertDialog.Builder(a).setTitle(R.string.u2_delete_device).setMessage(message)
-                .setPositiveButton(R.string.u2_delete, (d, w) -> deleteLegacy(a, deletable))
+                .setPositiveButton(R.string.u2_delete, (d, w) -> withLegacyWriteAccess(a, () -> deleteLegacy(a, deletable)))
                 .setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    /** API 26-28: a plain delete needs WRITE_EXTERNAL_STORAGE, asked the first time. Later versions need nothing here. */
+    private static void withLegacyWriteAccess(FragmentActivity a, Runnable then) {
+        String write = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                || a.checkSelfPermission(write) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            then.run();
+            return;
+        }
+        ActivityResultLauncher<String>[] holder = new ActivityResultLauncher[1];
+        holder[0] = a.getActivityResultRegistry().register("u2_write_" + REQUEST_KEYS.incrementAndGet(),
+                new ActivityResultContracts.RequestPermission(), granted -> {
+                    holder[0].unregister();
+                    if (granted) then.run(); else TrackMenuSheet.toast(a, a.getString(R.string.u2_delete_failed));
+                });
+        holder[0].launch(write);
     }
 
     private static void deleteLegacy(FragmentActivity a, List<Track> tracks) {

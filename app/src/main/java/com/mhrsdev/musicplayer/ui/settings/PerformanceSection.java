@@ -1,7 +1,6 @@
 package com.mhrsdev.musicplayer.ui.settings;
 
 import android.content.Context;
-import android.os.Build;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.BulletSpan;
@@ -18,6 +17,7 @@ import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.data.settings.PerformanceProfile;
 import com.mhrsdev.musicplayer.data.settings.PerformanceProfile.Preset;
 import com.mhrsdev.musicplayer.databinding.SettingsPerformanceBinding;
+import com.mhrsdev.musicplayer.ui.player.lyrics.LyricsEffects;
 import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -105,9 +105,10 @@ class PerformanceSection {
         Preset current = p.preset();
         for (int i = 0; i < presetRows.length; i++) presetRows[i].setSelected(presets[i] == current);
         b.perfCustom.setVisibility(current == Preset.CUSTOM ? View.VISIBLE : View.GONE);
+        b.perfChosenNote.setVisibility(current == vm.chosenForThisPhone() ? View.VISIBLE : View.GONE);
 
         setChecked(b.perfReduceMotion, p.reduceMotion());
-        boolean blurPossible = Build.VERSION.SDK_INT >= 31;
+        boolean blurPossible = LyricsEffects.blurSupported(host.requireContext());
         for (Effect e : effects) {
             setChecked(e.view(), e.get().test(p));
             boolean enabled = !(e.pausedByReduceMotion() && p.reduceMotion()) && (e.view() != b.perfLyricsBlur || blurPossible);

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.Trace;
 import com.mhrsdev.musicplayer.data.settings.BatterySaverMode;
+import com.mhrsdev.musicplayer.data.settings.DeviceClass;
 import com.mhrsdev.musicplayer.di.AppContainer;
 import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import com.mhrsdev.musicplayer.diag.CrashReporter;
@@ -36,6 +37,7 @@ public class MusicPlayerApp extends Application {
                 mode == BatterySaverMode.AUTO ? null : mode == BatterySaverMode.ON));
         // Settings > Performance (incl. reduce motion) applied app-wide, live. Registered before any screen exists, so
         // MotionPolicy already holds the new value when a screen's own observer of the same LiveData runs.
+        container.settings().chooseDefaultPerformance(() -> DeviceClass.firstRunPreset(this)); // first run only; weaker phones start lighter
         container.settings().performance().observeForever(MotionPolicy::setPerformance);
         // Below API 33 AppCompat keeps the chosen locale only in memory: re-apply the stored choice on every start.
         if (Build.VERSION.SDK_INT < 33) ThemeApplier.applyLanguage(container.settings().language().getValue());

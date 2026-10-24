@@ -34,6 +34,7 @@
     <string name="settings_perf_fps_60_sub">حداکثر ۶۰ فریم در ثانیه. روی صفحه‌های ۹۰ و ۱۲۰ هرتز کار کمتری دارد.</string>
     <string name="settings_perf_fps_30_sub">حداکثر ۳۰ فریم در ثانیه: نصف کار رسم، کمی کم‌روان‌تر.</string>
     <string name="settings_perf_note_system">«حذف انیمیشن‌ها»ی گوشی روشن است؛ پس هر چه اینجا انتخاب کنید، موج ثابت می‌ماند.</string>
+    <string name="settings_perf_chosen">متناسب با حافظه و سرعت همین گوشی انتخاب شده است. هر زمان خواستید می‌توانید آن را عوض کنید.</string>
     <string name="settings_perf_note_thermal">گوشی گرم است، برای همین فعلاً جلوه‌ها سبک‌تر شده‌اند. وقتی خنک شود برمی‌گردند.</string>
     <string name="settings_perf_note_saver">صرفه‌جویی باتری الان روشن است؛ حرکت و محوشدن فعلاً متوقف‌اند.</string>
     <string name="settings_perf_tips_title">روی گوشی‌های کندتر</string>

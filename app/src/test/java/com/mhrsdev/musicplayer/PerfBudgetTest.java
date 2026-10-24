@@ -65,10 +65,13 @@ public class PerfBudgetTest {
         while (m.find()) permissions.add(m.group(1).replace("android.permission.", ""));
         Set<String> expected = new TreeSet<>(Arrays.asList("FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
                 "POST_NOTIFICATIONS", "WAKE_LOCK", "ACCESS_NETWORK_STATE", "READ_MEDIA_AUDIO", "READ_EXTERNAL_STORAGE",
-                "INTERNET", "REQUEST_INSTALL_PACKAGES")); // install: user-started self-update only
+                "INTERNET", "REQUEST_INSTALL_PACKAGES", // install: user-started self-update only
+                "WRITE_EXTERNAL_STORAGE")); // C1: maxSdkVersion 28 only, asked at the first "Delete from device" on Android 8-9
         // BLUETOOTH_CONNECT is optional (output chip name); allowed if the UI team adds it.
         permissions.remove("BLUETOOTH_CONNECT");
         assertEquals("new permission: review battery impact and update docs/PERF_BUDGET.md", expected, permissions);
+        assertTrue("legacy storage write must stay capped at API 28",
+                manifest.contains("WRITE_EXTERNAL_STORAGE\" android:maxSdkVersion=\"28\""));
         assertTrue("largeHeap must stay off", !manifest.contains("largeHeap=\"true\""));
         assertEquals("only PlaybackService may run as a service", 1, count(manifest, "<service"));
         Set<String> receivers = new TreeSet<>();

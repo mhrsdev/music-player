@@ -88,10 +88,24 @@ dependencies {
 
 // A hung unit test must be visible and bounded: the last STARTED line in the log names it, and the task fails after 20 min.
 tasks.withType(Test).configureEach {
+    systemProperty 'mowj.preset', 'FULL' // DeviceClass.firstRunPreset: tests see a flagship, whatever machine runs them
     timeout = java.time.Duration.ofMinutes(20)
     maxHeapSize = '2g' // Gradle's 512m default OOMs on the Robolectric render tests and leaves the worker GC-thrashing (player tests then never reach READY)
     testLogging {
         events 'started', 'failed', 'skipped'
         exceptionFormat 'short'
+    }
+}
+
+// C1 (D32): the same unit tests' classpath, but a 256 MB heap like a 2-3 GB phone's per-app limit: `./gradlew :app:testSmallHeap`.
+afterEvaluate {
+    def base = tasks.named('testDebugUnitTest')
+    tasks.register('testSmallHeap', Test) {
+        group = 'verification'
+        description = 'Home / Library / Player with 2,000 tracks inside a 256 MB heap (SmallHeapTest).'
+        testClassesDirs = base.get().testClassesDirs
+        classpath = base.get().classpath
+        maxHeapSize = '256m'
+        filter { includeTestsMatching '*SmallHeapTest' }
     }
 }

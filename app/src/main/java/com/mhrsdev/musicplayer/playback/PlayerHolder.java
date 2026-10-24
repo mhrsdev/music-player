@@ -15,6 +15,7 @@ import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer;
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.extractor.DefaultExtractorsFactory;
+import com.mhrsdev.musicplayer.data.settings.DeviceClass;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
 
 /**
@@ -36,10 +37,10 @@ class PlayerHolder {
     static synchronized ExoPlayer get(Context context) {
         if (player == null) {
             Context app = context.getApplicationContext();
-            // Local files: small, bounded buffers (a few seconds, <= 4 MB) instead of the streaming defaults.
+            // Local files: small, bounded buffers (a few seconds, <= 4 MB; 2 MB on low-RAM phones) instead of the streaming defaults.
             LoadControl loadControl = new DefaultLoadControl.Builder()
                     .setBufferDurationsMsForLocalPlayback(2_000, 8_000, 500, 1_000)
-                    .setTargetBufferBytes(4 * 1024 * 1024)
+                    .setTargetBufferBytes(DeviceClass.playerBufferBytes(DeviceClass.detect(app)))
                     .setBackBuffer(0, false)
                     .build();
             // Audio only: no video/text/metadata renderers to initialise or hold memory for.

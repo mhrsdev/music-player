@@ -9,7 +9,7 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 | Budget | Limit | How to check |
 |--------|-------|--------------|
 | Cold start to first frame (mid-range phone) | <= 600 ms, no jank in the first 2 s | `adb shell am start -W -n com.mhrsdev.musicplayer/.MainActivity` (TotalTime), `dumpsys gfxinfo` |
-| `Application.onCreate` | only: StrictMode (debug), `AppContainer` construction, one observer registration, locale re-apply below API 33. No DB, MediaStore, file, network or thread work | `PerfBudgetTest.applicationOnCreateStaysCheap`; Perfetto slice `MusicPlayerApp.onCreate` < 30 ms |
+| `Application.onCreate` | only: StrictMode (debug), `AppContainer` construction, one observer registration, locale re-apply below API 33, the first-run Performance preset (C1: skipped once any Performance setting exists; else one `ActivityManager` read, cached). No DB, MediaStore, file, network or thread work | `PerfBudgetTest.applicationOnCreateStaysCheap`; Perfetto slice `MusicPlayerApp.onCreate` < 30 ms |
 | Idle RAM after 1 min in background, library of 10k tracks | PSS <= 60 MB (`adb shell dumpsys meminfo com.mhrsdev.musicplayer`, "TOTAL PSS"); Java heap <= 20 MB | meminfo |
 | RAM with Home open | PSS <= 110 MB | meminfo |
 | `largeHeap` | never | `PerfBudgetTest` (manifest) |
@@ -36,6 +36,7 @@ list at the bottom (owner-visible) and an update of the test allow-list in the s
 * R5 A screen observes LiveData with the view lifecycle owner; `observeForever` only for process-wide singletons or with removal in the same callback; Handler callbacks removed in `onDestroyView`/`onDetachedFromWindow`; no static `Context/View/Activity/Fragment` fields (`PerfBudgetTest.noContextOrViewHeldInStaticFields`).
 * R6 Lists of 10k rows: queries return in < 150 ms on a mid-range phone, use an index (see `QueryPlanTest`, prints every plan), share repeated strings (`TrackQueries.read`).
 * R7 A 10k-track queue must not jank: queue save runs off the main thread (`PlaybackStore`), decode is incremental (`ExoPlayerController.readQueue`). Measured on the JVM: encode 16 ms, decode 10 ms, 1.35 MB.
+* R7b (C1, D32) The player holds only a window of `PlaybackStore.RADIUS` (200) `MediaItem`s either side of the playing one; the rest of a long queue stays as `Track`s and joins near the edge / on a hidden edit / for shuffle and repeat-all. Starting or restoring a 10k queue builds ~400 items, not 10,000 (JVM: restore 53 ms, `show` 7 ms, was ~400 ms for the items alone; Android 17's per-app memory limiter kills outliers). `QueueWindowTest`.
 
 ## Background work
 
@@ -56,6 +57,19 @@ Details and measurements: `docs/PERF_BACKGROUND_v0.3.1.md`. Enforced by `PerfBud
 * BG5 No regex compiled per call in non-UI code: `String.matches/replaceAll/replaceFirst` with a regex literal are forbidden (static `Pattern` instead). `PerfBudgetTest.noRegexCompiledPerCall`.
 * BG6 Update check at most once a day (retry >= 1 h after a failure), foreground only; LRCLIB only for the track whose lyrics view is open; both cached. `PerfBudgetTest.updateCheckIsAtMostDaily`.
 * BG7 A baseline profile (`app/src/main/baseline-prof.txt`, wildcard rules expanded by AGP) compiles the app and Media3 ahead of time; replace by a recorded profile when a device is available. `PerfBudgetTest.aBaselineProfileCompilesTheAppAheadOfTime`.
+
+## Low-end and older phones (C1, D32; details and the per-API table in `docs/COMPATIBILITY.md`)
+
+* L1 The first-run Performance preset follows the device class (`data/settings/DeviceClass`): Light for very weak phones
+  (low-RAM with a <= 96 MB heap, or API 26-27 with <= 3 GB), Balanced for low-RAM / <= 128 MB heap / <= 4 cores / API <= 28, else Full.
+  Never over a saved choice; shown in Settings > Performance. `DeviceClassTest`, `SettingsStoreDeviceDefaultTest`.
+* L2 Budgets scale with the class (`DeviceClass.lowEnd` = low-RAM flag or heap class <= 128 MB): one artwork decode at a time, covers decoded
+  at most 768 px, ExoPlayer buffer 2 MB (4 MB otherwise), notification cover cache 2 MB (4 MB), no per-line lyrics blur. The artwork cache
+  keeps `min(16 MB, heap / 16)`, at least 6 MB (`ArtworkCacheBudgetTest`).
+* L3 Nothing may assume a 120 Hz panel: decorative loops run on a time-based 30 fps beat (`DecorBeatRefreshRateTest`: 60-144 Hz).
+* L4 A new API-N feature (N > 26) needs its `Build.VERSION.SDK_INT` check and a fallback in the same change, and the key flows must pass
+  `ApiMatrixSmokeTest` (SDK 26-35) and `lintDebug` with 0 errors. 2,000 tracks must fit a 256 MB heap: `./gradlew :app:testSmallHeap`
+  (artwork cache 16.3 / 16.4 MB, heap in use ~164 MB, no OutOfMemoryError).
 
 ## Animations
 

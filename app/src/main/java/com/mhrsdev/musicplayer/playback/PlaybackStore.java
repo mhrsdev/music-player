@@ -121,6 +121,7 @@ class PlaybackStore implements Player.Listener {
      */
     void show(List<Track> all, int index, long positionMs) {
         int lo = Math.max(0, index - RADIUS), hi = Math.min(all.size(), index + RADIUS + 1);
+        externalEdit = false; // an earlier, never applied "external edit" must not collapse this window
         before = all.subList(0, lo);
         after = all.subList(hi, all.size());
         epoch++;
@@ -188,6 +189,7 @@ class PlaybackStore implements Player.Listener {
 
     /** Appends to the hidden tail (no MediaItem needed): "add to queue" on a windowed queue. */
     void appendHidden(Track track) {
+        externalEdit = false;
         List<Track> tail = new ArrayList<>(after.size() + 1);
         tail.addAll(after);
         tail.add(track);
@@ -199,6 +201,11 @@ class PlaybackStore implements Player.Listener {
     /** An external controller (Android Auto, Assistant) is about to change the player's queue: the hidden rest is stale. */
     void noteExternalEdit() {
         externalEdit = true;
+    }
+
+    /** The app itself edits the queue now: a pending external-edit mark (one that was never applied) is void. */
+    void ownEdit() {
+        externalEdit = false;
     }
 
     /** Tests: waits until every queued disk write / background hydration has run. */

@@ -40,6 +40,8 @@ public class SettingsStore {
             K_HS_TRIPLE = "headset_triple", K_HS_LONG = "headset_long", K_HS_CONNECT = "headset_resume_on_connect",
             K_HS_DISCONNECT = "headset_pause_on_disconnect", K_HS_CALL = "headset_resume_after_call";
     private static final String K_IMMERSIVE_PLAYER = "immersive_player";
+    /** The preset {@link #chooseDefaultPerformance} stored for this phone; removed as soon as the user changes anything. */
+    private static final String K_PERF_AUTO = "perf_auto_preset";
 
     private static final int MAX_BACKUP_STRING = 32;
     private static final Map<String, Class<?>> BACKUP_TYPES = Map.of(
@@ -245,6 +247,12 @@ public class SettingsStore {
             else edit.putInt(type.getKey(), (Integer) v);
             applied++;
         }
+        for (String key : PerformancePrefs.BACKUP_TYPES.keySet()) {
+            if (values.containsKey(key)) { // the backup's Performance choice replaces the one made for this phone
+                edit.remove(K_PERF_AUTO);
+                break;
+            }
+        }
         edit.apply();
         publish(theme, readEnum(K_THEME, ThemeMode.SYSTEM));
         publish(artworkColors, prefs.getBoolean(K_ARTWORK_COLORS, true));
@@ -279,8 +287,32 @@ public class SettingsStore {
     public void setPerformance(PerformanceProfile value) {
         SharedPreferences.Editor e = prefs.edit();
         PerformancePrefs.write(e, value);
-        e.apply();
+        e.remove(K_PERF_AUTO).apply();
         publish(performance, value);
+    }
+
+    /**
+     * First run (C1, D32): stores the preset picked for this phone's class, but only when no Performance setting was
+     * ever saved and none was chosen before: a user's choice (or an older version's reduce-motion) is never overridden.
+     */
+    public void chooseDefaultPerformance(java.util.function.Supplier<PerformanceProfile.Preset> forThisPhone) {
+        if (PerformancePrefs.hasSaved(prefs) || prefs.contains(K_PERF_AUTO)) return;
+        PerformanceProfile.Preset preset = forThisPhone.get();
+        SharedPreferences.Editor e = prefs.edit();
+        PerformancePrefs.write(e, PerformanceProfile.of(preset));
+        e.putString(K_PERF_AUTO, preset.name()).apply();
+        publish(performance, PerformanceProfile.of(preset));
+    }
+
+    /** The preset chosen for this phone, while the user has not changed Performance since; else null. */
+    @androidx.annotation.Nullable
+    public PerformanceProfile.Preset performanceChosenForPhone() {
+        String name = prefs.getString(K_PERF_AUTO, null);
+        try {
+            return name == null ? null : PerformanceProfile.Preset.valueOf(name);
+        } catch (IllegalArgumentException unknown) {
+            return null;
+        }
     }
 
     /** Hide the status bar while the full player is open (swipe from the top shows it briefly). */

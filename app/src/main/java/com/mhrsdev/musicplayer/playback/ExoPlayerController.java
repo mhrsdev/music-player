@@ -178,6 +178,7 @@ public class ExoPlayerController implements PlayerController {
      * player holds every queue index in {@code [a, b]} (else the whole queue is put into it first).
      */
     private int offsetFor(int a, int b) {
+        store.ownEdit();
         int first = store.before().size();
         if (a < first || b > first + player.getMediaItemCount()) {
             store.hydrateAll();

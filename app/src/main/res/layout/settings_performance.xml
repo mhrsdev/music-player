@@ -45,6 +45,8 @@
             </LinearLayout>
             <ImageView style="@style/Settings.PerfPresetMark" android:contentDescription="@null" />
         </LinearLayout>
+        <!-- C1: shown while the preset is still the one picked for this phone's memory and speed on first run. -->
+        <TextView android:id="@+id/perf_chosen_note" style="@style/Settings.CardSub" android:paddingTop="8dp" android:paddingBottom="8dp" android:text="@string/settings_perf_chosen" android:visibility="gone" />
         <!-- Shown only while the phone itself holds motion back (Remove animations / Battery Saver). -->
         <TextView android:id="@+id/perf_system_note" style="@style/Settings.CardSub" android:paddingTop="8dp" android:paddingBottom="8dp" android:textColor="?attr/mpPrimary" android:visibility="gone" />
     </LinearLayout>

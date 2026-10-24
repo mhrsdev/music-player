@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.ui.widget.ArtworkResolver;
+import com.mhrsdev.musicplayer.data.settings.DeviceClass;
 import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
 import com.mhrsdev.musicplayer.ui.widget.cover.GeneratedCover;
 import java.io.IOException;
@@ -43,15 +44,16 @@ class ArtworkLoader implements BitmapLoader {
     private final ArtworkResolver resolver;
     private final ListeningExecutorService executor;
     /** A few covers (<= 4 MB, RGB_565 512 px = 0.5 MB each) so a track change or re-post does not decode again. */
-    private final LruCache<String, Bitmap> cache = new LruCache<String, Bitmap>(4 * 1024 * 1024) {
-        @Override protected int sizeOf(String key, Bitmap value) {
-            return value.getAllocationByteCount();
-        }
-    };
+    private final LruCache<String, Bitmap> cache;
     private final LruCache<String, Boolean> misses = new LruCache<>(64);
 
     ArtworkLoader(Context context) {
         this.context = context.getApplicationContext();
+        cache = new LruCache<String, Bitmap>(DeviceClass.notificationCoverCacheBytes(DeviceClass.detect(this.context))) {
+            @Override protected int sizeOf(String key, Bitmap value) {
+                return value.getAllocationByteCount();
+            }
+        };
         resolver = new ArtworkResolver(backendOverride != null ? backendOverride
                 : new com.mhrsdev.musicplayer.ui.widget.ArtworkLoader.PlatformBackend(context.getApplicationContext()));
         ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());

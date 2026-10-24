@@ -1,11 +1,11 @@
 package com.mhrsdev.musicplayer.ui.player.lyrics;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.Nullable;
 
+import com.mhrsdev.musicplayer.data.settings.DeviceClass;
 import com.mhrsdev.musicplayer.data.settings.LyricsTextSize;
 import com.mhrsdev.musicplayer.ui.theme.MotionPolicy;
 
@@ -22,10 +22,12 @@ public class LyricsEffects {
      * those get alpha + scale falloff only.
      */
     public static boolean blurAllowed(Context c) {
-        if (Build.VERSION.SDK_INT < 31) return false;
-        if (!MotionPolicy.lyricsBlurEnabled(c)) return false;
-        ActivityManager am = (ActivityManager) c.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-        return am == null || !am.isLowRamDevice();
+        return blurSupported(c) && MotionPolicy.lyricsBlurEnabled(c);
+    }
+
+    /** The phone can do it: API 31+ (RenderEffect) and not a low-RAM / small-heap one (a blur layer per line). */
+    public static boolean blurSupported(Context c) {
+        return Build.VERSION.SDK_INT >= 31 && !DeviceClass.lowEnd(DeviceClass.detect(c));
     }
 
     public static float textSp(@Nullable LyricsTextSize s) {
