@@ -1,144 +1,152 @@
 <div dir="rtl">
 
-# Music Player (اندروید)
+<p align="center">
+  <img src="docs/brand/logo.png" alt="لوگوی موج" width="120">
+</p>
 
-<div dir="ltr">
+<h1 align="center">موج / Mowj</h1>
 
-![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Pre-release v0.1.0](https://img.shields.io/badge/release-v0.1.0%20pre--release-orange)
+<p align="center"><b>یک پخش‌کنندهٔ سبک و زیبا برای آهنگ‌هایی که همین الان روی گوشی‌ات داری.</b><br>
+متن آهنگ کلمه‌به‌کلمه، ۹ سبک نوار پخش، پس‌زمینهٔ زنده و طراحی‌شده با تمرکز روی مصرف کم باتری و رم.</p>
 
-</div>
+<div dir="ltr" align="center">
 
-یک **پخش‌کنندهٔ موسیقی محلی**، سریع و کم‌مصرف برای اندروید، با هویت بصری اختصاصی، متن آهنگ همگام (synced lyrics)، سه سبک seek bar و پشتیبانی کامل از فارسی و RTL.
-
-> **وضعیت: پیش‌انتشار (pre-release) `v0.1.0`.** پروژه build می‌شود و unit testها پاس می‌شوند، اما تا الان فقط با تست‌های JVM و رندرهای Robolectric بررسی شده است؛
-> **روی گوشی واقعی یا emulator هنوز تأیید نشده است.** بخش [محدودیت‌های شناخته‌شده](#محدودیتهای-شناختهشده) را ببینید.
-> نسخهٔ انگلیسی: [README.md](README.md) - تغییرات: [CHANGELOG.md](CHANGELOG.md)
-
-- پکیج `com.mhrsdev.musicplayer`، minSdk 26 (اندروید ۸٫۰)، target/compile SDK 37
-- **فقط Java** (بدون Kotlin)، layoutهای XML + Viewهای سفارشی، MVVM، SQLite خود فریم‌ورک (بدون Room)، Media3
-
-## صفحه‌ها
-
-رندرهای واقعی که از خود کد برنامه روی داده‌های نمونه تولید شده‌اند (Robolectric، پوشهٔ `docs/screens/`؛ نه از روی دستگاه):
-
-<div dir="ltr">
-
-| Home | Home (فارسی، RTL) | Home (light) |
-|---|---|---|
-| ![Home](docs/screens/p3-home-dark.png) | ![Home fa](docs/screens/p3-home-fa-dark.png) | ![Home light](docs/screens/p3-home-light.png) |
-
-| Library | Artists | Search |
-|---|---|---|
-| ![Library](docs/screens/p3-library-dark.png) | ![Artists](docs/screens/p3-artists-dark.png) | ![Search](docs/screens/p3-search-dark.png) |
-
-| Player dark | Player light | Widget gallery |
-|---|---|---|
-| ![Player dark](docs/screens/p2-player-dark.png) | ![Player light](docs/screens/p2-player-light.png) | ![Widgets dark](docs/screens/t2-widget-gallery-dark.png) |
+![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Release v0.3.0](https://img.shields.io/badge/release-v0.3.0-blue) ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-brightgreen) ![Java only](https://img.shields.io/badge/code-Java-orange)
 
 </div>
 
-دو رندر Player **بدون آهنگ بارگذاری‌شده** هستند (عنوان خالی، دکمه‌های غیرفعال)؛ به همین دلیل نمای lyrics نشان داده نشده است. برای پلیر کامل، mockupهای زیر را ببینید.
+> نسخهٔ انگلیسی: [README.md](README.md) - تغییرات: [CHANGELOG.md](CHANGELOG.md) - دانلود: [Releases](https://github.com/mhrsdev/music-player-mowj/releases)
 
-طرح هدف (mockup مرورگری در `docs/design/`؛ پیاده‌سازی از آن پیروی می‌کند ولی پیکسل‌به‌پیکسل یکسان نیست):
+«موج» (Mowj) فقط فایل‌های موسیقی روی خود گوشی را پخش می‌کند. بدون حساب کاربری، بدون تبلیغ، بدون استریم، بدون آنالیتیکس.
+پکیج `com.mhrsdev.musicplayer`، حداقل اندروید ۸٫۰ (minSdk 26)، target/compile SDK 37. فقط Java (بدون Kotlin)، layoutهای XML و Viewهای سفارشی، MVVM، Media3، و SQLite خود اندروید (بدون Room).
+
+> **اول این را بخوان.** بیشتر چیزها با تست‌های JVM و رندرهای Robolectric بررسی شده‌اند، و چند مورد (نصب، کارت اعلان) روی گوشی خود سازنده. دکمه‌های هدست، انتخاب فایل متن آهنگ، Android Auto، ویجت‌ها روی لانچرهای دیگر و اعداد مصرف باتری و رم **هنوز روی گوشی واقعی تأیید نشده‌اند.** بخش [محدودیت‌های شناخته‌شده](#محدودیتهای-شناختهشده) را ببین.
+
+## تصاویر
+
+این تصاویر را خود کد برنامه روی داده‌های نمونه ساخته است (Robolectric، با جلدهای واقعی و مشخصات آهنگ‌های دارای مجوز آزاد؛ [`docs/CREDITS.md`](docs/CREDITS.md))، یعنی عکس از دستگاه نیستند و فونت و محوشدگی روی گوشی ممکن است کمی فرق کند. متن زیر عکس‌ها انگلیسی است چون نمونه‌ها به همین زبان رندر شده‌اند.
 
 <div dir="ltr">
 
-![Design overview](docs/design/png/00-overview.png)
-
-| Player | Lyrics | Queue | RTL player |
-|---|---|---|---|
-| ![Player](docs/design/png/05-player-cover.png) | ![Lyrics](docs/design/png/06-player-lyrics.png) | ![Queue](docs/design/png/07-queue.png) | ![RTL player](docs/design/png/11-rtl-player.png) |
+<table>
+  <tr>
+    <td align="center" valign="top"><img src="docs/screens/g1-home-dark.png" width="220" alt="Home"><br>Home</td>
+    <td align="center" valign="top"><img src="docs/screens/u2-library-hub-dark.png" width="220" alt="Library"><br>Library</td>
+    <td align="center" valign="top"><img src="docs/screens/l1-word3-dark.png" width="220" alt="Word-synced lyrics"><br>Word-synced lyrics</td>
+    <td align="center" valign="top"><img src="docs/screens/b2-picker-dark.png" width="220" alt="Seek bar styles"><br>Seek bar styles</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/screens/q1-performance-dark.png" width="220" alt="Performance settings"><br>Performance</td>
+    <td align="center" valign="top"><img src="docs/screens/o1-headset-two-dark.png" width="220" alt="Headset and outputs"><br>Headset &amp; outputs</td>
+    <td align="center" valign="top"><img src="docs/screens/s1-widget-dark.png" width="220" alt="Home-screen widgets"><br>Widgets</td>
+    <td align="center" valign="top"><img src="docs/screens/g1-covers-sheet.png" width="220" alt="Generated covers"><br>Generated covers</td>
+  </tr>
+</table>
 
 </div>
+
+رندرهای بیشتر (تم روشن، فارسی و RTL، تایمر خواب، صف پخش، پشتیبان‌گیری، صفحه‌های به‌روزرسانی) در [`docs/screens/`](docs/screens/) هستند.
 
 ## امکانات
 
-پیاده‌سازی‌شده (کد موجود است و در جاهایی که ذکر شده با unit test پوشش داده شده):
+**کتابخانه و پخش**
+- اسکن تدریجی MediaStore در SQLite؛ آهنگ‌ها، آلبوم‌ها، خواننده‌ها، پلی‌لیست‌ها، علاقه‌مندی‌ها، تاریخچه، تعداد پخش، مرتب‌سازی، انتخاب چندتایی، مشخصات آهنگ / اشتراک‌گذاری / حذف. دکمهٔ اسکن دوباره و انتخاب پوشهٔ موسیقی در تنظیمات هست.
+- صفحهٔ اصلی بر پایهٔ کتابخانه و تاریخچهٔ گوش دادن خودت (پیشنهاد سریع، تازه‌اضافه‌شده‌ها، قدیمی‌ها، میکس‌ها، دهه‌ها، سبک‌ها) و جستجو بین آهنگ، آلبوم، خواننده و پلی‌لیست.
+- پلی‌لیست (ساخت، تغییر نام، حذف، افزودن و برداشتن آهنگ)، صف پخش (پخش بعدی، افزودن، جابه‌جایی با کشیدن، حذف با کشیدن به کنار همراه با بازگردانی، شافل با بازگردانی، تکرار خاموش / همه / یکی)، بازیابی صف و جای پخش بعد از راه‌اندازی دوباره، تایمر خواب (چند دقیقه با کم‌شدن تدریجی صدا، یا پایان آهنگ).
+- Media3 ExoPlayer در یک سرویس پیش‌زمینه (`MediaSessionService`): اعلان و کنترل روی صفحهٔ قفل، audio focus، مکث با درآوردن هدفون.
+- **صدا**: اکولایزر، بیس، virtualizer، loudness، سرعت پخش، رد کردن سکوت، ReplayGain (فقط صدا را کم می‌کند، هرگز زیاد نمی‌کند).
 
-- **کتابخانه (Library)** - اسکن افزایشی MediaStore به SQLite (در اولین اجرا هم بلافاصله پس از دادن مجوز)؛ آهنگ‌ها، آلبوم‌ها، هنرمندان، پلی‌لیست‌ها، لایک‌ها، تاریخچه و تعداد پخش. صفحهٔ اصلی Library با کولاژ محو لایک‌ها، شبکهٔ ۲×۲ و skeleton هنگام بارگذاری.
-- **صفحهٔ Home** (hero carousel، skeleton loading) بر پایهٔ کتابخانه و تاریخچهٔ پخش خودتان (quick picks، آلبوم‌ها، پلی‌لیست‌ها - مرتب‌شده بر اساس پخش‌های شما).
-- **جستجو** در آهنگ، آلبوم، هنرمند و پلی‌لیست با فیلتر.
-- **پخش** - Media3 ExoPlayer داخل یک foreground `MediaSessionService`: نوتیفیکیشن، کنترل lock screen / بلوتوث / هدست، audio focus، توقف با جداشدن هدفون.
-- **افزودن به پلی‌لیست** - از منوی آهنگ و منوی پلیر: انتخاب پلی‌لیست موجود یا ساخت پلی‌لیست جدید.
-- **صف (Queue)** - پخش بعدی، افزودن به صف، جابه‌جایی با drag، حذف با swipe و Undo، shuffle با Undo، تکرار خاموش / همه / یکی، بازیابی صف و موقعیت پس از راه‌اندازی مجدد.
-- **Sleep timer** - N دقیقه (با fade-out) یا پایان آهنگ؛ مقدار پیش‌فرض قابل تنظیم است.
-- **متن آهنگ (Lyrics)** - تگ‌های embedded (ID3 / FLAC / MP4)، فایل کناری `.lrc` / `.txt`، سپس جستجوی آنلاینِ اختیاری در [LRCLIB](https://lrclib.net) (کلید در Settings). خطوط همگام هایلایت می‌شوند و با لمس seek می‌کنند؛ نتایج (و نتیجهٔ «پیدا نشد») cache می‌شوند. هنگام آفلاین بودن، چیپ Retry نشان داده می‌شود.
-- **سبک‌های seek bar** (در Settings): *Wavy* (پیش‌فرض)، *Waveform* و *Bars*؛ دادهٔ waveform پوشش بلندی واقعی صداست که روی خود دستگاه و به‌صورت lazy استخراج و cache می‌شود.
-- **پلیر** - پلیر روشن و تیره با کنترل کنتراست روی accent مشتق از کاور، چیپ مسیر خروجی (This phone / بلوتوث / ...) و انیمیشن «پرواز کاور» بین mini-player و پلیر کامل.
-- **مجوز نوتیفیکیشن** در اولین پخش درخواست می‌شود (اندروید ۱۳+).
-- **تم‌ها** - سیستم / روشن / تیره / مشکی، رنگ‌گیری اختیاری از کاور، accent با کنترل کنتراست.
-- **فارسی و RTL** - ترجمهٔ کامل `fa`، فونت Vazirmatn برای فارسی (انتخاب فونت بر اساس خط، پس متن مخلوط فارسی/لاتین فونت درست می‌گیرد)، layout آینه‌ای؛ seek barها و دکمه‌های پخش LTR می‌مانند. زبان در Settings قابل تغییر است.
-- **Battery saver** - تنظیم (Auto / On / Off) که حرکت، blur و grain را خاموش می‌کند؛ تنظیم reduce-motion سیستم را هم رعایت می‌کند.
+**ظاهر و حس برنامه**
+- **۹ سبک نوار پخش** با انتخابگر و پیش‌نمایش زنده: Wavy، Waveform، Bars، Ribbon، Pulse dots، LED ladder، Mountain، Thread and beads، Liquid. سبک‌های مبتنی بر بلندی صدا از بلندی واقعی همان آهنگ استفاده می‌کنند که روی خود گوشی استخراج و ذخیره می‌شود.
+- **متن آهنگ همگام کلمه‌به‌کلمه** با پر شدن هر کلمه، محوشدگی ملایمی که با فاصله از خط در حال خوانده‌شدن بیشتر می‌شود، پرش با لمس، تنظیم تأخیر برای هر آهنگ و اندازهٔ متن. خط‌هایی که زمان‌بندی کلمه ندارند، با تخمین کلمه‌به‌کلمه نمایش داده می‌شوند. جزئیات: [`docs/LYRICS_AND_BACKDROP.md`](docs/LYRICS_AND_BACKDROP.md).
+- **پس‌زمینهٔ زنده**: رنگ‌های جلد آهسته پشت پخش‌کننده و متن آهنگ جابه‌جا می‌شوند و صفحهٔ اصلی و سرِ صفحهٔ آلبوم / خواننده / پلی‌لیست را هم رنگ می‌کنند.
+- **جلد ساخته‌شده** برای آهنگ‌های بدون جلد: طرح شب‌مانند قطعی (هر بار و روی هر گوشی یکسان)، سازگار با فارسی، در برنامه، اعلان و ویجت‌ها. [`docs/GENERATED_COVERS.md`](docs/GENERATED_COVERS.md).
+- **تم‌ها**: سیستم / روشن / تیره / مشکی، رنگ گرفتن اختیاری از جلد، و **Material You (رنگ پویا)** در اندروید ۱۲ به بالا (پیش‌فرض خاموش است تا هویت موج حفظ شود). حرکت فنری و دکمهٔ پخش / مکث که شکلش تغییر می‌کند. [`docs/THEMING.md`](docs/THEMING.md).
+- **تمام‌صفحه (edge-to-edge)** با رعایت ناچ و ناوبری ژستی یا سه‌دکمه‌ای، و حالت اختیاری پخش‌کنندهٔ immersive.
+- **فارسی (RTL) و انگلیسی**، فونت وزیرمتن برای فارسی و Google Sans Flex برای لاتین. زبان از تنظیمات عوض می‌شود.
 
-هنوز نیست (برنامه‌ریزی‌شده، در v0.1.0 نیست): equalizer، ویجت صفحهٔ اصلی، Android Auto، UI تغییر نام / حذف پلی‌لیست و حذف آهنگ از آن، دکمهٔ rescan، انتخاب پوشهٔ موزیک (ردیف UI فقط نمایشی است)، ویرایش تگ، crossfade، کاتالوگ آنلاین.
+**منبع‌های متن آهنگ** (اولین نتیجه برنده است؛ نتیجه‌ها و پیدا نشدن‌ها ذخیره می‌شوند):
+1. فایل کنار آهنگ با همان نام: `.lrc`، `.elrc`، `.json` (و `.ttml` و `.txt`).
+2. تگ‌های داخل فایل: ID3 `USLT` / `SYLT`، `LYRICS` در FLAC / Vorbis، `©lyr` در MP4.
+3. [LRCLIB](https://lrclib.net) (رایگان، بدون کلید؛ قابل خاموش کردن).
+
+تگ‌هایی که فقط اسم یک سایت یا تبلیغ دارند نادیده گرفته می‌شوند. اگر چیزی پیدا نشود، از صفحهٔ خالی می‌توانی **دستی جستجو کنی** یا **یک فایل متن اضافه کنی**؛ و دکمهٔ متن برای آهنگ‌های بدون متن نمایش داده نمی‌شود.
+
+**کارایی (تنظیمات > Performance)**
+- حالت‌های آماده: **Full** (پیش‌فرض)، **Balanced** (بدون محوشدگی متن، پس‌زمینهٔ ثابت، تا ۶۰ فریم) و **Light** (نوار پخش هم ثابت، بدون جهش، تا ۳۰ فریم).
+- کلیدهای جداگانه: انتقال بین صفحه‌ها، دکمه‌های فنری، پس‌زمینهٔ متحرک، محوشدگی متن، متن کلمه‌به‌کلمه، نوار پخش متحرک، و سقف نرخ فریم انیمیشن‌ها (هم‌اندازهٔ صفحه / ۶۰ / ۳۰). تغییرها همان لحظه اعمال می‌شوند. «کاهش حرکت» و حالت بهینه‌سازی باتری اندروید هم افکت‌های تزئینی را خاموش می‌کنند.
+
+**هدست و خروجی‌ها (تنظیمات > Headset)**
+- **یک بار / دو بار / سه بار / نگه داشتن** دکمهٔ پخش-مکث هندزفری و هدست سیم‌دار را به کار دلخواه نگاشت کن (پیش‌فرض: پخش-مکث، بعدی، قبلی، هیچ).
+- ادامه‌دادن وقتی هدست وصل می‌شود، مکث وقتی قطع می‌شود، ادامه بعد از تماس تلفنی.
+- **دستگاه‌های خروجی**: خروجی‌های وصل‌شده را فهرست می‌کند، فعال را نشان می‌دهد، صدایش را نشان می‌دهد، تعویض‌کنندهٔ خروجی سیستم را باز می‌کند و برای هر دستگاه یک **پروفایل صدای ذخیره‌شده** (اکولایزر، بیس، سرعت) نگه می‌دارد که وقتی همان دستگاه پخش می‌کند اعمال می‌شود.
+- فهرست تست دستی: [`docs/HEADSET_CHECKLIST.md`](docs/HEADSET_CHECKLIST.md).
+
+**سیستم**
+- سه **ویجت صفحهٔ اصلی** (جمع‌وجور، مربعی، پهن).
+- فهرست مرور **Android Auto** (تازه‌اضافه‌شده، پرپخش‌ترین، علاقه‌مندی‌ها، پلی‌لیست‌ها، آلبوم‌ها، خواننده‌ها) و ادامهٔ پخش.
+- **پشتیبان‌گیری و بازیابی** پلی‌لیست‌ها، علاقه‌مندی‌ها و تاریخچه در فایلی که خودت انتخاب می‌کنی (آهنگ‌ها با تگ‌هایشان دوباره پیدا می‌شوند).
+- **به‌روزرسانی خودکار از GitHub Releases**: حداکثر روزی یک بار وقتی برنامه باز است، به‌علاوهٔ دکمهٔ دستی؛ هرگز در پس‌زمینه. قبل از باز شدن نصب‌کنندهٔ سیستم، فایل APK با **SHA-256** و **گواهی امضا** بررسی می‌شود و نصب را خودت تأیید می‌کنی.
+
+**ساخته‌شده برای مصرف کم باتری و رم**
+- بدون WorkManager، آلارم، گیرندهٔ بوت، wake lock اضافه یا polling در پس‌زمینه. سرویس حدود ۶۰ ثانیه بعد از توقف پخش خودش را می‌بندد.
+- انیمیشن‌ها از یک frame driver مشترک عبور می‌کنند و فقط وقتی دیده می‌شوند و موسیقی پخش می‌شود کار می‌کنند. بلور زنده نداریم: محوشدگی یک بار روی یک بیت‌مپ کوچک محاسبه می‌شود.
+- شبکه فقط برای جستجوی اختیاری متن آهنگ (وقتی صفحهٔ متن باز است) و بررسی به‌روزرسانی استفاده می‌شود.
+- سقف‌ها با یک تست اسکن کد اجرا می‌شوند: [`docs/PERF_BUDGET.md`](docs/PERF_BUDGET.md). ادعاها همراه با شاهد در کد و روش اندازه‌گیری روی گوشی: [`docs/BATTERY_AUDIT.md`](docs/BATTERY_AUDIT.md). حجم APK نسخهٔ release حدود ۳ مگابایت است.
 
 ## نصب
 
-1. فایل `MusicPlayer-v0.1.0.apk` (و در صورت تمایل `.sha256`) را از [صفحهٔ Releases](https://github.com/mhrsdev/music-player/releases) دانلود کنید.
-2. بررسی: `sha256sum -c MusicPlayer-v0.1.0.apk.sha256`
-3. APK را روی گوشی باز کنید و برای مرورگر / فایل‌منیجر اجازهٔ «نصب برنامه‌های ناشناس» بدهید.
+1. فایل `MusicPlayer-vX.Y.Z.apk` (و اگر خواستی `.sha256`) را از [صفحهٔ Releases](https://github.com/mhrsdev/music-player-mowj/releases) دانلود کن.
+2. بررسی اختیاری: `sha256sum -c MusicPlayer-vX.Y.Z.apk.sha256`.
+3. APK را روی گوشی باز کن. وقتی اندروید پرسید، برای مرورگر یا فایل‌منیجرت اجازهٔ **نصب برنامه‌های ناشناس (Install unknown apps)** را بده.
+4. موج را باز کن و دسترسی به موسیقی (و در اندروید ۱۳ به بالا اعلان‌ها) را بده.
 
-**نکتهٔ امضا.** تا زمانی که نگه‌دارندهٔ پروژه release keystore تنظیم نکرده، APKهای release با کلید استاندارد **debug** اندروید امضا می‌شوند. نصب می‌شوند، اما (الف) امضای سطح فروشگاه ندارند و (ب) برای آپدیت روی APKای که با کلید دیگری امضا شده باید برنامهٔ قبلی را اول uninstall کرد (داده‌ها مثل لایک‌ها، پلی‌لیست‌ها و تاریخچه از بین می‌رود).
+نسخه‌ها از `v0.2.0` به بعد با کلید انتشار سازنده امضا شده‌اند، پس نسخهٔ جدید روی قبلی نصب می‌شود و داده‌هایت می‌ماند. `v0.1.0` با کلید debug امضا شده بود؛ رفتن از آن به نسخهٔ بعدی یک بار حذف برنامه لازم دارد (علاقه‌مندی‌ها و پلی‌لیست‌ها از بین می‌روند). بعد از آن موج می‌تواند از تنظیمات خودش را به‌روز کند.
 
 ## ساخت از سورس
 
-نیازمندی‌ها: JDK 17+ (با 21 ساخته شده)، Android SDK با `platforms;android-37.0` و `build-tools;35.0.0`.
+نیازمندی‌ها: JDK 17 یا بالاتر (با 21 ساخته شده)، Android SDK همراه با `platforms;android-37.0` و یک `build-tools` تازه.
 
 <div dir="ltr">
 
 ```bash
 export ANDROID_HOME=/opt/android-sdk        # or sdk.dir in local.properties (gitignored)
-./gradlew :app:assembleDebug                # app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:assembleRelease              # R8 + resource shrinking
+./gradlew :app:assembleDebug test lint      # what CI runs on every push
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
 </div>
 
-نسخه و امضا با Gradle property یا متغیر محیطی تنظیم می‌شوند:
+ابزارها: Gradle wrapper نسخهٔ **9.0.0**، Android Gradle Plugin نسخهٔ **8.13.2** (جدیدترینی که روی Gradle 9.0.0 اجرا می‌شود)، سطح سورس Java 17، compileSdk و targetSdk برابر 37 و minSdk برابر 26. نسخهٔ وابستگی‌ها در `gradle/libs.versions.toml` است.
 
-<div dir="ltr">
-
-| Name | Meaning | Default |
-|---|---|---|
-| `-PappVersionName` | `versionName` | `0.1.0` |
-| `-PappVersionCode` | `versionCode` | `1` |
-| `RELEASE_KEYSTORE_FILE`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD` | release signing | unset: debug keystore |
-
-| Toolchain | Version |
-|---|---|
-| Gradle wrapper | **9.0.0** |
-| Android Gradle Plugin | **8.13.2** (AGP 9.x needs Gradle >= 9.1) |
-| compileSdk / targetSdk / minSdk | 37 / 37 / 26 |
-
-</div>
-
-مراحل نصب Android SDK روی لینوکس خام در [README.md](README.md) (بخش «Installing the Android SDK on a bare Linux box») آمده است.
-
-### انتشار (Release)
-دو راه برای ساخت release وجود دارد که هر دو را `.github/workflows/release.yml` انجام می‌دهد:
-
-1. push کردن یک tag به شکل `vX.Y.Z`.
-2. اجرای دستی: GitHub > Actions > *Release* > *Run workflow*، انتخاب branch (معمولاً `main`) و وارد کردن نسخه (مثلاً `0.1.0`). GitHub خودش tag با نام `v<version>` را روی آخرین commit آن branch می‌سازد.
-
-workflow ابتدا unit testها و `assembleRelease` را اجرا می‌کند و سپس یک GitHub Release شامل `MusicPlayer-vX.Y.Z.apk`، فایل `.sha256` و بخش مربوط از `CHANGELOG.md`. هر release یک release معمولی (stable و «latest») است، مگر اینکه نسخه پسوند `-` داشته باشد (مثلاً `v1.0.0-rc.1`) که pre-release علامت می‌خورد. (`v0.1.0` و `v0.2.0` به‌صورت pre-release منتشر شدند؛ از `v0.3.0` به بعد release معمولی‌اند.) برای امضای واقعی secretهای اختیاری مخزن: `ANDROID_KEYSTORE_BASE64`، `ANDROID_KEYSTORE_PASSWORD`، `ANDROID_KEY_ALIAS`، `ANDROID_KEY_PASSWORD`.
-
-## تست‌ها
+<details><summary>نصب Android SDK روی یک لینوکس خالی</summary>
 
 <div dir="ltr">
 
 ```bash
-./gradlew test      # JVM unit tests (JUnit 4 + Robolectric)
-./gradlew lint
+mkdir -p /opt/android-sdk/cmdline-tools && cd /tmp
+curl -fLO https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+unzip -q commandlinetools-linux-11076708_latest.zip
+mv cmdline-tools /opt/android-sdk/cmdline-tools/latest
+yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk --licenses
+/opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
+  "platform-tools" "platforms;android-37.0" "build-tools;35.0.0"
 ```
 
 </div>
+</details>
 
-CI (`.github/workflows/android.yml`) روی هر push دستور `assembleDebug test lint` را اجرا می‌کند. هنوز تست روی دستگاه (instrumented) وجود ندارد.
+### انتشار و امضا
+
+انتشار با `.github/workflows/release.yml` انجام می‌شود: یک تگ `vX.Y.Z` بفرست، یا workflow را دستی اجرا کن (GitHub > Actions > *Release* > *Run workflow*، شاخهٔ `main`، نسخهٔ `X.Y.Z`). این workflow تست‌های واحد و `assembleRelease` را اجرا می‌کند و بعد یک GitHub Release با عنوان «Mowj vX.Y.Z» می‌سازد، همراه با APK، فایل `.sha256` و بخش مربوط در `CHANGELOG.md`. نسخه‌ای که پسوند `-` ندارد انتشار عادی (stable و «latest») است؛ مثلاً `v1.0.0-rc.1` pre-release می‌شود. `v0.1.0` و `v0.2.0` پیش‌انتشار بودند و از `v0.3.0` به بعد انتشارها عادی‌اند.
+
+keystore انتشار **داخل مخزن نیست** و فقط در secretهای GitHub Actions است (`ANDROID_KEYSTORE_BASE64`، `ANDROID_KEYSTORE_PASSWORD`، `ANDROID_KEY_ALIAS`، `ANDROID_KEY_PASSWORD`). بدون آن‌ها، ساخت محلی یا روی fork با کلید debug اندروید امضا می‌شود که برای آزمایش خوب است ولی روی نسخهٔ release نصب نمی‌شود. به‌روزرسانی‌کنندهٔ داخل برنامه APKی را که گواهی امضایش با برنامهٔ نصب‌شده فرق دارد قبول نمی‌کند.
+
+نسخه از `-PappVersionName` و `-PappVersionCode` می‌آید (workflow آن‌ها را تنظیم می‌کند).
 
 ## معماری
 
-یک ماژول `:app` با ساختار package-by-layer. جزئیات و قراردادها: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+یک ماژول `:app`، بسته‌بندی بر اساس لایه. قرارداد بین UI و بقیه: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 <div dir="ltr">
 
@@ -151,88 +159,72 @@ CI (`.github/workflows/android.yml`) روی هر push دستور `assembleDebug 
    ^                       ^
  data/*                 playback/*
  SQLite, scanner,       Media3 ExoPlayer + MediaSessionService,
- lyrics, waveform,      queue store, sleep timer
- settings
+ lyrics, waveform,      queue store, sleep timer, audio effects,
+ settings, backup,      headset controls
+ update
  di/AppContainer  - hand-written DI (no Hilt/Koin), cheap to construct
 ```
 
 </div>
 
-- لایهٔ `ui` هرگز `data.*` / `playback.*` را import نمی‌کند؛ فقط interfaceهای `domain` را می‌بیند که `di/AppContainer` می‌دهد.
-- **SQLite فریم‌ورک** (`SQLiteOpenHelper`): همهٔ SQL در `data/db/query/*Queries` و نام جدول/ستون در `data/db/contract/*Contract` است.
-- **بدون Room، بدون Kotlin، بدون coroutine/RxJava**: یک thread به نام `ioExecutor` (بعد از ۳۰ ثانیه بیکاری تمام می‌شود)؛ نتایج به‌صورت `LiveData` می‌رسند.
-- **Media3** `MediaSessionService` تنها `ExoPlayer` داخل process را نگه می‌دارد و UI از طریق `PlayerController` آن را کنترل می‌کند.
-- کاور آهنگ‌ها با یک bitmap loader کوچک و `LruCache` محدود بارگذاری می‌شود (بدون کتابخانهٔ تصویر).
+- `ui` هرگز `data.*` یا `playback.*` را import نمی‌کند؛ فقط interfaceهای `domain` را می‌بیند که `di/AppContainer` به آن می‌دهد.
+- تمام SQL در `data/db/query/*Queries` است و نام جدول و ستون‌ها در `data/db/contract/*Contract`. بدون Room، بدون Kotlin، بدون coroutines / RxJava.
+- تصویرها را یک بارگذار کوچک خودمان با `LruCache` محدود لود می‌کند (کتابخانهٔ تصویر نداریم).
 
-### طراحی برای باتری و RAM
-- wake lock اختصاصی نداریم؛ فقط wake mode محلی ExoPlayer هنگام پخش. سرویس حدود ۶۰ ثانیه پس از توقف پخش متوقف می‌شود.
-- به‌روزرسانی موقعیت فقط هنگام پخش و دیده‌شدن UI؛ observerها به lifecycle وابسته‌اند؛ هیچ polling یا sync پس‌زمینه‌ای نیست.
-- انیمیشن‌ها (wavy، bars، blur، grain) وقتی برنامه یا پلیر دیده نمی‌شود متوقف و با battery saver / reduce motion خاموش می‌شوند.
-- اسکن کتابخانه افزایشی است؛ استخراج waveform lazy و نمونه‌برداری پراکنده است، cache می‌شود و در battery saver رد می‌شود.
-- شبکه فقط برای LRCLIB، در صورت نیاز و برای هر آهنگ، با cache (حتی برای «پیدا نشد») و هرگز در پس‌زمینه.
-- کاورهای downsample‌شده با cache چندمگابایتی؛ thread مربوط به `ioExecutor` در بیکاری تمام می‌شود.
+## تست
 
-## مجوزها (Permissions)
+<div dir="ltr">
+
+```bash
+./gradlew test      # JVM unit tests (JUnit 4 + Robolectric): data, lyrics, playback logic, ViewModels, widgets, perf budget, renders
+./gradlew lint
+```
+
+</div>
+
+CI (`.github/workflows/android.yml`) روی هر push دستور `assembleDebug test lint` را اجرا می‌کند. هنوز تست روی دستگاه (instrumented) نداریم.
+
+## مجوزها
 
 <div dir="ltr">
 
 | Permission | Why |
 |---|---|
-| `READ_MEDIA_AUDIO` (Android 13+) / `READ_EXTERNAL_STORAGE` (<= Android 12L, `maxSdkVersion=32`) | read your music from MediaStore |
+| `READ_MEDIA_AUDIO` (Android 13+) / `READ_EXTERNAL_STORAGE` (up to Android 12L) | read your music from MediaStore |
 | `POST_NOTIFICATIONS` | playback notification (Android 13+) |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | keep music playing in the background |
-| `WAKE_LOCK` | CPU stays awake only while a local file is playing (ExoPlayer) |
-| `INTERNET` | **only** for the optional LRCLIB lyrics lookup (can be switched off in Settings) |
+| `WAKE_LOCK` | CPU awake only while a local file plays (ExoPlayer) |
+| `BLUETOOTH_CONNECT` (Android 12+) | show the name of the connected Bluetooth output |
+| `INTERNET`, `ACCESS_NETWORK_STATE` | optional LRCLIB lyrics lookup and the GitHub update check |
+| `REQUEST_INSTALL_PACKAGES` | hand a downloaded update to the system installer (you confirm it) |
 
 </div>
 
 ## حریم خصوصی
 
-بدون analytics، بدون تبلیغات، بدون حساب کاربری، بدون crash reporting، بدون ردیابی. کتابخانه، لایک‌ها، پلی‌لیست‌ها و تاریخچه روی دستگاه می‌مانند (`allowBackup` خاموش است). تنها درخواست شبکهٔ برنامه جستجوی اختیاری LRCLIB است: وقتی متن آهنگ به‌صورت محلی پیدا نشود و گزینهٔ «Find lyrics online» روشن باشد، **عنوان، هنرمند، آلبوم و مدت** آهنگ به `lrclib.net` فرستاده می‌شود. با خاموش کردن آن در Settings > Lyrics برنامه کاملاً آفلاین کار می‌کند.
-
-## ساختار پروژه
-
-<div dir="ltr">
-
-```
-app/src/main/java/com/mhrsdev/musicplayer/
-  MusicPlayerApp, MainActivity     application + single-activity shell
-  di/                              AppContainer and per-layer modules
-  domain/{model,repository}/       records + interfaces the UI codes against
-  data/{db,scanner,repository,lyrics,waveform,settings}/
-  playback/                        ExoPlayerController, PlaybackService, queue store, sleep timer
-  ui/{theme,widget,nav,home,search,library,player,queue,settings}/
-  fake/                            in-memory implementations used by tests and render previews
-app/src/main/res/                  layouts, drawables, fonts, values (en) + values-fa
-app/src/test/                      JVM unit tests
-docs/                              ARCHITECTURE, DESIGN, STATUS, screenshots, design mockups
-.github/workflows/                 android.yml (CI), release.yml (tag -> GitHub Release)
-```
-
-</div>
-
-## مشارکت / قوانین پروژه
-
-فقط Java (خروجی `git ls-files | grep -E '\.kts?$'` باید خالی باشد؛ فایل‌های Gradle با Groovy هستند)، MVVM، بدون Room (SQLite فریم‌ورک، SQL فقط در کلاس‌های query)، پکیج‌بندی تمیز، Gradle 9.0.0. مصرف باتری و RAM الزام سخت‌گیرانه است. اول `CLAUDE.md`، `docs/STATUS.md` و `docs/ARCHITECTURE.md` را بخوانید. روی branch جدا کار کنید؛ `main` وضعیت تحویلی است.
+بدون آنالیتیکس، تبلیغ، حساب کاربری، گزارش خرابی یا ردیابی. کتابخانه، علاقه‌مندی‌ها، پلی‌لیست‌ها و تاریخچه روی دستگاه می‌مانند (`allowBackup` خاموش است؛ اگر نسخهٔ پشتیبان می‌خواهی از پشتیبان‌گیری داخل برنامه استفاده کن). دو نوع درخواست شبکه داریم که هر دو فقط در صورت نیاز انجام می‌شوند:
+- جستجوی متن آهنگ: وقتی چیزی به‌صورت محلی پیدا نشود و متن آنلاین روشن باشد، **عنوان، خواننده، آلبوم و مدت** آهنگ به `lrclib.net` فرستاده می‌شود (تنظیمات > Lyrics).
+- بررسی به‌روزرسانی: آخرین نسخه را از API مربوط به GitHub Releases می‌پرسد، حداکثر روزی یک بار وقتی برنامه باز است.
 
 ## محدودیت‌های شناخته‌شده
 
-- **روی دستگاه واقعی تأیید نشده**: اسکن MediaStore روی کتابخانهٔ واقعی، نوتیفیکیشن / lock screen / بلوتوث، شروع foreground service در اندروید ۱۴+، استخراج waveform با MediaCodec و مصرف باتری. ظاهر فقط از راه رندرهای Robolectric بررسی شده است.
-- APK نسخهٔ release با کلید debug امضا شده (بخش «نصب»)؛ آپدیت خودکار ندارد.
-- متن‌های فارسی را فارسی‌زبان بومی بازبینی نکرده است.
-- در دسترس بودن LRCLIB دست ما نیست (هنگام توسعه گاهی 503 داده است).
-- UI تغییر نام / حذف پلی‌لیست و حذف آهنگ از آن، دکمهٔ rescan و انتخاب پوشه هنوز وجود ندارد (ردیف پوشه‌ها در Settings فقط نمایشی است).
-- کاتالوگ آنلاین یا streaming وجود ندارد: برنامه فقط فایل‌های روی دستگاه را پخش می‌کند.
+- **روی گوشی واقعی تأیید نشده**: دکمه‌های هدست و هندزفری (منطق برنامه تست شده، ولی رسیدن کلید از گوشی به برنامه نه)، انتخاب فایل متن آهنگ، Android Auto، ویجت‌ها روی لانچرهای دیگر، آیکن تم‌پذیر لانچر، رنگ پویا روی والپیپرهای واقعی، مصرف باتری و رم، و هزینهٔ محوشدگی روی GPUهای ضعیف. ظاهر برنامه فقط از رندرهای Robolectric دیده شده است.
+- **دو دستگاه بلوتوث همزمان**: اندروید API عمومی برای این کار ندارد. اگر گوشی‌ات Dual Audio / Audio Sharing دارد، موج به تنظیماتش لینک می‌دهد؛ وگرنه فقط روی یک خروجی پخش می‌کند.
+- **مدیریت‌کننده‌های سخت‌گیر باتری** (شیائومی، اوپو، ریلمی، «sleeping apps» سامسونگ) ممکن است برنامه را فریز یا بکشند و دکمهٔ هدست دیگر آن را بیدار نکند. روی این گوشی‌ها بهینه‌سازی باتری را برای موج خاموش کن.
+- کارت رسانهٔ سیستم در بعضی گوشی‌ها (One UI، اندروید ۱۳ به بعد) نوار پخش خودش را از روی media session می‌کشد و برنامه‌ها نمی‌توانند ظاهرش را عوض کنند.
+- متن فارسی هنوز توسط یک فارسی‌زبان بومی بازبینی نشده است.
+- در دسترس بودن LRCLIB دست ما نیست، و زمان‌بندی کلمه فقط وقتی هست که فایل یا ورودی LRCLIB آن را داشته باشد (وگرنه تخمین زده می‌شود).
+- استریم یا کاتالوگ آنلاین نداریم: فقط فایل‌های محلی. ویرایشگر تگ و crossfade هنوز نیست.
 
-## نقشهٔ راه (Roadmap)
+## مشارکت / قواعد پروژه
 
-برنامه‌ریزی‌شده، هنوز پیاده‌سازی نشده: equalizer، ویجت صفحهٔ اصلی، Android Auto، ویرایش پلی‌لیست در UI (تغییر نام / حذف)، دکمهٔ rescan، انتخاب پوشهٔ موزیک، layout تبلت / landscape، crossfade، ویرایش تگ، release با keystore واقعی، مجموعه تست روی دستگاه، audit باتری.
+فقط Java (`git ls-files | grep -E '\.kts?$'` نباید چیزی چاپ کند؛ فایل‌های Gradle با Groovy هستند)، MVVM، بدون Room، بدون کلاس `final`، Java 17، Gradle 9.0.0. مصرف باتری و رم الزام سخت‌اند (`docs/PERF_BUDGET.md`). اول `CLAUDE.md`، `docs/STATUS.md` و `docs/ARCHITECTURE.md` را بخوان. روی یک شاخه کار کن؛ `main` وضعیت تحویل‌شده است.
 
-## مجوز (License)
+## مجوز
 
-منتشرشده با [مجوز MIT](LICENSE) - Copyright (c) 2026 mhrsdev.
+تحت [مجوز MIT](LICENSE) منتشر شده است - Copyright (c) 2026 mhrsdev.
 
-فونت‌های داخل پروژه (Google Sans Flex و Vazirmatn) تحت مجوز SIL Open Font License 1.1 هستند؛ به
-[`app/src/main/assets/licenses/FONTS-NOTICE.txt`](app/src/main/assets/licenses/FONTS-NOTICE.txt) مراجعه کنید.
+فونت‌های همراه (Google Sans Flex و Vazirmatn) تحت SIL Open Font License 1.1 هستند؛ به
+[`app/src/main/assets/licenses/FONTS-NOTICE.txt`](app/src/main/assets/licenses/FONTS-NOTICE.txt) نگاه کن. جلدها و مشخصات نمونه در تصاویر: [`docs/CREDITS.md`](docs/CREDITS.md).
 
 </div>
