@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.ui.player;
 
+import com.mhrsdev.musicplayer.diag.PerfProbe;
 import com.mhrsdev.musicplayer.ui.motion.PeriodicTick;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -182,6 +183,7 @@ public class PlayerBackdropView extends View {
         boolean run = on && com.mhrsdev.musicplayer.ui.theme.MotionPolicy.backdropMotionEnabled(getContext());
         if (run == animating) return;
         animating = run;
+        PerfProbe.setFlag(PerfProbe.F_BACKDROP, run);
         if (run) ticker.start(); else ticker.stop();
     }
 
@@ -189,7 +191,11 @@ public class PlayerBackdropView extends View {
 
     private boolean driftFrame() {
         if (!animating) return false;
-        if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE || !isShown()) { animating = false; return false; }
+        if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE || !isShown()) {
+            animating = false;
+            PerfProbe.setFlag(PerfProbe.F_BACKDROP, false);
+            return false;
+        }
         invalidate();
         return true;
     }
@@ -218,6 +224,7 @@ public class PlayerBackdropView extends View {
         if (anim != null) anim.cancel();
         ticker.stop();
         animating = false;
+        PerfProbe.setFlag(PerfProbe.F_BACKDROP, false);
         super.onDetachedFromWindow();
     }
 }

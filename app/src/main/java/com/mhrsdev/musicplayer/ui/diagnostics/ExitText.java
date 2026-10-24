@@ -42,16 +42,20 @@ class ExitText {
 
     /** The system share sheet with the report as plain text (mail, messengers, notes...). */
     static void share(Context context, String report) {
+        share(context, report, R.string.diag_share_subject, R.string.diag_share_chooser);
+    }
+
+    static void share(Context context, String report, @StringRes int subject, @StringRes int chooserTitle) {
         Intent send = new Intent(Intent.ACTION_SEND)
                 .setType("text/plain")
-                .putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.diag_share_subject))
+                .putExtra(Intent.EXTRA_SUBJECT, context.getString(subject))
                 .putExtra(Intent.EXTRA_TEXT, report);
-        Intent chooser = Intent.createChooser(send, context.getString(R.string.diag_share_chooser));
+        Intent chooser = Intent.createChooser(send, context.getString(chooserTitle));
         if (!(context instanceof android.app.Activity)) chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             context.startActivity(chooser);
         } catch (RuntimeException e) { // no app can receive text (rare), or the intent was too large
-            android.widget.Toast.makeText(context, R.string.diag_share_subject, android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(context, subject, android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 }

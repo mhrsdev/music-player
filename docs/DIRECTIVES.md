@@ -533,3 +533,46 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** (2 screenshots: One UI lock-screen media pill and notification-shade media card, both showing only [previous] [pause]) "تو همه جا این باگه هس"
 
 **Summary:** On the lock screen, the notification shade card (and by extension every system surface fed by our MediaSession) only previous and play/pause are shown, next is missing; together with D35 (mini-player missing previous) the owner expects BOTH skip buttons everywhere, always. Root cause (code read): the session uses ExoPlayer's raw available commands; ExoPlayer withholds COMMAND_SEEK_TO_NEXT when the current item is the last and repeat is off (no ForwardingPlayer anywhere), so Samsung hides the button. Fix N2 (Sonnet): session player wrapper that always exposes seek-to-next/previous; behaviour at the ends defined and consistent (next on the last track -> first track, previous on the first -> restart), applied to notification, lock screen, shade, headset buttons, Android Auto, widgets. Ships v0.3.3 with U4 (+C1 later).
+
+---
+
+## D37 — 2026-10-24 — Refactor the project
+
+**Original (verbatim):** "یه ریفکتور هم بزن رو پروژه"
+
+**Summary:** Owner asks for a refactor of the whole project. Plan (behaviour-preserving, starts AFTER v0.3.3 ships so it does not collide with U4/N2/C1): RF-UI (Opus) splits the giant UI classes (PlayerFragment 1089 lines, SettingsFragment 595, MainActivity 518, TrackListFragment 476, GeneratedCover 751) into focused binders/controllers/helpers; RF-CORE (Sonnet) splits ExoPlayerController (510), HomeFeedBuilder (397), SettingsStore (322), removes dead code (e.g. UpdateBanner never wired, unused constraintlayout), fixes layer leaks (playback -> ui.widget dependency; neutral package), consistent naming/package-info; adds a layer-rules test (ui -> domain/data interfaces only, playback never imports ui, domain pure Java) next to PerfBudgetTest. Rules: NO behaviour change, no perf regression (PerfBudgetTest, RegexIcuTest, smoke tests), small commits, CI green on every merge, nothing on `final class`, Java only.
+
+---
+
+## D38 — 2026-10-24 — After the refactor: full audit + fix the lag (still there)
+
+**Original (verbatim):** "بعد ریفکتور یه اودیت کامل بزن و سعی کن این مشکل لگ رو برطرف کنی / هنوزم هست"
+
+**Summary:** Lag is still present on the owner's phone (latest build). After the refactor (D37): run a full audit of the whole codebase (ponytail-audit style: bugs, security, load behaviour, risky untested code, slow paths, deletions) and keep working on the lag until it is gone. Because we cannot measure on a device, FIRST add local performance telemetry (PT1: FrameMetrics-based jank stats per screen, thermal/memory/GC snapshot, shareable report in Settings > About > Diagnostics) so the owner's phone gives us real numbers; then target what the numbers show.
+
+---
+
+## D39 — 2026-10-24 — Scrolling lags EVERYWHERE in the app
+
+**Original (verbatim):** "اسکرول همه جای برنامه لگه"
+
+**Summary:** Scroll jank is app-wide (all lists/screens), so the cause is in something shared by every scrolling screen: row binding (ArtworkView/ArtworkLoader/GeneratedCover rendering for coverless tracks, which the owner's library has many of), shared row layouts (elevation/outline clipping/overdraw/depth), a global per-frame consumer behind or above the lists (ambient backdrop/DecorBeat/dock/mini-player/edge-to-edge insets listeners), or RecyclerView configuration (prefetch, pools, DiffUtil). Task SC1 (Opus): systematic scroll-path hunt with measurements, then fixes; PT1 will give on-device numbers.
+
+---
+
+## D40 — 2026-10-24 — Flagship lags + battery drain 6% / 5 min (normal 1–2%)
+
+**Original (verbatim):**
+
+> نخیر مشکلم اینه گوشیم خفن ترین گوشیه و لگ داره میخوره / ببین دیگه رو میان رده و پایین رده چخبره / چخبره گوشیم S26 ULTRA هست
+> مصرف باتریشم خیلی خیلی زیاده تو ۵ دقیقه ۶ درصد شارژمو کم کرد / درحالت عادی این عدد روی ۱ یا ۲ درصد بوده نهایت
+
+**Summary:** The owner stresses that his phone is the most powerful one (S26 Ultra) and still lags — so mid/low-end phones must be far worse; and the app drains 6% battery in 5 minutes (normal 1–2%). Treated as severe: sustained CPU/GPU load (idle redraw at display refresh rate is the prime suspect). SC1 gets scroll budgets for a ~4x slower phone plus an idle-redraw audit; PT1 telemetry adds battery current (mA), per-thread CPU, idle-redraw fps. Questions sent to owner: was the screen on / was music playing / which version.
+
+---
+
+## D41 — 2026-10-24 — Disable everything useless when the app is not on screen (and inside the app for hidden parts)
+
+**Original (verbatim):** "و اینکه مثلا وقتی از صفحه برنامه خارج میشی میری تو یه برنامه دیگه پ داری موزیک گوش میدی تمام بخشهای بیفایده غیر فعال بشن / همینطور توی خود برنامه هم بشه"
+
+**Summary:** When the user leaves Mowj for another app while music keeps playing, every part that is useless without a visible UI must be inactive (frame loops, animations, lyrics sweeps, backdrop, seek-bar ticks, Home feed/DB observers, artwork/palette work, position polling, widget/notification churn…) — only audio playback + the media notification/session remain. The same principle inside the app: anything not visible (hidden tabs, screens under the full player, off-screen views, collapsed sheets, lyrics when not shown, mini-player when the player is open) must not run. Task BG1 (Opus): one central app/window visibility gate (ProcessLifecycleOwner + window/view visibility) feeding FrameDriver/PeriodicTick/DecorBeat and all other periodic consumers, plus audit + tests that count wakeups/frames/threads in background and in hidden-UI states.

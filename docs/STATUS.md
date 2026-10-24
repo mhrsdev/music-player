@@ -139,6 +139,15 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 - 🔄 **N2** [Sonnet] D36 system media card/lock screen/Auto: always expose next+previous via ForwardingPlayer (commands + end-of-queue semantics). `task/n2-always-prev-next`.
 
+- 🔄 **PT1** [Sonnet] D38 perf telemetry: FrameMetrics jank stats per screen + thermal/memory/GC snapshot, off by default, shareable report in Diagnostics. `task/pt1-perf-telemetry`.
+- 🔄 **SC1** [Opus] D39 app-wide scroll jank hunt (row bind cost, GeneratedCover on main thread, shared row layouts, global per-frame consumers, RecyclerView config). `task/sc1-scroll-jank`.
+- 🔄 **BG1** [Opus] D41 central visibility gate: when app is backgrounded (music playing) or a part is hidden, all useless work stops; tests count frames/wakeups/threads. `task/bg1-visibility-gate`.
+- ⏭ **AUDIT** (after refactor): full-repo audit (bugs/security/load/tests/slow paths/dead code) + lag fix driven by PT1 numbers.
+
+## Refactor (D37) — after v0.3.3
+- **RF-UI** [Opus] split PlayerFragment/SettingsFragment/MainActivity/TrackListFragment/GeneratedCover into focused classes; behaviour + visuals unchanged (render tests as golden checks).
+- **RF-CORE** [Sonnet] split ExoPlayerController/HomeFeedBuilder/SettingsStore; remove dead code; fix layering (playback -> ui.widget); layer-rules test.
+
 ## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
 - **PF1** [Sonnet] Cold start + first frame: Application/DI lazy init, work off main thread, baseline profile (hand-written baseline-prof.txt + startup profile), splash→Home time budget; measure with JVM-side counters since no device.
 - **PF2** [Opus] Scroll/animation smoothness: RecyclerView adapters (DiffUtil, payloads, view recycling, no per-bind allocations), overdraw/layout depth, custom View draw paths, image decode sizes. Keep all effects.

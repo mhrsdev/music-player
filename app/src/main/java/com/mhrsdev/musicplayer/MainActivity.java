@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.mhrsdev.musicplayer.databinding.ActivityMainBinding;
 import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import com.mhrsdev.musicplayer.diag.ExitInfoReader;
+import com.mhrsdev.musicplayer.diag.PerfProbe;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.playback.PlaybackService;
@@ -186,6 +187,11 @@ public class MainActivity extends AppCompatActivity
                 String name = f.getClass().getSimpleName();
                 Breadcrumbs.add("screen " + name);
                 ExitInfoReader.setStateSummary(MainActivity.this, "screen=" + name);
+                PerfProbe.setScreen(name); // frame stats are attributed to the screen on top (off: one array write)
+            }
+
+            @Override public void onFragmentPaused(FragmentManager fm, Fragment f) {
+                PerfProbe.leaveScreen(f.getClass().getSimpleName());
             }
 
             @Override public void onFragmentStarted(FragmentManager fm, Fragment f) {
@@ -350,6 +356,7 @@ public class MainActivity extends AppCompatActivity
     private void renderMini(PlaybackState s) {
         Track t = s == null ? null : s.currentTrack();
         binding.mini.setVisibility(t == null ? View.GONE : View.VISIBLE);
+        PerfProbe.setFlag(PerfProbe.F_MINI, t != null);
         if (com.mhrsdev.musicplayer.ui.nav.Adaptive.isWide(this)) binding.miniPlayerSlot.setVisibility(binding.mini.getVisibility());
         if (t == null) return;
         if (!t.id().equals(miniTrackId)) {

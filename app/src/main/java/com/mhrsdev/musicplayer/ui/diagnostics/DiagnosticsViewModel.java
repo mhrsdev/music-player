@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import com.mhrsdev.musicplayer.diag.Diagnostics;
 import com.mhrsdev.musicplayer.diag.ExitRecord;
+import com.mhrsdev.musicplayer.diag.PerfProbe;
 import com.mhrsdev.musicplayer.domain.repository.Callback;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -60,6 +61,16 @@ public class DiagnosticsViewModel extends ViewModel {
             String text = store.report(header);
             if (text.length() > SHARE_MAX) text = text.substring(0, SHARE_MAX) + "\n...";
             store.markSeen(System.currentTimeMillis());
+            String result = text;
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> done.onResult(result));
+        });
+    }
+
+    /** Builds the performance report text (io thread); {@code done} runs on the main thread, with null when nothing was recorded. */
+    public void sharePerf(Callback<String> done) {
+        io.execute(() -> {
+            String text = PerfProbe.report(header);
+            if (text != null && text.length() > SHARE_MAX) text = text.substring(0, SHARE_MAX) + "\n...";
             String result = text;
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> done.onResult(result));
         });
