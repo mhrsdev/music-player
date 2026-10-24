@@ -116,8 +116,9 @@ public class HeadsetButtonsTest {
         settle();
         assertEquals(2, player().getCurrentMediaItemIndex());
         assertTrue("double click must not toggle", player().getPlayWhenReady());
-        // Freeze the position: "previous" restarts the track instead when more than 3 s in, and the silent clip decodes fast.
+        // "previous" restarts the track instead when more than 3 s in, and a slow runner can be past that by now: pause and rewind.
         player().pause();
+        player().seekTo(0L);
         for (int i = 0; i < 3; i++) press(h, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
         assertEquals("third click resolves at once", 1, player().getCurrentMediaItemIndex());
     }
