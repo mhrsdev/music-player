@@ -132,7 +132,7 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 
 - 🔄 **C1** [Sonnet] D32 compatibility + low-end: Robolectric matrix over API 26/28/29/30/31/33/34/35, API-gate audit (RenderEffect 31+, thermal 29+, ExitInfo 30+, AudioDeviceInfo.getAddress 28+, notification perms 33+, FGS types 34+, dynamic color 31+, predictive back 33+), low-RAM/low-end auto profile (ActivityManager.isLowRamDevice / memory class / cores -> default Balanced/Light on first run), bitmap/cache budgets by memory class, test under small heap. `task/c1-compat-lowend`.
 
-- 🔴 **HOTFIX v0.3.2** [Sonnet PF-B] D33: ICU regex crash (LyricsQueryNormalizer `}`), audit all regexes, safe-compile helper, SafeExecutor catches Throwable, ICU-strictness scan test. `task/pfb-hotfix-regex`. v0.3.0/0.3.1 crash within 2 s of launch on affected devices (confirmed Note 9 / Android 10).
+- ✅ **HOTFIX v0.3.2** (released) [Sonnet PF-B] D33: ICU regex crash (LyricsQueryNormalizer `}`), audit all regexes, safe-compile helper, SafeExecutor catches Throwable, ICU-strictness scan test. `task/pfb-hotfix-regex`. v0.3.0/0.3.1 crash within 2 s of launch on affected devices (confirmed Note 9 / Android 10).
 - 💡 **Backlog from BitChord (D34, ideas only, GPL — no code)**: crossfade + gapless tuning, 'stats for nerds' overlay (codec/bitrate/sample rate from ExoPlayer Format), ListenBrainz/Last.fm scrobbling, optional extra lyrics providers (check ToS).
 
 ## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
@@ -144,6 +144,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - Cross-cutting: update docs/PERF_BUDGET.md + tests that enforce budgets; every change measured or argued; no feature work; owner's D24 rule: never cut effects by default.
 
 ## Change log
+
+- 2026-10-24: **v0.3.2 released** (stable, hotfix) https://github.com/mhrsdev/music-player-mowj/releases/tag/v0.3.2 — fixes the launch/play crash of v0.3.0/0.3.1 (ICU regex `}` in LyricsQueryNormalizer, found from the friend's Diagnostics log: Note 9 / Android 10). APK 3.19 MB, SHA-256 110ab97d…cf5, signature = our key. Waiting for owner + friend to confirm no crash; then merge C1 (task/c1-compat-lowend bba8e4d: queue window, low-end profile, API matrix) -> v0.3.3.
 
 - 2026-10-24: **v0.3.1 released** (stable) https://github.com/mhrsdev/music-player-mowj/releases/tag/v0.3.1 — APK 3.19 MB, SHA-256 18c30ffb…174d, signature = our key (2e59ce52…aacd), baseline profile included. Contains PF-A/PF-B perf, X1 diagnostics + non-fatal background tasks + widget/Android 17 guards. Pending: C1 (compat/low-end profile + queue restore window) -> v0.3.2; crash root cause on owner's S26 Ultra (Android 17 / One UI 9) still unconfirmed — waiting for his Diagnostics log. TODO: fix release.yml install-text template (says 'debug-signed unless keystore', misleading); wire UpdateBanner (Banners.attach never called); remove unused constraintlayout dep line.
 
