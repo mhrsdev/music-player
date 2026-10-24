@@ -2,6 +2,23 @@
 
 Releases are stable unless the version has a `-` suffix (e.g. `v1.0.0-rc.1`). `v0.1.0` and `v0.2.0` were published as pre-releases; `v0.3.0` onward are normal releases.
 
+## v0.3.3
+
+Normal (stable) release.
+
+### Fixed
+- The mini-player now has both skip buttons: previous, play / pause, next. The order is the same in Persian (RTL) as in the full player.
+- The lock-screen pill, the notification-shade card, headset keys, Android Auto and the widgets always offer both previous and next. Before, Next disappeared on the last track.
+- Next on the last track goes to the first track and keeps the play / pause state. Previous restarts the track after 3 s, otherwise goes back.
+- The full player's skip buttons stay enabled.
+
+### Added
+- **Settings > About > Diagnostics > Performance**: a recorder for bug reports. "Record performance" is off by default and costs nothing when off. It records frame timings per screen (jank %, p50 / p95 / p99), idle redraw rate, thermal state, battery drain and current (%/min, mA), CPU per thread, GC and memory. "Share performance report" sends it with the top suspects.
+
+### Known limitations
+- Lag, heat and battery use on some phones (reported on a Galaxy S26 Ultra) are still being investigated. Please record a performance report and share it.
+- Everything is verified by tests only, not on real devices.
+
 ## v0.3.2
 
 Normal (stable) release. **If you use v0.3.0 or v0.3.1, please update.**
