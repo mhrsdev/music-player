@@ -12,7 +12,7 @@ _Last updated: 2026-10-23 — D16 phase 2 started (name Mowj/موج, logo, auto-
 - Branches: `main` = final deliverable (supervisor merges). Working branch: `ccr-b49e5e2a-53r8m3`.
 - Models: UI → Opus 5.5. Everything else → Sonnet 5.5. Supervisor writes no product code.
 - Environment: JDK 21 + Gradle present; Android SDK installed by T1 at `/opt/android-sdk` (platform 37, build-tools 37.0.0; reinstall steps in README.md). Network (dl.google.com, Maven Central/Google, services.gradle.org) works through the proxy.
-- How to build: `export ANDROID_HOME=/opt/android-sdk && ./gradlew assembleDebug lint test` (SDK install steps + details in `README.md`; SDK lives outside the repo, `local.properties` is gitignored). JDK 21, Gradle wrapper 9.8.2, AGP 9.4.1, compileSdk 37.
+- How to build: `export ANDROID_HOME=/opt/android-sdk && ./gradlew assembleDebug lint test` (SDK install steps + details in `README.md`; SDK lives outside the repo, `local.properties` is gitignored). JDK 21, Gradle wrapper 9.0.0, AGP 8.13.2, compileSdk 37.
 
 ## Decisions
 | # | Decision | Why / status |
@@ -124,6 +124,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - **J1** (after all merges) mechanical refactor: remove `final class`, Java 17 idioms in touched code, drop redundant AppCompat-transitive deps from the version catalog; verify on GitHub CI (local builds OOM).
 
 ## Change log
+
+- 2026-10-24: CI GREEN on ccr 605c064 (E2, L2, O1, B2, Q1, J1, CI1 all merged; PlaybackNotificationTest/HeadsetButtonsTest flakes fixed test-side). D1 docs (README en/fa, CHANGELOG v0.3.0) merged. Next: main fast-forward + release v0.3.0 (stable). Backlog: tablet/landscape layouts, remove unused constraintlayout dep line, root-cause of Robolectric renderer stall.
 
 - 2026-10-24: CI GREEN again on ccr 22bb13e (hang = stale PlayerHolder player + unbounded release; fixed by CI1; test heap 2g, 20-min timeout, STARTED logging). ccr = E2, L2, O1, B2, Q1 (Performance settings), CI1 merged. Next: J1 cleanup (running), README/docs/screens refresh, main, release 0.3.0 (stable).
 
