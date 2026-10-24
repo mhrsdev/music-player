@@ -15,6 +15,7 @@ import com.mhrsdev.musicplayer.BuildConfig;
 import com.mhrsdev.musicplayer.appwidget.WidgetUpdater;
 import com.mhrsdev.musicplayer.data.lyrics.SqliteLyricsCacheStore;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
+import com.mhrsdev.musicplayer.diag.SafeExecutor;
 import com.mhrsdev.musicplayer.data.update.UpdateModule;
 import com.mhrsdev.musicplayer.data.waveform.WaveformRepositoryImpl;
 import com.mhrsdev.musicplayer.domain.repository.AudioEffectsController;
@@ -100,15 +101,16 @@ public class AppContainer {
     public AppContainer(Context context, boolean useFakes) {
         appContext = context.getApplicationContext();
         this.useFakes = useFakes;
-        ThreadPoolExecutor io = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        // SafeExecutor: an exception in one background task is logged (Diagnostics), not an app crash (D30).
+        ThreadPoolExecutor io = new SafeExecutor(1, 1, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), BuildConfig.DEBUG);
         io.allowCoreThreadTimeOut(true);
         ioExecutor = io;
         // Library scans get their own low-priority thread so Home / search reads never queue behind a 10k-row scan.
-        ThreadPoolExecutor scan = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+        ThreadPoolExecutor scan = new SafeExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
                 r -> new Thread(() -> {
                     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     r.run();
-                }, "scan"));
+                }, "scan"), BuildConfig.DEBUG);
         scan.allowCoreThreadTimeOut(true);
         settings = new SettingsStore(appContext);
         deviceProfiles = new DeviceProfiles(appContext);

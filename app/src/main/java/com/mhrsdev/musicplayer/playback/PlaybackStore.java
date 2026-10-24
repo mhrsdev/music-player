@@ -49,8 +49,8 @@ class PlaybackStore implements Player.Listener {
     private static final long QUEUE_SAVE_DELAY_MS = 1_000L;
 
     /** Single writer, thread exits when idle: writes stay ordered, nothing lingers between saves. */
-    private static final ThreadPoolExecutor WRITER = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS,
-            new java.util.concurrent.LinkedBlockingQueue<>(), r -> new Thread(r, "queue-store"));
+    private static final ThreadPoolExecutor WRITER = new com.mhrsdev.musicplayer.diag.SafeExecutor(1, 1, 10, TimeUnit.SECONDS,
+            new java.util.concurrent.LinkedBlockingQueue<>(), r -> new Thread(r, "queue-store"), com.mhrsdev.musicplayer.BuildConfig.DEBUG);
     static { WRITER.allowCoreThreadTimeOut(true); }
 
     private final SharedPreferences prefs;

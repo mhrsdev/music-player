@@ -15,6 +15,11 @@ import java.util.List;
  * Crash-proof itself: every step is guarded, and a crash inside the handler goes straight to the previous one.
  */
 public class CrashReporter implements Thread.UncaughtExceptionHandler {
+    /** Non-fatal reports per process at most (a failing task in a loop must not turn into an I/O storm). */
+    static final int NON_FATAL_MAX = 5;
+    @Nullable private static volatile CrashReporter installed;
+    static final java.util.concurrent.atomic.AtomicInteger NON_FATALS = new java.util.concurrent.atomic.AtomicInteger();
+
     @Nullable private final Thread.UncaughtExceptionHandler previous;
     private final Diagnostics store;
     private final String header;
@@ -32,10 +37,28 @@ public class CrashReporter implements Thread.UncaughtExceptionHandler {
         try {
             Thread.UncaughtExceptionHandler current = Thread.getDefaultUncaughtExceptionHandler();
             if (current instanceof CrashReporter) return;
-            Thread.setDefaultUncaughtExceptionHandler(new CrashReporter(current, Diagnostics.get(context),
-                    Diagnostics.deviceInfo(versionName, versionCode)));
+            CrashReporter r = new CrashReporter(current, Diagnostics.get(context),
+                    Diagnostics.deviceInfo(versionName, versionCode));
+            Thread.setDefaultUncaughtExceptionHandler(r);
+            installed = r;
         } catch (Throwable ignored) {
             // never stop the app from starting
+        }
+    }
+
+    /**
+     * A caught background failure the app survived: written like a crash (marked non-fatal) so it reaches the
+     * Diagnostics screen, at most {@link #NON_FATAL_MAX} per process. Never throws.
+     */
+    public static void nonFatal(Thread thread, Throwable error) {
+        try {
+            Breadcrumbs.add("non-fatal " + error);
+            CrashReporter r = installed;
+            if (r == null || NON_FATALS.incrementAndGet() > NON_FATAL_MAX) return;
+            long now = System.currentTimeMillis();
+            r.store.writeCrash("NON-FATAL (caught, the app kept running)\n" + r.format(thread, error, now), now);
+        } catch (Throwable ignored) {
+            // diagnostics never break the app
         }
     }
 
@@ -50,10 +73,12 @@ public class CrashReporter implements Thread.UncaughtExceptionHandler {
             }
         }
         if (previous != null) {
-            previous.uncaughtException(thread, error);
+            previous.uncaughtException(thread, error); // Android: the platform's handler (dialog + process kill)
         } else {
-            android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(10);
+            // Plain JVM (tests; never on Android, where the platform always installs one). Not ThreadGroup's
+            // uncaughtException: that calls the default handler, i.e. this one, again.
+            System.err.print("Exception in thread \"" + thread.getName() + "\" ");
+            error.printStackTrace(System.err);
         }
     }
 

@@ -17,7 +17,7 @@ public class UpdateModule {
      */
     public static UpdateRepository create(Context context, String versionName, String repo) {
         // Own thread, not AppContainer.ioExecutor: a download takes minutes and must not stall database and lyrics work.
-        ThreadPoolExecutor io = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        ThreadPoolExecutor io = new com.mhrsdev.musicplayer.diag.SafeExecutor(1, 1, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), com.mhrsdev.musicplayer.BuildConfig.DEBUG);
         io.allowCoreThreadTimeOut(true);
         return new UpdateRepositoryImpl(io, new PrefsUpdateStore(context),
                 new UrlConnectionUpdateHttp("MusicPlayer/" + versionName + " (https://github.com/" + repo + ")"),

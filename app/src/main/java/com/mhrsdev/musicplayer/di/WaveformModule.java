@@ -43,11 +43,11 @@ public class WaveformModule {
     public static WaveformRepositoryImpl create(Context context, WaveformStore store, BooleanSupplier skipPrefetch,
             BooleanSupplier throttled) {
         Context app = context.getApplicationContext();
-        ThreadPoolExecutor worker = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+        ThreadPoolExecutor worker = new com.mhrsdev.musicplayer.diag.SafeExecutor(1, 1, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
                 runnable -> new Thread(() -> {
                     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     runnable.run();
-                }, "waveform-extractor"));
+                }, "waveform-extractor"), com.mhrsdev.musicplayer.BuildConfig.DEBUG); // a codec failure on a bad file: logged, not an app crash
         worker.allowCoreThreadTimeOut(true);
         Handler mainHandler = new Handler(Looper.getMainLooper());
         return new WaveformRepositoryImpl(store, new WaveformExtractor(app), new MediaFingerprint(app),

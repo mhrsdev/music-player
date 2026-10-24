@@ -50,7 +50,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.Holder> {
     private static final Executor DIFF;
 
     static {
-        ThreadPoolExecutor e = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        ThreadPoolExecutor e = new com.mhrsdev.musicplayer.diag.SafeExecutor(1, 1, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), com.mhrsdev.musicplayer.BuildConfig.DEBUG);
         e.allowCoreThreadTimeOut(true);
         DIFF = e;
     }

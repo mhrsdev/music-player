@@ -203,7 +203,8 @@ public class PerfBudgetTest {
     @Test public void waveformDecodingIsOnDemandBackgroundPriorityAndGated() throws IOException {
         String module = read(MAIN.resolve(PKG + "di/WaveformModule.java"));
         assertTrue("one extractor thread at background priority",
-                module.contains("new ThreadPoolExecutor(1, 1,") && module.contains("THREAD_PRIORITY_BACKGROUND"));
+                (module.contains("new ThreadPoolExecutor(1, 1,") || module.contains("SafeExecutor(1, 1,"))
+                        && module.contains("THREAD_PRIORITY_BACKGROUND"));
         String container = read(MAIN.resolve(PKG + "di/AppContainer.java"));
         for (String gate : new String[] {"getCurrentThermalStatus", "THERMAL_STATUS_MODERATE", "Build.VERSION_CODES.Q",
                 "!uiVisible", "usesWaveform()", "batterySaverActive()"}) {

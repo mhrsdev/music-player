@@ -590,6 +590,9 @@ public class PlayerFragment extends Fragment {
     }
 
     private void collapse() {
+        // Runs at the end of the 200 ms close animation: Back / a tab tap may have removed the player meanwhile, and
+        // requireContext() on a detached fragment throws (an app crash, not a no-op).
+        if (!isAdded() || isRemoving()) return;
         PlayerNavigator nav = PlayerNavigator.from(requireContext());
         if (nav != null) nav.closeFullPlayer();
         else requireActivity().getOnBackPressedDispatcher().onBackPressed();

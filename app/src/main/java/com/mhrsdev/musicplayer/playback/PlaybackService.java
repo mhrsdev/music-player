@@ -27,6 +27,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mhrsdev.musicplayer.R;
 import com.mhrsdev.musicplayer.data.settings.SettingsStore;
+import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -61,6 +62,15 @@ public class PlaybackService extends MediaLibraryService {
     };
 
     private final Player.Listener idleWatcher = new Player.Listener() {
+        /** Diagnostics (D30): why playback paused (focus loss, noisy, end, user...), into the crash/exit log. */
+        @Override public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
+            Breadcrumbs.add("player " + (playWhenReady ? "play" : "pause") + " reason " + reason);
+        }
+
+        @Override public void onPlayerError(androidx.media3.common.PlaybackException error) {
+            Breadcrumbs.add("player error " + error.getErrorCodeName());
+        }
+
         @Override public void onEvents(Player p, Player.Events events) {
             if (!events.containsAny(Player.EVENT_PLAY_WHEN_READY_CHANGED, Player.EVENT_PLAYBACK_STATE_CHANGED)) return;
             handler.removeCallbacks(idleStopTask);
@@ -130,7 +140,13 @@ public class PlaybackService extends MediaLibraryService {
         return result;
     }
 
+    @Override public void onTaskRemoved(@Nullable Intent rootIntent) {
+        Breadcrumbs.add("service onTaskRemoved playing=" + player.isPlaying());
+        super.onTaskRemoved(rootIntent);
+    }
+
     @Override public void onDestroy() {
+        Breadcrumbs.add("service onDestroy");
         handler.removeCallbacks(idleStopTask);
         player.removeListener(idleWatcher);
         player.removeListener(headset);

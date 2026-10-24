@@ -35,12 +35,12 @@ public class CollageBlurView extends View {
     private static final ExecutorService EXEC = idleExitPool();
     /** One low-priority worker that exits after 10 s idle (a plain single-thread executor would keep it forever). */
     private static ExecutorService idleExitPool() {
-        java.util.concurrent.ThreadPoolExecutor pool = new java.util.concurrent.ThreadPoolExecutor(1, 1, 10,
+        java.util.concurrent.ThreadPoolExecutor pool = new com.mhrsdev.musicplayer.diag.SafeExecutor(1, 1, 10,
                 java.util.concurrent.TimeUnit.SECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), r -> {
                     Thread t = new Thread(r, "collage-blur");
                     t.setPriority(Thread.MIN_PRIORITY);
                     return t;
-                });
+                }, com.mhrsdev.musicplayer.BuildConfig.DEBUG);
         pool.allowCoreThreadTimeOut(true);
         return pool;
     }

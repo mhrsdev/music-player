@@ -43,7 +43,7 @@ public class LyricsModule {
                 cache,
                 System::currentTimeMillis,
                 onlineAllowed);
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        ThreadPoolExecutor executor = new com.mhrsdev.musicplayer.diag.SafeExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), com.mhrsdev.musicplayer.BuildConfig.DEBUG);
         executor.allowCoreThreadTimeOut(true);
         android.content.ContentResolver cr = context.getApplicationContext().getContentResolver();
         return new LyricsRepositoryImpl(resolver, executor, lrclib, userStore, uri -> readDocument(cr, uri));

@@ -88,6 +88,45 @@ public class DiagnosticsTest {
         assertSame(e, prev.error);
     }
 
+    /** Without a previous handler (plain JVM) it must neither exit the JVM nor call itself through ThreadGroup. */
+    @Test public void noPreviousHandlerDoesNotRecurse() {
+        Thread.UncaughtExceptionHandler before = Thread.getDefaultUncaughtExceptionHandler();
+        CrashReporter r = new CrashReporter(null, store, "h");
+        try {
+            Thread.setDefaultUncaughtExceptionHandler(r);
+            r.uncaughtException(new Thread("w"), new IllegalStateException("x"));
+        } finally {
+            Thread.setDefaultUncaughtExceptionHandler(before);
+        }
+        assertTrue(store.lastCrash().contains("IllegalStateException: x"));
+    }
+
+    @Test public void nonFatalIsWrittenAndCapped() throws Exception {
+        Thread.UncaughtExceptionHandler before = Thread.getDefaultUncaughtExceptionHandler();
+        try {
+            Thread.setDefaultUncaughtExceptionHandler(null);
+            android.content.Context c = org.robolectric.RuntimeEnvironment.getApplication();
+            CrashReporter.install(c, "1", 1);
+            CrashReporter.NON_FATALS.set(0);
+            Diagnostics app = Diagnostics.get(c);
+            app.clear();
+            SafeExecutor ex = new SafeExecutor(1, 1, 1, java.util.concurrent.TimeUnit.SECONDS,
+                    new java.util.concurrent.LinkedBlockingQueue<>(), false);
+            java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
+            ex.execute(() -> { throw new IllegalArgumentException("bad tag"); });
+            ex.execute(done::countDown); // the worker survived the first task
+            assertTrue(done.await(5, java.util.concurrent.TimeUnit.SECONDS));
+            ex.shutdown();
+            assertTrue(ex.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS));
+            String last = app.lastCrash();
+            assertNotNull(last);
+            assertTrue(last.startsWith("NON-FATAL"));
+            assertTrue(last.contains("IllegalArgumentException: bad tag"));
+        } finally {
+            Thread.setDefaultUncaughtExceptionHandler(before);
+        }
+    }
+
     @Test public void installingTwiceDoesNotChainItself() {
         Thread.UncaughtExceptionHandler before = Thread.getDefaultUncaughtExceptionHandler();
         try {

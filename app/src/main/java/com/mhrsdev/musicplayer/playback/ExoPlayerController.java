@@ -65,6 +65,8 @@ public class ExoPlayerController implements PlayerController {
     private List<Track> queue = Collections.emptyList();
     private IdentityHashMap<MediaItem, Track> decoded = new IdentityHashMap<>();
     private int consecutiveErrors;
+    /** Unplayable tracks skipped in a row before playback stops on the error. */
+    static final int MAX_ERROR_SKIPS = 10;
     private ReplayGain replayGain = ReplayGain.NONE;
     private float sleepVolume = 1f; // fade factor of the sleep timer; the player volume is this times the ReplayGain volume
 
@@ -479,7 +481,9 @@ public class ExoPlayerController implements PlayerController {
 
         /** Unreadable file: skip to the next one, but never loop forever over a fully broken queue. */
         @Override public void onPlayerError(PlaybackException error) {
-            if (++consecutiveErrors <= player.getMediaItemCount() && player.hasNextMediaItem()) {
+            // Skip an unplayable file, but not a whole unplayable queue (SD card gone, 2,000 deleted files): each skip
+            // re-prepares and re-renders the notification cover, a CPU / memory storm that ends in an ANR or kill.
+            if (++consecutiveErrors <= Math.min(MAX_ERROR_SKIPS, player.getMediaItemCount()) && player.hasNextMediaItem()) {
                 player.seekToNextMediaItem();
                 player.prepare();
                 player.play();
