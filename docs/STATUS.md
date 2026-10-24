@@ -135,6 +135,8 @@ Obsolete WIP (Kotlin/Compose, do NOT reuse code): `task/t2-ui-foundation`, `task
 - ✅ **HOTFIX v0.3.2** (released) [Sonnet PF-B] D33: ICU regex crash (LyricsQueryNormalizer `}`), audit all regexes, safe-compile helper, SafeExecutor catches Throwable, ICU-strictness scan test. `task/pfb-hotfix-regex`. v0.3.0/0.3.1 crash within 2 s of launch on affected devices (confirmed Note 9 / Android 10).
 - 💡 **Backlog from BitChord (D34, ideas only, GPL — no code)**: crossfade + gapless tuning, 'stats for nerds' overlay (codec/bitrate/sample rate from ExoPlayer Format), ListenBrainz/Last.fm scrobbling, optional extra lyrics providers (check ToS).
 
+- 🔄 **U4** [Opus] D35 mini-player: add previous button (prev / play-pause / next), RTL-aware. `task/u4-miniplayer-prev`.
+
 ## Next release v0.4.0 — performance only (D28), starts after v0.3.0 is verified
 - **PF1** [Sonnet] Cold start + first frame: Application/DI lazy init, work off main thread, baseline profile (hand-written baseline-prof.txt + startup profile), splash→Home time budget; measure with JVM-side counters since no device.
 - **PF2** [Opus] Scroll/animation smoothness: RecyclerView adapters (DiffUtil, payloads, view recycling, no per-bind allocations), overdraw/layout depth, custom View draw paths, image decode sizes. Keep all effects.

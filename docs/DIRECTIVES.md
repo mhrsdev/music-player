@@ -517,3 +517,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** "این پروژه روهم بخون ببین اگه چیزیش بدرد میخپرد استفاده کن: https://github.com/kushagrasinghx/BitChord"
 
 **Summary:** Reviewed BitChord (YouTube Music client, Kotlin, Apple-Music-inspired, **GPL-3.0**). We are MIT + Java-only and the owner's rule is "don't copy others' implementations", so NO code is taken; only ideas, implemented in our own way. Candidate ideas (backlog, after the performance-only releases): crossfade/gapless tuning, 'stats for nerds' audio-format overlay, ListenBrainz/Last.fm scrobbling, optional extra lyrics providers (ToS risk), per-network quality (n/a for local files). Skipped for perf/scope: animated artwork canvas, frosted-glass bars, Discord RPC, streaming sources.
+
+---
+
+## D35 — 2026-10-24 — Mini-player has only one skip button (needs previous + next)
+
+**Original (verbatim):** (screenshot of Home with the mini-player) "تو اینجا فقط یه دکمه عقب جلو هست از دوتا"
+
+**Summary:** The mini-player shows play/pause and only ONE skip button (next); the owner expects both previous and next. Task U4 (Opus): add the missing previous button to the mini-player (RTL-aware order, touch targets, no layout overflow on small widths), keep effects/perf budgets. Ships in v0.3.3.
