@@ -5,10 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
 import androidx.media3.common.Timeline;
+import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.session.MediaSession;
 import com.mhrsdev.musicplayer.domain.model.Track;
@@ -38,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  * are saved on item transitions, pause, mode changes and by {@link #saveNow()} (UI went to background / service
  * stopping). Restore happens paused and unprepared.
  */
+@OptIn(markerClass = UnstableApi.class)
 class PlaybackStore implements Player.Listener {
     private static final String FILE = "playback_state";
     private static final String QUEUE_FILE = "queue.bin";

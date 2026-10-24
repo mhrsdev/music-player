@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.domain.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +12,8 @@ public record SoundProfile(boolean eqEnabled, int preset, List<Integer> bandLeve
 
     /** Snapshot of what is playing now. */
     public static SoundProfile of(SoundState s, PlaybackOptions o) {
-        List<Integer> levels = s.bands().stream().map(SoundState.Band::levelMb).toList();
+        List<Integer> levels = new ArrayList<>(s.bands().size()); // Stream.toList() needs API 34
+        for (SoundState.Band band : s.bands()) levels.add(band.levelMb());
         return new SoundProfile(s.equalizerEnabled(), s.preset(), levels, s.bassBoost(), s.virtualizer(),
                 s.loudnessGainMb(), o.speed());
     }

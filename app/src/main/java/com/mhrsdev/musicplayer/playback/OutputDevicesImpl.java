@@ -70,8 +70,8 @@ public class OutputDevicesImpl implements OutputDevices {
         AudioDeviceInfo[] infos = am.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
         List<Raw> raws = new ArrayList<>(infos.length);
         for (AudioDeviceInfo d : infos) {
-            CharSequence name = d.getProductName();
-            raws.add(new Raw(d.getType(), d.getAddress(), name == null ? null : name.toString()));
+            CharSequence name = d.getProductName(); // address needs API 28; before it the key falls back to the name
+            raws.add(new Raw(d.getType(), Build.VERSION.SDK_INT >= 28 ? d.getAddress() : null, name == null ? null : name.toString()));
         }
         int activeType = -1;
         String activeAddress = null;
