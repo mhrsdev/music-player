@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Diagnostics: a pulse line inside a rounded frame (Settings > About > Diagnostics, Home notice). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="?attr/mpOnSurfaceVariant" android:autoMirrored="false">
+    <path android:strokeColor="@android:color/white" android:strokeWidth="2" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:fillColor="#00000000"
+        android:pathData="M3,12h4l2,-5 3.5,10 2.5,-7 1.5,2H21" />
+</vector>

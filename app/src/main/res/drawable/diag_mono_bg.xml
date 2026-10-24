@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quiet well for the stack-trace excerpt. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/mpSurfaceContainerHigh" />
+    <corners android:radius="14dp" />
+</shape>

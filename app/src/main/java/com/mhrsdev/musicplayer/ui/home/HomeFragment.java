@@ -17,6 +17,7 @@ import com.mhrsdev.musicplayer.di.AppContainer;
 import com.mhrsdev.musicplayer.domain.model.HomeItem;
 import com.mhrsdev.musicplayer.domain.model.HomeSection;
 import com.mhrsdev.musicplayer.domain.model.Track;
+import com.mhrsdev.musicplayer.ui.diagnostics.DiagnosticsNotice;
 import com.mhrsdev.musicplayer.ui.library.ScanFeedback;
 import com.mhrsdev.musicplayer.ui.library.StateView;
 import com.mhrsdev.musicplayer.ui.nav.AudioPermission;
@@ -78,6 +79,7 @@ public class HomeFragment extends Fragment implements HomeAdapter.Listener {
             }
         });
         installPullToRefresh();
+        DiagnosticsNotice.attach(this, (ViewGroup) view); // one-time "closed unexpectedly last time" card (D30)
     }
 
     /**

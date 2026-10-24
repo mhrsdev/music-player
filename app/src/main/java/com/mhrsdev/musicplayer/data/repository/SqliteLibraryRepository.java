@@ -1,5 +1,6 @@
 package com.mhrsdev.musicplayer.data.repository;
 
+import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
@@ -251,11 +252,18 @@ public class SqliteLibraryRepository implements LibraryRepository, LibraryAdmin 
         ScanResult result = ScanResult.FAILED;
         if (scanRunning.compareAndSet(false, true)) {
             scanning.postValue(true);
+            Breadcrumbs.add(force ? "scan start (full)" : "scan start");
             try {
                 result = scanner.scan(force);
                 if (result.ok()) lastFinishedMs = SystemClock.elapsedRealtime();
                 if (result.changed() || (force && result.ok())) notifier.notifyChanged(ChangeNotifier.TRACKS);
+            } catch (RuntimeException e) {
+                // A MediaStore provider error or SQLite failure (disk full, locked, corrupt) on the scan thread would
+                // kill the whole app; the scan just fails and is retried on the next start.
+                Breadcrumbs.add("scan failed " + e);
             } finally {
+                Breadcrumbs.add("scan end " + (result.ok() ? "+" + result.added() + " ~" + result.updated()
+                        + " -" + result.removed() : "failed"));
                 scanRunning.set(false);
                 scanning.postValue(false);
             }

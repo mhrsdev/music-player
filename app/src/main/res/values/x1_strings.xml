@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- X1 (D30): Settings > Diagnostics and the Home notice after an unexpected exit. -->
+    <string name="diag_title">Diagnostics</string>
+    <string name="diag_row_sub">Crash and exit reports to send to the developer</string>
+    <string name="diag_intro">If Mowj closes on its own, this page shows why. Sharing the report helps us fix it. It holds technical details only (app and phone model, error traces) and stays on your phone until you share it.</string>
+    <string name="diag_last_exit">Last time the app closed</string>
+    <string name="diag_last_crash">Last crash</string>
+    <string name="diag_none">Nothing recorded. Mowj has not closed unexpectedly.</string>
+    <string name="diag_none_old_android">Nothing recorded. Android 10 and older only report crashes, not other closes.</string>
+    <string name="diag_share">Share diagnostics</string>
+    <string name="diag_clear">Clear</string>
+    <string name="diag_cleared">Diagnostics cleared</string>
+    <string name="diag_share_subject">Mowj diagnostics</string>
+    <string name="diag_share_chooser">Send diagnostics with</string>
+    <string name="diag_exits_count">%1$d closes recorded</string>
+    <string name="diag_exit_crash">The app crashed</string>
+    <string name="diag_exit_froze">The app stopped responding</string>
+    <string name="diag_exit_low_memory">The system closed the app because memory was low</string>
+    <string name="diag_exit_system">The system closed the app</string>
+    <string name="diag_exit_user">You closed the app</string>
+    <string name="diag_exit_update">The app was updated</string>
+    <string name="diag_exit_normal">The app closed normally</string>
+    <string name="diag_exit_unknown">Closed for an unknown reason</string>
+    <string name="diag_notice_title">Mowj closed unexpectedly last time</string>
+    <string name="diag_notice_body">Sharing the report helps us fix it.</string>
+    <string name="diag_notice_share">Share report</string>
+    <string name="diag_notice_dismiss">Dismiss</string>
+</resources>

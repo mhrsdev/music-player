@@ -43,6 +43,8 @@ playback            ExoPlayerController (real PlayerController), PlaybackService
                     (SleepTimerLogic, PlayCountTracker, QueueShuffler); di/PlaybackModule.createController(ctx, playCountListener)
 di                  AppContainer (hand-written DI, real implementations; fakes behind one switch), DataModule, PlaybackModule,
                     WaveformModule
+diag                crash / exit diagnostics (CrashReporter, ExitInfoReader, Breadcrumbs, Diagnostics store; D30, see
+                    docs/DIAGNOSTICS.md). No UI, no network; the UI (ui/diagnostics) reads it through Diagnostics.
 fake                in-memory implementations + SampleData (UI development and tests)
 ui/theme  ui/widget  ui/nav  ui/home  ui/search  ui/library  ui/player  ui/queue  ui/settings
                     (owned by the UI agent; ui/home/HomeViewModel is the ViewModel example)

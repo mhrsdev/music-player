@@ -17,6 +17,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
 import com.mhrsdev.musicplayer.ui.widget.cover.GeneratedCover;
 
@@ -145,9 +146,15 @@ public class ArtworkLoader {
             // One probe per cover at a time: the same album asked at 3 sizes (row, card, player) must not run the
             // thumbnail / retriever / folder probes three times in parallel. The later ones find the miss or the winner.
             synchronized (probeLocks[(uri.hashCode() & 0x7fffffff) % probeLocks.length]) {
-                bmp = misses.get(uri) != null ? null : resolver.resolve(uri, bucket(sizePx));
+                try {
+                    bmp = misses.get(uri) != null ? null : resolver.resolve(uri, bucket(sizePx));
+                } catch (RuntimeException | OutOfMemoryError e) { // else the key stays "pending" forever
+                    Breadcrumbs.add("artwork error " + e);
+                    bmp = null;
+                }
             }
-            main.post(() -> deliver(uri, key, bmp));
+            Bitmap found = bmp;
+            main.post(() -> deliver(uri, key, found));
         });
     }
 
@@ -172,9 +179,14 @@ public class ArtworkLoader {
         String key = generatedKey(spec, sizePx);
         Bitmap hit = cache.get(key);
         if (hit != null || generator == null || bucket(sizePx) > SYNC_MAX_PX) return hit;
-        Bitmap b = generator.render(spec, bucket(sizePx));
-        cache.put(key, b);
-        return b;
+        try {
+            Bitmap b = generator.render(spec, bucket(sizePx));
+            cache.put(key, b);
+            return b;
+        } catch (RuntimeException | OutOfMemoryError e) { // the view keeps its quiet loading tone
+            Breadcrumbs.add("generated cover error " + e);
+            return null;
+        }
     }
 
     /** The generated cover for {@code spec} at the bucket of {@code sizePx}, rendered on a worker thread. */
@@ -201,6 +213,7 @@ public class ArtworkLoader {
             try {
                 bmp = g.render(spec, px);
             } catch (RuntimeException | OutOfMemoryError e) {
+                Breadcrumbs.add("generated cover error " + e);
                 bmp = null;
             }
             Bitmap result = bmp;

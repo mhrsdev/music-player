@@ -21,6 +21,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import com.mhrsdev.musicplayer.databinding.ActivityMainBinding;
+import com.mhrsdev.musicplayer.diag.Breadcrumbs;
+import com.mhrsdev.musicplayer.diag.ExitInfoReader;
 import com.mhrsdev.musicplayer.domain.model.PlaybackState;
 import com.mhrsdev.musicplayer.domain.model.Track;
 import com.mhrsdev.musicplayer.playback.PlaybackService;
@@ -171,6 +173,13 @@ public class MainActivity extends AppCompatActivity
                 if (dockPx >= 0) BottomChrome.apply(view, dockPx);
             }
 
+            @Override public void onFragmentResumed(FragmentManager fm, Fragment f) {
+                // Crash/exit diagnostics: which screen was showing (rare event, no I/O; one tiny binder call on 11+).
+                String name = f.getClass().getSimpleName();
+                Breadcrumbs.add("screen " + name);
+                ExitInfoReader.setStateSummary(MainActivity.this, "screen=" + name);
+            }
+
             @Override public void onFragmentStarted(FragmentManager fm, Fragment f) {
                 // Sheets and dialogs (queue, add to playlist, track menu, sleep timer...) are edge-to-edge too.
                 if (f instanceof DialogFragment df) SystemBars.applyTo(df.getDialog(), MainActivity.this);
@@ -191,6 +200,12 @@ public class MainActivity extends AppCompatActivity
         } else {
             c.show(WindowInsetsCompat.Type.statusBars());
         }
+    }
+
+    /** Home / Recents pressed (not called for Back): tells a normal "left the app" apart from a crash in the log. */
+    @Override protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        Breadcrumbs.add("user left (home/recents)");
     }
 
     @Override protected void onResume() {
@@ -296,13 +311,25 @@ public class MainActivity extends AppCompatActivity
         binding.mini.setListener(new MiniPlayerView.Listener() {
             @Override public void onOpen() { openFullPlayer(); }
 
-            @Override public void onPlayPause() { shell.togglePlayPause(); }
+            @Override public void onPlayPause() {
+                Breadcrumbs.add("mini play/pause");
+                shell.togglePlayPause();
+            }
 
-            @Override public void onNext() { shell.next(); }
+            @Override public void onNext() {
+                Breadcrumbs.add("mini next");
+                shell.next();
+            }
 
-            @Override public void onPrevious() { shell.previous(); }
+            @Override public void onPrevious() {
+                Breadcrumbs.add("mini previous");
+                shell.previous();
+            }
 
-            @Override public void onDismiss() { shell.pause(); }
+            @Override public void onDismiss() {
+                Breadcrumbs.add("mini dismiss");
+                shell.pause();
+            }
         });
         ThemeController.get(this).accent().observe(this, binding.mini::setAccent);
         shell.getPlayback().observe(this, this::renderMini);

@@ -30,7 +30,9 @@ import com.mhrsdev.musicplayer.di.AppContainer;
 import com.mhrsdev.musicplayer.domain.model.ScanResult;
 import com.mhrsdev.musicplayer.ui.nav.Adaptive;
 import com.mhrsdev.musicplayer.ui.nav.FeatureScreens;
+import com.mhrsdev.musicplayer.ui.nav.ScreenNavigator;
 import com.mhrsdev.musicplayer.ui.nav.Screens;
+import com.mhrsdev.musicplayer.ui.diagnostics.DiagnosticsFragment;
 import com.mhrsdev.musicplayer.data.settings.SeekBarStyle;
 import com.mhrsdev.musicplayer.ui.widget.BaseSeekView;
 import com.mhrsdev.musicplayer.ui.widget.SeekShapes;
@@ -500,6 +502,11 @@ public class SettingsFragment extends Fragment {
                         .show()));
         chevron(row(b.aboutCard, R.drawable.settings_ic_open, getString(R.string.settings_source),
                 REPO_URL.replace("https://", ""), v -> openUrl(REPO_URL)));
+        chevron(row(b.aboutCard, R.drawable.settings_ic_diagnostics, getString(R.string.diag_title),
+                getString(R.string.diag_row_sub), v -> {
+                    ScreenNavigator nav = ScreenNavigator.from(requireContext());
+                    if (nav != null) nav.openFragment(new DiagnosticsFragment(), DiagnosticsFragment.TAG);
+                }));
         chevron(row(b.aboutCard, R.drawable.search_ic_history, getString(R.string.settings_feedback),
                 getString(R.string.settings_feedback_sub), v -> openUrl(REPO_URL + "/issues/new")));
     }

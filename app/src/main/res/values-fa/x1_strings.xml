@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diag_title">عیب‌یابی</string>
+    <string name="diag_row_sub">گزارش کرش و بسته‌شدن برنامه برای ارسال به سازنده</string>
+    <string name="diag_intro">اگر موج خودبه‌خود بسته شود، این صفحه دلیلش را نشان می‌دهد. فرستادن گزارش به ما کمک می‌کند مشکل را برطرف کنیم. گزارش فقط جزئیات فنی دارد (نسخه‌ی برنامه، مدل گوشی و ردِ خطا) و تا وقتی خودتان نفرستید روی گوشی می‌ماند.</string>
+    <string name="diag_last_exit">آخرین بار که برنامه بسته شد</string>
+    <string name="diag_last_crash">آخرین کرش</string>
+    <string name="diag_none">چیزی ثبت نشده. موج ناگهانی بسته نشده است.</string>
+    <string name="diag_none_old_android">چیزی ثبت نشده. اندروید ۱۰ و قدیمی‌تر فقط کرش‌ها را گزارش می‌دهد.</string>
+    <string name="diag_share">ارسال گزارش عیب‌یابی</string>
+    <string name="diag_clear">پاک کردن</string>
+    <string name="diag_cleared">گزارش‌ها پاک شد</string>
+    <string name="diag_share_subject">گزارش عیب‌یابی موج</string>
+    <string name="diag_share_chooser">ارسال گزارش با</string>
+    <string name="diag_exits_count">%1$d بار بسته‌شدن ثبت شده</string>
+    <string name="diag_exit_crash">برنامه کرش کرد</string>
+    <string name="diag_exit_froze">برنامه از کار افتاد و پاسخ نداد</string>
+    <string name="diag_exit_low_memory">سیستم به‌خاطر کمبود حافظه برنامه را بست</string>
+    <string name="diag_exit_system">سیستم برنامه را بست</string>
+    <string name="diag_exit_user">خودتان برنامه را بستید</string>
+    <string name="diag_exit_update">برنامه به‌روزرسانی شد</string>
+    <string name="diag_exit_normal">برنامه به‌طور عادی بسته شد</string>
+    <string name="diag_exit_unknown">به دلیلی نامشخص بسته شد</string>
+    <string name="diag_notice_title">موج دفعه‌ی قبل ناگهان بسته شد</string>
+    <string name="diag_notice_body">فرستادن گزارش به ما کمک می‌کند مشکل را برطرف کنیم.</string>
+    <string name="diag_notice_share">ارسال گزارش</string>
+    <string name="diag_notice_dismiss">بستن</string>
+</resources>
