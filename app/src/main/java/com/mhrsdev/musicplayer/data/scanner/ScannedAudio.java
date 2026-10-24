@@ -45,9 +45,12 @@ public record ScannedAudio(
     @Nullable public static String cleanGenre(@Nullable String raw) {
         if (raw == null) return null;
         String g = raw.trim();
-        if (g.isEmpty() || UNKNOWN.equals(g) || g.matches("\\(?\\d+\\)?")) return null;
+        if (g.isEmpty() || UNKNOWN.equals(g) || GENRE_CODE.matcher(g).matches()) return null;
         return g.length() > 40 ? g.substring(0, 40) : g;
     }
+
+    /** Compiled once: the scan calls {@link #cleanGenre} for every row. */
+    private static final java.util.regex.Pattern GENRE_CODE = java.util.regex.Pattern.compile("\\(?\\d+\\)?");
 
     /** MediaStore's placeholder for missing tags. */
     private static final String UNKNOWN = "<unknown>";

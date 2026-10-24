@@ -1,9 +1,10 @@
 package com.mhrsdev.musicplayer.domain.model;
 
 import androidx.annotation.Nullable;
+import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.RandomAccess;
 
 /**
  * Immutable snapshot of the player, published as {@code LiveData<PlaybackState>}.
@@ -28,13 +29,37 @@ public record PlaybackState(
         boolean canUndoShuffle) {
 
     public PlaybackState {
-        queue = Collections.unmodifiableList(new ArrayList<>(queue));
+        queue = frozen(queue);
+    }
+
+    /**
+     * An immutable copy of {@code tracks}; a list that already came from here is returned as is. The player publishes a
+     * state 4 times a second and a 10k-track queue must not be copied each time (PerfBudget: no per-tick O(queue) work).
+     */
+    public static List<Track> frozen(List<Track> tracks) {
+        return tracks instanceof Frozen ? tracks : new Frozen(new ArrayList<>(tracks));
+    }
+
+    private static class Frozen extends AbstractList<Track> implements RandomAccess {
+        private final List<Track> items;
+
+        Frozen(List<Track> items) {
+            this.items = items;
+        }
+
+        @Override public Track get(int index) {
+            return items.get(index);
+        }
+
+        @Override public int size() {
+            return items.size();
+        }
     }
 
     /** Idle player: empty queue, nothing playing. */
     public static PlaybackState empty() {
         return new PlaybackState(null, false, false, 0L, 0L, false, RepeatMode.OFF,
-                Collections.emptyList(), -1, SleepTimer.OFF, null, false);
+                List.of(), -1, SleepTimer.OFF, null, false);
     }
 
     public boolean hasNext() {

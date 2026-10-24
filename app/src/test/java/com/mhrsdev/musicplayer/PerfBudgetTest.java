@@ -169,4 +169,90 @@ public class PerfBudgetTest {
                 "new Thread", "Executor", "MediaStore", "openInputStream", "Thread.sleep", "BitmapFactory"));
         for (String f : forbidden) assertTrue("Application.onCreate must not call " + f, !body.contains(f));
     }
+
+    // ---- PF-B (D29): background / sustained CPU budgets, v0.3.1 ----
+
+    private static final String PKG = "java/com/mhrsdev/musicplayer/";
+
+    /** Value of {@code NAME = 5 * 60_000L;} style constants (products of integer literals) in a source file. */
+    private static long constant(String file, String name) throws IOException {
+        Matcher m = Pattern.compile(name + "\\s*=\\s*([0-9_L *]+);").matcher(read(MAIN.resolve(PKG + file)));
+        assertTrue(file + " must define " + name, m.find());
+        long v = 1;
+        for (String f : m.group(1).split("\\*")) v *= Long.parseLong(f.trim().replace("_", "").replace("L", ""));
+        return v;
+    }
+
+    @Test public void libraryScanIsDebouncedThrottledAndOnItsOwnLowPriorityThread() throws IOException {
+        assertTrue("a download touches MediaStore many times: wait for the burst",
+                constant("di/AppContainer.java", "OBSERVER_DEBOUNCE_MS") >= 2_000);
+        assertTrue("foreground rescans at most every 20 s",
+                constant("di/AppContainer.java", "FOREGROUND_SCAN_THROTTLE_MS") >= 20_000);
+        assertTrue("without a MediaStore generation (API < 30) every check is a full pass: at most every 5 min",
+                constant("di/AppContainer.java", "LEGACY_FOREGROUND_SCAN_THROTTLE_MS") >= 5 * 60_000);
+        String container = read(MAIN.resolve(PKG + "di/AppContainer.java"));
+        assertTrue("scan thread priority", container.contains("Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)"));
+        assertTrue("MediaStore is only watched while the UI is visible", container.contains("unregisterContentObserver"));
+        // The scanner reads MediaStore columns only: decoding or tag-parsing every file would be a library-sized job.
+        String scanner = read(MAIN.resolve(PKG + "data/scanner/MediaStoreScanner.java"));
+        for (String heavy : new String[] {"MediaMetadataRetriever", "MediaExtractor", "MediaCodec"}) {
+            assertTrue("the scan must not open audio files (" + heavy + ")", !scanner.contains(heavy));
+        }
+    }
+
+    @Test public void waveformDecodingIsOnDemandBackgroundPriorityAndGated() throws IOException {
+        String module = read(MAIN.resolve(PKG + "di/WaveformModule.java"));
+        assertTrue("one extractor thread at background priority",
+                module.contains("new ThreadPoolExecutor(1, 1,") && module.contains("THREAD_PRIORITY_BACKGROUND"));
+        String container = read(MAIN.resolve(PKG + "di/AppContainer.java"));
+        for (String gate : new String[] {"getCurrentThermalStatus", "THERMAL_STATUS_MODERATE", "Build.VERSION_CODES.Q",
+                "!uiVisible", "usesWaveform()", "batterySaverActive()"}) {
+            assertTrue("prefetch gate missing: " + gate, container.contains(gate));
+        }
+        String repo = read(MAIN.resolve(PKG + "data/waveform/WaveformRepositoryImpl.java"));
+        assertTrue("throttled applies to prefetch and to on-screen jobs",
+                count(repo, "throttled.getAsBoolean()") == 2 && count(repo, "skipPrefetch.getAsBoolean()") == 2);
+        // Only the next-track listener may start a decode without an on-screen observer.
+        Set<String> callers = filesMatching("\\.prefetch\\(|::prefetch");
+        assertEquals(new TreeSet<>(Arrays.asList("java/com/mhrsdev/musicplayer/di/AppContainer.java")), callers);
+    }
+
+    @Test public void widgetsAreRedrawnOnPlaybackStateEventsOnlyAndCoalesced() throws IOException {
+        String bridge = read(MAIN.resolve(PKG + "playback/NowPlayingBridge.java"));
+        assertTrue("coalescing window >= 200 ms", constant("playback/NowPlayingBridge.java", "COALESCE_MS") >= 200);
+        for (String tick : new String[] {"EVENT_POSITION_DISCONTINUITY", "EVENT_TIMELINE_CHANGED", "EVENT_IS_LOADING_CHANGED",
+                "EVENT_MEDIA_METADATA_CHANGED", "TICK"}) {
+            assertTrue("a widget push on " + tick + " would redraw on every tick/seek/buffer", !bridge.contains(tick));
+        }
+        assertTrue("the cover of one track is resolved once, not per play/pause",
+                read(MAIN.resolve(PKG + "appwidget/WidgetUpdater.java")).contains("lastArtKey"));
+    }
+
+    @Test public void playerStateTickNeverCopiesTheQueue() throws IOException {
+        assertEquals("the 4 Hz tick period", 250, constant("playback/ExoPlayerController.java", "TICK_MS"));
+        assertTrue(read(MAIN.resolve(PKG + "domain/model/PlaybackState.java")).contains("queue = frozen(queue);"));
+        assertTrue(read(MAIN.resolve(PKG + "playback/ExoPlayerController.java")).contains("return PlaybackState.frozen(tracks);"));
+    }
+
+    @Test public void noRegexCompiledPerCall() throws IOException {
+        // String.matches / replaceAll / replaceFirst with a regex literal compile a Pattern each call; hot loops use a
+        // static final Pattern. (ui/ is reviewed by the UI budget; SemVer runs once per release comparison.)
+        Set<String> found = filesMatching("\\.(matches|replaceAll|replaceFirst)\\(\"(\\[|[^\"]*\\\\\\\\)");
+        found.removeIf(f -> f.contains("/ui/"));
+        found.remove("java/com/mhrsdev/musicplayer/data/update/SemVer.java");
+        assertEquals("hoist the regex into a static final Pattern: " + found, new TreeSet<String>(), found);
+    }
+
+    @Test public void updateCheckIsAtMostDaily() throws IOException {
+        assertEquals(24L * 60 * 60 * 1000, constant("data/update/UpdateRepositoryImpl.java", "CHECK_INTERVAL_MS"));
+        assertTrue(constant("data/update/UpdateRepositoryImpl.java", "RETRY_AFTER_FAILURE_MS") >= 60 * 60 * 1000);
+    }
+
+    @Test public void aBaselineProfileCompilesTheAppAheadOfTime() throws IOException {
+        // A sideloaded APK has no cloud profile: after every install / update the app runs interpreted + JIT until the
+        // nightly dexopt. The catch-all profile makes AGP expand the wildcards (expandReleaseArtProfileWildcards).
+        String profile = read(MAIN.resolve("baseline-prof.txt"));
+        assertTrue(profile.contains("HSPLcom/mhrsdev/musicplayer/**->**(**)**"));
+        assertTrue(profile.contains("Lcom/mhrsdev/musicplayer/**;"));
+    }
 }

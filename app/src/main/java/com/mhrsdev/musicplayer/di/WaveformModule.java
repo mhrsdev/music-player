@@ -34,8 +34,14 @@ public class WaveformModule {
         return create(context, store, power::isPowerSaveMode);
     }
 
-    /** With a caller-provided store (e.g. the SQLite-backed one) and battery-saver state (called on the worker too). */
-    public static WaveformRepositoryImpl create(Context context, WaveformStore store, BooleanSupplier powerSave) {
+    /** With a caller-provided store (e.g. the SQLite-backed one) and prefetch policy (called on the worker too). */
+    public static WaveformRepositoryImpl create(Context context, WaveformStore store, BooleanSupplier skipPrefetch) {
+        return create(context, store, skipPrefetch, () -> false);
+    }
+
+    /** As above, plus {@code throttled}: true while the phone is hot, then nothing is decoded (see the repository). */
+    public static WaveformRepositoryImpl create(Context context, WaveformStore store, BooleanSupplier skipPrefetch,
+            BooleanSupplier throttled) {
         Context app = context.getApplicationContext();
         ThreadPoolExecutor worker = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
                 runnable -> new Thread(() -> {
@@ -45,6 +51,6 @@ public class WaveformModule {
         worker.allowCoreThreadTimeOut(true);
         Handler mainHandler = new Handler(Looper.getMainLooper());
         return new WaveformRepositoryImpl(store, new WaveformExtractor(app), new MediaFingerprint(app),
-                powerSave, worker, mainHandler::post);
+                skipPrefetch, throttled, worker, mainHandler::post);
     }
 }
