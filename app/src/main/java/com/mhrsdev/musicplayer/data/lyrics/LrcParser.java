@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
  * Without any timestamp the text becomes unsynced lines.
  */
 public class LrcParser {
+    private static final Pattern SPACE_RUNS = Pattern.compile("[ \\t]{2,}");
     private static final Pattern WORD_TAG = Pattern.compile("<\\s*\\d+\\s*:\\s*\\d+(?:\\s*[.:,]\\s*\\d+)?\\s*>");
     private static final Pattern SHORT_TS = Pattern.compile("(\\d{1,5}):(\\d{1,2})(?:[.:,](\\d{1,3}))?");
     private static final Pattern LONG_TS = Pattern.compile("(\\d{1,4}):(\\d{1,2}):(\\d{1,2})[.,](\\d{1,3})");
@@ -289,7 +290,7 @@ public class LrcParser {
     /** Removes word tags (on unsynced lines) and collapses whitespace; keeps all other characters intact. */
     private static String clean(String s) {
         if (s.indexOf('<') >= 0) s = WORD_TAG.matcher(s).replaceAll("");
-        return s.replaceAll("[ \\t]{2,}", " ").trim();
+        return SPACE_RUNS.matcher(s).replaceAll(" ").trim();
     }
 
     private static int skipInvisible(String s, int from) {

@@ -477,3 +477,16 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 **Original (verbatim):** (attached screen recording "Screen_Recording_…One_UI_Home.mp4", 4.8 s, 720x1560@120) + "و برنامه کرش میکنه زیاد رو قسمت های مختلفش"
 
 **Summary:** Owner reports frequent crashes in various parts of the app. The recording shows Home (hero 'تازه‌های کتابخانه', 'ادامه‌ی پخش', 'دوباره سراغشان برو', 'ساخته‌شده برای تو', 'انتخاب‌های سریع'), scrolled down and back up, then the app window closes straight to the One UI launcher at ~2.4 s. No stack trace is visible, so the exit could be a crash, a system kill (low memory/thermal) or a normal finish. Task X1: in-app crash/exit diagnostics (UncaughtExceptionHandler log + ApplicationExitInfo reasons + share button) and a hostile-data smoke test of every screen.
+
+---
+
+## D31 — 2026-10-24 — Crash evidence on v0.3.0 (videos, system dialog, triggers)
+
+**Original (verbatim, in order):**
+
+> ۰.۳.۰  (answer: recordings are from v0.3.0)
+> اینم نمونه بعدیش  (2nd screen recording, 25 s: Home → App info → app closes via back-to-home animation → reopened, playback paused)
+> این یکی دیگه  (screenshot of Android dialog: "مشکلی در موج پیش آمد — موج بسته شد زیرا این برنامه دارای اشکال است")
+> موقعی که میخوام یه اهنگو وا کنم / وسط اسکرول تقریبا همه جا
+
+**Summary:** Confirmed real process crashes on v0.3.0 (Android 16-class system dialog). Triggers per owner: (a) tapping a song to start it, (b) mid-scroll almost anywhere. Playback also seemed to stop after leaving the app. Android version not yet given. X1 (crash hunt + diagnostics) and PF-A/PF-B briefed with these triggers; plan: ship diagnostics + crash fixes + perf as v0.3.1 ASAP.

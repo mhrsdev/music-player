@@ -60,6 +60,8 @@ public class AppContainer {
     static final boolean USE_FAKES = false;
     /** App start: skip the incremental scan if one finished this recently. */
     static final long FOREGROUND_SCAN_THROTTLE_MS = 20_000L;
+    /** Below API 30 there is no MediaStore generation, so every check is a full pass over all rows: rarely. */
+    static final long LEGACY_FOREGROUND_SCAN_THROTTLE_MS = 5 * 60_000L;
     /** After a MediaStore change event: wait for the burst (a download) to settle before scanning. */
     static final long OBSERVER_DEBOUNCE_MS = 2_500L;
 
@@ -87,6 +89,8 @@ public class AppContainer {
     private final Runnable observedScan = this::scanAfterMediaChange;
     private ContentObserver mediaObserver;
     private UpdateRepository updates;
+    /** True between the first activity start and the last stop: the only time a prefetched waveform could be seen. */
+    private volatile boolean uiVisible;
 
     public AppContainer(Context context) {
         this(context, USE_FAKES);
@@ -129,7 +133,8 @@ public class AppContainer {
             libraryBrowser = data.browser;
             homeFeed = data.homeFeed;
             backup = data.backup;
-            WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore, this::batterySaverActive);
+            WaveformRepositoryImpl realWaveform = WaveformModule.create(appContext, data.waveformStore,
+                    this::skipWaveformPrefetch, this::thermalThrottled);
             waveform = realWaveform;
             player = PlaybackModule.createController(appContext, data.library::recordPlay, realWaveform::prefetch);
             PlaybackModule.setLibraryReader(data.reader);
@@ -200,6 +205,7 @@ public class AppContainer {
      */
     public void onAppForeground() {
         if (useFakes) return;
+        uiVisible = true;
         updates().checkIfDue();
         if (mediaObserver == null) {
             mediaObserver = new ContentObserver(mainHandler) {
@@ -212,11 +218,15 @@ public class AppContainer {
             appContext.getContentResolver().registerContentObserver(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaObserver);
         }
-        if (hasAudioPermission()) libraryAdmin.scanIfStale(FOREGROUND_SCAN_THROTTLE_MS);
+        if (hasAudioPermission()) {
+            libraryAdmin.scanIfStale(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                    ? FOREGROUND_SCAN_THROTTLE_MS : LEGACY_FOREGROUND_SCAN_THROTTLE_MS);
+        }
     }
 
     /** Call when no activity is visible any more: stops watching MediaStore (no background observers). */
     public void onAppBackground() {
+        uiVisible = false;
         mainHandler.removeCallbacks(observedScan);
         if (mediaObserver != null) {
             appContext.getContentResolver().unregisterContentObserver(mediaObserver);
@@ -232,6 +242,22 @@ public class AppContainer {
     private boolean batterySaverActive() {
         PowerManager power = (PowerManager) appContext.getSystemService(Context.POWER_SERVICE);
         return settings.batterySaver().getValue().active(power != null && power.isPowerSaveMode());
+    }
+
+    /**
+     * Next-track waveform prefetch is only worth the decoding when someone can see the result: the UI is visible, the
+     * seek style draws a waveform, and the phone is neither saving power nor hot. Otherwise the current track's
+     * envelope is still computed on demand when the player screen asks for it.
+     */
+    private boolean skipWaveformPrefetch() {
+        return !uiVisible || !settings.seekBarStyle().getValue().usesWaveform() || batterySaverActive();
+    }
+
+    /** Thermal status MODERATE or worse (API 29+): optional background decoding stops until the phone cools. */
+    private boolean thermalThrottled() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false;
+        PowerManager power = (PowerManager) appContext.getSystemService(Context.POWER_SERVICE);
+        return power != null && power.getCurrentThermalStatus() >= PowerManager.THERMAL_STATUS_MODERATE;
     }
 
     private boolean hasAudioPermission() {

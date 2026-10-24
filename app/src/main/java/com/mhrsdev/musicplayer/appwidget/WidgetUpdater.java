@@ -19,6 +19,9 @@ import java.util.concurrent.Executor;
  */
 public class WidgetUpdater {
     private static final int ART_PX = 420;
+    /** The last cover resolved for a widget, so play/pause and buffering updates of one track do not probe again. io thread only. */
+    private static String lastArtKey;
+    private static Bitmap lastArt;
 
     private WidgetUpdater() { }
 
@@ -43,13 +46,23 @@ public class WidgetUpdater {
         return GeneratedCover.get(app).render(spec, ART_PX);
     }
 
-    private static void render(Context app, AppWidgetManager manager, @Nullable NowPlaying np) {
-        Bitmap art = np == null ? null : WidgetArt.decode(app, np.artworkUri(), ART_PX);
-        if (art == null && np != null && np.artworkUri() != null) { // Android 10+: albumart URIs often do not open
+    /** The cover for {@code np}: remembered for the same track, else decode, resolver chain, then the generated one. */
+    private static Bitmap cover(Context app, NowPlaying np) {
+        String key = np.albumId() + '|' + np.title() + '|' + np.artworkUri();
+        if (key.equals(lastArtKey) && lastArt != null) return lastArt;
+        Bitmap art = WidgetArt.decode(app, np.artworkUri(), ART_PX);
+        if (art == null && np.artworkUri() != null) { // Android 10+: albumart URIs often do not open
             art = new com.mhrsdev.musicplayer.ui.widget.ArtworkResolver(
                     new com.mhrsdev.musicplayer.ui.widget.ArtworkLoader.PlatformBackend(app)).resolve(np.artworkUri(), ART_PX);
         }
-        if (art == null && np != null) art = generated(app, np); // no cover: the app's generated one
+        if (art == null) art = generated(app, np); // no cover: the app's generated one
+        lastArtKey = key;
+        lastArt = art;
+        return art;
+    }
+
+    private static void render(Context app, AppWidgetManager manager, @Nullable NowPlaying np) {
+        Bitmap art = np == null ? null : cover(app, np);
         boolean dark = (app.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
                 == Configuration.UI_MODE_NIGHT_YES;
         for (WidgetKind kind : WidgetKind.values()) {
