@@ -568,3 +568,11 @@ Visual language = **Material 3 Expressive**, dark theme, dynamic blurred artwork
 > مصرف باتریشم خیلی خیلی زیاده تو ۵ دقیقه ۶ درصد شارژمو کم کرد / درحالت عادی این عدد روی ۱ یا ۲ درصد بوده نهایت
 
 **Summary:** The owner stresses that his phone is the most powerful one (S26 Ultra) and still lags — so mid/low-end phones must be far worse; and the app drains 6% battery in 5 minutes (normal 1–2%). Treated as severe: sustained CPU/GPU load (idle redraw at display refresh rate is the prime suspect). SC1 gets scroll budgets for a ~4x slower phone plus an idle-redraw audit; PT1 telemetry adds battery current (mA), per-thread CPU, idle-redraw fps. Questions sent to owner: was the screen on / was music playing / which version.
+
+---
+
+## D41 — 2026-10-24 — Disable everything useless when the app is not on screen (and inside the app for hidden parts)
+
+**Original (verbatim):** "و اینکه مثلا وقتی از صفحه برنامه خارج میشی میری تو یه برنامه دیگه پ داری موزیک گوش میدی تمام بخشهای بیفایده غیر فعال بشن / همینطور توی خود برنامه هم بشه"
+
+**Summary:** When the user leaves Mowj for another app while music keeps playing, every part that is useless without a visible UI must be inactive (frame loops, animations, lyrics sweeps, backdrop, seek-bar ticks, Home feed/DB observers, artwork/palette work, position polling, widget/notification churn…) — only audio playback + the media notification/session remain. The same principle inside the app: anything not visible (hidden tabs, screens under the full player, off-screen views, collapsed sheets, lyrics when not shown, mini-player when the player is open) must not run. Task BG1 (Opus): one central app/window visibility gate (ProcessLifecycleOwner + window/view visibility) feeding FrameDriver/PeriodicTick/DecorBeat and all other periodic consumers, plus audit + tests that count wakeups/frames/threads in background and in hidden-UI states.
