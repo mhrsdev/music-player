@@ -17,6 +17,7 @@
     <string name="diag_exit_crash">The app crashed</string>
     <string name="diag_exit_froze">The app stopped responding</string>
     <string name="diag_exit_low_memory">The system closed the app because memory was low</string>
+    <string name="diag_exit_memory_limit">The system closed the app for using too much memory</string>
     <string name="diag_exit_system">The system closed the app</string>
     <string name="diag_exit_user">You closed the app</string>
     <string name="diag_exit_update">The app was updated</string>

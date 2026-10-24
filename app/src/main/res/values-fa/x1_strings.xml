@@ -16,6 +16,7 @@
     <string name="diag_exit_crash">برنامه کرش کرد</string>
     <string name="diag_exit_froze">برنامه از کار افتاد و پاسخ نداد</string>
     <string name="diag_exit_low_memory">سیستم به‌خاطر کمبود حافظه برنامه را بست</string>
+    <string name="diag_exit_memory_limit">سیستم برنامه را به‌خاطر مصرف بیش از حد حافظه بست</string>
     <string name="diag_exit_system">سیستم برنامه را بست</string>
     <string name="diag_exit_user">خودتان برنامه را بستید</string>
     <string name="diag_exit_update">برنامه به‌روزرسانی شد</string>

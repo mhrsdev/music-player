@@ -49,4 +49,16 @@ public class WidgetLogicTest {
             assertEquals(kind.layout, playing.getLayoutId());
         }
     }
+
+    /** X1: a launcher-reported tiny / zero cell or a huge one must not reach createBitmap with bad sizes. */
+    @Test public void coverBuildsForOddCellSizes() {
+        Application app = RuntimeEnvironment.getApplication();
+        NowPlaying np = new NowPlaying("t", "a", null, true, 10, 1000);
+        android.graphics.Bitmap art = android.graphics.Bitmap.createBitmap(3000, 3000, android.graphics.Bitmap.Config.RGB_565);
+        for (WidgetKind kind : WidgetKind.values()) {
+            for (int[] size : new int[][] {{1, 1}, {8, 8}, {16, 16}, {2000, 2000}}) {
+                assertEquals(kind.layout, WidgetRenderer.build(app, kind, np, art, true, size[0], size[1]).getLayoutId());
+            }
+        }
+    }
 }

@@ -27,7 +27,13 @@ public class ExitReasons {
     static final int IMPORTANCE_PERCEPTIBLE = 230;
 
     /** What the person is told (one string per kind). */
-    public enum Kind { CRASH, FROZE, LOW_MEMORY, SYSTEM, USER, UPDATE, NORMAL, UNKNOWN }
+    public enum Kind { CRASH, FROZE, LOW_MEMORY, MEMORY_LIMIT, SYSTEM, USER, UPDATE, NORMAL, UNKNOWN }
+
+    /**
+     * Android 17 per-app memory limiter: the app was killed for using too much memory itself (not because the phone
+     * ran low). Reported as {@link #OTHER} with this marker in the description.
+     */
+    static final String MEMORY_LIMITER = "MemoryLimiter";
 
     private static final String[] NAMES = {"UNKNOWN", "EXIT_SELF", "SIGNALED", "LOW_MEMORY", "CRASH", "CRASH_NATIVE",
             "ANR", "INITIALIZATION_FAILURE", "PERMISSION_CHANGE", "EXCESSIVE_RESOURCE_USAGE", "USER_REQUESTED",
@@ -37,6 +43,12 @@ public class ExitReasons {
 
     public static String name(int reason) {
         return reason >= 0 && reason < NAMES.length ? NAMES[reason] : "REASON_" + reason;
+    }
+
+    /** As {@link #kind(int)}, recognising the Android 17 memory limiter from the description. */
+    public static Kind kind(int reason, String description) {
+        if (reason == OTHER && description != null && description.contains(MEMORY_LIMITER)) return Kind.MEMORY_LIMIT;
+        return kind(reason);
     }
 
     public static Kind kind(int reason) {
@@ -57,7 +69,13 @@ public class ExitReasons {
      * (a cached app killed for memory in the background is normal Android behaviour, not a bug).
      */
     public static boolean unexpected(int reason, int importance) {
-        Kind k = kind(reason);
+        return unexpected(reason, importance, "");
+    }
+
+    /** As {@link #unexpected(int, int)}; a memory-limiter kill always counts (it is our own memory use). */
+    public static boolean unexpected(int reason, int importance, String description) {
+        Kind k = kind(reason, description);
+        if (k == Kind.MEMORY_LIMIT) return true;
         if (k == Kind.CRASH || k == Kind.FROZE) return true;
         boolean kill = k == Kind.LOW_MEMORY || reason == SIGNALED || reason == EXCESSIVE_RESOURCE_USAGE;
         return kill && importance > 0 && importance <= IMPORTANCE_PERCEPTIBLE;

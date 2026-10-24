@@ -19,11 +19,11 @@ public record ExitRecord(long timestamp, int reason, int status, int importance,
         String description, String summary) {
 
     public ExitReasons.Kind kind() {
-        return ExitReasons.kind(reason);
+        return ExitReasons.kind(reason, description);
     }
 
     public boolean unexpected() {
-        return ExitReasons.unexpected(reason, importance);
+        return ExitReasons.unexpected(reason, importance, description);
     }
 
     /** One line, no tabs or newlines inside fields. */

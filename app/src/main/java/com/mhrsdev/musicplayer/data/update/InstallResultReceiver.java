@@ -20,7 +20,15 @@ public class InstallResultReceiver extends BroadcastReceiver {
         int status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
         if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
             Intent confirm = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_INTENT, Intent.class);
-            if (confirm != null) context.startActivity(confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            if (confirm == null) return;
+            try {
+                // Allowed while the app is visible (the person just tapped Install); a background start is refused by
+                // background-activity-launch rules (stricter on Android 17) and must not crash the receiver.
+                context.startActivity(confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            } catch (RuntimeException e) {
+                IntConsumer l = listener;
+                if (l != null) l.accept(PackageInstaller.STATUS_FAILURE);
+            }
             return;
         }
         IntConsumer l = listener;

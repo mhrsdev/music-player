@@ -53,6 +53,7 @@ public class PlaybackService extends MediaLibraryService {
     private HeadsetControls headset;
     private MediaLibrarySession.Callback callback;
     private AudioManager audioManager;
+    @Nullable private ArtworkLoader bitmapLoader;
 
     /** Event-driven and only registered while this service lives: a headset showing up can resume paused playback. */
     private final AudioDeviceCallback deviceCallback = new AudioDeviceCallback() {
@@ -69,6 +70,11 @@ public class PlaybackService extends MediaLibraryService {
 
         @Override public void onPlayerError(androidx.media3.common.PlaybackException error) {
             Breadcrumbs.add("player error " + error.getErrorCodeName());
+        }
+
+        /** E.g. audio focus held by a call, or output routed nowhere: playback waits silently (Android 17 hardening). */
+        @Override public void onPlaybackSuppressionReasonChanged(int reason) {
+            if (reason != Player.PLAYBACK_SUPPRESSION_REASON_NONE) Breadcrumbs.add("playback suppressed reason " + reason);
         }
 
         @Override public void onEvents(Player p, Player.Events events) {
@@ -92,7 +98,7 @@ public class PlaybackService extends MediaLibraryService {
         browseExecutor = MoreExecutors.listeningDecorator(pool);
         callback = new BrowseCallback(new BrowseTree(getResources(), BrowseHolder.get()), store);
         MediaLibrarySession.Builder builder = new MediaLibrarySession.Builder(this, player, callback)
-                .setBitmapLoader(new ArtworkLoader(this));
+                .setBitmapLoader(bitmapLoader = new ArtworkLoader(this));
         Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (launch != null) {
             builder.setSessionActivity(PendingIntent.getActivity(this, 0, launch,
@@ -110,6 +116,12 @@ public class PlaybackService extends MediaLibraryService {
         provider.setSmallIcon(R.drawable.ic_stat_playback);
         setMediaNotificationProvider(provider);
         player.addListener(idleWatcher);
+        // Android 12+: Media3 already catches the refusal (no crash); keep a trace of it for Diagnostics.
+        setListener(new Listener() {
+            @Override public void onForegroundServiceStartNotAllowedException() {
+                Breadcrumbs.add("FGS start refused (background)");
+            }
+        });
         if (!isActive()) handler.postDelayed(idleStopTask, idleDelayMs());
     }
 
@@ -145,8 +157,15 @@ public class PlaybackService extends MediaLibraryService {
         super.onTaskRemoved(rootIntent);
     }
 
+    /** UI gone or memory tight: drop the cached notification covers (the posted notification keeps its own). */
+    @Override public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= TRIM_MEMORY_UI_HIDDEN && bitmapLoader != null) bitmapLoader.trim();
+    }
+
     @Override public void onDestroy() {
         Breadcrumbs.add("service onDestroy");
+        clearListener();
         handler.removeCallbacks(idleStopTask);
         player.removeListener(idleWatcher);
         player.removeListener(headset);

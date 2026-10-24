@@ -59,6 +59,11 @@ class ArtworkLoader implements BitmapLoader {
         executor = MoreExecutors.listeningDecorator(pool);
     }
 
+    /** Memory is tight / the UI is gone: forget cached covers (they are re-decoded on the next track change). */
+    void trim() {
+        cache.evictAll();
+    }
+
     /** Largest power-of-two sample size that keeps both sides at or above {@code maxPx} (1 for small images). */
     static int sampleSize(int width, int height, int maxPx) {
         int sample = 1;

@@ -18,6 +18,7 @@ class ExitText {
             case CRASH -> R.string.diag_exit_crash;
             case FROZE -> R.string.diag_exit_froze;
             case LOW_MEMORY -> R.string.diag_exit_low_memory;
+            case MEMORY_LIMIT -> R.string.diag_exit_memory_limit;
             case SYSTEM -> R.string.diag_exit_system;
             case USER -> R.string.diag_exit_user;
             case UPDATE -> R.string.diag_exit_update;
@@ -29,7 +30,7 @@ class ExitText {
     /** Error tone for crashes and freezes, tertiary for system kills, primary for ordinary closes. */
     @AttrRes static int accent(ExitReasons.Kind kind) {
         return switch (kind) {
-            case CRASH, FROZE -> R.attr.mpError;
+            case CRASH, FROZE, MEMORY_LIMIT -> R.attr.mpError;
             case LOW_MEMORY, SYSTEM, UNKNOWN -> R.attr.mpTertiary;
             default -> R.attr.mpPrimary;
         };

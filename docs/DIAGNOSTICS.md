@@ -39,6 +39,12 @@ adb logcat -d -s AndroidRuntime:E DEBUG:F ActivityManager:I lowmemorykiller:I
 adb bugreport bugreport.zip                              # everything (tombstones, ANR traces, freecess/thermal)
 adb shell dumpsys meminfo com.mhrsdev.musicplayer        # heap / graphics / native while on Home
 ```
+Android 17 per-app memory limiter (the owner's phone): a kill shows as reason `OTHER` with description
+`MemoryLimiter:AnonSwap`; the app files it as "The system closed the app for using too much memory". To test it:
+```
+adb shell am memory-limiter status
+adb shell am memory-limiter manual <pid> <limit>      # force a limit on the running app, then use it normally
+```
 Samsung-specific: a "freecess"/battery-manager kill shows up as `SIGNALED` or `OTHER` with a description; a
 low-memory kill as `LOW_MEMORY` with importance 100 (foreground) or 125 (playing in the background).
 

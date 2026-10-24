@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.mhrsdev.musicplayer.MusicPlayerApp;
+import com.mhrsdev.musicplayer.diag.Breadcrumbs;
 import com.mhrsdev.musicplayer.domain.model.NowPlaying;
 import com.mhrsdev.musicplayer.playback.NowPlayingBridge;
 import com.mhrsdev.musicplayer.ui.widget.cover.CoverSpec;
@@ -70,8 +71,19 @@ public class WidgetUpdater {
                 Bundle options = manager.getAppWidgetOptions(id);
                 int w = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0);
                 int h = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0);
-                manager.updateAppWidget(id, WidgetRenderer.build(app, kind, np, art, dark,
-                        w > 0 ? w : kind.defaultWidthDp, h > 0 ? h : kind.defaultHeightDp));
+                int wDp = w > 0 ? w : kind.defaultWidthDp, hDp = h > 0 ? h : kind.defaultHeightDp;
+                try {
+                    manager.updateAppWidget(id, WidgetRenderer.build(app, kind, np, art, dark, wDp, hDp));
+                } catch (RuntimeException e) {
+                    // Android 17 (target 37) throws when a RemoteViews' bitmaps exceed its memory budget; a launcher can
+                    // also reject an update. A widget must never take the app (and playback) down: retry without the cover.
+                    Breadcrumbs.add("widget update failed " + e);
+                    try {
+                        manager.updateAppWidget(id, WidgetRenderer.build(app, kind, np, null, dark, wDp, hDp));
+                    } catch (RuntimeException ignored) {
+                        // the widget keeps its previous look
+                    }
+                }
             }
         }
     }
